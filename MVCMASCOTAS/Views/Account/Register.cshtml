@@ -1,0 +1,101 @@
+﻿html
+@model MVCMASCOTAS.Models.ViewModels.RegisterViewModel
+@{
+    ViewBag.Title = "Registrarse";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="card shadow">
+            <div class="card-body">
+                <h3 class="card-title text-center mb-4">Crear Cuenta</h3>
+
+                @using (Html.BeginForm("Register", "Account", FormMethod.Post, new { enctype = "multipart/form-data", @class = "needs-validation" }))
+                {
+                    @Html.AntiForgeryToken()
+                    @Html.ValidationSummary(true, "", new { @class = "alert alert-danger" })
+
+                    <div class="row">
+                        <div class="col-md-12 mb-3">
+                            @Html.LabelFor(m => m.NombreCompleto, new { @class = "form-label" })
+                            @Html.TextBoxFor(m => m.NombreCompleto, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.NombreCompleto, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            @Html.LabelFor(m => m.Email, new { @class = "form-label" })
+                            @Html.TextBoxFor(m => m.Email, new { @class = "form-control", type = "email" })
+                            @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger" })
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            @Html.LabelFor(m => m.Telefono, new { @class = "form-label" })
+                            @Html.TextBoxFor(m => m.Telefono, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.Telefono, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            @Html.LabelFor(m => m.Cedula, new { @class = "form-label" })
+                            @Html.TextBoxFor(m => m.Cedula, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.Cedula, "", new { @class = "text-danger" })
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            @Html.LabelFor(m => m.Ciudad, new { @class = "form-label" })
+                            @Html.TextBoxFor(m => m.Ciudad, new { @class = "form-control", value = "Quito" })
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        @Html.LabelFor(m => m.Direccion, new { @class = "form-label" })
+                        @Html.TextBoxFor(m => m.Direccion, new { @class = "form-control" })
+                        @Html.ValidationMessageFor(m => m.Direccion, "", new { @class = "text-danger" })
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            @Html.LabelFor(m => m.Password, new { @class = "form-label" })
+                            @Html.PasswordFor(m => m.Password, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger" })
+                            <small class="form-text text-muted">Mínimo 8 caracteres, incluir letras y números</small>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            @Html.LabelFor(m => m.ConfirmPassword, new { @class = "form-label" })
+                            @Html.PasswordFor(m => m.ConfirmPassword, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.ConfirmPassword, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        @Html.LabelFor(m => m.ImagenPerfil, new { @class = "form-label" })
+                        <input type="file" name="ImagenPerfil" class="form-control" accept="image/*" />
+                        <small class="form-text text-muted">Opcional. Máximo 5 MB.</small>
+                    </div>
+
+                    <div class="mb-3 form-check">
+                        @Html.CheckBoxFor(m => m.AceptaTerminos, new { @class = "form-check-input" })
+                        @Html.LabelFor(m => m.AceptaTerminos, new { @class = "form-check-label" })
+                        @Html.ValidationMessageFor(m => m.AceptaTerminos, "", new { @class = "text-danger" })
+                    </div>
+
+                    <button type="submit" class="btn btn-success w-100">Crear Cuenta</button>
+                }
+
+                <hr />
+
+                <div class="text-center">
+                    <p class="mb-0">¿Ya tienes cuenta? <a href="@Url.Action("Login", "Account")">Inicia sesión</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

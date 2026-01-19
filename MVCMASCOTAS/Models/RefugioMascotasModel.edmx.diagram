@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="f76bcb522ba0412c976956ee7b66202e" Name="Diagram1">
+        <EntityTypeShape EntityType="RefugioMascotasDBModel.Actividades" Width="1.5" PointX="3" PointY="24.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="RefugioMascotasDBModel.Apadrinamientos" Width="1.5" PointX="5.25" PointY="51.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="RefugioMascotasDBModel.ApoyosEmpresariales" Width="1.5" PointX="0.75" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="RefugioMascotasDBModel.AuditoriaAcciones" Width="1.5" PointX="3" PointY="34.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="RefugioMascotasDBModel.CategoriasProducto" Width="1.5" PointX="0.75" PointY="82.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="RefugioMascotasDBModel.ConfiguracionSistema" Width="1.5" PointX="3" PointY="37.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="RefugioMascotasDBModel.ContratoAdopcion" Width="1.5" PointX="10.5" PointY="51.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="RefugioMascotasDBModel.Donaciones" Width="1.5" PointX="3" PointY="40.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="RefugioMascotasDBModel.EvaluacionAdopcion" Width="1.5" PointX="3" PointY="46" IsExpanded="true" />
+        <EntityTypeShape EntityType="RefugioMascotasDBModel.FormularioAdopcionDetalle" Width="1.5" PointX="10.5" PointY="57.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="RefugioMascotasDBModel.HistorialMedico" Width="1.5" PointX="8.25" PointY="51.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="RefugioMascotasDBModel.HorasVoluntariado" Width="1.5" PointX="5.25" PointY="36" IsExpanded="true" />
+        <EntityTypeShape EntityType="RefugioMascotasDBModel.ImagenesAdicionales" Width="1.5" PointX="3" PointY="54.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="RefugioMascotasDBModel.InscripcionesActividades" Width="1.5" PointX="8.25" PointY="35.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="RefugioMascotasDBModel.Mascotas" Width="1.5" PointX="3" PointY="58" IsExpanded="true" />
+        <EntityTypeShape EntityType="RefugioMascotasDBModel.MascotasPerdidas" Width="1.5" PointX="3" PointY="65.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="RefugioMascotasDBModel.MascotaVacunas" Width="1.5" PointX="5.25" PointY="56.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="RefugioMascotasDBModel.MovimientosContables" Width="1.5" PointX="3" PointY="71.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="RefugioMascotasDBModel.PagosApadrinamiento" Width="1.5" PointX="7.5" PointY="61.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="RefugioMascotasDBModel.PedidoDetalle" Width="1.5" PointX="5.25" PointY="77" IsExpanded="true" />
+        <EntityTypeShape EntityType="RefugioMascotasDBModel.Pedidos" Width="1.5" PointX="3" PointY="76" IsExpanded="true" />
+        <EntityTypeShape EntityType="RefugioMascotasDBModel.Productos" Width="1.5" PointX="3" PointY="81.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="RefugioMascotasDBModel.ReportesRescate" Width="1.5" PointX="5.25" PointY="44.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="RefugioMascotasDBModel.Roles" Width="1.5" PointX="3.75" PointY="30.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="RefugioMascotasDBModel.SeguimientoAdopcion" Width="1.5" PointX="12.75" PointY="47.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="RefugioMascotasDBModel.SolicitudAdopcion" Width="1.5" PointX="8.25" PointY="56" IsExpanded="true" />
+        <EntityTypeShape EntityType="RefugioMascotasDBModel.Tratamientos" Width="1.5" PointX="8.25" PointY="46.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="RefugioMascotasDBModel.Usuarios" Width="1.5" PointX="0.75" PointY="41.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="RefugioMascotasDBModel.UsuariosRoles" Width="1.5" PointX="6" PointY="40.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="RefugioMascotasDBModel.Vacunas" Width="1.5" PointX="3" PointY="51" IsExpanded="true" />
+        <EntityTypeShape EntityType="RefugioMascotasDBModel.vw_MascotasDisponibles" Width="1.5" PointX="2.75" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="RefugioMascotasDBModel.vw_ResumenAdopciones" Width="1.5" PointX="4.75" PointY="0.75" IsExpanded="true" />
+        <AssociationConnector Association="RefugioMascotasDBModel.FK__Actividad__Respo__41EDCAC5" ManuallyRouted="false" />
+        <AssociationConnector Association="RefugioMascotasDBModel.FK__HorasVolu__Activ__4D5F7D71" ManuallyRouted="false" />
+        <AssociationConnector Association="RefugioMascotasDBModel.FK__Inscripci__Activ__489AC854" ManuallyRouted="false" />
+        <AssociationConnector Association="RefugioMascotasDBModel.FK__Apadrinam__Masco__04E4BC85" ManuallyRouted="false" />
+        <AssociationConnector Association="RefugioMascotasDBModel.FK__Apadrinam__Usuar__05D8E0BE" ManuallyRouted="false" />
+        <AssociationConnector Association="RefugioMascotasDBModel.FK__PagosApad__Apadr__0B91BA14" ManuallyRouted="false" />
+        <AssociationConnector Association="RefugioMascotasDBModel.FK__Auditoria__Usuar__56E8E7AB" ManuallyRouted="false" />
+        <AssociationConnector Association="RefugioMascotasDBModel.FK__Productos__Categ__17F790F9" ManuallyRouted="false" />
+        <AssociationConnector Association="RefugioMascotasDBModel.FK__Configura__Modif__5BAD9CC8" ManuallyRouted="false" />
+        <AssociationConnector Association="RefugioMascotasDBModel.FK__ContratoA__Solic__70DDC3D8" ManuallyRouted="false" />
+        <AssociationConnector Association="RefugioMascotasDBModel.FK__Seguimien__Contr__75A278F5" ManuallyRouted="false" />
+        <AssociationConnector Association="RefugioMascotasDBModel.FK__Donacione__Usuar__7E37BEF6" ManuallyRouted="false" />
+        <AssociationConnector Association="RefugioMascotasDBModel.FK__Evaluacio__Evalu__693CA210" ManuallyRouted="false" />
+        <AssociationConnector Association="RefugioMascotasDBModel.FK__Evaluacio__Solic__68487DD7" ManuallyRouted="false" />
+        <AssociationConnector Association="RefugioMascotasDBModel.FK__Formulari__Solic__6383C8BA" ManuallyRouted="false" />
+        <AssociationConnector Association="RefugioMascotasDBModel.FK__Historial__Masco__45F365D3" ManuallyRouted="false" />
+        <AssociationConnector Association="RefugioMascotasDBModel.FK__Historial__Veter__46E78A0C" ManuallyRouted="false" />
+        <AssociationConnector Association="RefugioMascotasDBModel.FK__HorasVolu__Usuar__4C6B5938" ManuallyRouted="false" />
+        <AssociationConnector Association="RefugioMascotasDBModel.FK__HorasVolu__Valid__4E53A1AA" ManuallyRouted="false" />
+        <AssociationConnector Association="RefugioMascotasDBModel.FK__ImagenesA__Subid__531856C7" ManuallyRouted="false" />
+        <AssociationConnector Association="RefugioMascotasDBModel.FK__Inscripci__Usuar__498EEC8D" ManuallyRouted="false" />
+        <AssociationConnector Association="RefugioMascotasDBModel.FK__Mascotas__Rescat__412EB0B6" ManuallyRouted="false" />
+        <AssociationConnector Association="RefugioMascotasDBModel.FK__Mascotas__Veteri__4222D4EF" ManuallyRouted="false" />
+        <AssociationConnector Association="RefugioMascotasDBModel.FK__MascotaVa__Masco__4D94879B" ManuallyRouted="false" />
+        <AssociationConnector Association="RefugioMascotasDBModel.FK__ReportesR__Masco__367C1819" ManuallyRouted="false" />
+        <AssociationConnector Association="RefugioMascotasDBModel.FK__Solicitud__Masco__5AEE82B9" ManuallyRouted="false" />
+        <AssociationConnector Association="RefugioMascotasDBModel.FK__Tratamien__Masco__5441852A" ManuallyRouted="false" />
+        <AssociationConnector Association="RefugioMascotasDBModel.FK__MascotasP__Usuar__3D2915A8" ManuallyRouted="false" />
+        <AssociationConnector Association="RefugioMascotasDBModel.FK__MascotaVa__Vacun__4E88ABD4" ManuallyRouted="false" />
+        <AssociationConnector Association="RefugioMascotasDBModel.FK__MascotaVa__Veter__4F7CD00D" ManuallyRouted="false" />
+        <AssociationConnector Association="RefugioMascotasDBModel.FK__Movimient__Respo__2A164134" ManuallyRouted="false" />
+        <AssociationConnector Association="RefugioMascotasDBModel.FK__PedidoDet__Pedid__245D67DE" ManuallyRouted="false" />
+        <AssociationConnector Association="RefugioMascotasDBModel.FK__PedidoDet__Produ__25518C17" ManuallyRouted="false" />
+        <AssociationConnector Association="RefugioMascotasDBModel.FK__Pedidos__Usuario__2180FB33" ManuallyRouted="false" />
+        <AssociationConnector Association="RefugioMascotasDBModel.FK__ReportesR__Resca__3587F3E0" ManuallyRouted="false" />
+        <AssociationConnector Association="RefugioMascotasDBModel.FK__ReportesR__Usuar__3493CFA7" ManuallyRouted="false" />
+        <AssociationConnector Association="RefugioMascotasDBModel.FK__UsuariosR__RolId__35BCFE0A" ManuallyRouted="false" />
+        <AssociationConnector Association="RefugioMascotasDBModel.FK__Seguimien__Respo__76969D2E" ManuallyRouted="false" />
+        <AssociationConnector Association="RefugioMascotasDBModel.FK__Solicitud__Evalu__5CD6CB2B" ManuallyRouted="false" />
+        <AssociationConnector Association="RefugioMascotasDBModel.FK__Solicitud__Usuar__5BE2A6F2" ManuallyRouted="false" />
+        <AssociationConnector Association="RefugioMascotasDBModel.FK__Tratamien__Veter__5535A963" ManuallyRouted="false" />
+        <AssociationConnector Association="RefugioMascotasDBModel.FK__UsuariosR__Asign__36B12243" ManuallyRouted="false" />
+        <AssociationConnector Association="RefugioMascotasDBModel.FK__UsuariosR__Usuar__34C8D9D1" ManuallyRouted="false" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

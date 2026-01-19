@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\packages\EntityFramework.6.4.4\build\EntityFramework.props" Condition="Exists('..\packages\EntityFramework.6.4.4\build\EntityFramework.props')" />
   <Import Project="..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.1\build\net46\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props" Condition="Exists('..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.1\build\net46\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -45,10 +46,18 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.4.4\lib\net45\EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.4.4\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Security" />
     <Reference Include="System.Web.DynamicData" />
     <Reference Include="System.Web.Entity" />
     <Reference Include="System.Web.ApplicationServices" />
@@ -120,11 +129,158 @@
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
+    <Compile Include="Controllers\AccountController.cs" />
+    <Compile Include="Controllers\AdminController.cs" />
+    <Compile Include="Controllers\AdopcionController.cs" />
+    <Compile Include="Controllers\ContabilidadController.cs" />
+    <Compile Include="Controllers\DonacionesController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\MascotasController.cs" />
+    <Compile Include="Controllers\RescateController.cs" />
+    <Compile Include="Controllers\TiendaController.cs" />
+    <Compile Include="Controllers\VeterinarioController.cs" />
+    <Compile Include="Controllers\VoluntariadoController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Helpers\AuditoriaHelper.cs" />
+    <Compile Include="Helpers\AuthorizeRolesAttribute.cs" />
+    <Compile Include="Helpers\EmailHelper.cs" />
+    <Compile Include="Helpers\ImageHelper.cs" />
+    <Compile Include="Helpers\PasswordHelper.cs" />
+    <Compile Include="Helpers\PdfHelper.cs" />
+    <Compile Include="Models\Actividades.cs">
+      <DependentUpon>RefugioMascotasModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Apadrinamientos.cs">
+      <DependentUpon>RefugioMascotasModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ApoyosEmpresariales.cs">
+      <DependentUpon>RefugioMascotasModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\AuditoriaAcciones.cs">
+      <DependentUpon>RefugioMascotasModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\CategoriasProducto.cs">
+      <DependentUpon>RefugioMascotasModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ConfiguracionSistema.cs">
+      <DependentUpon>RefugioMascotasModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ContratoAdopcion.cs">
+      <DependentUpon>RefugioMascotasModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\CustomModels\FiltroMascotasModel.cs" />
+    <Compile Include="Models\CustomModels\PaginacionModel.cs" />
+    <Compile Include="Models\CustomModels\ResultadoEvaluacionModel.cs" />
+    <Compile Include="Models\Donaciones.cs">
+      <DependentUpon>RefugioMascotasModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\EvaluacionAdopcion.cs">
+      <DependentUpon>RefugioMascotasModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\FormularioAdopcionDetalle.cs">
+      <DependentUpon>RefugioMascotasModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\HistorialMedico.cs">
+      <DependentUpon>RefugioMascotasModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\HorasVoluntariado.cs">
+      <DependentUpon>RefugioMascotasModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ImagenesAdicionales.cs">
+      <DependentUpon>RefugioMascotasModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\InscripcionesActividades.cs">
+      <DependentUpon>RefugioMascotasModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Mascotas.cs">
+      <DependentUpon>RefugioMascotasModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\MascotasPerdidas.cs">
+      <DependentUpon>RefugioMascotasModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\MascotaVacunas.cs">
+      <DependentUpon>RefugioMascotasModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\MovimientosContables.cs">
+      <DependentUpon>RefugioMascotasModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\PagosApadrinamiento.cs">
+      <DependentUpon>RefugioMascotasModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\PedidoDetalle.cs">
+      <DependentUpon>RefugioMascotasModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Pedidos.cs">
+      <DependentUpon>RefugioMascotasModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Productos.cs">
+      <DependentUpon>RefugioMascotasModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\RefugioMascotasModel.Context.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RefugioMascotasModel.Context.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\RefugioMascotasModel.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RefugioMascotasModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\RefugioMascotasModel.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RefugioMascotasModel.edmx</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ReportesRescate.cs">
+      <DependentUpon>RefugioMascotasModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Roles.cs">
+      <DependentUpon>RefugioMascotasModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\SeguimientoAdopcion.cs">
+      <DependentUpon>RefugioMascotasModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\SolicitudAdopcion.cs">
+      <DependentUpon>RefugioMascotasModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Tratamientos.cs">
+      <DependentUpon>RefugioMascotasModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Usuarios.cs">
+      <DependentUpon>RefugioMascotasModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\UsuariosRoles.cs">
+      <DependentUpon>RefugioMascotasModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Vacunas.cs">
+      <DependentUpon>RefugioMascotasModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ViewModels\CarritoViewModel.cs" />
+    <Compile Include="Models\ViewModels\DashboardViewModel.cs" />
+    <Compile Include="Models\ViewModels\DonacionViewModel.cs" />
+    <Compile Include="Models\ViewModels\FormularioAdopcionViewModel.cs" />
+    <Compile Include="Models\ViewModels\LoginViewModel.cs" />
+    <Compile Include="Models\ViewModels\MascotaDetalleViewModel.cs" />
+    <Compile Include="Models\ViewModels\MascotaViewModel.cs" />
+    <Compile Include="Models\ViewModels\ProductoViewModel.cs" />
+    <Compile Include="Models\ViewModels\RegisterViewModel.cs" />
+    <Compile Include="Models\ViewModels\SolicitudAdopcionViewModel.cs" />
+    <Compile Include="Models\vw_MascotasDisponibles.cs">
+      <DependentUpon>RefugioMascotasModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\vw_ResumenAdopciones.cs">
+      <DependentUpon>RefugioMascotasModel.tt</DependentUpon>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Services\AdopcionService.cs" />
+    <Compile Include="Services\ContabilidadService.cs" />
+    <Compile Include="Services\DonacionService.cs" />
+    <Compile Include="Services\EvaluacionService.cs" />
+    <Compile Include="Services\MascotaService.cs" />
+    <Compile Include="Services\TiendaService.cs" />
+    <Compile Include="Services\VeterinarioService.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap-grid.css" />
@@ -143,20 +299,74 @@
     <Content Include="Content\bootstrap.min.css" />
     <Content Include="Content\bootstrap.rtl.css" />
     <Content Include="Content\bootstrap.rtl.min.css" />
+    <Content Include="Content\css\adopcion.css" />
+    <Content Include="Content\css\bootstrap.min.css" />
+    <Content Include="Content\css\mascotas.css" />
+    <Content Include="Content\css\site.css" />
+    <Content Include="Content\css\tienda.css" />
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
+    <Content Include="Models\RefugioMascotasModel.Context.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>RefugioMascotasModel.edmx</DependentUpon>
+      <LastGenOutput>RefugioMascotasModel.Context.cs</LastGenOutput>
+    </Content>
+    <Content Include="Models\RefugioMascotasModel.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>RefugioMascotasModel.edmx</DependentUpon>
+      <LastGenOutput>RefugioMascotasModel.cs</LastGenOutput>
+    </Content>
+    <EntityDeploy Include="Models\RefugioMascotasModel.edmx">
+      <Generator>EntityModelCodeGenerator</Generator>
+      <LastGenOutput>RefugioMascotasModel.Designer.cs</LastGenOutput>
+    </EntityDeploy>
+    <Content Include="Models\RefugioMascotasModel.edmx.diagram">
+      <DependentUpon>RefugioMascotasModel.edmx</DependentUpon>
+    </Content>
     <Content Include="Scripts\bootstrap.bundle.js" />
     <Content Include="Scripts\bootstrap.bundle.min.js" />
     <Content Include="Scripts\bootstrap.esm.js" />
     <Content Include="Scripts\bootstrap.esm.min.js" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
-    <None Include="Scripts\jquery-3.7.0.intellisense.js" />
-    <Content Include="Scripts\jquery-3.7.0.js" />
-    <Content Include="Scripts\jquery-3.7.0.min.js" />
-    <Content Include="Scripts\jquery-3.7.0.slim.js" />
-    <Content Include="Scripts\jquery-3.7.0.slim.min.js" />
+    <Content Include="Scripts\bootstrap.min.js.map" />
+    <Content Include="Scripts\bootstrap.js.map" />
+    <Content Include="Scripts\bootstrap.esm.min.js.map" />
+    <Content Include="Scripts\bootstrap.esm.js.map" />
+    <Content Include="Scripts\bootstrap.bundle.min.js.map" />
+    <Content Include="Scripts\bootstrap.bundle.js.map" />
+    <Content Include="Content\bootstrap.rtl.min.css.map" />
+    <Content Include="Content\bootstrap.rtl.css.map" />
+    <Content Include="Content\bootstrap.min.css.map" />
+    <Content Include="Content\bootstrap.css.map" />
+    <Content Include="Content\bootstrap-utilities.rtl.min.css.map" />
+    <Content Include="Content\bootstrap-utilities.rtl.css.map" />
+    <Content Include="Content\bootstrap-utilities.min.css.map" />
+    <Content Include="Content\bootstrap-utilities.css.map" />
+    <Content Include="Content\bootstrap-reboot.rtl.min.css.map" />
+    <Content Include="Content\bootstrap-reboot.rtl.css.map" />
+    <Content Include="Content\bootstrap-reboot.min.css.map" />
+    <Content Include="Content\bootstrap-reboot.css.map" />
+    <Content Include="Content\bootstrap-grid.rtl.min.css.map" />
+    <Content Include="Content\bootstrap-grid.rtl.css.map" />
+    <Content Include="Content\bootstrap-grid.min.css.map" />
+    <Content Include="Content\bootstrap-grid.css.map" />
+    <Content Include="Models\Partials\Usuario.Partial" />
+    <Content Include="Models\Partials\Mascota.Partial" />
+    <Content Include="Models\Partials\SolicitudAdopcion.Partial" />
+    <None Include="Scripts\jquery-3.6.0.intellisense.js" />
+    <Content Include="Scripts\custom\animaciones-canvas.js" />
+    <Content Include="Scripts\custom\carrito-compras.js" />
+    <Content Include="Scripts\custom\carrusel-mascotas.js" />
+    <Content Include="Scripts\custom\site.js" />
+    <Content Include="Scripts\custom\validacion-formulario.js" />
+    <Content Include="Scripts\jquery-3.6.0.js" />
+    <Content Include="Scripts\jquery-3.6.0.min.js" />
+    <Content Include="Scripts\jquery-3.6.0.slim.js" />
+    <Content Include="Scripts\jquery-3.6.0.slim.min.js" />
+    <Content Include="Scripts\jquery-3.6.0.slim.min.map" />
+    <Content Include="Scripts\jquery-3.6.0.min.map" />
     <None Include="Scripts\jquery.validate-vsdoc.js" />
     <Content Include="Scripts\jquery.validate.js" />
     <Content Include="Scripts\jquery.validate.min.js" />
@@ -177,37 +387,67 @@
     <Content Include="Views\Home\About.cshtml" />
     <Content Include="Views\Home\Contact.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
+    <Content Include="Views\Account\Login.cshtml" />
+    <Content Include="Views\Account\Register.cshtml" />
+    <Content Include="Views\Shared\_LoginPartial.cshtml" />
+    <Content Include="Views\Shared\_AlertasMensajes.cshtml" />
+    <Content Include="Views\Shared\_Paginacion.cshtml" />
+    <Content Include="Views\Account\ForgotPassword.cshtml" />
+    <Content Include="Views\Account\Profile.cshtml" />
+    <Content Include="Views\Mascotas\Index.cshtml" />
+    <Content Include="Views\Mascotas\Detalle.cshtml" />
+    <Content Include="Views\Mascotas\Crear.cshtml" />
+    <Content Include="Views\Mascotas\Editar.cshtml" />
+    <Content Include="Views\Mascotas\Gestionar.cshtml" />
+    <Content Include="Views\Adopcion\Solicitar.cshtml" />
+    <Content Include="Views\Adopcion\MisSolicitudes.cshtml" />
+    <Content Include="Views\Adopcion\Evaluar.cshtml" />
+    <Content Include="Views\Adopcion\Contrato.cshtml" />
+    <Content Include="Views\Adopcion\Seguimiento.cshtml" />
+    <Content Include="Views\Veterinario\Dashboard.cshtml" />
+    <Content Include="Views\Veterinario\HistorialMedico.cshtml" />
+    <Content Include="Views\Veterinario\RegistrarConsulta.cshtml" />
+    <Content Include="Views\Veterinario\Vacunas.cshtml" />
+    <Content Include="Views\Veterinario\Tratamientos.cshtml" />
+    <Content Include="Views\Donaciones\Donar.cshtml" />
+    <Content Include="Views\Donaciones\Apadrinar.cshtml" />
+    <Content Include="Views\Donaciones\MisDonaciones.cshtml" />
+    <Content Include="Views\Donaciones\MisApadrinamientos.cshtml" />
+    <Content Include="Views\Tienda\Index.cshtml" />
+    <Content Include="Views\Tienda\Detalle.cshtml" />
+    <Content Include="Views\Tienda\Carrito.cshtml" />
+    <Content Include="Views\Tienda\Checkout.cshtml" />
+    <Content Include="Views\Tienda\MisPedidos.cshtml" />
+    <Content Include="Views\Voluntariado\Actividades.cshtml" />
+    <Content Include="Views\Voluntariado\Inscribirse.cshtml" />
+    <Content Include="Views\Voluntariado\MisActividades.cshtml" />
+    <Content Include="Views\Rescate\ReportarRescate.cshtml" />
+    <Content Include="Views\Rescate\MascotasPerdidas.cshtml" />
+    <Content Include="Views\Rescate\MisReportes.cshtml" />
+    <Content Include="Views\Contabilidad\Dashboard.cshtml" />
+    <Content Include="Views\Contabilidad\Movimientos.cshtml" />
+    <Content Include="Views\Contabilidad\Reportes.cshtml" />
+    <Content Include="Views\Contabilidad\RegistrarMovimiento.cshtml" />
+    <Content Include="Views\Admin\Dashboard.cshtml" />
+    <Content Include="Views\Admin\Usuarios.cshtml" />
+    <Content Include="Views\Admin\Roles.cshtml" />
+    <Content Include="Views\Admin\Configuracion.cshtml" />
+    <Content Include="Views\Admin\Auditoria.cshtml" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="App_Data\" />
-    <Folder Include="Models\" />
+    <Folder Include="App_Data\Uploads\Documentos\" />
+    <Folder Include="App_Data\Uploads\Mascotas\" />
+    <Folder Include="App_Data\Uploads\Productos\" />
+    <Folder Include="App_Data\Uploads\Usuarios\" />
+    <Folder Include="Content\fonts\" />
+    <Folder Include="Content\images\icons\" />
+    <Folder Include="Models\Entities\" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Content\bootstrap.rtl.min.css.map" />
-    <Content Include="Content\bootstrap.rtl.css.map" />
-    <Content Include="Content\bootstrap.min.css.map" />
-    <Content Include="Content\bootstrap.css.map" />
-    <Content Include="Content\bootstrap-utilities.rtl.min.css.map" />
-    <Content Include="Content\bootstrap-utilities.rtl.css.map" />
-    <Content Include="Content\bootstrap-utilities.min.css.map" />
-    <Content Include="Content\bootstrap-utilities.css.map" />
-    <Content Include="Content\bootstrap-reboot.rtl.min.css.map" />
-    <Content Include="Content\bootstrap-reboot.rtl.css.map" />
-    <Content Include="Content\bootstrap-reboot.min.css.map" />
-    <Content Include="Content\bootstrap-reboot.css.map" />
-    <Content Include="Content\bootstrap-grid.rtl.min.css.map" />
-    <Content Include="Content\bootstrap-grid.rtl.css.map" />
-    <Content Include="Content\bootstrap-grid.min.css.map" />
-    <Content Include="Content\bootstrap-grid.css.map" />
     <None Include="packages.config" />
-    <Content Include="Scripts\bootstrap.min.js.map" />
-    <Content Include="Scripts\bootstrap.js.map" />
-    <Content Include="Scripts\bootstrap.esm.min.js.map" />
-    <Content Include="Scripts\bootstrap.esm.js.map" />
-    <Content Include="Scripts\bootstrap.bundle.min.js.map" />
-    <Content Include="Scripts\bootstrap.bundle.js.map" />
-    <Content Include="Scripts\jquery-3.7.0.slim.min.map" />
-    <Content Include="Scripts\jquery-3.7.0.min.map" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
@@ -242,7 +482,10 @@
       <ErrorText>Este proyecto hace referencia a los paquetes NuGet que faltan en este equipo. Use la restauración de paquetes NuGet para descargarlos. Para obtener más información, consulte http://go.microsoft.com/fwlink/?LinkID=322105. El archivo que falta es {0}.</ErrorText>
     </PropertyGroup>
     <Error Condition="!Exists('..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.1\build\net46\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.1\build\net46\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props'))" />
+    <Error Condition="!Exists('..\packages\EntityFramework.6.4.4\build\EntityFramework.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\EntityFramework.6.4.4\build\EntityFramework.props'))" />
+    <Error Condition="!Exists('..\packages\EntityFramework.6.4.4\build\EntityFramework.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\EntityFramework.6.4.4\build\EntityFramework.targets'))" />
   </Target>
+  <Import Project="..\packages\EntityFramework.6.4.4\build\EntityFramework.targets" Condition="Exists('..\packages\EntityFramework.6.4.4\build\EntityFramework.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

@@ -1,33 +1,109 @@
-﻿@{
-    ViewBag.Title = "Home Page";
+﻿html
+@{
+    ViewBag.Title = "Inicio";
 }
 
-<main>
-    <section class="row" aria-labelledby="aspnetTitle">
-        <h1 id="title">ASP.NET</h1>
-        <p class="lead">ASP.NET is a free web framework for building great Web sites and Web applications using HTML, CSS and JavaScript.</p>
-        <p><a href="https://asp.net" class="btn btn-primary btn-md">Learn more &raquo;</a></p>
-    </section>
+<div class="jumbotron text-center bg-light p-5 rounded">
+    <h1 class="display-4">🐾 Bienvenido al Refugio de Animales Quito</h1>
+    <p class="lead">Dale una segunda oportunidad a una mascota que te necesita</p>
+    <hr class="my-4">
+    <p>Conoce a nuestras mascotas disponibles para adopción</p>
+    <a class="btn btn-primary btn-lg" href="@Url.Action("Index", "Mascotas")" role="button">
+        Ver Mascotas Disponibles
+    </a>
+</div>
 
-    <div class="row">
-        <section class="col-md-4" aria-labelledby="gettingStartedTitle">
-            <h2 id="gettingStartedTitle">Getting started</h2>
-            <p>
-                ASP.NET MVC gives you a powerful, patterns-based way to build dynamic websites that
-                enables a clean separation of concerns and gives you full control over markup
-                for enjoyable, agile development.
-            </p>
-            <p><a class="btn btn-outline-dark" href="https://go.microsoft.com/fwlink/?LinkId=301865">Learn more &raquo;</a></p>
-        </section>
-        <section class="col-md-4" aria-labelledby="librariesTitle">
-            <h2 id="librariesTitle">Get more libraries</h2>
-            <p>NuGet is a free Visual Studio extension that makes it easy to add, remove, and update libraries and tools in Visual Studio projects.</p>
-            <p><a class="btn btn-outline-dark" href="https://go.microsoft.com/fwlink/?LinkId=301866">Learn more &raquo;</a></p>
-        </section>
-        <section class="col-md-4" aria-labelledby="hostingTitle">
-            <h2 id="hostingTitle">Web Hosting</h2>
-            <p>You can easily find a web hosting company that offers the right mix of features and price for your applications.</p>
-            <p><a class="btn btn-outline-dark" href="https://go.microsoft.com/fwlink/?LinkId=301867">Learn more &raquo;</a></p>
-        </section>
+<div class="row mt-5">
+    <div class="col-md-4 text-center mb-3">
+        <div class="card h-100">
+            <div class="card-body">
+                <h3>🏠 Adopta</h3>
+                <p>Encuentra a tu compañero perfecto y dale un hogar lleno de amor.</p>
+                <a href="@Url.Action("Index", "Mascotas")" class="btn btn-outline-primary">Conoce a nuestras mascotas</a>
+            </div>
+        </div>
     </div>
-</main>
+    <div class="col-md-4 text-center mb-3">
+        <div class="card h-100">
+            <div class="card-body">
+                <h3>💝 Dona</h3>
+                <p>Ayúdanos a seguir rescatando y cuidando a más animales.</p>
+                <a href="#" class="btn btn-outline-success">Hacer una donación</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 text-center mb-3">
+        <div class="card h-100">
+            <div class="card-body">
+                <h3>🤝 Voluntariado</h3>
+                <p>Únete a nuestro equipo y marca la diferencia.</p>
+                <a href="#" class="btn btn-outline-info">Ser voluntario</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-5">
+    <div class="col-12">
+        <h2 class="text-center mb-4">Estadísticas del Refugio</h2>
+    </div>
+    <div class="col-md-3 text-center mb-3">
+        <div class="card p-3">
+            <h4 class="text-primary display-4">@ViewBag.TotalMascotasDisponibles</h4>
+            <p>Disponibles para Adopción</p>
+        </div>
+    </div>
+    <div class="col-md-3 text-center mb-3">
+        <div class="card p-3">
+            <h4 class="text-success display-4">@ViewBag.TotalAdopciones</h4>
+            <p>Adopciones Exitosas</p>
+        </div>
+    </div>
+    <div class="col-md-3 text-center mb-3">
+        <div class="card p-3">
+            <h4 class="text-info display-4">@ViewBag.TotalVoluntarios</h4>
+            <p>Voluntarios Activos</p>
+        </div>
+    </div>
+    <div class="col-md-3 text-center mb-3">
+        <div class="card p-3">
+            <h4 class="text-warning display-4">100+</h4>
+            <p>Mascotas Rescatadas</p>
+        </div>
+    </div>
+</div>
+
+@if (ViewBag.MascotasDestacadas != null && ((System.Collections.IList)ViewBag.MascotasDestacadas).Count > 0)
+{
+    <div class="row mt-5">
+        <div class="col-12">
+            <h2 class="text-center mb-4">Mascotas Destacadas</h2>
+        </div>
+        @foreach (var mascota in ViewBag.MascotasDestacadas)
+        {
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    @if (mascota.ImagenPrincipal != null)
+                    {
+                        <img src="@MVCMASCOTAS.Helpers.ImageHelper.GetImageDataUri(mascota.ImagenPrincipal)" class="card-img-top" alt="@mascota.Nombre" style="height: 250px; object-fit: cover;">
+                    }
+                    else
+                    {
+                        <div class="card-img-top bg-secondary d-flex align-items-center justify-content-center" style="height: 250px;">
+                            <span class="text-white">Sin imagen</span>
+                        </div>
+                    }
+                    <div class="card-body">
+                        <h5 class="card-title">@mascota.Nombre</h5>
+                        <p class="card-text">
+                            <strong>Especie:</strong> @mascota.Especie<br />
+                            <strong>Edad:</strong> @mascota.EdadAproximada<br />
+                            <strong>Tamaño:</strong> @mascota.Tamanio
+                        </p>
+                        <a href="@Url.Action("Detalle", "Mascotas", new { id = mascota.MascotaId })" class="btn btn-primary w-100">Ver Detalles</a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}

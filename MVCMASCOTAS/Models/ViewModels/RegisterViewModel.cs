@@ -1,0 +1,62 @@
+﻿using System.ComponentModel.DataAnnotations;
+using System.Web;
+
+namespace MVCMASCOTAS.Models.ViewModels
+{
+    public class RegisterViewModel
+    {
+        [Required(ErrorMessage = "El nombre completo es requerido")]
+        [StringLength(150, ErrorMessage = "El nombre no puede exceder 150 caracteres")]
+        [Display(Name = "Nombre Completo")]
+        public string NombreCompleto { get; set; }
+
+        [Required(ErrorMessage = "El email es requerido")]
+        [EmailAddress(ErrorMessage = "Email inválido")]
+        [StringLength(150)]
+        [Display(Name = "Email")]
+        public string Email { get; set; }
+
+        [Required(ErrorMessage = "El teléfono es requerido")]
+        [Phone(ErrorMessage = "Teléfono inválido")]
+        [StringLength(20)]
+        [Display(Name = "Teléfono")]
+        public string Telefono { get; set; }
+
+        [Required(ErrorMessage = "La cédula es requerida")]
+        [StringLength(13, MinimumLength = 10, ErrorMessage = "Cédula inválida")]
+        [Display(Name = "Cédula")]
+        public string Cedula { get; set; }
+
+        [Required(ErrorMessage = "La dirección es requerida")]
+        [StringLength(255)]
+        [Display(Name = "Dirección")]
+        public string Direccion { get; set; }
+
+        [StringLength(100)]
+        [Display(Name = "Ciudad")]
+        public string Ciudad { get; set; }
+
+        [StringLength(100)]
+        [Display(Name = "Provincia")]
+        public string Provincia { get; set; }
+
+        [Required(ErrorMessage = "La contraseña es requerida")]
+        [StringLength(100, MinimumLength = 8, ErrorMessage = "La contraseña debe tener al menos 8 caracteres")]
+        [DataType(DataType.Password)]
+        [Display(Name = "Contraseña")]
+        public string Password { get; set; }
+
+        [Required(ErrorMessage = "Debe confirmar la contraseña")]
+        [DataType(DataType.Password)]
+        [Compare("Password", ErrorMessage = "Las contraseñas no coinciden")]
+        [Display(Name = "Confirmar Contraseña")]
+        public string ConfirmPassword { get; set; }
+
+        [Display(Name = "Foto de Perfil")]
+        public HttpPostedFileBase ImagenPerfil { get; set; }
+
+        [Required(ErrorMessage = "Debe aceptar los términos y condiciones")]
+        [Display(Name = "Acepto los términos y condiciones")]
+        public bool AceptaTerminos { get; set; }
+    }
+}
