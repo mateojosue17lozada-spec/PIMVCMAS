@@ -1,7 +1,126 @@
-﻿
+﻿@model IEnumerable<MVCMASCOTAS.Models.Mascotas>
+
 @{
-    ViewBag.Title = "Apadrinar";
+    ViewBag.Title = "Apadrinar una Mascota";
 }
 
-<h2>Apadrinar</h2>
+<div class="page-header mb-4">
+    <h2><i class="fas fa-heart"></i> Programa de Apadrinamiento</h2>
+    <p class="lead">Ayuda a cubrir los gastos de cuidado de una mascota con una contribución mensual</p>
+</div>
 
+<div class="alert alert-info">
+    <h5><i class="fas fa-info-circle"></i> ¿Cómo funciona el apadrinamiento?</h5>
+    <ul class="mb-0">
+        <li>Eliges una mascota para apadrinar</li>
+        <li>Realizas una contribución mensual mínima de $10</li>
+        <li>Recibes actualizaciones mensuales con fotos y noticias</li>
+        <li>Puedes visitar a tu ahijado cuando quieras (con cita previa)</li>
+        <li>Recibes un certificado de apadrinamiento</li>
+    </ul>
+</div>
+
+<div class="row">
+    @if (Model != null && Model.Any())
+    {
+        foreach (var mascota in Model)
+        {
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 shadow-custom">
+                    @if (mascota.ImagenPrincipal != null)
+                    {
+                        <img src="@MVCMASCOTAS.Helpers.ImageHelper.GetImageDataUri(mascota.ImagenPrincipal)" class="card-img-top" style="height: 250px; object-fit: cover;" alt="@mascota.Nombre">
+                    }
+                    else
+                    {
+                        <img src="~/Content/images/no-image.png" class="card-img-top" alt="Sin imagen">
+                    }
+                    <div class="card-body">
+                        <h5 class="card-title">@mascota.Nombre</h5>
+                        <p class="card-text">
+                            <i class="fas fa-paw"></i> @mascota.Especie<br />
+                            <i class="fas fa-venus-mars"></i> @mascota.Sexo<br />
+                            <i class="fas fa-calendar"></i> @mascota.EdadAproximada<br />
+                            <i class="fas fa-info-circle"></i> @mascota.Estado
+                        </p>
+                        @if (!string.IsNullOrEmpty(mascota.DescripcionGeneral))
+                        {
+                            <p class="text-muted small">@(mascota.DescripcionGeneral.Length > 80 ? mascota.DescripcionGeneral.Substring(0, 80) + "..." : mascota.DescripcionGeneral)</p>
+                        }
+                    </div>
+                    <div class="card-footer bg-white">
+                        <button type="button" class="btn btn-danger btn-block" data-toggle="modal" data-target="#modalApadrinar" data-mascota-id="@mascota.MascotaId" data-mascota-nombre="@mascota.Nombre">
+                            <i class="fas fa-heart"></i> Apadrinar a @mascota.Nombre
+                        </button>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="col-12">
+            <div class="alert alert-warning text-center">
+                <i class="fas fa-exclamation-triangle"></i> No hay mascotas disponibles para apadrinamiento en este momento.
+            </div>
+        </div>
+    }
+</div>
+
+<!-- Modal de Apadrinamiento -->
+<div class="modal fade" id="modalApadrinar" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title"><i class="fas fa-heart"></i> Apadrinar Mascota</h5>
+                <button type="button" class="close text-white" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            @using (Html.BeginForm("ConfirmarApadrinamiento", "Donaciones", FormMethod.Post))
+            {
+                @Html.AntiForgeryToken()
+                <div class="modal-body">
+                    <p>Estás a punto de apadrinar a <strong id="nombreMascota"></strong></p>
+                    <input type="hidden" name="mascotaId" id="mascotaIdInput" />
+
+                    <div class="form-group">
+                        <label>Monto Mensual (USD) *</label>
+                        <input type="number" name="montoMensual" class="form-control" min="10" step="0.01" value="10.00" required />
+                        <small class="form-text text-muted">Monto mínimo: $10.00</small>
+                    </div>
+
+                    <div class="alert alert-info">
+                        <strong><i class="fas fa-info-circle"></i> ¿Qué incluye?</strong>
+                        <ul class="mb-0">
+                            <li>Actualizaciones mensuales con fotos</li>
+                            <li>Certificado de apadrinamiento</li>
+                            <li>Visitas programadas</li>
+                            <li>Tu nombre en redes sociales (opcional)</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-heart"></i> Confirmar Apadrinamiento
+                    </button>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $('#modalApadrinar').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget);
+            var mascotaId = button.data('mascota-id');
+            var mascotaNombre = button.data('mascota-nombre');
+
+            var modal = $(this);
+            modal.find('#nombreMascota').text(mascotaNombre);
+            modal.find('#mascotaIdInput').val(mascotaId);
+        });
+    </script>
+}

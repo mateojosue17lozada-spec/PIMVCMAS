@@ -1,0 +1,105 @@
+﻿@{
+    ViewBag.Title = "Reportar un Rescate";
+}
+
+<div class="jumbotron jumbotron-fluid text-center" style="background: linear-gradient(135deg, #e74c3c, #c0392b); color: white;">
+    <div class="container">
+        <h1 class="display-4"><i class="fas fa-first-aid"></i> ¿Encontraste un Animal en Peligro?</h1>
+        <p class="lead">Repórtalo y ayúdanos a salvarlo</p>
+    </div>
+</div>
+
+<!-- Estadísticas -->
+<div class="container my-5">
+    <div class="row text-center">
+        <div class="col-md-3">
+            <div class="stat-box bg-danger">
+                <div class="stat-value">@ViewBag.TotalRescates</div>
+                <div class="stat-label">Total de Rescates</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-box bg-warning">
+                <div class="stat-value">@ViewBag.RescatesPendientes</div>
+                <div class="stat-label">Pendientes</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-box bg-info">
+                <div class="stat-value">@ViewBag.RescatesEnProceso</div>
+                <div class="stat-label">En Proceso</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-box bg-success">
+                <div class="stat-value">@ViewBag.RescatesCompletados</div>
+                <div class="stat-label">Completados</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Información sobre rescates -->
+<div class="container my-5">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card h-100 shadow-custom">
+                <div class="card-body">
+                    <h3><i class="fas fa-exclamation-triangle text-danger"></i> ¿Cuándo Reportar?</h3>
+                    <ul class="mt-3">
+                        <li>Animal herido o enfermo</li>
+                        <li>Animal abandonado o perdido</li>
+                        <li>Animal en situación de maltrato</li>
+                        <li>Animal atrapado o en peligro</li>
+                        <li>Camada de cachorros abandonados</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card h-100 shadow-custom">
+                <div class="card-body">
+                    <h3><i class="fas fa-clipboard-list text-primary"></i> ¿Qué Necesitamos?</h3>
+                    <ul class="mt-3">
+                        <li>Ubicación exacta del animal</li>
+                        <li>Descripción del estado del animal</li>
+                        <li>Fotos si es posible</li>
+                        <li>Tus datos de contacto</li>
+                        <li>Cualquier información adicional</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- CTA Reportar -->
+<div class="container my-5">
+    <div class="card shadow-custom bg-danger">
+        <div class="card-body text-center py-5">
+            <h2 class="text-white mb-4"><i class="fas fa-hand-holding-medical"></i> ¿Necesita un Animal tu Ayuda?</h2>
+            <a href="@Url.Action("Reportar", "Rescate")" class="btn btn-light btn-lg">
+                <i class="fas fa-plus-circle"></i> Reportar un Rescate
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Mascotas Perdidas -->
+<div class="container my-5">
+    <h2 class="text-center mb-4"><i class="fas fa-search"></i> Mascotas Perdidas</h2>
+    <p class="text-center text-muted">Ayuda a encontrar a estas mascotas perdidas</p>
+
+    <div class="text-center">
+        <a href="@Url.Action("MascotasPerdidas", "Rescate")" class="btn btn-primary btn-lg">
+            <i class="fas fa-paw"></i> Ver Mascotas Perdidas
+        </a>
+        @if (Request.IsAuthenticated)
+        {
+            <a href="@Url.Action("ReportarMascotaPerdida", "Rescate")" class="btn btn-outline-primary btn-lg">
+                <i class="fas fa-exclamation-circle"></i> Reportar Mascota Perdida
+            </a>
+        }
+    </div>
+</div>

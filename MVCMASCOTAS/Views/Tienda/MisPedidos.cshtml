@@ -1,7 +1,92 @@
-﻿
+﻿@model IEnumerable<MVCMASCOTAS.Models.Pedidos>
+
 @{
-    ViewBag.Title = "MisPedidos";
+    ViewBag.Title = "Mis Pedidos";
 }
 
-<h2>MisPedidos</h2>
+<div class="page-header mb-4">
+    <h2><i class="fas fa-box"></i> Mis Pedidos</h2>
+</div>
 
+@if (Model != null && Model.Any())
+{
+    foreach (var pedido in Model)
+    {
+        <div class="card mb-4 shadow-custom">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <div>
+                    <h5 class="mb-0">Pedido #@pedido.PedidoId</h5>
+                    <small class="text-muted">@pedido.FechaPedido.ToString("dd/MM/yyyy HH:mm")</small>
+                </div>
+                <span class="badge badge-pill @(pedido.Estado == "Confirmado" ? "badge-warning" : pedido.Estado == "Enviado" ? "badge-info" : pedido.Estado == "Entregado" ? "badge-success" : "badge-secondary") p-2">
+                    @pedido.Estado
+                </span>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Producto</th>
+                                <th>Precio</th>
+                                <th>Cantidad</th>
+                                <th>Subtotal</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var detalle in pedido.PedidoDetalle)
+                            {
+                                <tr>
+                                    <td>@detalle.Productos.NombreProducto</td>
+                                    <td>$@detalle.PrecioUnitario.ToString("N2")</td>
+                                    <td>@detalle.Cantidad</td>
+                                    <td>$@detalle.Subtotal.ToString("N2")</td>
+                                </tr>
+                            }
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="3" class="text-right"><strong>Total:</strong></td>
+                                <td><strong>$@pedido.MontoTotal.ToString("N2")</strong></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+
+                @if (!string.IsNullOrEmpty(pedido.DireccionEnvio))
+                {
+                    <p class="mt-3 mb-0">
+                        <strong><i class="fas fa-map-marker-alt"></i> Dirección de Envío:</strong> @pedido.DireccionEnvio
+                    </p>
+                }
+
+                @if (!string.IsNullOrEmpty(pedido.MetodoPago))
+                {
+                    <p class="mb-0">
+                        <strong><i class="fas fa-credit-card"></i> Método de Pago:</strong> @pedido.MetodoPago
+                    </p>
+                }
+
+                @if (!string.IsNullOrEmpty(pedido.Observaciones))
+                {
+                    <p class="mb-0">
+                        <strong><i class="fas fa-comment"></i> Observaciones:</strong> @pedido.Observaciones
+                    </p>
+                }
+            </div>
+        </div>
+    }
+}
+else
+{
+    <div class="card shadow-custom">
+        <div class="card-body text-center py-5">
+            <i class="fas fa-box-open fa-5x text-muted mb-3"></i>
+            <h4>No tienes pedidos</h4>
+            <p class="text-muted">Empieza a comprar en nuestra tienda solidaria</p>
+            <a href="@Url.Action("Index", "Tienda")" class="btn btn-primary btn-lg">
+                <i class="fas fa-shopping-bag"></i> Ir a la Tienda
+            </a>
+        </div>
+    </div>
+}

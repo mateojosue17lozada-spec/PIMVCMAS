@@ -1,20 +1,29 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace MVCMASCOTAS.Models.CustomModels
 {
-    /// <summary>
-    /// Modelo para resultados de evaluación de adopción
-    /// </summary>
     public class ResultadoEvaluacionModel
     {
-        public int Puntaje { get; set; }
+        public int PuntajeTotal { get; set; }
         public string Resultado { get; set; }
         public string Recomendacion { get; set; }
-        public List<string> DetallesEvaluacion { get; set; }
+        public List<CriterioEvaluacion> Criterios { get; set; }
+        public bool Aprobado => PuntajeTotal >= 70;
+        public string NivelAdopcion { get; set; }
 
         public ResultadoEvaluacionModel()
         {
-            DetallesEvaluacion = new List<string>();
+            Criterios = new List<CriterioEvaluacion>();
         }
+    }
+
+    public class CriterioEvaluacion
+    {
+        public string Nombre { get; set; }
+        public int Puntaje { get; set; }
+        public int PuntajeMaximo { get; set; }
+        public string Descripcion { get; set; }
+        public string Categoria { get; set; }
     }
 }

@@ -1,5 +1,4 @@
-﻿html
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8" />
@@ -7,60 +6,114 @@
     <title>@ViewBag.Title - Refugio de Animales Quito</title>
     @Styles.Render("~/Content/css")
     @Scripts.Render("~/bundles/modernizr")
-    <style>
-        body {
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .container {
-            flex: 1;
-        }
-
-        footer {
-            margin-top: auto;
-        }
-    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <nav class="navbar navbar-expand-lg navbar-custom">
         <div class="container">
             <a class="navbar-brand" href="@Url.Action("Index", "Home")">
-                🐾 Refugio de Animales Quito
+                <i class="fas fa-paw"></i> Refugio Animales
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
+                <ul class="navbar-nav mr-auto">
                     <li class="nav-item">
                         <a class="nav-link" href="@Url.Action("Index", "Home")">Inicio</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="@Url.Action("Index", "Mascotas")">Mascotas</a>
+                        <a class="nav-link" href="@Url.Action("Index", "Mascotas")">Adoptar</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="@Url.Action("Index", "Donaciones")">Donar</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="@Url.Action("Index", "Tienda")">Tienda</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="@Url.Action("Index", "Voluntariado")">Voluntariado</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="@Url.Action("Index", "Rescate")">Rescatar</a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav">
                     @if (Request.IsAuthenticated)
                     {
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
-                                Mi Cuenta
+                        @if (User.IsInRole("Administrador"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" href="@Url.Action("Dashboard", "Admin")">
+                                    <i class="fas fa-user-shield"></i> Admin
+                                </a>
+                            </li>
+                        }
+                        @if (User.IsInRole("Veterinario"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" href="@Url.Action("Dashboard", "Veterinario")">
+                                    <i class="fas fa-stethoscope"></i> Veterinaria
+                                </a>
+                            </li>
+                        }
+                        @if (User.IsInRole("Contabilidad"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" href="@Url.Action("Dashboard", "Contabilidad")">
+                                    <i class="fas fa-calculator"></i> Contabilidad
+                                </a>
+                            </li>
+                        }
+                        @if (User.IsInRole("Rescatista"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" href="@Url.Action("Gestionar", "Mascotas")">
+                                    <i class="fas fa-dog"></i> Mascotas
+                                </a>
+                            </li>
+                        }
+                        <li class="nav-item">
+                            <a class="nav-link" href="@Url.Action("Carrito", "Tienda")">
+                                <i class="fas fa-shopping-cart"></i>
+                                <span id="cart-count" class="badge badge-danger">0</span>
                             </a>
-                            <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="@Url.Action("Profile", "Account")">Mi Perfil</a></li>
-                                <li><a class="dropdown-item" href="@Url.Action("MisSolicitudes", "Adopcion")">Mis Solicitudes</a></li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" href="@Url.Action("Logout", "Account")">Cerrar Sesión</a></li>
-                            </ul>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown">
+                                <i class="fas fa-user"></i> @User.Identity.Name
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-right">
+                                <a class="dropdown-item" href="@Url.Action("MiPerfil", "Account")">
+                                    <i class="fas fa-user-circle"></i> Mi Perfil
+                                </a>
+                                <a class="dropdown-item" href="@Url.Action("MisSolicitudes", "Adopcion")">
+                                    <i class="fas fa-file-alt"></i> Mis Solicitudes
+                                </a>
+                                <a class="dropdown-item" href="@Url.Action("MisDonaciones", "Donaciones")">
+                                    <i class="fas fa-hand-holding-heart"></i> Mis Donaciones
+                                </a>
+                                <a class="dropdown-item" href="@Url.Action("MisPedidos", "Tienda")">
+                                    <i class="fas fa-box"></i> Mis Pedidos
+                                </a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" href="@Url.Action("Logout", "Account")">
+                                    <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                                </a>
+                            </div>
                         </li>
                     }
                     else
                     {
                         <li class="nav-item">
-                            <a class="nav-link" href="@Url.Action("Login", "Account")">Iniciar Sesión</a>
+                            <a class="nav-link" href="@Url.Action("Login", "Account")">
+                                <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+                            </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link btn btn-success text-white ms-2" href="@Url.Action("Register", "Account")">Registrarse</a>
+                            <a class="nav-link" href="@Url.Action("Register", "Account")">
+                                <i class="fas fa-user-plus"></i> Registrarse
+                            </a>
                         </li>
                     }
                 </ul>
@@ -68,34 +121,80 @@
         </div>
     </nav>
 
-    <div class="container mt-4">
+    <div class="container main-container">
         @if (TempData["SuccessMessage"] != null)
         {
             <div class="alert alert-success alert-dismissible fade show" role="alert">
-                @TempData["SuccessMessage"]
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                <i class="fas fa-check-circle"></i> @TempData["SuccessMessage"]
+                <button type="button" class="close" data-dismiss="alert">
+                    <span>&times;</span>
+                </button>
             </div>
         }
+
         @if (TempData["ErrorMessage"] != null)
         {
             <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                @TempData["ErrorMessage"]
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                <i class="fas fa-exclamation-circle"></i> @TempData["ErrorMessage"]
+                <button type="button" class="close" data-dismiss="alert">
+                    <span>&times;</span>
+                </button>
+            </div>
+        }
+
+        @if (TempData["InfoMessage"] != null)
+        {
+            <div class="alert alert-info alert-dismissible fade show" role="alert">
+                <i class="fas fa-info-circle"></i> @TempData["InfoMessage"]
+                <button type="button" class="close" data-dismiss="alert">
+                    <span>&times;</span>
+                </button>
             </div>
         }
 
         @RenderBody()
     </div>
 
-    <footer class="bg-dark text-white text-center py-4 mt-5">
+    <footer class="footer">
         <div class="container">
-            <p class="mb-0">&copy; @DateTime.Now.Year - Refugio de Animales Quito. Todos los derechos reservados.</p>
-            <p class="mb-0"><small>Sistema conforme a la Ley Orgánica de Bienestar Animal (LOBA)</small></p>
+            <div class="row">
+                <div class="col-md-4">
+                    <h5><i class="fas fa-paw"></i> Refugio de Animales Quito</h5>
+                    <p>Dedicados al rescate, cuidado y adopción responsable de animales necesitados.</p>
+                </div>
+                <div class="col-md-4">
+                    <h5><i class="fas fa-link"></i> Enlaces Rápidos</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="@Url.Action("Index", "Mascotas")">Adoptar una Mascota</a></li>
+                        <li><a href="@Url.Action("Index", "Donaciones")">Hacer una Donación</a></li>
+                        <li><a href="@Url.Action("Index", "Voluntariado")">Ser Voluntario</a></li>
+                        <li><a href="@Url.Action("Index", "Rescate")">Reportar un Rescate</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h5><i class="fas fa-envelope"></i> Contacto</h5>
+                    <p>
+                        <i class="fas fa-map-marker-alt"></i> Quito, Ecuador<br />
+                        <i class="fas fa-phone"></i> (02) 123-4567<br />
+                        <i class="fas fa-envelope"></i> info@refugioquito.org
+                    </p>
+                    <div>
+                        <a href="#" class="text-light mr-3"><i class="fab fa-facebook fa-2x"></i></a>
+                        <a href="#" class="text-light mr-3"><i class="fab fa-instagram fa-2x"></i></a>
+                        <a href="#" class="text-light"><i class="fab fa-twitter fa-2x"></i></a>
+                    </div>
+                </div>
+            </div>
+            <hr style="background-color: white;" />
+            <div class="text-center">
+                <p>&copy; @DateTime.Now.Year - Refugio de Animales Quito. Todos los derechos reservados.</p>
+            </div>
         </div>
     </footer>
 
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/bootstrap")
+    @Scripts.Render("~/bundles/custom")
     @RenderSection("scripts", required: false)
 </body>
 </html>

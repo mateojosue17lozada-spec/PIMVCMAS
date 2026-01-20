@@ -1,84 +1,118 @@
-﻿using System;
+﻿using MVCMASCOTAS.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using MVCMASCOTAS.Models;
 
 namespace MVCMASCOTAS.Services
 {
-    /// <summary>
-    /// Servicio para lógica de negocio de donaciones y apadrinamientos
-    /// </summary>
     public class DonacionService
     {
-        private RefugioMascotasEntities db;
+        private readonly RefugioMascotasEntities db;
+        private readonly ContabilidadService contabilidadService;
 
         public DonacionService()
         {
             db = new RefugioMascotasEntities();
+            contabilidadService = new ContabilidadService();
         }
 
-        public DonacionService(RefugioMascotasEntities context)
-        {
-            db = context;
-        }
-
-        /// <summary>
-        /// Registra una nueva donación
-        /// </summary>
-        public Donaciones RegistrarDonacion(int? usuarioId, string tipoDonacion, decimal? montoEfectivo,
-            string descripcion, string metodoPago, string nombreDonante, string emailDonante,
-            string telefonoDonante, bool anonimo, bool publicar)
+        // Registrar donación
+        public Donaciones RegistrarDonacion(int? usuarioId, string tipoDonacion, decimal monto,
+            string frecuencia, string metodoPago, string numeroTransaccion, bool anonima, string mensaje = null)
         {
             var donacion = new Donaciones
             {
                 UsuarioId = usuarioId,
                 TipoDonacion = tipoDonacion,
-                MontoEfectivo = montoEfectivo,
-                DescripcionDonacion = descripcion,
-                MetodoPago = metodoPago,
-                NombreDonante = nombreDonante,
-                EmailDonante = emailDonante,
-                TelefonoDonante = telefonoDonante,
-                AnonimatoDonante = anonimo,
-                PublicarEnWeb = publicar,
+                Monto = monto,
+                Frecuencia = frecuencia,
                 FechaDonacion = DateTime.Now,
-                EstadoDonacion = "Pendiente"
+                MetodoPago = metodoPago,
+                NumeroTransaccion = numeroTransaccion,
+                Estado = "Completada",
+                Anonima = anonima,
+                Mensaje = mensaje,
+                ComprobanteElectronico = GenerarComprobanteElectronico()
             };
 
             db.Donaciones.Add(donacion);
             db.SaveChanges();
 
-            // Si es monetaria, registrar en contabilidad
-            if (tipoDonacion == "Monetaria" && montoEfectivo.HasValue)
+            // Registrar en contabilidad si es donación monetaria
+            if (tipoDonacion == "Monetaria" && usuarioId.HasValue)
             {
-                RegistrarEnContabilidad(donacion);
+                contabilidadService.RegistrarMovimiento(
+                    "Ingreso",
+                    monto,
+                    "Donaciones",
+                    $"Donación {(anonima ? "anónima" : "de usuario")} - {frecuencia}",
+                    usuarioId.Value,
+                    $"DON-{donacion.DonacionId}"
+                );
             }
 
             return donacion;
         }
 
-        /// <summary>
-        /// Registra la donación en contabilidad
-        /// </summary>
-        private void RegistrarEnContabilidad(Donaciones donacion)
+        // Registrar apadrinamiento
+        public Apadrinamientos RegistrarApadrinamiento(int usuarioId, int mascotaId, decimal montoMensual,
+            DateTime fechaInicio, int duracionMeses, string metodoPago)
         {
-            var movimiento = new MovimientosContables
+            var fechaFin = fechaInicio.AddMonths(duracionMeses);
+
+            var apadrinamiento = new Apadrinamientos
             {
-                TipoMovimiento = "Ingreso",
-                Categoria = "Donaciones",
-                Monto = donacion.MontoEfectivo.Value,
-                Descripcion = $"Donación de {donacion.NombreDonante ?? "Anónimo"}",
-                FechaMovimiento = donacion.FechaDonacion,
-                MetodoPago = donacion.MetodoPago
+                UsuarioId = usuarioId,
+                MascotaId = mascotaId,
+                MontoMensual = montoMensual,
+                FechaInicio = fechaInicio,
+                FechaFin = fechaFin,
+                Estado = "Activo",
+                MetodoPago = metodoPago
             };
 
-            db.MovimientosContables.Add(movimiento);
+            db.Apadrinamientos.Add(apadrinamiento);
             db.SaveChanges();
+
+            // Registrar primer pago
+            RegistrarPagoApadrinamiento(apadrinamiento.ApadrinamientoId, montoMensual, DateTime.Now, "Completado");
+
+            return apadrinamiento;
         }
 
-        /// <summary>
-        /// Obtiene las donaciones de un usuario
-        /// </summary>
+        // Registrar pago de apadrinamiento
+        public PagosApadrinamiento RegistrarPagoApadrinamiento(int apadrinamientoId, decimal monto,
+            DateTime fechaPago, string estado)
+        {
+            var pago = new PagosApadrinamiento
+            {
+                ApadrinamientoId = apadrinamientoId,
+                Monto = monto,
+                FechaPago = fechaPago,
+                Estado = estado
+            };
+
+            db.PagosApadrinamiento.Add(pago);
+            db.SaveChanges();
+
+            // Registrar en contabilidad
+            var apadrinamiento = db.Apadrinamientos.Find(apadrinamientoId);
+            if (apadrinamiento != null && estado == "Completado")
+            {
+                contabilidadService.RegistrarMovimiento(
+                    "Ingreso",
+                    monto,
+                    "Apadrinamientos",
+                    $"Pago apadrinamiento mascota ID: {apadrinamiento.MascotaId}",
+                    apadrinamiento.UsuarioId,
+                    $"PAD-{pago.PagoId}"
+                );
+            }
+
+            return pago;
+        }
+
+        // Obtener donaciones de un usuario
         public List<Donaciones> ObtenerDonacionesUsuario(int usuarioId)
         {
             return db.Donaciones
@@ -87,147 +121,97 @@ namespace MVCMASCOTAS.Services
                 .ToList();
         }
 
-        /// <summary>
-        /// Obtiene estadísticas de donaciones
-        /// </summary>
-        public Dictionary<string, object> ObtenerEstadisticasDonaciones(DateTime? desde = null, DateTime? hasta = null)
+        // Obtener apadrinamientos activos
+        public List<Apadrinamientos> ObtenerApadrinamientosActivos()
         {
-            var query = db.Donaciones.AsQueryable();
-
-            if (desde.HasValue)
-                query = query.Where(d => d.FechaDonacion >= desde.Value);
-
-            if (hasta.HasValue)
-                query = query.Where(d => d.FechaDonacion <= hasta.Value);
-
-            var stats = new Dictionary<string, object>
-            {
-                ["TotalDonaciones"] = query.Count(),
-                ["MontoTotal"] = query.Sum(d => d.MontoEfectivo) ?? 0,
-                ["DonacionesMonetarias"] = query.Count(d => d.TipoDonacion == "Monetaria"),
-                ["DonacionesEspecie"] = query.Count(d => d.TipoDonacion == "Especie"),
-                ["PromedioMonetaria"] = query.Where(d => d.TipoDonacion == "Monetaria")
-                    .Average(d => d.MontoEfectivo) ?? 0
-            };
-
-            return stats;
-        }
-
-        /// <summary>
-        /// Crea un apadrinamiento
-        /// </summary>
-        public Apadrinamientos CrearApadrinamiento(int mascotaId, int padrinoId, decimal montoMensual)
-        {
-            // Verificar si ya existe apadrinamiento activo
-            var existente = db.Apadrinamientos
-                .Any(a => a.MascotaId == mascotaId && a.PadrinoId == padrinoId && a.Estado == "Activo");
-
-            if (existente)
-            {
-                return null;
-            }
-
-            var apadrinamiento = new Apadrinamientos
-            {
-                MascotaId = mascotaId,
-                PadrinoId = padrinoId,
-                MontoMensual = montoMensual,
-                FechaInicio = DateTime.Now,
-                Estado = "Activo"
-            };
-
-            db.Apadrinamientos.Add(apadrinamiento);
-            db.SaveChanges();
-
-            return apadrinamiento;
-        }
-
-        /// <summary>
-        /// Obtiene los apadrinamientos de un usuario
-        /// </summary>
-        public List<Apadrinamientos> ObtenerApadrinamientosUsuario(int usuarioId, bool soloActivos = true)
-        {
-            var query = db.Apadrinamientos.Where(a => a.PadrinoId == usuarioId);
-
-            if (soloActivos)
-            {
-                query = query.Where(a => a.Estado == "Activo");
-            }
-
-            return query.OrderByDescending(a => a.FechaInicio).ToList();
-        }
-
-        /// <summary>
-        /// Cancela un apadrinamiento
-        /// </summary>
-        public bool CancelarApadrinamiento(int apadrinamientoId, string motivo)
-        {
-            var apadrinamiento = db.Apadrinamientos.Find(apadrinamientoId);
-
-            if (apadrinamiento == null || apadrinamiento.Estado != "Activo")
-            {
-                return false;
-            }
-
-            apadrinamiento.Estado = "Cancelado";
-            apadrinamiento.FechaFin = DateTime.Now;
-            apadrinamiento.MotivoFinalizacion = motivo;
-
-            db.SaveChanges();
-
-            return true;
-        }
-
-        /// <summary>
-        /// Registra un pago de apadrinamiento
-        /// </summary>
-        public PagosApadrinamiento RegistrarPagoApadrinamiento(int apadrinamientoId, decimal monto,
-            string metodoPago, DateTime? fechaPago = null)
-        {
-            var pago = new PagosApadrinamiento
-            {
-                ApadrinamientoId = apadrinamientoId,
-                MontoPagado = monto,
-                FechaPago = fechaPago ?? DateTime.Now,
-                MetodoPago = metodoPago
-            };
-
-            db.PagosApadrinamiento.Add(pago);
-
-            // Registrar en contabilidad
-            var apadrinamiento = db.Apadrinamientos.Find(apadrinamientoId);
-            var movimiento = new MovimientosContables
-            {
-                TipoMovimiento = "Ingreso",
-                Categoria = "Apadrinamientos",
-                Monto = monto,
-                Descripcion = $"Pago apadrinamiento - {apadrinamiento.Mascotas.Nombre}",
-                FechaMovimiento = fechaPago ?? DateTime.Now,
-                MetodoPago = metodoPago
-            };
-
-            db.MovimientosContables.Add(movimiento);
-            db.SaveChanges();
-
-            return pago;
-        }
-
-        /// <summary>
-        /// Obtiene mascotas disponibles para apadrinar
-        /// </summary>
-        public List<Mascotas> ObtenerMascotasParaApadrinar()
-        {
-            return db.Mascotas
-                .Where(m => m.Activo &&
-                       (m.Estado == "Rescatada" || m.Estado == "En tratamiento" ||
-                        m.Estado == "Disponible para adopción"))
-                .OrderBy(m => m.Nombre)
+            return db.Apadrinamientos
+                .Where(a => a.Estado == "Activo")
+                .OrderBy(a => a.FechaInicio)
                 .ToList();
+        }
+
+        // Obtener apadrinamientos de un usuario
+        public List<Apadrinamientos> ObtenerApadrinamientosUsuario(int usuarioId)
+        {
+            return db.Apadrinamientos
+                .Where(a => a.UsuarioId == usuarioId)
+                .OrderByDescending(a => a.FechaInicio)
+                .ToList();
+        }
+
+        // Obtener apadrinamientos de una mascota
+        public List<Apadrinamientos> ObtenerApadrinamientosMascota(int mascotaId)
+        {
+            return db.Apadrinamientos
+                .Where(a => a.MascotaId == mascotaId)
+                .OrderByDescending(a => a.FechaInicio)
+                .ToList();
+        }
+
+        // Cancelar apadrinamiento
+        public void CancelarApadrinamiento(int apadrinamientoId, string motivo)
+        {
+            var apadrinamiento = db.Apadrinamientos.Find(apadrinamientoId);
+            if (apadrinamiento != null)
+            {
+                apadrinamiento.Estado = "Cancelado";
+                apadrinamiento.MotivoCancelacion = motivo;
+                db.SaveChanges();
+            }
+        }
+
+        // Obtener total de donaciones del mes
+        public decimal ObtenerTotalDonacionesMes(int mes, int anio)
+        {
+            return db.Donaciones
+                .Where(d => d.TipoDonacion == "Monetaria" &&
+                           d.FechaDonacion.HasValue &&
+                           d.FechaDonacion.Value.Month == mes &&
+                           d.FechaDonacion.Value.Year == anio)
+                .Sum(d => (decimal?)d.Monto) ?? 0;
+        }
+
+        // Obtener número de donantes del mes
+        public int ObtenerNumeroDonantesMes(int mes, int anio)
+        {
+            return db.Donaciones
+                .Where(d => d.FechaDonacion.HasValue &&
+                           d.FechaDonacion.Value.Month == mes &&
+                           d.FechaDonacion.Value.Year == anio &&
+                           d.UsuarioId.HasValue)
+                .Select(d => d.UsuarioId.Value)
+                .Distinct()
+                .Count();
+        }
+
+        // Obtener últimas donaciones
+        public List<Donaciones> ObtenerUltimasDonaciones(int cantidad = 10)
+        {
+            return db.Donaciones
+                .OrderByDescending(d => d.FechaDonacion)
+                .Take(cantidad)
+                .ToList();
+        }
+
+        // Generar comprobante electrónico
+        private string GenerarComprobanteElectronico()
+        {
+            var fecha = DateTime.Now.ToString("yyyyMMddHHmmss");
+            var random = new Random().Next(1000, 9999);
+            return $"CE-{fecha}-{random}";
+        }
+
+        // Verificar si mascota tiene apadrinamiento activo
+        public bool TieneApadrinamientoActivo(int mascotaId)
+        {
+            return db.Apadrinamientos
+                .Any(a => a.MascotaId == mascotaId && a.Estado == "Activo");
         }
 
         public void Dispose()
         {
             db?.Dispose();
+            contabilidadService?.Dispose();
         }
     }
 }

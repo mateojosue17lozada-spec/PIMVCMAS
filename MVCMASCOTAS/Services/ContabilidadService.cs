@@ -1,43 +1,33 @@
-﻿using System;
+﻿using MVCMASCOTAS.Models;
+using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
-using MVCMASCOTAS.Models;
 
 namespace MVCMASCOTAS.Services
 {
-    /// <summary>
-    /// Servicio para lógica de negocio contable
-    /// </summary>
     public class ContabilidadService
     {
-        private RefugioMascotasEntities db;
+        private readonly RefugioMascotasEntities db;
 
         public ContabilidadService()
         {
             db = new RefugioMascotasEntities();
         }
 
-        public ContabilidadService(RefugioMascotasEntities context)
-        {
-            db = context;
-        }
-
-        /// <summary>
-        /// Registra un movimiento contable
-        /// </summary>
-        public MovimientosContables RegistrarMovimiento(string tipo, string categoria, decimal monto,
-            string descripcion, string metodoPago, DateTime? fecha, string numeroComprobante, int? responsableId)
+        // Registrar movimiento contable
+        public MovimientosContables RegistrarMovimiento(string tipo, decimal monto, string categoria, string descripcion, int usuarioId, string referencia = null)
         {
             var movimiento = new MovimientosContables
             {
-                TipoMovimiento = tipo,
+                Tipo = tipo, // "Ingreso" o "Egreso"
                 Categoria = categoria,
                 Monto = monto,
                 Descripcion = descripcion,
-                MetodoPago = metodoPago,
-                FechaMovimiento = fecha ?? DateTime.Now,
-                NumeroComprobante = numeroComprobante,
-                ResponsableRegistroId = responsableId
+                FechaMovimiento = DateTime.Now,
+                UsuarioRegistro = usuarioId,
+                Referencia = referencia,
+                Comprobante = GenerarNumeroComprobante(tipo)
             };
 
             db.MovimientosContables.Add(movimiento);
@@ -46,248 +36,113 @@ namespace MVCMASCOTAS.Services
             return movimiento;
         }
 
-        /// <summary>
-        /// Obtiene movimientos con filtros
-        /// </summary>
-        public List<MovimientosContables> ObtenerMovimientos(string tipo = null, string categoria = null,
-            DateTime? fechaDesde = null, DateTime? fechaHasta = null)
+        // Obtener balance del mes
+        public decimal ObtenerBalanceMes(int mes, int anio)
         {
-            var query = db.MovimientosContables.AsQueryable();
-
-            if (!string.IsNullOrEmpty(tipo) && tipo != "Todos")
-            {
-                query = query.Where(m => m.TipoMovimiento == tipo);
-            }
-
-            if (!string.IsNullOrEmpty(categoria) && categoria != "Todos")
-            {
-                query = query.Where(m => m.Categoria == categoria);
-            }
-
-            if (fechaDesde.HasValue)
-            {
-                query = query.Where(m => m.FechaMovimiento >= fechaDesde.Value);
-            }
-
-            if (fechaHasta.HasValue)
-            {
-                query = query.Where(m => m.FechaMovimiento <= fechaHasta.Value);
-            }
-
-            return query.OrderByDescending(m => m.FechaMovimiento).ToList();
+            var ingresos = ObtenerIngresosMes(mes, anio);
+            var egresos = ObtenerEgresosMes(mes, anio);
+            return ingresos - egresos;
         }
 
-        /// <summary>
-        /// Calcula el balance entre ingresos y egresos
-        /// </summary>
-        public Dictionary<string, decimal> CalcularBalance(DateTime? fechaDesde = null, DateTime? fechaHasta = null)
+        // Obtener ingresos del mes
+        public decimal ObtenerIngresosMes(int mes, int anio)
         {
-            var movimientos = ObtenerMovimientos(null, null, fechaDesde, fechaHasta);
-
-            var ingresos = movimientos
-                .Where(m => m.TipoMovimiento == "Ingreso")
-                .Sum(m => m.Monto);
-
-            var egresos = movimientos
-                .Where(m => m.TipoMovimiento == "Egreso")
-                .Sum(m => m.Monto);
-
-            return new Dictionary<string, decimal>
-            {
-                ["Ingresos"] = ingresos,
-                ["Egresos"] = egresos,
-                ["Balance"] = ingresos - egresos
-            };
-        }
-
-        /// <summary>
-        /// Obtiene ingresos agrupados por categoría
-        /// </summary>
-        public Dictionary<string, decimal> ObtenerIngresosPorCategoria(DateTime? fechaDesde = null,
-            DateTime? fechaHasta = null)
-        {
-            var query = db.MovimientosContables.Where(m => m.TipoMovimiento == "Ingreso");
-
-            if (fechaDesde.HasValue)
-                query = query.Where(m => m.FechaMovimiento >= fechaDesde.Value);
-
-            if (fechaHasta.HasValue)
-                query = query.Where(m => m.FechaMovimiento <= fechaHasta.Value);
-
-            return query
-                .GroupBy(m => m.Categoria)
-                .ToDictionary(g => g.Key, g => g.Sum(m => m.Monto));
-        }
-
-        /// <summary>
-        /// Obtiene egresos agrupados por categoría
-        /// </summary>
-        public Dictionary<string, decimal> ObtenerEgresosPorCategoria(DateTime? fechaDesde = null,
-            DateTime? fechaHasta = null)
-        {
-            var query = db.MovimientosContables.Where(m => m.TipoMovimiento == "Egreso");
-
-            if (fechaDesde.HasValue)
-                query = query.Where(m => m.FechaMovimiento >= fechaDesde.Value);
-
-            if (fechaHasta.HasValue)
-                query = query.Where(m => m.FechaMovimiento <= fechaHasta.Value);
-
-            return query
-                .GroupBy(m => m.Categoria)
-                .ToDictionary(g => g.Key, g => g.Sum(m => m.Monto));
-        }
-
-        /// <summary>
-        /// Obtiene estadísticas mensuales
-        /// </summary>
-        public Dictionary<string, object> ObtenerEstadisticasMes(int mes, int anio)
-        {
-            DateTime inicioMes = new DateTime(anio, mes, 1);
-            DateTime finMes = inicioMes.AddMonths(1).AddDays(-1);
-
-            var balance = CalcularBalance(inicioMes, finMes);
-            var ingresosPorCategoria = ObtenerIngresosPorCategoria(inicioMes, finMes);
-            var egresosPorCategoria = ObtenerEgresosPorCategoria(inicioMes, finMes);
-
-            return new Dictionary<string, object>
-            {
-                ["Mes"] = mes,
-                ["Anio"] = anio,
-                ["TotalIngresos"] = balance["Ingresos"],
-                ["TotalEgresos"] = balance["Egresos"],
-                ["Balance"] = balance["Balance"],
-                ["IngresosPorCategoria"] = ingresosPorCategoria,
-                ["EgresosPorCategoria"] = egresosPorCategoria
-            };
-        }
-
-        /// <summary>
-        /// Obtiene estadísticas anuales
-        /// </summary>
-        public Dictionary<string, object> ObtenerEstadisticasAnio(int anio)
-        {
-            DateTime inicioAnio = new DateTime(anio, 1, 1);
-            DateTime finAnio = new DateTime(anio, 12, 31);
-
-            var balance = CalcularBalance(inicioAnio, finAnio);
-            var ingresosPorCategoria = ObtenerIngresosPorCategoria(inicioAnio, finAnio);
-            var egresosPorCategoria = ObtenerEgresosPorCategoria(inicioAnio, finAnio);
-
-            // Ingresos y egresos por mes
-            var ingresosPorMes = new Dictionary<int, decimal>();
-            var egresosPorMes = new Dictionary<int, decimal>();
-
-            for (int mes = 1; mes <= 12; mes++)
-            {
-                var inicioMes = new DateTime(anio, mes, 1);
-                var finMes = inicioMes.AddMonths(1).AddDays(-1);
-
-                var balanceMes = CalcularBalance(inicioMes, finMes);
-                ingresosPorMes[mes] = balanceMes["Ingresos"];
-                egresosPorMes[mes] = balanceMes["Egresos"];
-            }
-
-            return new Dictionary<string, object>
-            {
-                ["Anio"] = anio,
-                ["TotalIngresos"] = balance["Ingresos"],
-                ["TotalEgresos"] = balance["Egresos"],
-                ["Balance"] = balance["Balance"],
-                ["IngresosPorCategoria"] = ingresosPorCategoria,
-                ["EgresosPorCategoria"] = egresosPorCategoria,
-                ["IngresosPorMes"] = ingresosPorMes,
-                ["EgresosPorMes"] = egresosPorMes
-            };
-        }
-
-        /// <summary>
-        /// Obtiene el total de donaciones
-        /// </summary>
-        public decimal ObtenerTotalDonaciones(DateTime? fechaDesde = null, DateTime? fechaHasta = null)
-        {
-            var query = db.Donaciones.Where(d => d.TipoDonacion == "Monetaria");
-
-            if (fechaDesde.HasValue)
-                query = query.Where(d => d.FechaDonacion >= fechaDesde.Value);
-
-            if (fechaHasta.HasValue)
-                query = query.Where(d => d.FechaDonacion <= fechaHasta.Value);
-
-            return query.Sum(d => d.MontoEfectivo) ?? 0;
-        }
-
-        /// <summary>
-        /// Obtiene el total de apadrinamientos activos por mes
-        /// </summary>
-        public decimal ObtenerIngresoMensualApadrinamientos()
-        {
-            return db.Apadrinamientos
-                .Where(a => a.Estado == "Activo")
-                .Sum(a => (decimal?)a.MontoMensual) ?? 0;
-        }
-
-        /// <summary>
-        /// Genera un resumen financiero
-        /// </summary>
-        public Dictionary<string, object> GenerarResumenFinanciero(DateTime fechaInicio, DateTime fechaFin)
-        {
-            var balance = CalcularBalance(fechaInicio, fechaFin);
-            var totalDonaciones = ObtenerTotalDonaciones(fechaInicio, fechaFin);
-
-            var resumen = new Dictionary<string, object>
-            {
-                ["FechaInicio"] = fechaInicio,
-                ["FechaFin"] = fechaFin,
-                ["TotalIngresos"] = balance["Ingresos"],
-                ["TotalEgresos"] = balance["Egresos"],
-                ["Balance"] = balance["Balance"],
-                ["TotalDonaciones"] = totalDonaciones,
-                ["IngresoMensualApadrinamientos"] = ObtenerIngresoMensualApadrinamientos(),
-                ["PromedioIngresoDiario"] = CalcularPromedioIngresoDiario(fechaInicio, fechaFin),
-                ["PromedioEgresoDiario"] = CalcularPromedioEgresoDiario(fechaInicio, fechaFin)
-            };
-
-            return resumen;
-        }
-
-        /// <summary>
-        /// Calcula el promedio de ingresos diarios
-        /// </summary>
-        private decimal CalcularPromedioIngresoDiario(DateTime fechaInicio, DateTime fechaFin)
-        {
-            int dias = (fechaFin - fechaInicio).Days + 1;
-            var totalIngresos = db.MovimientosContables
-                .Where(m => m.TipoMovimiento == "Ingreso" &&
-                           m.FechaMovimiento >= fechaInicio &&
-                           m.FechaMovimiento <= fechaFin)
+            return db.MovimientosContables
+                .Where(m => m.Tipo == "Ingreso" &&
+                           m.FechaMovimiento.HasValue &&
+                           m.FechaMovimiento.Value.Month == mes &&
+                           m.FechaMovimiento.Value.Year == anio)
                 .Sum(m => (decimal?)m.Monto) ?? 0;
-
-            return dias > 0 ? totalIngresos / dias : 0;
         }
 
-        /// <summary>
-        /// Calcula el promedio de egresos diarios
-        /// </summary>
-        private decimal CalcularPromedioEgresoDiario(DateTime fechaInicio, DateTime fechaFin)
+        // Obtener egresos del mes
+        public decimal ObtenerEgresosMes(int mes, int anio)
         {
-            int dias = (fechaFin - fechaInicio).Days + 1;
-            var totalEgresos = db.MovimientosContables
-                .Where(m => m.TipoMovimiento == "Egreso" &&
-                           m.FechaMovimiento >= fechaInicio &&
-                           m.FechaMovimiento <= fechaFin)
+            return db.MovimientosContables
+                .Where(m => m.Tipo == "Egreso" &&
+                           m.FechaMovimiento.HasValue &&
+                           m.FechaMovimiento.Value.Month == mes &&
+                           m.FechaMovimiento.Value.Year == anio)
                 .Sum(m => (decimal?)m.Monto) ?? 0;
-
-            return dias > 0 ? totalEgresos / dias : 0;
         }
 
-        /// <summary>
-        /// Verifica si hay fondos suficientes
-        /// </summary>
-        public bool HayFondosSuficientes(decimal montoRequerido)
+        // Obtener movimientos por período
+        public List<MovimientosContables> ObtenerMovimientosPorPeriodo(DateTime fechaInicio, DateTime fechaFin)
         {
-            var balance = CalcularBalance();
-            return balance["Balance"] >= montoRequerido;
+            return db.MovimientosContables
+                .Where(m => m.FechaMovimiento >= fechaInicio && m.FechaMovimiento <= fechaFin)
+                .OrderByDescending(m => m.FechaMovimiento)
+                .ToList();
+        }
+
+        // Obtener movimientos por categoría
+        public List<MovimientosContables> ObtenerMovimientosPorCategoria(string categoria, int mes, int anio)
+        {
+            return db.MovimientosContables
+                .Where(m => m.Categoria == categoria &&
+                           m.FechaMovimiento.HasValue &&
+                           m.FechaMovimiento.Value.Month == mes &&
+                           m.FechaMovimiento.Value.Year == anio)
+                .OrderByDescending(m => m.FechaMovimiento)
+                .ToList();
+        }
+
+        // Obtener resumen por categorías
+        public Dictionary<string, decimal> ObtenerResumenPorCategorias(int mes, int anio, string tipo)
+        {
+            return db.MovimientosContables
+                .Where(m => m.Tipo == tipo &&
+                           m.FechaMovimiento.HasValue &&
+                           m.FechaMovimiento.Value.Month == mes &&
+                           m.FechaMovimiento.Value.Year == anio)
+                .GroupBy(m => m.Categoria)
+                .Select(g => new { Categoria = g.Key, Total = g.Sum(m => m.Monto) })
+                .ToDictionary(x => x.Categoria, x => x.Total);
+        }
+
+        // Obtener últimos movimientos
+        public List<MovimientosContables> ObtenerUltimosMovimientos(int cantidad = 10)
+        {
+            return db.MovimientosContables
+                .OrderByDescending(m => m.FechaMovimiento)
+                .Take(cantidad)
+                .ToList();
+        }
+
+        // Generar número de comprobante
+        private string GenerarNumeroComprobante(string tipo)
+        {
+            var prefijo = tipo == "Ingreso" ? "ING" : "EGR";
+            var fecha = DateTime.Now.ToString("yyyyMMdd");
+            var consecutivo = db.MovimientosContables
+                .Where(m => m.Tipo == tipo &&
+                           DbFunctions.TruncateTime(m.FechaMovimiento) == DbFunctions.TruncateTime(DateTime.Now))
+                .Count() + 1;
+
+            return $"{prefijo}-{fecha}-{consecutivo:D4}";
+        }
+
+        // Obtener estadísticas anuales
+        public Dictionary<int, decimal> ObtenerIngresosPorMes(int anio)
+        {
+            return db.MovimientosContables
+                .Where(m => m.Tipo == "Ingreso" &&
+                           m.FechaMovimiento.HasValue &&
+                           m.FechaMovimiento.Value.Year == anio)
+                .GroupBy(m => m.FechaMovimiento.Value.Month)
+                .Select(g => new { Mes = g.Key, Total = g.Sum(m => m.Monto) })
+                .ToDictionary(x => x.Mes, x => x.Total);
+        }
+
+        public Dictionary<int, decimal> ObtenerEgresosPorMes(int anio)
+        {
+            return db.MovimientosContables
+                .Where(m => m.Tipo == "Egreso" &&
+                           m.FechaMovimiento.HasValue &&
+                           m.FechaMovimiento.Value.Year == anio)
+                .GroupBy(m => m.FechaMovimiento.Value.Month)
+                .Select(g => new { Mes = g.Key, Total = g.Sum(m => m.Monto) })
+                .ToDictionary(x => x.Mes, x => x.Total);
         }
 
         public void Dispose()

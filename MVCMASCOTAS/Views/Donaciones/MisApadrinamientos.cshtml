@@ -1,7 +1,108 @@
-﻿
+﻿@model IEnumerable<MVCMASCOTAS.Models.Apadrinamientos>
+
 @{
-    ViewBag.Title = "MisApadrinamientos";
+    ViewBag.Title = "Mis Apadrinamientos";
 }
 
-<h2>MisApadrinamientos</h2>
+<div class="page-header mb-4">
+    <h2><i class="fas fa-heart"></i> Mis Apadrinamientos</h2>
+</div>
 
+@if (Model != null && Model.Any())
+{
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card shadow-custom text-center">
+                <div class="card-body">
+                    <h5>Apadrinamientos Activos</h5>
+                    <h2 class="text-danger">@Model.Count(a => a.Estado == "Activo")</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card shadow-custom text-center">
+                <div class="card-body">
+                    <h5>Contribución Mensual Total</h5>
+                    <h2 class="text-success">$@Model.Where(a => a.Estado == "Activo").Sum(a => a.MontoMensual).ToString("N2")</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    foreach (var apadrinamiento in Model)
+    {
+        <div class="card mb-4 shadow-custom">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3">
+                        @if (apadrinamiento.Mascotas.ImagenPrincipal != null)
+                        {
+                            <img src="@MVCMASCOTAS.Helpers.ImageHelper.GetImageDataUri(apadrinamiento.Mascotas.ImagenPrincipal)" class="img-fluid rounded" alt="@apadrinamiento.Mascotas.Nombre">
+                        }
+                        else
+                        {
+                            <img src="~/Content/images/no-image.png" class="img-fluid rounded" alt="Sin imagen">
+                        }
+                    </div>
+                    <div class="col-md-9">
+                        <div class="d-flex justify-content-between">
+                            <h4><i class="fas fa-paw"></i> @apadrinamiento.Mascotas.Nombre</h4>
+                            <span class="badge badge-pill @(apadrinamiento.Estado == "Activo" ? "badge-success" : "badge-secondary") p-2">
+                                @apadrinamiento.Estado
+                            </span>
+                        </div>
+
+                        <p class="text-muted">
+                            @apadrinamiento.Mascotas.Especie - @apadrinamiento.Mascotas.Raza - @apadrinamiento.Mascotas.Sexo
+                        </p>
+
+                        <div class="row mt-3">
+                            <div class="col-md-6">
+                                <p>
+                                    <strong><i class="fas fa-calendar-plus"></i> Desde:</strong> @apadrinamiento.FechaInicio.ToString("dd/MM/yyyy")<br />
+                                    <strong><i class="fas fa-dollar-sign"></i> Contribución Mensual:</strong> $@apadrinamiento.MontoMensual.ToString("N2")
+                                </p>
+                            </div>
+                            <div class="col-md-6">
+                                @if (apadrinamiento.Estado == "Activo")
+                                {
+                                    <a href="@Url.Action("Detalle", "Mascotas", new { id = apadrinamiento.MascotaId })" class="btn btn-info btn-sm">
+                                        <i class="fas fa-eye"></i> Ver Mascota
+                                    </a>
+                                }
+                                else if (apadrinamiento.FechaFin.HasValue)
+                                {
+                                    <p><strong><i class="fas fa-calendar-times"></i> Finalizado:</strong> @apadrinamiento.FechaFin.Value.ToString("dd/MM/yyyy")</p>
+                                    @if (!string.IsNullOrEmpty(apadrinamiento.MotivoFinalizacion))
+                                    {
+                                        <p><strong>Motivo:</strong> @apadrinamiento.MotivoFinalizacion</p>
+                                    }
+                                }
+                            </div>
+                        </div>
+
+                        @if (apadrinamiento.Estado == "Activo")
+                        {
+                            <div class="alert alert-success mt-3">
+                                <i class="fas fa-heart"></i> ¡Gracias por apadrinar a @apadrinamiento.Mascotas.Nombre! Tu ayuda mensual de $@apadrinamiento.MontoMensual.ToString("N2") está marcando una gran diferencia.
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+}
+else
+{
+    <div class="card shadow-custom">
+        <div class="card-body text-center py-5">
+            <i class="fas fa-heart fa-5x text-muted mb-3"></i>
+            <h4>Aún no apadrinas ninguna mascota</h4>
+            <p class="text-muted">¿Te gustaría apadrinar a un animal del refugio?</p>
+            <a href="@Url.Action("Apadrinar", "Donaciones")" class="btn btn-danger btn-lg">
+                <i class="fas fa-heart"></i> Ver Mascotas Disponibles
+            </a>
+        </div>
+    </div>
+}

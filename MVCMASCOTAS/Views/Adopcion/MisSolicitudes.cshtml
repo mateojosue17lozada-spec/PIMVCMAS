@@ -1,7 +1,105 @@
-﻿
+﻿@model IEnumerable<MVCMASCOTAS.Models.SolicitudAdopcion>
+
 @{
-    ViewBag.Title = "MisSolicitudes";
+    ViewBag.Title = "Mis Solicitudes de Adopción";
 }
 
-<h2>MisSolicitudes</h2>
+<div class="page-header mb-4">
+    <h2><i class="fas fa-file-alt"></i> Mis Solicitudes de Adopción</h2>
+</div>
 
+@if (Model != null && Model.Any())
+{
+    foreach (var solicitud in Model)
+    {
+        <div class="card mb-4 shadow-custom">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3">
+                        @if (solicitud.Mascotas.ImagenPrincipal != null)
+                        {
+                            <img src="@MVCMASCOTAS.Helpers.ImageHelper.GetImageDataUri(solicitud.Mascotas.ImagenPrincipal)" class="img-fluid rounded" alt="@solicitud.Mascotas.Nombre">
+                        }
+                        else
+                        {
+                            <img src="~/Content/images/no-image.png" class="img-fluid rounded" alt="Sin imagen">
+                        }
+                    </div>
+                    <div class="col-md-9">
+                        <h4>@solicitud.Mascotas.Nombre</h4>
+                        <p class="text-muted">@solicitud.Mascotas.Especie - @solicitud.Mascotas.Raza</p>
+
+                        <div class="row mt-3">
+                            <div class="col-md-6">
+                                <p><strong><i class="fas fa-calendar"></i> Fecha de Solicitud:</strong> @solicitud.FechaSolicitud.ToString("dd/MM/yyyy")</p>
+                                <p>
+                                    <strong><i class="fas fa-info-circle"></i> Estado:</strong>
+                                    @switch (solicitud.Estado)
+                                    {
+                                        case "Pendiente":
+                                            <span class="badge badge-warning">Pendiente</span>
+                                            break;
+                                        case "En evaluación":
+                                            <span class="badge badge-info">En Evaluación</span>
+                                            break;
+                                        case "Aprobada":
+                                            <span class="badge badge-success">Aprobada</span>
+                                            break;
+                                        case "Rechazada":
+                                            <span class="badge badge-danger">Rechazada</span>
+                                            break;
+                                        default:
+                                            <span class="badge badge-secondary">@solicitud.Estado</span>
+                                            break;
+                                    }
+                                </p>
+                            </div>
+                            <div class="col-md-6">
+                                @if (solicitud.PuntajeEvaluacion.HasValue)
+                                {
+                                    <p><strong><i class="fas fa-star"></i> Puntaje:</strong> @solicitud.PuntajeEvaluacion.Value / 100</p>
+                                }
+                                @if (solicitud.FechaAprobacion.HasValue)
+                                {
+                                    <p><strong><i class="fas fa-check"></i> Aprobada:</strong> @solicitud.FechaAprobacion.Value.ToString("dd/MM/yyyy")</p>
+                                }
+                                @if (solicitud.FechaRespuesta.HasValue && solicitud.Estado == "Rechazada")
+                                {
+                                    <p><strong><i class="fas fa-times"></i> Rechazada:</strong> @solicitud.FechaRespuesta.Value.ToString("dd/MM/yyyy")</p>
+                                }
+                            </div>
+                        </div>
+
+                        @if (!string.IsNullOrEmpty(solicitud.ObservacionesEvaluador))
+                        {
+                            <div class="alert alert-info mt-3">
+                                <strong><i class="fas fa-comment"></i> Observaciones del Evaluador:</strong><br />
+                                @solicitud.ObservacionesEvaluador
+                            </div>
+                        }
+
+                        @if (solicitud.Estado == "Aprobada")
+                        {
+                            <div class="alert alert-success mt-3">
+                                <i class="fas fa-check-circle"></i> ¡Felicitaciones! Tu solicitud ha sido aprobada. Nos pondremos en contacto contigo pronto para coordinar la entrega.
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+}
+else
+{
+    <div class="card shadow-custom">
+        <div class="card-body text-center py-5">
+            <i class="fas fa-folder-open fa-5x text-muted mb-3"></i>
+            <h4>No tienes solicitudes de adopción</h4>
+            <p class="text-muted">¿Qué esperas para darle un hogar a un animal necesitado?</p>
+            <a href="@Url.Action("Index", "Mascotas")" class="btn btn-primary btn-lg">
+                <i class="fas fa-paw"></i> Ver Mascotas Disponibles
+            </a>
+        </div>
+    </div>
+}

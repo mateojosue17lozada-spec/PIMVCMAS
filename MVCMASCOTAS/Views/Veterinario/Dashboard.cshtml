@@ -1,7 +1,130 @@
-﻿
-@{
-    ViewBag.Title = "Dashboard";
+﻿@{
+    ViewBag.Title = "Dashboard Veterinario";
 }
 
-<h2>Dashboard</h2>
+<div class="page-header mb-4">
+    <h2><i class="fas fa-stethoscope"></i> Panel Veterinario</h2>
+    <p class="text-muted">Gestión de salud animal</p>
+</div>
 
+<!-- Estadísticas -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card shadow-custom text-center">
+            <div class="card-body">
+                <i class="fas fa-paw fa-3x text-warning mb-3"></i>
+                <h3>@ViewBag.MascotasEnTratamiento</h3>
+                <p class="text-muted">Mascotas en Tratamiento</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card shadow-custom text-center">
+            <div class="card-body">
+                <i class="fas fa-notes-medical fa-3x text-primary mb-3"></i>
+                <h3>@ViewBag.TratamientosActivos</h3>
+                <p class="text-muted">Tratamientos Activos</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card shadow-custom text-center">
+            <div class="card-body">
+                <i class="fas fa-calendar-check fa-3x text-success mb-3"></i>
+                <h3>@ViewBag.CitasHoy</h3>
+                <p class="text-muted">Consultas Hoy</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card shadow-custom text-center">
+            <div class="card-body">
+                <i class="fas fa-syringe fa-3x text-info mb-3"></i>
+                <h3>@ViewBag.VacunasAplicadasEsteMes</h3>
+                <p class="text-muted">Vacunas Este Mes</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Mascotas que Requieren Atención -->
+<div class="row">
+    <div class="col-md-6">
+        <div class="card shadow-custom mb-4">
+            <div class="card-header bg-warning text-white">
+                <h5><i class="fas fa-exclamation-triangle"></i> Mascotas que Requieren Atención</h5>
+            </div>
+            <div class="card-body">
+                @if (ViewBag.MascotasAtencion != null && ViewBag.MascotasAtencion.Count > 0)
+                {
+                    <div class="list-group">
+                        @foreach (var mascota in ViewBag.MascotasAtencion)
+                        {
+                            <a href="@Url.Action("HistorialMedico", "Veterinario", new { mascotaId = mascota.MascotaId })" class="list-group-item list-group-item-action">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h6 class="mb-1"><i class="fas fa-paw"></i> @mascota.Nombre</h6>
+                                    <small>@mascota.FechaIngreso.ToString("dd/MM/yyyy")</small>
+                                </div>
+                                <p class="mb-1">@mascota.Especie - @mascota.Raza</p>
+                                <small class="text-muted">Estado: @mascota.Estado</small>
+                            </a>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <p class="text-center text-muted">No hay mascotas pendientes de atención</p>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card shadow-custom mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5><i class="fas fa-pills"></i> Tratamientos en Curso</h5>
+            </div>
+            <div class="card-body">
+                @if (ViewBag.TratamientosPendientes != null && ViewBag.TratamientosPendientes.Count > 0)
+                {
+                    <div class="list-group">
+                        @foreach (var tratamiento in ViewBag.TratamientosPendientes)
+                        {
+                            <a href="@Url.Action("HistorialMedico", "Veterinario", new { mascotaId = tratamiento.MascotaId })" class="list-group-item list-group-item-action">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h6 class="mb-1">@tratamiento.Mascotas.Nombre</h6>
+                                    <small>@tratamiento.FechaInicio.ToString("dd/MM/yyyy")</small>
+                                </div>
+                                <p class="mb-1"><strong>@tratamiento.TipoTratamiento</strong></p>
+                                <small class="text-muted">Duración estimada: @tratamiento.DuracionEstimadaDias días</small>
+                            </a>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <p class="text-center text-muted">No hay tratamientos activos</p>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Accesos Rápidos -->
+<div class="row">
+    <div class="col-md-4 mb-3">
+        <a href="@Url.Action("Mascotas", "Veterinario")" class="btn btn-primary btn-lg btn-block">
+            <i class="fas fa-list"></i> Ver Todas las Mascotas
+        </a>
+    </div>
+    <div class="col-md-4 mb-3">
+        <a href="@Url.Action("ListaVacunas", "Veterinario")" class="btn btn-success btn-lg btn-block">
+            <i class="fas fa-syringe"></i> Gestionar Vacunas
+        </a>
+    </div>
+    <div class="col-md-4 mb-3">
+        <a href="@Url.Action("Gestionar", "Mascotas")" class="btn btn-info btn-lg btn-block">
+            <i class="fas fa-plus"></i> Registrar Nueva Mascota
+        </a>
+    </div>
+</div>

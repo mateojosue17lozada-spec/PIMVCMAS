@@ -1,7 +1,189 @@
-﻿
+﻿@model MVCMASCOTAS.Models.ViewModels.DashboardViewModel
+
 @{
-    ViewBag.Title = "Dashboard";
+    ViewBag.Title = "Dashboard Administrativo";
 }
 
-<h2>Dashboard</h2>
+<div class="page-header mb-4">
+    <h2><i class="fas fa-user-shield"></i> Panel de Administración</h2>
+    <p class="text-muted">Vista general del sistema</p>
+</div>
 
+<!-- Estadísticas Principales -->
+<div class="row mb-4">
+    <div class="col-md-3 mb-3">
+        <div class="card shadow-custom text-center bg-primary text-white">
+            <div class="card-body">
+                <i class="fas fa-paw fa-3x mb-3"></i>
+                <h3>@Model.TotalMascotas</h3>
+                <p>Total Mascotas</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card shadow-custom text-center bg-success text-white">
+            <div class="card-body">
+                <i class="fas fa-heart fa-3x mb-3"></i>
+                <h3>@Model.TotalAdopciones</h3>
+                <p>Adopciones Exitosas</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card shadow-custom text-center bg-warning text-white">
+            <div class="card-body">
+                <i class="fas fa-file-alt fa-3x mb-3"></i>
+                <h3>@Model.SolicitudesPendientes</h3>
+                <p>Solicitudes Pendientes</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card shadow-custom text-center bg-info text-white">
+            <div class="card-body">
+                <i class="fas fa-users fa-3x mb-3"></i>
+                <h3>@Model.TotalUsuarios</h3>
+                <p>Usuarios Registrados</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Segunda Fila de Estadísticas -->
+<div class="row mb-4">
+    <div class="col-md-3 mb-3">
+        <div class="card shadow-custom text-center">
+            <div class="card-body">
+                <i class="fas fa-dollar-sign fa-3x text-success mb-3"></i>
+                <h4>$@Model.MontoRecaudadoMes.ToString("N2")</h4>
+                <p class="text-muted">Donaciones Este Mes</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card shadow-custom text-center">
+            <div class="card-body">
+                <i class="fas fa-hand-holding-heart fa-3x text-danger mb-3"></i>
+                <h4>@Model.ApadrinamientosActivos</h4>
+                <p class="text-muted">Apadrinamientos Activos</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card shadow-custom text-center">
+            <div class="card-body">
+                <i class="fas fa-box fa-3x text-primary mb-3"></i>
+                <h4>@Model.ProductosEnStock</h4>
+                <p class="text-muted">Productos en Stock</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card shadow-custom text-center">
+            <div class="card-body">
+                <i class="fas fa-hands-helping fa-3x text-warning mb-3"></i>
+                <h4>@Model.TotalVoluntarios</h4>
+                <p class="text-muted">Voluntarios Activos</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Solicitudes Pendientes de Atención -->
+@if (ViewBag.SolicitudesPendientes != null && ViewBag.SolicitudesPendientes.Count > 0)
+{
+    <div class="card shadow-custom mb-4">
+        <div class="card-header bg-warning text-white">
+            <h5><i class="fas fa-exclamation-triangle"></i> Solicitudes Pendientes de Atención</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Usuario</th>
+                            <th>Mascota</th>
+                            <th>Fecha</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var solicitud in ViewBag.SolicitudesPendientes)
+                        {
+                            <tr>
+                                <td>@solicitud.Usuarios.NombreCompleto</td>
+                                <td>@solicitud.Mascotas.Nombre</td>
+                                <td>@solicitud.FechaSolicitud.ToString("dd/MM/yyyy")</td>
+                                <td><span class="badge badge-warning">@solicitud.Estado</span></td>
+                                <td>
+                                    <a href="@Url.Action("DetallesSolicitud", "Admin", new { id = solicitud.SolicitudId })" class="btn btn-sm btn-info">
+                                        <i class="fas fa-eye"></i> Ver
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <a href="@Url.Action("SolicitudesAdopcion", "Admin")" class="btn btn-primary">Ver Todas las Solicitudes</a>
+        </div>
+    </div>
+}
+
+<!-- Actividades Recientes -->
+@if (ViewBag.ActividadesRecientes != null && ViewBag.ActividadesRecientes.Count > 0)
+{
+    <div class="card shadow-custom">
+        <div class="card-header">
+            <h5><i class="fas fa-history"></i> Actividad Reciente del Sistema</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Usuario</th>
+                            <th>Acción</th>
+                            <th>Controlador</th>
+                            <th>Detalles</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var actividad in ViewBag.ActividadesRecientes)
+                        {
+                            <tr>
+                                <td>@actividad.FechaAccion.ToString("dd/MM/yyyy HH:mm")</td>
+                                <td>@(actividad.Usuarios?.NombreCompleto ?? "Sistema")</td>
+                                <td><span class="badge badge-info">@actividad.Accion</span></td>
+                                <td>@actividad.Controlador</td>
+                                <td>@actividad.Detalles</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <a href="@Url.Action("Auditoria", "Admin")" class="btn btn-secondary btn-sm">Ver Auditoría Completa</a>
+        </div>
+    </div>
+}
+
+<!-- Accesos Rápidos -->
+<div class="row mt-4">
+    <div class="col-md-4 mb-3">
+        <a href="@Url.Action("Usuarios", "Admin")" class="btn btn-outline-primary btn-lg btn-block">
+            <i class="fas fa-users"></i> Gestionar Usuarios
+        </a>
+    </div>
+    <div class="col-md-4 mb-3">
+        <a href="@Url.Action("SolicitudesAdopcion", "Admin")" class="btn btn-outline-success btn-lg btn-block">
+            <i class="fas fa-file-alt"></i> Solicitudes de Adopción
+        </a>
+    </div>
+    <div class="col-md-4 mb-3">
+        <a href="@Url.Action("Configuracion", "Admin")" class="btn btn-outline-warning btn-lg btn-block">
+            <i class="fas fa-cog"></i> Configuración del Sistema
+        </a>
+    </div>
+</div>

@@ -1,109 +1,187 @@
-﻿html
-@{
+﻿@{
     ViewBag.Title = "Inicio";
 }
 
-<div class="jumbotron text-center bg-light p-5 rounded">
-    <h1 class="display-4">🐾 Bienvenido al Refugio de Animales Quito</h1>
-    <p class="lead">Dale una segunda oportunidad a una mascota que te necesita</p>
-    <hr class="my-4">
-    <p>Conoce a nuestras mascotas disponibles para adopción</p>
-    <a class="btn btn-primary btn-lg" href="@Url.Action("Index", "Mascotas")" role="button">
-        Ver Mascotas Disponibles
-    </a>
-</div>
-
-<div class="row mt-5">
-    <div class="col-md-4 text-center mb-3">
-        <div class="card h-100">
-            <div class="card-body">
-                <h3>🏠 Adopta</h3>
-                <p>Encuentra a tu compañero perfecto y dale un hogar lleno de amor.</p>
-                <a href="@Url.Action("Index", "Mascotas")" class="btn btn-outline-primary">Conoce a nuestras mascotas</a>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-4 text-center mb-3">
-        <div class="card h-100">
-            <div class="card-body">
-                <h3>💝 Dona</h3>
-                <p>Ayúdanos a seguir rescatando y cuidando a más animales.</p>
-                <a href="#" class="btn btn-outline-success">Hacer una donación</a>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-4 text-center mb-3">
-        <div class="card h-100">
-            <div class="card-body">
-                <h3>🤝 Voluntariado</h3>
-                <p>Únete a nuestro equipo y marca la diferencia.</p>
-                <a href="#" class="btn btn-outline-info">Ser voluntario</a>
-            </div>
+<!-- Hero Section -->
+<div class="jumbotron jumbotron-fluid bg-primary text-white text-center" style="background: linear-gradient(135deg, #3498db, #2c3e50); padding: 100px 0;">
+    <div class="container">
+        <h1 class="display-3"><i class="fas fa-heart"></i> Refugio de Animales Quito</h1>
+        <p class="lead">Salvando vidas, un animal a la vez</p>
+        <hr class="my-4 bg-white">
+        <p>Adopta, dona, apadrina o hazte voluntario. ¡Tu ayuda marca la diferencia!</p>
+        <div class="mt-4">
+            <a class="btn btn-light btn-lg mr-3" href="@Url.Action("Index", "Mascotas")" role="button">
+                <i class="fas fa-dog"></i> Adoptar una Mascota
+            </a>
+            <a class="btn btn-outline-light btn-lg" href="@Url.Action("Index", "Donaciones")" role="button">
+                <i class="fas fa-hand-holding-heart"></i> Hacer una Donación
+            </a>
         </div>
     </div>
 </div>
 
-<div class="row mt-5">
-    <div class="col-12">
-        <h2 class="text-center mb-4">Estadísticas del Refugio</h2>
-    </div>
-    <div class="col-md-3 text-center mb-3">
-        <div class="card p-3">
-            <h4 class="text-primary display-4">@ViewBag.TotalMascotasDisponibles</h4>
-            <p>Disponibles para Adopción</p>
+<!-- Estadísticas -->
+<div class="container my-5">
+    <div class="row text-center">
+        <div class="col-md-3">
+            <div class="stat-box bg-success">
+                <div class="stat-value">@ViewBag.TotalMascotas</div>
+                <div class="stat-label">Mascotas Rescatadas</div>
+            </div>
         </div>
-    </div>
-    <div class="col-md-3 text-center mb-3">
-        <div class="card p-3">
-            <h4 class="text-success display-4">@ViewBag.TotalAdopciones</h4>
-            <p>Adopciones Exitosas</p>
+        <div class="col-md-3">
+            <div class="stat-box bg-info">
+                <div class="stat-value">@ViewBag.MascotasDisponibles</div>
+                <div class="stat-label">Disponibles para Adopción</div>
+            </div>
         </div>
-    </div>
-    <div class="col-md-3 text-center mb-3">
-        <div class="card p-3">
-            <h4 class="text-info display-4">@ViewBag.TotalVoluntarios</h4>
-            <p>Voluntarios Activos</p>
+        <div class="col-md-3">
+            <div class="stat-box bg-warning">
+                <div class="stat-value">@ViewBag.TotalAdopciones</div>
+                <div class="stat-label">Adopciones Exitosas</div>
+            </div>
         </div>
-    </div>
-    <div class="col-md-3 text-center mb-3">
-        <div class="card p-3">
-            <h4 class="text-warning display-4">100+</h4>
-            <p>Mascotas Rescatadas</p>
+        <div class="col-md-3">
+            <div class="stat-box bg-danger">
+                <div class="stat-value">@ViewBag.TotalVoluntarios</div>
+                <div class="stat-label">Voluntarios Activos</div>
+            </div>
         </div>
     </div>
 </div>
 
-@if (ViewBag.MascotasDestacadas != null && ((System.Collections.IList)ViewBag.MascotasDestacadas).Count > 0)
-{
-    <div class="row mt-5">
-        <div class="col-12">
-            <h2 class="text-center mb-4">Mascotas Destacadas</h2>
-        </div>
-        @foreach (var mascota in ViewBag.MascotasDestacadas)
+<!-- Mascotas Destacadas -->
+<div class="container my-5">
+    <h2 class="text-center mb-4">
+        <i class="fas fa-star"></i> Mascotas Buscando Hogar
+    </h2>
+    <div class="row">
+        @if (ViewBag.MascotasDestacadas != null)
         {
-            <div class="col-md-4 mb-4">
-                <div class="card h-100">
-                    @if (mascota.ImagenPrincipal != null)
-                    {
-                        <img src="@MVCMASCOTAS.Helpers.ImageHelper.GetImageDataUri(mascota.ImagenPrincipal)" class="card-img-top" alt="@mascota.Nombre" style="height: 250px; object-fit: cover;">
-                    }
-                    else
-                    {
-                        <div class="card-img-top bg-secondary d-flex align-items-center justify-content-center" style="height: 250px;">
-                            <span class="text-white">Sin imagen</span>
+            foreach (var mascota in ViewBag.MascotasDestacadas)
+            {
+                <div class="col-md-4 mb-4">
+                    <div class="card mascota-card">
+                        @if (mascota.ImagenPrincipal != null)
+                        {
+                            <img src="@MVCMASCOTAS.Helpers.ImageHelper.GetImageDataUri(mascota.ImagenPrincipal)" class="card-img-top" alt="@mascota.Nombre">
+                        }
+                        else
+                        {
+                            <img src="~/Content/images/no-image.png" class="card-img-top" alt="Sin imagen">
+                        }
+                        <div class="card-body">
+                            <h5 class="card-title">@mascota.Nombre</h5>
+                            <p class="card-text">
+                                <i class="fas fa-paw"></i> @mascota.Especie<br />
+                                <i class="fas fa-venus-mars"></i> @mascota.Sexo<br />
+                                <i class="fas fa-ruler"></i> @mascota.Tamanio
+                            </p>
+                            <a href="@Url.Action("Detalle", "Mascotas", new { id = mascota.MascotaId })" class="btn btn-primary btn-block">
+                                <i class="fas fa-info-circle"></i> Ver Detalles
+                            </a>
                         </div>
-                    }
+                    </div>
+                </div>
+            }
+        }
+    </div>
+    <div class="text-center mt-4">
+        <a href="@Url.Action("Index", "Mascotas")" class="btn btn-primary btn-lg">
+            Ver Todas las Mascotas <i class="fas fa-arrow-right"></i>
+        </a>
+    </div>
+</div>
+
+<!-- Cómo Ayudar -->
+<div class="bg-light py-5">
+    <div class="container">
+        <h2 class="text-center mb-5">
+            <i class="fas fa-hands-helping"></i> ¿Cómo Puedes Ayudar?
+        </h2>
+        <div class="row">
+            <div class="col-md-3 text-center mb-4">
+                <div class="card h-100 shadow-custom">
                     <div class="card-body">
-                        <h5 class="card-title">@mascota.Nombre</h5>
-                        <p class="card-text">
-                            <strong>Especie:</strong> @mascota.Especie<br />
-                            <strong>Edad:</strong> @mascota.EdadAproximada<br />
-                            <strong>Tamaño:</strong> @mascota.Tamanio
-                        </p>
-                        <a href="@Url.Action("Detalle", "Mascotas", new { id = mascota.MascotaId })" class="btn btn-primary w-100">Ver Detalles</a>
+                        <i class="fas fa-home fa-3x text-primary mb-3"></i>
+                        <h5 class="card-title">Adoptar</h5>
+                        <p class="card-text">Dale un hogar permanente a un animal necesitado.</p>
+                        <a href="@Url.Action("Index", "Mascotas")" class="btn btn-primary">Adoptar</a>
                     </div>
                 </div>
             </div>
-        }
+            <div class="col-md-3 text-center mb-4">
+                <div class="card h-100 shadow-custom">
+                    <div class="card-body">
+                        <i class="fas fa-dollar-sign fa-3x text-success mb-3"></i>
+                        <h5 class="card-title">Donar</h5>
+                        <p class="card-text">Tu donación nos ayuda a seguir rescatando vidas.</p>
+                        <a href="@Url.Action("Index", "Donaciones")" class="btn btn-success">Donar</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 text-center mb-4">
+                <div class="card h-100 shadow-custom">
+                    <div class="card-body">
+                        <i class="fas fa-heart fa-3x text-danger mb-3"></i>
+                        <h5 class="card-title">Apadrinar</h5>
+                        <p class="card-text">Apadrina una mascota con una contribución mensual.</p>
+                        <a href="@Url.Action("Apadrinar", "Donaciones")" class="btn btn-danger">Apadrinar</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 text-center mb-4">
+                <div class="card h-100 shadow-custom">
+                    <div class="card-body">
+                        <i class="fas fa-hands fa-3x text-warning mb-3"></i>
+                        <h5 class="card-title">Voluntariado</h5>
+                        <p class="card-text">Dona tu tiempo y únete a nuestro equipo.</p>
+                        <a href="@Url.Action("Index", "Voluntariado")" class="btn btn-warning">Ser Voluntario</a>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
+</div>
+
+<!-- Testimonios -->
+<div class="container my-5">
+    <h2 class="text-center mb-5">
+        <i class="fas fa-comments"></i> Historias de Éxito
+    </h2>
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <div class="card shadow-custom">
+                <div class="card-body">
+                    <p class="card-text">"Adoptar a Luna fue la mejor decisión. ¡Es parte de nuestra familia!"</p>
+                    <footer class="blockquote-footer">María G. - <cite title="Source Title">Adoptante</cite></footer>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card shadow-custom">
+                <div class="card-body">
+                    <p class="card-text">"Ser voluntario aquí me ha dado un propósito. ¡Es increíble!"</p>
+                    <footer class="blockquote-footer">Carlos R. - <cite title="Source Title">Voluntario</cite></footer>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card shadow-custom">
+                <div class="card-body">
+                    <p class="card-text">"Apadrino a Max desde hace 6 meses. Recibo fotos y me hace muy feliz."</p>
+                    <footer class="blockquote-footer">Ana L. - <cite title="Source Title">Madrina</cite></footer>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <script>
+        $(document).ready(function () {
+            // Animaciones al cargar
+            $('.stat-box').addClass('fade-in');
+        });
+    </script>
 }

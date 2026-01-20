@@ -1,0 +1,173 @@
+﻿@{
+    ViewBag.Title = "Donaciones";
+}
+
+<div class="jumbotron jumbotron-fluid text-center" style="background: linear-gradient(135deg, #2ecc71, #27ae60); color: white;">
+    <div class="container">
+        <h1 class="display-4"><i class="fas fa-hand-holding-heart"></i> ¡Tu Ayuda Marca la Diferencia!</h1>
+        <p class="lead">Cada donación nos permite rescatar, cuidar y encontrar hogares para animales necesitados</p>
+    </div>
+</div>
+
+<!-- Estadísticas -->
+<div class="container my-5">
+    <div class="row text-center">
+        <div class="col-md-4">
+            <div class="stat-box bg-success">
+                <div class="stat-value">@ViewBag.TotalDonaciones</div>
+                <div class="stat-label">Donaciones Recibidas</div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-box bg-primary">
+                <div class="stat-value">$@ViewBag.MontoTotalRecaudado.ToString("N2")</div>
+                <div class="stat-label">Total Recaudado</div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-box bg-warning">
+                <div class="stat-value">@ViewBag.DonacionesEsteMes</div>
+                <div class="stat-label">Donaciones Este Mes</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tipos de Donaciones -->
+<div class="container my-5">
+    <h2 class="text-center mb-5"><i class="fas fa-gift"></i> Formas de Ayudar</h2>
+
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="card h-100 shadow-custom">
+                <div class="card-body text-center">
+                    <i class="fas fa-dollar-sign fa-4x text-success mb-3"></i>
+                    <h4 class="card-title">Donación Monetaria</h4>
+                    <p class="card-text">Tu donación nos ayuda a cubrir gastos veterinarios, alimentación y mantenimiento del refugio.</p>
+                    <ul class="text-left">
+                        <li>Atención veterinaria</li>
+                        <li>Alimento y suplementos</li>
+                        <li>Medicamentos</li>
+                        <li>Mantenimiento del refugio</li>
+                    </ul>
+                    <a href="@Url.Action("Donar", "Donaciones")" class="btn btn-success btn-lg btn-block mt-3">
+                        <i class="fas fa-hand-holding-usd"></i> Donar Ahora
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 mb-4">
+            <div class="card h-100 shadow-custom">
+                <div class="card-body text-center">
+                    <i class="fas fa-box fa-4x text-primary mb-3"></i>
+                    <h4 class="card-title">Donación en Especie</h4>
+                    <p class="card-text">También aceptamos donaciones de productos y materiales que necesitamos.</p>
+                    <ul class="text-left">
+                        <li>Alimento para mascotas</li>
+                        <li>Juguetes y accesorios</li>
+                        <li>Productos de limpieza</li>
+                        <li>Mantas y camas</li>
+                    </ul>
+                    <a href="@Url.Action("Donar", "Donaciones")" class="btn btn-primary btn-lg btn-block mt-3">
+                        <i class="fas fa-boxes"></i> Donar en Especie
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Apadrinamiento -->
+<div class="bg-light py-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <h2><i class="fas fa-heart"></i> Programa de Apadrinamiento</h2>
+                <p class="lead">¿No puedes adoptar pero quieres ayudar? ¡Apadrina una mascota!</p>
+                <p>Con una contribución mensual ayudas a cubrir los gastos de cuidado de una mascota específica. Recibirás:</p>
+                <ul>
+                    <li>Actualizaciones mensuales con fotos</li>
+                    <li>Certificado de apadrinamiento</li>
+                    <li>Visitas programadas (opcional)</li>
+                    <li>Reconocimiento en redes sociales</li>
+                </ul>
+                @if (Request.IsAuthenticated)
+                {
+                    <a href="@Url.Action("Apadrinar", "Donaciones")" class="btn btn-danger btn-lg">
+                        <i class="fas fa-heart"></i> Apadrinar una Mascota
+                    </a>
+                }
+                else
+                {
+                    <a href="@Url.Action("Login", "Account")" class="btn btn-danger btn-lg">
+                        <i class="fas fa-sign-in-alt"></i> Iniciar Sesión para Apadrinar
+                    </a>
+                }
+            </div>
+            <div class="col-md-6 text-center">
+                <i class="fas fa-paw fa-10x text-danger"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Últimas Donaciones -->
+@if (ViewBag.UltimasDonaciones != null && ViewBag.UltimasDonaciones.Count > 0)
+{
+    <div class="container my-5">
+        <h2 class="text-center mb-4"><i class="fas fa-users"></i> Nuestros Donantes</h2>
+        <div class="card shadow-custom">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Donante</th>
+                                <th>Tipo</th>
+                                <th>Fecha</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var donacion in ViewBag.UltimasDonaciones)
+                            {
+                                <tr>
+                                    <td><i class="fas fa-user-circle"></i> @donacion.Donante</td>
+                                    <td><span class="badge badge-info">@donacion.Tipo</span></td>
+                                    <td>@donacion.Fecha.ToString("dd/MM/yyyy")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<!-- Transparencia -->
+<div class="container my-5">
+    <div class="card shadow-custom">
+        <div class="card-body">
+            <h3 class="text-center mb-4"><i class="fas fa-shield-alt"></i> Compromiso de Transparencia</h3>
+            <p class="text-center">En el Refugio de Animales Quito, nos comprometemos a usar cada donación de manera responsable y transparente.</p>
+            <div class="row text-center mt-4">
+                <div class="col-md-4">
+                    <i class="fas fa-file-invoice-dollar fa-3x text-primary mb-3"></i>
+                    <h5>Reportes Financieros</h5>
+                    <p>Publicamos reportes trimestrales</p>
+                </div>
+                <div class="col-md-4">
+                    <i class="fas fa-camera fa-3x text-success mb-3"></i>
+                    <h5>Actualizaciones</h5>
+                    <p>Compartimos el impacto de tu ayuda</p>
+                </div>
+                <div class="col-md-4">
+                    <i class="fas fa-hands-helping fa-3x text-warning mb-3"></i>
+                    <h5>Compromiso</h5>
+                    <p>100% dedicados al bienestar animal</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

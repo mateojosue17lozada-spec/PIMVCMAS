@@ -1,7 +1,95 @@
-﻿
-@{
-    ViewBag.Title = "MisActividades";
+﻿@{
+    ViewBag.Title = "Mis Actividades de Voluntariado";
 }
 
-<h2>MisActividades</h2>
+<div class="page-header mb-4">
+    <h2><i class="fas fa-calendar-check"></i> Mis Actividades de Voluntariado</h2>
+    <p class="text-muted">Horas totales acumuladas: <strong>@ViewBag.HorasTotales</strong></p>
+</div>
 
+<!-- Actividades Próximas -->
+<div class="card shadow-custom mb-4">
+    <div class="card-header bg-primary text-white">
+        <h5><i class="fas fa-calendar-alt"></i> Actividades Próximas</h5>
+    </div>
+    <div class="card-body">
+        @if (ViewBag.ActividadesProximas != null && ViewBag.ActividadesProximas.Count > 0)
+        {
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Actividad</th>
+                            <th>Fecha</th>
+                            <th>Lugar</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var inscripcion in ViewBag.ActividadesProximas)
+                        {
+                            <tr>
+                                <td><strong>@inscripcion.Actividades.NombreActividad</strong></td>
+                                <td>@inscripcion.Actividades.FechaActividad.ToString("dd/MM/yyyy HH:mm")</td>
+                                <td>@inscripcion.Actividades.Lugar</td>
+                                <td><span class="badge badge-success">@inscripcion.Estado</span></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i> No tienes actividades próximas. <a href="@Url.Action("Actividades", "Voluntariado")">Ver actividades disponibles</a>
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Historial de Actividades -->
+<div class="card shadow-custom">
+    <div class="card-header">
+        <h5><i class="fas fa-history"></i> Historial de Actividades</h5>
+    </div>
+    <div class="card-body">
+        @if (ViewBag.HistorialActividades != null && ViewBag.HistorialActividades.Count > 0)
+        {
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Actividad</th>
+                            <th>Fecha</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var inscripcion in ViewBag.HistorialActividades)
+                        {
+                            <tr>
+                                <td>@inscripcion.Actividades.NombreActividad</td>
+                                <td>@inscripcion.Actividades.FechaActividad.ToString("dd/MM/yyyy")</td>
+                                <td>
+                                    @if (inscripcion.Estado == "Completada")
+                                    {
+                                        <span class="badge badge-success">Completada</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge badge-secondary">@inscripcion.Estado</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <p class="text-muted text-center">Aún no has participado en ninguna actividad</p>
+        }
+    </div>
+</div>

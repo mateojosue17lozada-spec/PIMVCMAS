@@ -1,0 +1,204 @@
+﻿@{
+    ViewBag.Title = "Voluntariado";
+}
+
+<div class="jumbotron jumbotron-fluid text-center" style="background: linear-gradient(135deg, #f39c12, #e67e22); color: white;">
+    <div class="container">
+        <h1 class="display-4"><i class="fas fa-hands-helping"></i> ¡Únete a Nuestro Equipo!</h1>
+        <p class="lead">Tu tiempo y dedicación pueden cambiar la vida de muchos animales</p>
+    </div>
+</div>
+
+<!-- Estadísticas -->
+<div class="container my-5">
+    <div class="row text-center">
+        <div class="col-md-4">
+            <div class="stat-box bg-warning">
+                <div class="stat-value">@ViewBag.TotalVoluntarios</div>
+                <div class="stat-label">Voluntarios Activos</div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-box bg-primary">
+                <div class="stat-value">@ViewBag.HorasTotales</div>
+                <div class="stat-label">Horas de Servicio</div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-box bg-success">
+                <div class="stat-value">@ViewBag.ActividadesRealizadas</div>
+                <div class="stat-label">Actividades Realizadas</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ¿Por qué ser voluntario? -->
+<div class="container my-5">
+    <h2 class="text-center mb-5"><i class="fas fa-heart"></i> ¿Por Qué Ser Voluntario?</h2>
+
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow-custom text-center">
+                <div class="card-body">
+                    <i class="fas fa-paw fa-4x text-warning mb-3"></i>
+                    <h5>Ayuda Directa</h5>
+                    <p>Trabajarás directamente con los animales, brindándoles cuidado y amor.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow-custom text-center">
+                <div class="card-body">
+                    <i class="fas fa-users fa-4x text-primary mb-3"></i>
+                    <h5>Comunidad</h5>
+                    <p>Conocerás personas con tus mismos valores e intereses.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow-custom text-center">
+                <div class="card-body">
+                    <i class="fas fa-heart fa-4x text-danger mb-3"></i>
+                    <h5>Satisfacción Personal</h5>
+                    <p>La gratitud de los animales es incomparable.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Actividades de Voluntariado -->
+<div class="bg-light py-5">
+    <div class="container">
+        <h2 class="text-center mb-5"><i class="fas fa-tasks"></i> Actividades que Puedes Realizar</h2>
+
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <div class="media">
+                    <i class="fas fa-dog fa-2x text-primary mr-3"></i>
+                    <div class="media-body">
+                        <h5>Paseo de Perros</h5>
+                        <p>Ayuda a socializar y ejercitar a nuestros perros.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-3">
+                <div class="media">
+                    <i class="fas fa-broom fa-2x text-success mr-3"></i>
+                    <div class="media-body">
+                        <h5>Limpieza y Mantenimiento</h5>
+                        <p>Mantén las instalaciones limpias y acogedoras.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-3">
+                <div class="media">
+                    <i class="fas fa-utensils fa-2x text-warning mr-3"></i>
+                    <div class="media-body">
+                        <h5>Alimentación</h5>
+                        <p>Prepara y sirve alimento a los animales.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-3">
+                <div class="media">
+                    <i class="fas fa-camera fa-2x text-info mr-3"></i>
+                    <div class="media-body">
+                        <h5>Fotografía y Redes</h5>
+                        <p>Ayuda a promover a los animales en adopción.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-3">
+                <div class="media">
+                    <i class="fas fa-calendar fa-2x text-danger mr-3"></i>
+                    <div class="media-body">
+                        <h5>Eventos Especiales</h5>
+                        <p>Participa en campañas de adopción y eventos.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-3">
+                <div class="media">
+                    <i class="fas fa-hand-holding-heart fa-2x text-purple mr-3"></i>
+                    <div class="media-body">
+                        <h5>Socialización</h5>
+                        <p>Brinda cariño y atención a los animales.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Próximas Actividades -->
+@if (ViewBag.ProximasActividades != null && ViewBag.ProximasActividades.Count > 0)
+{
+    <div class="container my-5">
+        <h2 class="text-center mb-4"><i class="fas fa-calendar-alt"></i> Próximas Actividades</h2>
+        <div class="row">
+            @foreach (var actividad in ViewBag.ProximasActividades)
+            {
+                <div class="col-md-12 mb-3">
+                    <div class="card shadow-custom">
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                <div class="col-md-8">
+                                    <h5><i class="fas fa-calendar-day"></i> @actividad.NombreActividad</h5>
+                                    <p class="mb-1"><strong>Fecha:</strong> @actividad.FechaActividad.ToString("dd/MM/yyyy HH:mm")</p>
+                                    <p class="mb-1"><strong>Lugar:</strong> @actividad.Lugar</p>
+                                    <p class="mb-0">@actividad.Descripcion</p>
+                                </div>
+                                <div class="col-md-4 text-right">
+                                    @if (Request.IsAuthenticated)
+                                    {
+                                        <button class="btn btn-warning btn-inscribir-actividad" data-actividad-id="@actividad.ActividadId">
+                                            <i class="fas fa-user-plus"></i> Inscribirme
+                                        </button>
+                                    }
+                                    else
+                                    {
+                                        <a href="@Url.Action("Login", "Account")" class="btn btn-warning">
+                                            <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+                                        </a>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+        <div class="text-center mt-4">
+            <a href="@Url.Action("Actividades", "Voluntariado")" class="btn btn-primary btn-lg">
+                Ver Todas las Actividades
+            </a>
+        </div>
+    </div>
+}
+
+<!-- CTA Inscripción -->
+<div class="container my-5">
+    <div class="card shadow-custom bg-warning">
+        <div class="card-body text-center py-5">
+            <h2 class="text-white mb-4"><i class="fas fa-hand-point-right"></i> ¿Listo para Hacer la Diferencia?</h2>
+            @if (Request.IsAuthenticated)
+            {
+                <a href="@Url.Action("Inscribirse", "Voluntariado")" class="btn btn-light btn-lg">
+                    <i class="fas fa-hands-helping"></i> Inscribirme como Voluntario
+                </a>
+            }
+            else
+            {
+                <a href="@Url.Action("Register", "Account")" class="btn btn-light btn-lg">
+                    <i class="fas fa-user-plus"></i> Registrarse y Ser Voluntario
+                </a>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @Html.AntiForgeryToken()
+}

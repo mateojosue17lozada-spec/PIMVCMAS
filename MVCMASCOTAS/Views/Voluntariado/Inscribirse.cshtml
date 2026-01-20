@@ -1,7 +1,73 @@
-﻿
-@{
-    ViewBag.Title = "Inscribirse";
+﻿@{
+    ViewBag.Title = "Inscribirse como Voluntario";
 }
 
-<h2>Inscribirse</h2>
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        @if (ViewBag.EsVoluntario == true)
+        {
+            <div class="card shadow-custom">
+                <div class="card-body text-center py-5">
+                    <i class="fas fa-check-circle fa-5x text-success mb-3"></i>
+                    <h3>¡Ya eres Voluntario!</h3>
+                    <p class="lead">Gracias por ser parte de nuestro equipo</p>
+                    <a href="@Url.Action("MisActividades", "Voluntariado")" class="btn btn-primary btn-lg">
+                        <i class="fas fa-calendar-check"></i> Ver Mis Actividades
+                    </a>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="card shadow-custom">
+                <div class="card-header bg-warning text-white">
+                    <h3><i class="fas fa-hands-helping"></i> Inscripción de Voluntario</h3>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <h5><i class="fas fa-info-circle"></i> Antes de continuar</h5>
+                        <p class="mb-0">Como voluntario tendrás acceso a actividades exclusivas y podrás contribuir directamente al bienestar de nuestros animales. El compromiso mínimo es de 4 horas mensuales.</p>
+                    </div>
 
+                    @using (Html.BeginForm("ConfirmarInscripcion", "Voluntariado", FormMethod.Post))
+                    {
+                        @Html.AntiForgeryToken()
+
+                        <div class="form-group">
+                            <label>¿Por qué deseas ser voluntario? *</label>
+                            <textarea name="motivacion" class="form-control" rows="4" required maxlength="500"></textarea>
+                            <small class="form-text text-muted">Cuéntanos qué te motiva a ayudar</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Disponibilidad de tiempo *</label>
+                            <select name="disponibilidad" class="form-control" required>
+                                <option value="">Seleccionar...</option>
+                                <option value="Fines de semana">Fines de semana</option>
+                                <option value="Entre semana (mañanas)">Entre semana (mañanas)</option>
+                                <option value="Entre semana (tardes)">Entre semana (tardes)</option>
+                                <option value="Flexible">Flexible</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Habilidades especiales (opcional)</label>
+                            <textarea name="habilidades" class="form-control" rows="3" placeholder="Ej: Fotografía, redes sociales, veterinaria, construcción, etc."></textarea>
+                        </div>
+
+                        <div class="form-check mb-3">
+                            <input type="checkbox" class="form-check-input" id="aceptaTerminos" required />
+                            <label class="form-check-label" for="aceptaTerminos">
+                                Acepto los términos y condiciones del programa de voluntariado
+                            </label>
+                        </div>
+
+                        <button type="submit" class="btn btn-warning btn-lg btn-block">
+                            <i class="fas fa-check"></i> Confirmar Inscripción
+                        </button>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+</div>

@@ -1,7 +1,84 @@
-﻿
+﻿@model MVCMASCOTAS.Models.Productos
+
 @{
-    ViewBag.Title = "Detalle";
+    ViewBag.Title = Model.NombreProducto;
 }
 
-<h2>Detalle</h2>
+<div class="row">
+    <div class="col-md-6">
+        <div class="card shadow-custom">
+            @if (ViewBag.ImagenBase64 != null)
+            {
+                <img src="@ViewBag.ImagenBase64" class="card-img-top img-preview" alt="@Model.NombreProducto">
+            }
+            else
+            {
+                <img src="~/Content/images/no-product.png" class="card-img-top" alt="Sin imagen">
+            }
+        </div>
+    </div>
 
+    <div class="col-md-6">
+        <div class="card shadow-custom">
+            <div class="card-body">
+                <h2>@Model.NombreProducto</h2>
+                <p class="text-muted"><i class="fas fa-tag"></i> @Model.CategoriasProducto.NombreCategoria</p>
+
+                <hr />
+
+                <h3 class="text-success">$@Model.Precio.ToString("N2")</h3>
+
+                <p class="mt-3">
+                    <strong><i class="fas fa-box"></i> Stock Disponible:</strong>
+                    @if (Model.Stock > 10)
+                    {
+                        <span class="badge badge-success">@Model.Stock unidades</span>
+                    }
+                    else if (Model.Stock > 0)
+                    {
+                        <span class="badge badge-warning">Solo quedan @Model.Stock unidades</span>
+                    }
+                    else
+                    {
+                        <span class="badge badge-danger">Agotado</span>
+                    }
+                </p>
+
+                <hr />
+
+                <h5>Descripción</h5>
+                <p>@Model.Descripcion</p>
+
+                @if (Model.Stock > 0)
+                {
+                    if (Request.IsAuthenticated)
+                    {
+                        <div class="mt-4">
+                            <div class="form-group">
+                                <label>Cantidad:</label>
+                                <input type="number" class="form-control cantidad-input" min="1" max="@Model.Stock" value="1" />
+                            </div>
+                            <button class="btn btn-success btn-lg btn-block btn-add-to-cart" data-producto-id="@Model.ProductoId">
+                                <i class="fas fa-cart-plus"></i> Agregar al Carrito
+                            </button>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-warning mt-4">
+                            <i class="fas fa-exclamation-triangle"></i> Debes <a href="@Url.Action("Login", "Account")">iniciar sesión</a> para comprar
+                        </div>
+                    }
+                }
+
+                <a href="@Url.Action("Index", "Tienda")" class="btn btn-secondary btn-lg btn-block mt-2">
+                    <i class="fas fa-arrow-left"></i> Volver a la Tienda
+                </a>
+
+                <div class="alert alert-info mt-4">
+                    <i class="fas fa-info-circle"></i> <strong>Nota:</strong> Todas las ganancias de la tienda son destinadas al cuidado de los animales del refugio.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

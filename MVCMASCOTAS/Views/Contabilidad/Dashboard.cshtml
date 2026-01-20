@@ -1,7 +1,140 @@
-﻿
-@{
-    ViewBag.Title = "Dashboard";
+﻿@{
+    ViewBag.Title = "Dashboard Contabilidad";
 }
 
-<h2>Dashboard</h2>
+<div class="page-header mb-4">
+    <h2><i class="fas fa-calculator"></i> Panel de Contabilidad</h2>
+    <p class="text-muted">Gestión financiera del refugio</p>
+</div>
 
+<!-- Estadísticas del Mes -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card shadow-custom text-center bg-success text-white">
+            <div class="card-body">
+                <i class="fas fa-arrow-up fa-3x mb-3"></i>
+                <h3>$@ViewBag.IngresosMes.ToString("N2")</h3>
+                <p>Ingresos del Mes</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card shadow-custom text-center bg-danger text-white">
+            <div class="card-body">
+                <i class="fas fa-arrow-down fa-3x mb-3"></i>
+                <h3>$@ViewBag.EgresosMes.ToString("N2")</h3>
+                <p>Egresos del Mes</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card shadow-custom text-center bg-primary text-white">
+            <div class="card-body">
+                <i class="fas fa-balance-scale fa-3x mb-3"></i>
+                <h3>$@ViewBag.BalanceMes.ToString("N2")</h3>
+                <p>Balance del Mes</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card shadow-custom text-center bg-info text-white">
+            <div class="card-body">
+                <i class="fas fa-chart-line fa-3x mb-3"></i>
+                <h3>$@ViewBag.BalanceAnio.ToString("N2")</h3>
+                <p>Balance del Año</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Estadísticas del Año -->
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card shadow-custom">
+            <div class="card-header bg-success text-white">
+                <h5><i class="fas fa-arrow-up"></i> Ingresos del Año</h5>
+            </div>
+            <div class="card-body text-center">
+                <h2 class="text-success">$@ViewBag.IngresosAnio.ToString("N2")</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card shadow-custom">
+            <div class="card-header bg-danger text-white">
+                <h5><i class="fas fa-arrow-down"></i> Egresos del Año</h5>
+            </div>
+            <div class="card-body text-center">
+                <h2 class="text-danger">$@ViewBag.EgresosAnio.ToString("N2")</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Últimos Movimientos -->
+@if (ViewBag.UltimosMovimientos != null && ViewBag.UltimosMovimientos.Count > 0)
+{
+    <div class="card shadow-custom">
+        <div class="card-header">
+            <h5><i class="fas fa-list"></i> Últimos Movimientos</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Tipo</th>
+                            <th>Categoría</th>
+                            <th>Descripción</th>
+                            <th>Monto</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var movimiento in ViewBag.UltimosMovimientos)
+                        {
+                            <tr>
+                                <td>@movimiento.FechaMovimiento.ToString("dd/MM/yyyy")</td>
+                                <td>
+                                    @if (movimiento.TipoMovimiento == "Ingreso")
+                                    {
+                                        <span class="badge badge-success">Ingreso</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge badge-danger">Egreso</span>
+                                    }
+                                </td>
+                                <td>@movimiento.Categoria</td>
+                                <td>@movimiento.Descripcion</td>
+                                <td class="@(movimiento.TipoMovimiento == "Ingreso" ? "text-success" : "text-danger")">
+                                    $@movimiento.Monto.ToString("N2")
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <a href="@Url.Action("Movimientos", "Contabilidad")" class="btn btn-primary">Ver Todos los Movimientos</a>
+        </div>
+    </div>
+}
+
+<!-- Accesos Rápidos -->
+<div class="row mt-4">
+    <div class="col-md-4 mb-3">
+        <a href="@Url.Action("RegistrarMovimiento", "Contabilidad")" class="btn btn-success btn-lg btn-block">
+            <i class="fas fa-plus-circle"></i> Registrar Movimiento
+        </a>
+    </div>
+    <div class="col-md-4 mb-3">
+        <a href="@Url.Action("ReporteDonaciones", "Contabilidad")" class="btn btn-info btn-lg btn-block">
+            <i class="fas fa-file-invoice-dollar"></i> Reporte de Donaciones
+        </a>
+    </div>
+    <div class="col-md-4 mb-3">
+        <a href="@Url.Action("GestionarApadrinamientos", "Contabilidad")" class="btn btn-warning btn-lg btn-block">
+            <i class="fas fa-heart"></i> Gestionar Apadrinamientos
+        </a>
+    </div>
+</div>

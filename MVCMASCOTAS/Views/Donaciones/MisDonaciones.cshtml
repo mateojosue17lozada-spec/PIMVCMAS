@@ -1,7 +1,96 @@
-﻿
+﻿@model IEnumerable<MVCMASCOTAS.Models.Donaciones>
+
 @{
-    ViewBag.Title = "MisDonaciones";
+    ViewBag.Title = "Mis Donaciones";
 }
 
-<h2>MisDonaciones</h2>
+<div class="page-header mb-4">
+    <h2><i class="fas fa-hand-holding-heart"></i> Mis Donaciones</h2>
+    <p class="text-muted">Gracias por tu generosidad y apoyo continuo</p>
+</div>
 
+@if (Model != null && Model.Any())
+{
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card shadow-custom text-center">
+                <div class="card-body">
+                    <h5>Total de Donaciones</h5>
+                    <h2 class="text-primary">@Model.Count()</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-custom text-center">
+                <div class="card-body">
+                    <h5>Donaciones Monetarias</h5>
+                    <h2 class="text-success">$@Model.Where(d => d.TipoDonacion == "Monetaria").Sum(d => d.MontoEfectivo ?? 0).ToString("N2")</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-custom text-center">
+                <div class="card-body">
+                    <h5>Donaciones en Especie</h5>
+                    <h2 class="text-info">@Model.Count(d => d.TipoDonacion == "Especie")</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    foreach (var donacion in Model)
+    {
+        <div class="card mb-3 shadow-custom">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-8">
+                        <h5>
+                            @if (donacion.TipoDonacion == "Monetaria")
+                            {
+                                <i class="fas fa-dollar-sign text-success"></i>
+                            }
+                            else
+                            {
+                                <i class="fas fa-box text-info"></i>
+                            }
+                            Donación @donacion.TipoDonacion
+                        </h5>
+
+                        @if (donacion.TipoDonacion == "Monetaria")
+                        {
+                            <p class="h4 text-success">$@donacion.MontoEfectivo.Value.ToString("N2")</p>
+                            <p><strong>Método de Pago:</strong> @donacion.MetodoPago</p>
+                        }
+                        else
+                        {
+                            <p><strong>Descripción:</strong> @donacion.DescripcionDonacion</p>
+                        }
+
+                        <p class="text-muted">
+                            <i class="fas fa-calendar"></i> @donacion.FechaDonacion.ToString("dd/MM/yyyy HH:mm")
+                        </p>
+                    </div>
+
+                    <div class="col-md-4 text-right">
+                        <span class="badge badge-pill @(donacion.EstadoDonacion == "Confirmada" ? "badge-success" : donacion.EstadoDonacion == "Pendiente" ? "badge-warning" : "badge-secondary") p-3">
+                            @donacion.EstadoDonacion
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+}
+else
+{
+    <div class="card shadow-custom">
+        <div class="card-body text-center py-5">
+            <i class="fas fa-heart fa-5x text-muted mb-3"></i>
+            <h4>Aún no has realizado donaciones</h4>
+            <p class="text-muted">¿Te gustaría ayudar a los animales del refugio?</p>
+            <a href="@Url.Action("Donar", "Donaciones")" class="btn btn-success btn-lg">
+                <i class="fas fa-hand-holding-heart"></i> Realizar una Donación
+            </a>
+        </div>
+    </div>
+}

@@ -1,7 +1,136 @@
-﻿
+﻿@model IEnumerable<MVCMASCOTAS.Models.MascotasPerdidas>
+
 @{
-    ViewBag.Title = "MascotasPerdidas";
+    ViewBag.Title = "Mascotas Perdidas";
 }
 
-<h2>MascotasPerdidas</h2>
+<div class="page-header mb-4">
+    <h2><i class="fas fa-search"></i> Mascotas Perdidas</h2>
+    <p class="lead">Ayuda a reunir a estas mascotas con sus familias</p>
+</div>
 
+<!-- Filtros -->
+<div class="card mb-4 shadow-custom">
+    <div class="card-body">
+        <form method="get" action="@Url.Action("MascotasPerdidas")" class="form-inline justify-content-center">
+            <div class="form-group mx-2 mb-2">
+                <label class="mr-2">Especie:</label>
+                <select name="especie" class="form-control">
+                    <option value="Todos" @(ViewBag.EspecieSeleccionada == "Todos" ? "selected" : "")>Todas</option>
+                    <option value="Perro" @(ViewBag.EspecieSeleccionada == "Perro" ? "selected" : "")>Perros</option>
+                    <option value="Gato" @(ViewBag.EspecieSeleccionada == "Gato" ? "selected" : "")>Gatos</option>
+                </select>
+            </div>
+
+            <div class="form-group mx-2 mb-2">
+                <label class="mr-2">Ciudad:</label>
+                <input type="text" name="ciudad" class="form-control" placeholder="Ciudad" value="@ViewBag.CiudadSeleccionada" />
+            </div>
+
+            <button type="submit" class="btn btn-primary mx-2 mb-2">
+                <i class="fas fa-search"></i> Buscar
+            </button>
+        </form>
+    </div>
+</div>
+
+<div class="text-right mb-3">
+    @if (Request.IsAuthenticated)
+    {
+        <a href="@Url.Action("ReportarMascotaPerdida", "Rescate")" class="btn btn-danger">
+            <i class="fas fa-exclamation-circle"></i> Reportar Mascota Perdida
+        </a>
+    }
+</div>
+
+<!-- Listado de Mascotas Perdidas -->
+<div class="row">
+    @if (Model != null && Model.Any())
+    {
+        foreach (var mascota in Model)
+        {
+            <div class="col-md-4 mb-4">
+                <div class="card shadow-custom">
+                    @if (mascota.ImagenMascota != null)
+                    {
+                        <img src="@MVCMASCOTAS.Helpers.ImageHelper.GetImageDataUri(mascota.ImagenMascota)" class="card-img-top" style="height: 250px; object-fit: cover;" alt="@mascota.NombreMascota">
+                    }
+                    else
+                    {
+                        <img src="~/Content/images/no-image.png" class="card-img-top" alt="Sin imagen">
+                    }
+                    <div class="card-body">
+                        <h5 class="text-danger"><i class="fas fa-exclamation-triangle"></i> PERDIDO: @mascota.NombreMascota</h5>
+
+                        <p class="mb-1"><strong>Especie:</strong> @mascota.Especie</p>
+                        <p class="mb-1"><strong>Raza:</strong> @(mascota.Raza ?? "Mestizo")</p>
+                        <p class="mb-1"><strong>Sexo:</strong> @mascota.Sexo</p>
+                        <p class="mb-1"><strong>Color:</strong> @mascota.Color</p>
+
+                        <hr />
+
+                        <p class="mb-1"><strong><i class="fas fa-calendar"></i> Perdido:</strong> @mascota.FechaPerdida.ToString("dd/MM/yyyy")</p>
+                        <p class="mb-1"><strong><i class="fas fa-map-marker-alt"></i> Lugar:</strong> @mascota.UbicacionPerdida</p>
+                        <p class="mb-1"><strong><i class="fas fa-city"></i> Ciudad:</strong> @mascota.CiudadPerdida</p>
+
+                        @if (!string.IsNullOrEmpty(mascota.CaracteristicasDistintivas))
+                        {
+                            <hr />
+                            <p class="small"><strong>Características:</strong> @mascota.CaracteristicasDistintivas</p>
+                        }
+
+                        @if (mascota.Recompensa.HasValue && mascota.Recompensa > 0)
+                        {
+                            <div class="alert alert-success text-center mt-2">
+                                <strong>Recompensa: $@mascota.Recompensa.Value.ToString("N2")</strong>
+                            </div>
+                        }
+
+                        <hr />
+
+                        <p class="mb-1"><strong>Contacto:</strong></p>
+                        <p class="mb-0">@mascota.Usuarios.NombreCompleto</p>
+                        <p class="mb-0"><i class="fas fa-phone"></i> @mascota.Usuarios.Telefono</p>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="col-12">
+            <div class="alert alert-info text-center">
+                <i class="fas fa-info-circle"></i> No hay mascotas perdidas reportadas en este momento.
+            </div>
+        </div>
+    }
+</div>
+
+<!-- Paginación -->
+@if (ViewBag.TotalPages > 1)
+{
+    <nav aria-label="Paginación">
+        <ul class="pagination justify-content-center">
+            @if (ViewBag.CurrentPage > 1)
+            {
+                <li class="page-item">
+                    <a class="page-link" href="@Url.Action("MascotasPerdidas", new { page = ViewBag.CurrentPage - 1, especie = ViewBag.EspecieSeleccionada, ciudad = ViewBag.CiudadSeleccionada })">Anterior</a>
+                </li>
+            }
+
+            @for (int i = 1; i <= ViewBag.TotalPages; i++)
+            {
+                <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                    <a class="page-link" href="@Url.Action("MascotasPerdidas", new { page = i, especie = ViewBag.EspecieSeleccionada, ciudad = ViewBag.CiudadSeleccionada })">@i</a>
+                </li>
+            }
+
+            @if (ViewBag.CurrentPage < ViewBag.TotalPages)
+            {
+                <li class="page-item">
+                    <a class="page-link" href="@Url.Action("MascotasPerdidas", new { page = ViewBag.CurrentPage + 1, especie = ViewBag.EspecieSeleccionada, ciudad = ViewBag.CiudadSeleccionada })">Siguiente</a>
+                </li>
+            }
+        </ul>
+    </nav>
+}

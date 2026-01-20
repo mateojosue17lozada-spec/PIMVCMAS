@@ -1,124 +1,143 @@
-﻿html
-@model IEnumerable<MVCMASCOTAS.Models.Mascotas>
+﻿@model IEnumerable<MVCMASCOTAS.Models.Mascotas>
+
 @{
-    ViewBag.Title = "Mascotas Disponibles";
+    ViewBag.Title = "Adoptar una Mascota";
 }
 
-<h2>🐾 Mascotas Disponibles para Adopción</h2>
-<p>Encuentra a tu nuevo compañero y dale una segunda oportunidad</p>
-
-<hr />
+<div class="page-header mb-4">
+    <h1 class="text-center">
+        <i class="fas fa-dog"></i> Mascotas Disponibles para Adopción
+    </h1>
+    <p class="text-center text-muted">Encuentra a tu nuevo mejor amigo</p>
+</div>
 
 <!-- Filtros -->
 <div class="card mb-4">
     <div class="card-body">
-        <h5>Filtrar Mascotas</h5>
-        @using (Html.BeginForm("Index", "Mascotas", FormMethod.Get))
-        {
-            <div class="row">
-                <div class="col-md-3">
-                    <label>Especie</label>
-                    <select name="especie" class="form-select">
-                        <option value="">Todos</option>
-                        <option value="Perro" @(ViewBag.FiltroEspecie == "Perro" ? "selected" : "")>Perro</option>
-                        <option value="Gato" @(ViewBag.FiltroEspecie == "Gato" ? "selected" : "")>Gato</option>
-                    </select>
-                </div>
-                <div class="col-md-3">
-                    <label>Tamaño</label>
-                    <select name="tamanio" class="form-select">
-                        <option value="">Todos</option>
-                        <option value="Pequeño" @(ViewBag.FiltroTamanio == "Pequeño" ? "selected" : "")>Pequeño</option>
-                        <option value="Mediano" @(ViewBag.FiltroTamanio == "Mediano" ? "selected" : "")>Mediano</option>
-                        <option value="Grande" @(ViewBag.FiltroTamanio == "Grande" ? "selected" : "")>Grande</option>
-                    </select>
-                </div>
-                <div class="col-md-3">
-                    <label>Sexo</label>
-                    <select name="sexo" class="form-select">
-                        <option value="">Todos</option>
-                        <option value="M" @(ViewBag.FiltroSexo == "M" ? "selected" : "")>Macho</option>
-                        <option value="F" @(ViewBag.FiltroSexo == "F" ? "selected" : "")>Hembra</option>
-                    </select>
-                </div>
-                <div class="col-md-3 d-flex align-items-end">
-                    <button type="submit" class="btn btn-primary w-100">Buscar</button>
-                </div>
+        <form method="get" action="@Url.Action("Index", "Mascotas")" class="form-inline justify-content-center">
+            <div class="form-group mx-2 mb-2">
+                <label class="mr-2">Especie:</label>
+                <select name="especie" class="form-control">
+                    <option value="Todos" @(ViewBag.FiltroEspecie == "Todos" ? "selected" : "")>Todos</option>
+                    <option value="Perro" @(ViewBag.FiltroEspecie == "Perro" ? "selected" : "")>Perros</option>
+                    <option value="Gato" @(ViewBag.FiltroEspecie == "Gato" ? "selected" : "")>Gatos</option>
+                </select>
             </div>
-        }
+
+            <div class="form-group mx-2 mb-2">
+                <label class="mr-2">Tamaño:</label>
+                <select name="tamanio" class="form-control">
+                    <option value="Todos" @(ViewBag.FiltroTamanio == "Todos" ? "selected" : "")>Todos</option>
+                    <option value="Pequeño" @(ViewBag.FiltroTamanio == "Pequeño" ? "selected" : "")>Pequeño</option>
+                    <option value="Mediano" @(ViewBag.FiltroTamanio == "Mediano" ? "selected" : "")>Mediano</option>
+                    <option value="Grande" @(ViewBag.FiltroTamanio == "Grande" ? "selected" : "")>Grande</option>
+                </select>
+            </div>
+
+            <div class="form-group mx-2 mb-2">
+                <label class="mr-2">Sexo:</label>
+                <select name="sexo" class="form-control">
+                    <option value="Todos" @(ViewBag.FiltroSexo == "Todos" ? "selected" : "")>Todos</option>
+                    <option value="Macho" @(ViewBag.FiltroSexo == "Macho" ? "selected" : "")>Macho</option>
+                    <option value="Hembra" @(ViewBag.FiltroSexo == "Hembra" ? "selected" : "")>Hembra</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn btn-primary mx-2 mb-2">
+                <i class="fas fa-search"></i> Buscar
+            </button>
+        </form>
     </div>
 </div>
 
 <!-- Resultados -->
-<p class="text-muted">Se encontraron @ViewBag.TotalItems mascotas</p>
-
-@if (Model != null && Model.Any())
-{
-    <div class="row">
-        @foreach (var mascota in Model)
+<div class="row">
+    @if (Model != null && Model.Any())
+    {
+        foreach (var mascota in Model)
         {
             <div class="col-md-4 mb-4">
-                <div class="card h-100 shadow-sm">
-                    @if (mascota.ImagenPrincipal != null)
-                    {
-                        <img src="@MVCMASCOTAS.Helpers.ImageHelper.GetImageDataUri(mascota.ImagenPrincipal)"
-                             class="card-img-top"
-                             alt="@mascota.Nombre"
-                             style="height: 250px; object-fit: cover;">
-                    }
-                    else
-                    {
-                        <div class="card-img-top bg-secondary d-flex align-items-center justify-content-center text-white" style="height: 250px;">
-                            <span>Sin imagen</span>
-                        </div>
-                    }
-                    <div class="card-body">
-                        <h5 class="card-title">@mascota.Nombre</h5>
-                        <p class="card-text">
-                            <strong>Especie:</strong> @mascota.Especie<br />
-                            <strong>Edad:</strong> @mascota.EdadAproximada<br />
-                            <strong>Tamaño:</strong> @mascota.Tamanio<br />
-                            <strong>Sexo:</strong> @(mascota.Sexo == "M" ? "Macho" : "Hembra")
-                        </p>
-                        @if (!string.IsNullOrEmpty(mascota.DescripcionGeneral))
+                <div class="card mascota-card h-100">
+                    <div class="position-relative">
+                        @if (mascota.ImagenPrincipal != null)
                         {
-                            <p class="card-text text-muted">
-                                @(mascota.DescripcionGeneral.Length > 100
-                                    ? mascota.DescripcionGeneral.Substring(0, 100) + "..."
-                                    : mascota.DescripcionGeneral)
-                            </p>
+                            <img src="@MVCMASCOTAS.Helpers.ImageHelper.GetImageDataUri(mascota.ImagenPrincipal)" class="card-img-top" alt="@mascota.Nombre">
+                        }
+                        else
+                        {
+                            <img src="~/Content/images/no-image.png" class="card-img-top" alt="Sin imagen">
+                        }
+                        @if (mascota.Categoria == "Especial")
+                        {
+                            <span class="badge badge-warning mascota-badge">
+                                <i class="fas fa-star"></i> Especial
+                            </span>
+                        }
+                        @if (mascota.Esterilizado == true)
+                        {
+                            <span class="badge badge-success" style="position: absolute; top: 10px; left: 10px;">
+                                <i class="fas fa-check"></i> Esterilizado
+                            </span>
                         }
                     </div>
+                    <div class="card-body">
+                        <h5 class="mascota-nombre">@mascota.Nombre</h5>
+                        <p class="mascota-detalle">
+                            <i class="fas fa-paw text-primary"></i> <strong>Especie:</strong> @mascota.Especie<br />
+                            <i class="fas fa-venus-mars text-info"></i> <strong>Sexo:</strong> @mascota.Sexo<br />
+                            <i class="fas fa-ruler text-success"></i> <strong>Tamaño:</strong> @mascota.Tamanio<br />
+                            <i class="fas fa-calendar text-warning"></i> <strong>Edad:</strong> @mascota.EdadAproximada
+                        </p>
+                        <p class="text-muted">@(mascota.DescripcionGeneral?.Length > 100 ? mascota.DescripcionGeneral.Substring(0, 100) + "..." : mascota.DescripcionGeneral)</p>
+                    </div>
                     <div class="card-footer bg-white">
-                        <a href="@Url.Action("Detalle", "Mascotas", new { id = mascota.MascotaId })"
-                           class="btn btn-primary w-100">Ver Detalles</a>
+                        <a href="@Url.Action("Detalle", "Mascotas", new { id = mascota.MascotaId })" class="btn btn-primary btn-block">
+                            <i class="fas fa-info-circle"></i> Ver Detalles
+                        </a>
                     </div>
                 </div>
             </div>
         }
-    </div>
-
-    <!-- Paginación -->
-    @if (ViewBag.TotalPages > 1)
-    {
-        <nav>
-            <ul class="pagination justify-content-center">
-                @for (int i = 1; i <= ViewBag.TotalPages; i++)
-                {
-                    <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
-                        <a class="page-link" href="@Url.Action("Index", new { page = i, especie = ViewBag.FiltroEspecie, tamanio = ViewBag.FiltroTamanio, sexo = ViewBag.FiltroSexo })">
-                            @i
-                        </a>
-                    </li>
-                }
-            </ul>
-        </nav>
     }
-}
-else
+    else
+    {
+        <div class="col-12">
+            <div class="alert alert-info text-center">
+                <i class="fas fa-info-circle"></i> No hay mascotas disponibles con los filtros seleccionados.
+            </div>
+        </div>
+    }
+</div>
+
+<!-- Paginación -->
+@if (ViewBag.TotalPages > 1)
 {
-    <div class="alert alert-info">
-        <p>No hay mascotas disponibles con los filtros seleccionados.</p>
-        <a href="@Url.Action("Index", "Mascotas")" class="btn btn-primary">Ver todas</a>
-    </div>
+    <nav aria-label="Paginación">
+        <ul class="pagination pagination-custom justify-content-center">
+            @if (ViewBag.CurrentPage > 1)
+            {
+                <li class="page-item">
+                    <a class="page-link" href="@Url.Action("Index", new { page = ViewBag.CurrentPage - 1, especie = ViewBag.FiltroEspecie, tamanio = ViewBag.FiltroTamanio, sexo = ViewBag.FiltroSexo })">Anterior</a>
+                </li>
+            }
+
+            @for (int i = 1; i <= ViewBag.TotalPages; i++)
+            {
+                <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                    <a class="page-link" href="@Url.Action("Index", new { page = i, especie = ViewBag.FiltroEspecie, tamanio = ViewBag.FiltroTamanio, sexo = ViewBag.FiltroSexo })">@i</a>
+                </li>
+            }
+
+            @if (ViewBag.CurrentPage < ViewBag.TotalPages)
+            {
+                <li class="page-item">
+                    <a class="page-link" href="@Url.Action("Index", new { page = ViewBag.CurrentPage + 1, especie = ViewBag.FiltroEspecie, tamanio = ViewBag.FiltroTamanio, sexo = ViewBag.FiltroSexo })">Siguiente</a>
+                </li>
+            }
+        </ul>
+    </nav>
 }
+
+<div class="text-center text-muted mb-4">
+    Mostrando @Model.Count() de @ViewBag.TotalItems mascotas
+</div>

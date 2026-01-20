@@ -1,7 +1,109 @@
-﻿
-@{
-    ViewBag.Title = "ReportarRescate";
+﻿@{
+    ViewBag.Title = "Reportar un Rescate";
 }
 
-<h2>ReportarRescate</h2>
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <div class="card shadow-custom">
+            <div class="card-header bg-danger text-white">
+                <h3><i class="fas fa-first-aid"></i> Reportar un Rescate de Animal</h3>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-warning">
+                    <strong><i class="fas fa-exclamation-triangle"></i> Importante:</strong> Si el animal está en peligro inmediato o gravemente herido, llama a nuestro número de emergencias: <strong>(02) 123-4567</strong>
+                </div>
 
+                @using (Html.BeginForm("Reportar", "Rescate", FormMethod.Post, new { enctype = "multipart/form-data" }))
+                {
+                    @Html.AntiForgeryToken()
+
+                    <h5 class="border-bottom pb-2 mb-3">Información del Reportante</h5>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label><i class="fas fa-user"></i> Nombre Completo *</label>
+                                <input type="text" name="nombreReportante" class="form-control" required />
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label><i class="fas fa-phone"></i> Teléfono *</label>
+                                <input type="tel" name="telefonoReportante" class="form-control" required />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label><i class="fas fa-envelope"></i> Email</label>
+                        <input type="email" name="emailReportante" class="form-control" />
+                    </div>
+
+                    <h5 class="border-bottom pb-2 mb-3 mt-4">Información del Animal</h5>
+
+                    <div class="form-group">
+                        <label><i class="fas fa-map-marker-alt"></i> Ubicación Exacta *</label>
+                        <input type="text" name="ubicacion" class="form-control" placeholder="Dirección, referencias, coordenadas GPS" required />
+                        <small class="form-text text-muted">Sé lo más específico posible para facilitar el rescate</small>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label><i class="fas fa-paw"></i> Especie</label>
+                                <select name="especieAnimal" class="form-control">
+                                    <option value="">No identificado</option>
+                                    <option value="Perro">Perro</option>
+                                    <option value="Gato">Gato</option>
+                                    <option value="Otro">Otro</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label><i class="fas fa-heartbeat"></i> Estado del Animal</label>
+                                <select name="estadoAnimal" class="form-control">
+                                    <option value="">No especificado</option>
+                                    <option value="Saludable">Aparentemente saludable</option>
+                                    <option value="Herido">Herido</option>
+                                    <option value="Enfermo">Enfermo</option>
+                                    <option value="Crítico">Estado crítico</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label><i class="fas fa-align-left"></i> Descripción de la Situación *</label>
+                        <textarea name="descripcionSituacion" class="form-control" rows="5" required placeholder="Describe en detalle la situación del animal: ¿Cómo lo encontraste? ¿Qué lesiones o problemas tiene? ¿Hay algo más que debamos saber?"></textarea>
+                    </div>
+
+                    <div class="form-check mb-3">
+                        <input type="checkbox" name="requiereUrgencia" class="form-check-input" id="urgencia" />
+                        <label class="form-check-label text-danger" for="urgencia">
+                            <strong><i class="fas fa-exclamation-triangle"></i> Requiere atención URGENTE</strong>
+                        </label>
+                    </div>
+
+                    <div class="form-group">
+                        <label><i class="fas fa-camera"></i> Foto del Animal (Opcional)</label>
+                        <input type="file" name="imagenReporte" class="form-control-file" accept="image/*" data-preview="#preview-reporte" />
+                        <small class="form-text text-muted">Una foto nos ayuda a prepararnos mejor para el rescate</small>
+                        <img id="preview-reporte" src="#" alt="Preview" class="img-preview mt-2" style="display: none;" />
+                    </div>
+
+                    <div class="alert alert-info mt-4">
+                        <i class="fas fa-info-circle"></i> <strong>¿Qué sucede después?</strong><br />
+                        Nuestro equipo de rescate revisará tu reporte y te contactará dentro de las próximas horas para coordinar el rescate. En casos urgentes, nos comunicaremos de inmediato.
+                    </div>
+
+                    <button type="submit" class="btn btn-danger btn-lg btn-block">
+                        <i class="fas fa-paper-plane"></i> Enviar Reporte de Rescate
+                    </button>
+                }
+            </div>
+        </div>
+    </div>
+</div>

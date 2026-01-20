@@ -1,7 +1,357 @@
-﻿
-@{
-    ViewBag.Title = "HistorialMedico";
+﻿@{
+    ViewBag.Title = $"Historial Médico - {ViewBag.Mascota.Nombre}";
 }
 
-<h2>HistorialMedico</h2>
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card shadow-custom">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col-md-2">
+                        @if (ViewBag.ImagenBase64 != null)
+                        {
+                            <img src="@ViewBag.ImagenBase64" class="img-fluid rounded" alt="@ViewBag.Mascota.Nombre">
+                        }
+                    </div>
+                    <div class="col-md-10">
+                        <h2><i class="fas fa-paw"></i> @ViewBag.Mascota.Nombre</h2>
+                        <p class="mb-1"><strong>Especie:</strong> @ViewBag.Mascota.Especie | <strong>Raza:</strong> @ViewBag.Mascota.Raza | <strong>Sexo:</strong> @ViewBag.Mascota.Sexo</p>
+                        <p class="mb-1"><strong>Edad:</strong> @ViewBag.Mascota.EdadAproximada | <strong>Estado:</strong> <span class="badge badge-warning">@ViewBag.Mascota.Estado</span></p>
+                        <p class="mb-0"><strong>Fecha de Ingreso:</strong> @ViewBag.Mascota.FechaIngreso.ToString("dd/MM/yyyy")</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
+<!-- Tabs de Navegación -->
+<ul class="nav nav-tabs" id="historialTab" role="tablist">
+    <li class="nav-item">
+        <a class="nav-link active" id="consultas-tab" data-toggle="tab" href="#consultas" role="tab">
+            <i class="fas fa-notes-medical"></i> Historial de Consultas
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" id="vacunas-tab" data-toggle="tab" href="#vacunas" role="tab">
+            <i class="fas fa-syringe"></i> Vacunas
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" id="tratamientos-tab" data-toggle="tab" href="#tratamientos" role="tab">
+            <i class="fas fa-pills"></i> Tratamientos
+        </a>
+    </li>
+</ul>
+
+<div class="tab-content" id="historialTabContent">
+    <!-- Historial de Consultas -->
+    <div class="tab-pane fade show active" id="consultas" role="tabpanel">
+        <div class="card">
+            <div class="card-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5><i class="fas fa-notes-medical"></i> Historial Médico</h5>
+                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modalConsulta">
+                        <i class="fas fa-plus"></i> Nueva Consulta
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                @if (ViewBag.Historial != null && ViewBag.Historial.Count > 0)
+                {
+                    <div class="timeline">
+                        @foreach (var registro in ViewBag.Historial)
+                        {
+                            <div class="card mb-3 shadow-sm">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between">
+                                        <h6><i class="fas fa-calendar"></i> @registro.FechaRegistro.ToString("dd/MM/yyyy HH:mm")</h6>
+                                        <span class="badge badge-info">@registro.TipoRegistro</span>
+                                    </div>
+                                    <p class="mb-1"><strong>Diagnóstico:</strong> @registro.Diagnostico</p>
+                                    @if (!string.IsNullOrEmpty(registro.TratamientoRecetado))
+                                    {
+                                        <p class="mb-1"><strong>Tratamiento:</strong> @registro.TratamientoRecetado</p>
+                                    }
+                                    @if (registro.Peso.HasValue)
+                                    {
+                                        <p class="mb-1"><strong>Peso:</strong> @registro.Peso.Value kg</p>
+                                    }
+                                    @if (registro.Temperatura.HasValue)
+                                    {
+                                        <p class="mb-1"><strong>Temperatura:</strong> @registro.Temperatura.Value °C</p>
+                                    }
+                                    @if (!string.IsNullOrEmpty(registro.Observaciones))
+                                    {
+                                        <p class="mb-0"><strong>Observaciones:</strong> @registro.Observaciones</p>
+                                    }
+                                    <small class="text-muted">Veterinario: @(registro.Usuarios?.NombreCompleto ?? "No especificado")</small>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <p class="text-center text-muted">No hay registros médicos</p>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- Vacunas -->
+    <div class="tab-pane fade" id="vacunas" role="tabpanel">
+        <div class="card">
+            <div class="card-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5><i class="fas fa-syringe"></i> Vacunas Aplicadas</h5>
+                    <button type="button" class="btn btn-success" data-toggle="modal" data-target="#modalVacuna">
+                        <i class="fas fa-plus"></i> Registrar Vacuna
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                @if (ViewBag.Vacunas != null && ViewBag.Vacunas.Count > 0)
+                {
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Vacuna</th>
+                                    <th>Fecha Aplicación</th>
+                                    <th>Próxima Dosis</th>
+                                    <th>Veterinario</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var vacuna in ViewBag.Vacunas)
+                                {
+                                    <tr>
+                                        <td><strong>@vacuna.Vacunas.NombreVacuna</strong></td>
+                                        <td>@vacuna.FechaAplicacion.ToString("dd/MM/yyyy")</td>
+                                        <td>
+                                            @if (vacuna.FechaProximaDosis.HasValue)
+                                            {
+                                                @vacuna.FechaProximaDosis.Value.ToString("dd/MM/yyyy")
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">N/A</span>
+                                            }
+                                        </td>
+                                        <td>@(vacuna.Usuarios?.NombreCompleto ?? "No especificado")</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <p class="text-center text-muted">No hay vacunas registradas</p>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- Tratamientos -->
+    <div class="tab-pane fade" id="tratamientos" role="tabpanel">
+        <div class="card">
+            <div class="card-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5><i class="fas fa-pills"></i> Tratamientos</h5>
+                    <a href="@Url.Action("IniciarTratamiento", "Veterinario", new { mascotaId = ViewBag.Mascota.MascotaId })" class="btn btn-warning">
+                        <i class="fas fa-plus"></i> Iniciar Tratamiento
+                    </a>
+                </div>
+            </div>
+            <div class="card-body">
+                @if (ViewBag.Tratamientos != null && ViewBag.Tratamientos.Count > 0)
+                {
+                    foreach (var tratamiento in ViewBag.Tratamientos)
+                    {
+                        <div class="card mb-3 @(tratamiento.Estado == "En curso" ? "border-warning" : "")">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between">
+                                    <h5>@tratamiento.TipoTratamiento</h5>
+                                    <span class="badge badge-pill @(tratamiento.Estado == "En curso" ? "badge-warning" : "badge-success")">
+                                        @tratamiento.Estado
+                                    </span>
+                                </div>
+                                <p class="mb-1"><strong>Descripción:</strong> @tratamiento.Descripcion</p>
+                                @if (!string.IsNullOrEmpty(tratamiento.Medicamentos))
+                                {
+                                    <p class="mb-1"><strong>Medicamentos:</strong> @tratamiento.Medicamentos</p>
+                                }
+                                <p class="mb-1"><strong>Inicio:</strong> @tratamiento.FechaInicio.ToString("dd/MM/yyyy")</p>
+                                @if (tratamiento.FechaFin.HasValue)
+                                {
+                                    <p class="mb-1"><strong>Fin:</strong> @tratamiento.FechaFin.Value.ToString("dd/MM/yyyy")</p>
+                                }
+                                else
+                                {
+                                    <p class="mb-1"><strong>Duración Estimada:</strong> @tratamiento.DuracionEstimadaDias días</p>
+                                }
+                                @if (tratamiento.CostoEstimado.HasValue)
+                                {
+                                    <p class="mb-1"><strong>Costo:</strong> $@tratamiento.CostoEstimado.Value.ToString("N2")</p>
+                                }
+                                @if (!string.IsNullOrEmpty(tratamiento.Resultados))
+                                {
+                                    <p class="mb-0"><strong>Resultados:</strong> @tratamiento.Resultados</p>
+                                }
+                                @if (tratamiento.Estado == "En curso")
+                                {
+                                    <button type="button" class="btn btn-sm btn-success mt-2" data-toggle="modal" data-target="#modalFinalizarTratamiento" data-tratamiento-id="@tratamiento.TratamientoId">
+                                        <i class="fas fa-check"></i> Finalizar Tratamiento
+                                    </button>
+                                }
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <p class="text-center text-muted">No hay tratamientos registrados</p>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Nueva Consulta -->
+<div class="modal fade" id="modalConsulta" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title"><i class="fas fa-notes-medical"></i> Registrar Consulta</h5>
+                <button type="button" class="close text-white" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            @using (Html.BeginForm("RegistrarConsulta", "Veterinario", FormMethod.Post))
+            {
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="mascotaId" value="@ViewBag.Mascota.MascotaId" />
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Diagnóstico *</label>
+                        <textarea name="diagnostico" class="form-control" rows="3" required></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Tratamiento Recetado</label>
+                        <textarea name="tratamientoRecetado" class="form-control" rows="2"></textarea>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Peso (kg)</label>
+                                <input type="number" name="peso" class="form-control" step="0.1" />
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Temperatura (°C)</label>
+                                <input type="number" name="temperatura" class="form-control" step="0.1" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Observaciones</label>
+                        <textarea name="observaciones" class="form-control" rows="2"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Guardar Consulta
+                    </button>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<!-- Modal Registrar Vacuna -->
+<div class="modal fade" id="modalVacuna" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title"><i class="fas fa-syringe"></i> Registrar Vacuna</h5>
+                <button type="button" class="close text-white" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            @using (Html.BeginForm("RegistrarVacuna", "Veterinario", FormMethod.Post))
+            {
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="mascotaId" value="@ViewBag.Mascota.MascotaId" />
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Vacuna *</label>
+                        <select name="vacunaId" class="form-control" required>
+                            <option value="">Seleccionar...</option>
+                            <!-- Las opciones se llenarán desde el backend -->
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Fecha de Próxima Dosis</label>
+                        <input type="date" name="fechaProximaDosis" class="form-control" />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-save"></i> Registrar Vacuna
+                    </button>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<!-- Modal Finalizar Tratamiento -->
+<div class="modal fade" id="modalFinalizarTratamiento" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title"><i class="fas fa-check"></i> Finalizar Tratamiento</h5>
+                <button type="button" class="close text-white" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            @using (Html.BeginForm("FinalizarTratamiento", "Veterinario", FormMethod.Post))
+            {
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="tratamientoId" id="tratamientoIdInput" />
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Resultados del Tratamiento *</label>
+                        <textarea name="resultados" class="form-control" rows="4" required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-check"></i> Finalizar
+                    </button>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $('#modalFinalizarTratamiento').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget);
+            var tratamientoId = button.data('tratamiento-id');
+            var modal = $(this);
+            modal.find('#tratamientoIdInput').val(tratamientoId);
+        });
+    </script>
+}

@@ -1,404 +1,238 @@
-﻿using System;
+﻿using MVCMASCOTAS.Models;
+using MVCMASCOTAS.Models.CustomModels;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using MVCMASCOTAS.Models;
-using MVCMASCOTAS.Models.CustomModels;
 
 namespace MVCMASCOTAS.Services
 {
-    /// <summary>
-    /// Servicio para evaluación de solicitudes de adopción
-    /// </summary>
     public class EvaluacionService
     {
-        private RefugioMascotasEntities db;
+        private readonly RefugioMascotasEntities db;
 
         public EvaluacionService()
         {
             db = new RefugioMascotasEntities();
         }
 
-        public EvaluacionService(RefugioMascotasEntities context)
+        // Evaluar solicitud de adopción (sistema de 100 puntos)
+        public ResultadoEvaluacionModel EvaluarSolicitudAdopcion(FormularioAdopcionDetalle formulario)
         {
-            db = context;
-        }
+            var resultado = new ResultadoEvaluacionModel();
 
-        /// <summary>
-        /// Evalúa una solicitud de adopción completa
-        /// </summary>
-        public ResultadoEvaluacionModel EvaluarSolicitud(int solicitudId)
-        {
-            var solicitud = db.SolicitudAdopcion.Find(solicitudId);
+            // 1. Evaluación de Vivienda (25 puntos)
+            resultado.Criterios.Add(EvaluarVivienda(formulario));
 
-            if (solicitud == null)
-            {
-                return null;
-            }
+            // 2. Evaluación de Experiencia (20 puntos)
+            resultado.Criterios.Add(EvaluarExperiencia(formulario));
 
-            var formulario = db.FormularioAdopcionDetalle
-                .FirstOrDefault(f => f.SolicitudId == solicitudId);
+            // 3. Evaluación de Disponibilidad (20 puntos)
+            resultado.Criterios.Add(EvaluarDisponibilidad(formulario));
 
-            if (formulario == null)
-            {
-                return null;
-            }
+            // 4. Evaluación de Compromisos Legales (25 puntos)
+            resultado.Criterios.Add(EvaluarCompromisosLegales(formulario));
 
-            return EvaluarFormulario(formulario);
-        }
+            // 5. Evaluación de Motivación (10 puntos)
+            resultado.Criterios.Add(EvaluarMotivacion(formulario));
 
-        /// <summary>
-        /// Evalúa el formulario de adopción
-        /// </summary>
-        public ResultadoEvaluacionModel EvaluarFormulario(FormularioAdopcionDetalle formulario)
-        {
-            int puntaje = 0;
-            var detalles = new List<string>();
-
-            // 1. EVALUACIÓN DE VIVIENDA (20 puntos)
-            int puntajeVivienda = EvaluarVivienda(formulario, detalles);
-            puntaje += puntajeVivienda;
-
-            // 2. EVALUACIÓN DE EXPERIENCIA (20 puntos)
-            int puntajeExperiencia = EvaluarExperiencia(formulario, detalles);
-            puntaje += puntajeExperiencia;
-
-            // 3. EVALUACIÓN DE DISPONIBILIDAD (20 puntos)
-            int puntajeDisponibilidad = EvaluarDisponibilidad(formulario, detalles);
-            puntaje += puntajeDisponibilidad;
-
-            // 4. EVALUACIÓN DE COMPROMISOS LEGALES (20 puntos)
-            int puntajeCompromisos = EvaluarCompromisos(formulario, detalles);
-            puntaje += puntajeCompromisos;
-
-            // 5. EVALUACIÓN DE COMPROMISO Y MOTIVACIÓN (20 puntos)
-            int puntajeMotivacion = EvaluarMotivacion(formulario, detalles);
-            puntaje += puntajeMotivacion;
+            // Calcular puntaje total
+            resultado.PuntajeTotal = resultado.Criterios.Sum(c => c.Puntaje);
 
             // Determinar resultado
-            string resultado = DeterminarResultado(puntaje);
-            string recomendacion = GenerarRecomendacion(puntaje, formulario, detalles);
-
-            return new ResultadoEvaluacionModel
+            if (resultado.PuntajeTotal >= 85)
             {
-                Puntaje = puntaje,
-                Resultado = resultado,
-                Recomendacion = recomendacion,
-                DetallesEvaluacion = detalles
+                resultado.Resultado = "Excelente";
+                resultado.Recomendacion = "Candidato ideal para adopción. Cumple con todos los requisitos.";
+                resultado.NivelAdopcion = "Alto";
+            }
+            else if (resultado.PuntajeTotal >= 70)
+            {
+                resultado.Resultado = "Bueno";
+                resultado.Recomendacion = "Candidato apto para adopción. Cumple con la mayoría de requisitos.";
+                resultado.NivelAdopcion = "Medio";
+            }
+            else if (resultado.PuntajeTotal >= 60)
+            {
+                resultado.Resultado = "Regular";
+                resultado.Recomendacion = "Requiere seguimiento adicional. Considerar entrevista personal.";
+                resultado.NivelAdopcion = "Bajo";
+            }
+            else
+            {
+                resultado.Resultado = "Insuficiente";
+                resultado.Recomendacion = "No cumple con los requisitos mínimos de adopción.";
+                resultado.NivelAdopcion = "No Apto";
+            }
+
+            return resultado;
+        }
+
+        private CriterioEvaluacion EvaluarVivienda(FormularioAdopcionDetalle formulario)
+        {
+            int puntaje = 0;
+
+            // Tipo de vivienda (5 puntos)
+            if (formulario.TipoVivienda == "Casa")
+                puntaje += 5;
+            else if (formulario.TipoVivienda == "Departamento")
+                puntaje += 3;
+            else
+                puntaje += 2;
+
+            // Vivienda propia (5 puntos)
+            if (formulario.ViviendaPropia == true)
+                puntaje += 5;
+            else if (formulario.PermisoMascotas == true)
+                puntaje += 3;
+
+            // Jardín (5 puntos)
+            if (formulario.TieneJardin == true)
+                puntaje += 5;
+            else
+                puntaje += 2;
+
+            // Permiso para mascotas (10 puntos)
+            if (formulario.PermisoMascotas == true)
+                puntaje += 10;
+
+            return new CriterioEvaluacion
+            {
+                Nombre = "Condiciones de Vivienda",
+                Puntaje = Math.Min(puntaje, 25),
+                PuntajeMaximo = 25,
+                Categoria = "Vivienda",
+                Descripcion = "Evalúa si la vivienda es adecuada para la mascota"
             };
         }
 
-        /// <summary>
-        /// Evalúa las condiciones de vivienda
-        /// </summary>
-        private int EvaluarVivienda(FormularioAdopcionDetalle formulario, List<string> detalles)
+        private CriterioEvaluacion EvaluarExperiencia(FormularioAdopcionDetalle formulario)
         {
             int puntaje = 0;
 
-            if (formulario.ViviendaPropia == true)
-            {
-                puntaje += 10;
-                detalles.Add("✓ Vivienda propia (+10 pts)");
-            }
-            else
-            {
-                detalles.Add("○ Vivienda alquilada (0 pts)");
-            }
-
-            if (formulario.TieneJardin == true)
-            {
-                puntaje += 5;
-                detalles.Add("✓ Tiene jardín (+5 pts)");
-            }
-
-            if (formulario.PermisoMascotas == true)
-            {
-                puntaje += 5;
-                detalles.Add("✓ Permiso para mascotas (+5 pts)");
-            }
-            else
-            {
-                detalles.Add("✗ No tiene permiso para mascotas (0 pts) - CRÍTICO");
-            }
-
-            return puntaje;
-        }
-
-        /// <summary>
-        /// Evalúa la experiencia con mascotas
-        /// </summary>
-        private int EvaluarExperiencia(FormularioAdopcionDetalle formulario, List<string> detalles)
-        {
-            int puntaje = 0;
-
+            // Experiencia previa (10 puntos)
             if (formulario.ExperienciaPreviaConMascotas == true)
-            {
-                puntaje += 15;
-                detalles.Add("✓ Experiencia previa con mascotas (+15 pts)");
-            }
+                puntaje += 10;
             else
-            {
-                detalles.Add("○ Sin experiencia previa (0 pts)");
-            }
+                puntaje += 3;
 
+            // Mascotas actuales (5 puntos)
             if (formulario.TieneMascotasActualmente == true)
             {
+                puntaje += 3;
                 if (formulario.MascotasEsterilizadas == true)
-                {
-                    puntaje += 5;
-                    detalles.Add("✓ Mascotas actuales esterilizadas (+5 pts)");
-                }
-                else
-                {
-                    detalles.Add("○ Mascotas no esterilizadas (0 pts)");
-                }
+                    puntaje += 2;
             }
 
-            return puntaje;
-        }
-
-        /// <summary>
-        /// Evalúa la disponibilidad de tiempo
-        /// </summary>
-        private int EvaluarDisponibilidad(FormularioAdopcionDetalle formulario, List<string> detalles)
-        {
-            int puntaje = 0;
-
-            switch (formulario.TiempoDisponibleDiario)
-            {
-                case "4+ horas":
-                    puntaje = 20;
-                    detalles.Add("✓ Disponibilidad: 4+ horas diarias (+20 pts)");
-                    break;
-                case "2-4 horas":
-                    puntaje = 15;
-                    detalles.Add("✓ Disponibilidad: 2-4 horas diarias (+15 pts)");
-                    break;
-                case "1-2 horas":
-                    puntaje = 10;
-                    detalles.Add("○ Disponibilidad: 1-2 horas diarias (+10 pts)");
-                    break;
-                case "Menos de 1 hora":
-                    puntaje = 5;
-                    detalles.Add("✗ Disponibilidad: Menos de 1 hora (+5 pts) - INSUFICIENTE");
-                    break;
-            }
-
-            return puntaje;
-        }
-
-        /// <summary>
-        /// Evalúa los compromisos legales
-        /// </summary>
-        private int EvaluarCompromisos(FormularioAdopcionDetalle formulario, List<string> detalles)
-        {
-            int puntaje = 0;
-
-            if (formulario.AceptaEsterilizacion == true)
-            {
+            // Detalle de experiencia (5 puntos)
+            if (!string.IsNullOrEmpty(formulario.DetalleExperiencia) && formulario.DetalleExperiencia.Length > 50)
                 puntaje += 5;
-                detalles.Add("✓ Acepta esterilización (+5 pts)");
-            }
-            else
+            else if (!string.IsNullOrEmpty(formulario.DetalleExperiencia))
+                puntaje += 2;
+
+            return new CriterioEvaluacion
             {
-                detalles.Add("✗ No acepta esterilización (0 pts) - CRÍTICO");
-            }
+                Nombre = "Experiencia con Mascotas",
+                Puntaje = Math.Min(puntaje, 20),
+                PuntajeMaximo = 20,
+                Categoria = "Experiencia",
+                Descripcion = "Evalúa la experiencia previa con mascotas"
+            };
+        }
+
+        private CriterioEvaluacion EvaluarDisponibilidad(FormularioAdopcionDetalle formulario)
+        {
+            int puntaje = 0;
+
+            // Tiempo disponible (10 puntos)
+            if (formulario.TiempoDisponibleDiario == "Más de 4 horas")
+                puntaje += 10;
+            else if (formulario.TiempoDisponibleDiario == "2-4 horas")
+                puntaje += 7;
+            else if (formulario.TiempoDisponibleDiario == "1-2 horas")
+                puntaje += 4;
+            else
+                puntaje += 2;
+
+            // Personas en casa (5 puntos)
+            if (formulario.PersonasEnCasa >= 2)
+                puntaje += 5;
+            else if (formulario.PersonasEnCasa == 1)
+                puntaje += 3;
+
+            // Niños en casa (5 puntos)
+            if (formulario.HayNinios == false)
+                puntaje += 5;
+            else if (!string.IsNullOrEmpty(formulario.EdadesNinios))
+                puntaje += 3;
+
+            return new CriterioEvaluacion
+            {
+                Nombre = "Disponibilidad y Tiempo",
+                Puntaje = Math.Min(puntaje, 20),
+                PuntajeMaximo = 20,
+                Categoria = "Disponibilidad",
+                Descripcion = "Evalúa el tiempo disponible para cuidar la mascota"
+            };
+        }
+
+        private CriterioEvaluacion EvaluarCompromisosLegales(FormularioAdopcionDetalle formulario)
+        {
+            int puntaje = 0;
+
+            // Todos los compromisos son obligatorios
+            if (formulario.AceptaEsterilizacion == true)
+                puntaje += 7;
 
             if (formulario.AceptaVisitasSeguimiento == true)
-            {
-                puntaje += 5;
-                detalles.Add("✓ Acepta visitas de seguimiento (+5 pts)");
-            }
-            else
-            {
-                detalles.Add("✗ No acepta visitas de seguimiento (0 pts)");
-            }
+                puntaje += 6;
 
             if (formulario.AceptaCondicionesLOBA == true)
-            {
-                puntaje += 5;
-                detalles.Add("✓ Acepta condiciones LOBA (+5 pts)");
-            }
-            else
-            {
-                detalles.Add("✗ No acepta condiciones LOBA (0 pts) - CRÍTICO");
-            }
+                puntaje += 6;
 
             if (formulario.AceptaDevolucionSiNoPuedeAtender == true)
-            {
-                puntaje += 5;
-                detalles.Add("✓ Acepta devolución si no puede atender (+5 pts)");
-            }
-            else
-            {
-                detalles.Add("✗ No acepta devolución (0 pts)");
-            }
+                puntaje += 6;
 
-            return puntaje;
+            return new CriterioEvaluacion
+            {
+                Nombre = "Compromisos Legales",
+                Puntaje = puntaje,
+                PuntajeMaximo = 25,
+                Categoria = "Legal",
+                Descripcion = "Evalúa la aceptación de compromisos legales y éticos"
+            };
         }
 
-        /// <summary>
-        /// Evalúa la motivación y compromiso
-        /// </summary>
-        private int EvaluarMotivacion(FormularioAdopcionDetalle formulario, List<string> detalles)
+        private CriterioEvaluacion EvaluarMotivacion(FormularioAdopcionDetalle formulario)
         {
             int puntaje = 0;
 
+            // Motivo de adopción (5 puntos)
             if (!string.IsNullOrEmpty(formulario.MotivoAdopcion))
             {
                 if (formulario.MotivoAdopcion.Length > 100)
-                {
-                    puntaje += 10;
-                    detalles.Add("✓ Motivación bien explicada (+10 pts)");
-                }
+                    puntaje += 5;
                 else if (formulario.MotivoAdopcion.Length > 50)
-                {
-                    puntaje += 7;
-                    detalles.Add("✓ Motivación explicada (+7 pts)");
-                }
-                else
-                {
                     puntaje += 3;
-                    detalles.Add("○ Motivación breve (+3 pts)");
-                }
-            }
-
-            if (!string.IsNullOrEmpty(formulario.QuePasaSiCambiaResidencia))
-            {
-                puntaje += 5;
-                detalles.Add("✓ Plan ante cambio de residencia (+5 pts)");
-            }
-
-            if (!string.IsNullOrEmpty(formulario.QuePasaSiProblemasComportamiento))
-            {
-                puntaje += 5;
-                detalles.Add("✓ Plan ante problemas de comportamiento (+5 pts)");
-            }
-
-            return puntaje;
-        }
-
-        /// <summary>
-        /// Determina el resultado según el puntaje
-        /// </summary>
-        private string DeterminarResultado(int puntaje)
-        {
-            if (puntaje >= 80)
-                return "Apto";
-            else if (puntaje >= 60)
-                return "Revisión Manual";
-            else if (puntaje >= 40)
-                return "No Apto - Requiere Mejoras";
-            else
-                return "No Apto";
-        }
-
-        /// <summary>
-        /// Genera recomendaciones basadas en la evaluación
-        /// </summary>
-        private string GenerarRecomendacion(int puntaje, FormularioAdopcionDetalle formulario,
-            List<string> detalles)
-        {
-            if (puntaje >= 80)
-            {
-                return "APROBADO: El solicitante cumple con todos los requisitos necesarios para adoptar. " +
-                       "Se recomienda proceder con la adopción.";
-            }
-            else if (puntaje >= 60)
-            {
-                var problemas = new List<string>();
-
-                if (formulario.ViviendaPropia != true)
-                    problemas.Add("verificar estabilidad de vivienda");
-
-                if (formulario.ExperienciaPreviaConMascotas != true)
-                    problemas.Add("proporcionar orientación sobre cuidado de mascotas");
-
-                if (formulario.TiempoDisponibleDiario == "1-2 horas" ||
-                    formulario.TiempoDisponibleDiario == "Menos de 1 hora")
-                    problemas.Add("evaluar disponibilidad de tiempo");
-
-                return $"REVISIÓN MANUAL REQUERIDA: El solicitante tiene potencial pero requiere evaluación " +
-                       $"adicional. Recomendaciones: {string.Join(", ", problemas)}.";
-            }
-            else
-            {
-                return "NO APTO: El solicitante no cumple con los requisitos mínimos en este momento. " +
-                       "Se recomienda rechazar la solicitud o solicitar que mejore las condiciones antes de reevaluar.";
-            }
-        }
-
-        /// <summary>
-        /// Registra la evaluación en la base de datos
-        /// </summary>
-        public EvaluacionAdopcion RegistrarEvaluacion(int solicitudId, int evaluadorId,
-            ResultadoEvaluacionModel resultado)
-        {
-            var evaluacion = new EvaluacionAdopcion
-            {
-                SolicitudId = solicitudId,
-                EvaluadorId = evaluadorId,
-                FechaEvaluacion = DateTime.Now,
-                PuntajeTotal = resultado.Puntaje,
-                Resultado = resultado.Resultado,
-                Observaciones = resultado.Recomendacion
-            };
-
-            db.EvaluacionAdopcion.Add(evaluacion);
-
-            // Actualizar solicitud
-            var solicitud = db.SolicitudAdopcion.Find(solicitudId);
-            if (solicitud != null)
-            {
-                solicitud.PuntajeEvaluacion = resultado.Puntaje;
-                solicitud.ResultadoEvaluacion = resultado.Resultado;
-                solicitud.FechaEvaluacion = DateTime.Now;
-
-                if (resultado.Resultado == "Apto")
-                {
-                    solicitud.Estado = "Aprobada";
-                    solicitud.FechaAprobacion = DateTime.Now;
-                }
-                else if (resultado.Resultado == "Revisión Manual")
-                {
-                    solicitud.Estado = "En evaluación";
-                }
                 else
-                {
-                    solicitud.Estado = "Rechazada";
-                    solicitud.FechaRespuesta = DateTime.Now;
-                }
+                    puntaje += 1;
             }
 
-            db.SaveChanges();
+            // Planes futuros (3 puntos)
+            if (!string.IsNullOrEmpty(formulario.QuePasaSiCambiaResidencia))
+                puntaje += 3;
 
-            return evaluacion;
-        }
+            // Manejo de problemas (2 puntos)
+            if (!string.IsNullOrEmpty(formulario.QuePasaSiProblemasComportamiento))
+                puntaje += 2;
 
-        /// <summary>
-        /// Obtiene todas las evaluaciones de un solicitante
-        /// </summary>
-        public List<EvaluacionAdopcion> ObtenerEvaluacionesDeUsuario(int usuarioId)
-        {
-            return db.EvaluacionAdopcion
-                .Where(e => e.SolicitudAdopcion.UsuarioId == usuarioId)
-                .OrderByDescending(e => e.FechaEvaluacion)
-                .ToList();
-        }
-
-        /// <summary>
-        /// Calcula el promedio de puntajes de evaluación
-        /// </summary>
-        public decimal ObtenerPromedioPuntajes()
-        {
-            var evaluaciones = db.SolicitudAdopcion
-                .Where(s => s.PuntajeEvaluacion.HasValue)
-                .Select(s => s.PuntajeEvaluacion.Value)
-                .ToList();
-
-            if (!evaluaciones.Any())
-                return 0;
-
-            return (decimal)evaluaciones.Average();
+            return new CriterioEvaluacion
+            {
+                Nombre = "Motivación y Compromiso",
+                Puntaje = Math.Min(puntaje, 10),
+                PuntajeMaximo = 10,
+                Categoria = "Motivación",
+                Descripcion = "Evalúa la motivación y compromiso a largo plazo"
+            };
         }
 
         public void Dispose()

@@ -1,0 +1,133 @@
+﻿@model IEnumerable<MVCMASCOTAS.Models.SolicitudAdopcion>
+
+@{
+    ViewBag.Title = "Gestionar Solicitudes de Adopción";
+}
+
+<div class="page-header mb-4">
+    <h2><i class="fas fa-file-alt"></i> Solicitudes de Adopción</h2>
+</div>
+
+<!-- Filtros -->
+<div class="card mb-4 shadow-custom">
+    <div class="card-body">
+        <form method="get" action="@Url.Action("SolicitudesAdopcion")" class="form-inline">
+            <div class="form-group mr-3 mb-2">
+                <label class="mr-2">Estado:</label>
+                <select name="estado" class="form-control">
+                    <option value="Todos" @(ViewBag.EstadoSeleccionado == "Todos" ? "selected" : "")>Todos</option>
+                    <option value="Pendiente" @(ViewBag.EstadoSeleccionado == "Pendiente" ? "selected" : "")>Pendiente</option>
+                    <option value="En evaluación" @(ViewBag.EstadoSeleccionado == "En evaluación" ? "selected" : "")>En Evaluación</option>
+                    <option value="Aprobada" @(ViewBag.EstadoSeleccionado == "Aprobada" ? "selected" : "")>Aprobada</option>
+                    <option value="Rechazada" @(ViewBag.EstadoSeleccionado == "Rechazada" ? "selected" : "")>Rechazada</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn btn-primary mb-2">
+                <i class="fas fa-filter"></i> Filtrar
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- Tabla de Solicitudes -->
+<div class="card shadow-custom">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead class="bg-primary text-white">
+                    <tr>
+                        <th>ID</th>
+                        <th>Usuario</th>
+                        <th>Mascota</th>
+                        <th>Fecha</th>
+                        <th>Estado</th>
+                        <th>Puntaje</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var solicitud in Model)
+                        {
+                            <tr>
+                                <td>@solicitud.SolicitudId</td>
+                                <td>@solicitud.Usuarios.NombreCompleto</td>
+                                <td>@solicitud.Mascotas.Nombre</td>
+                                <td>@solicitud.FechaSolicitud.ToString("dd/MM/yyyy")</td>
+                                <td>
+                                    @switch (solicitud.Estado)
+                                    {
+                                        case "Pendiente":
+                                            <span class="badge badge-warning">Pendiente</span>
+                                            break;
+                                        case "En evaluación":
+                                            <span class="badge badge-info">En Evaluación</span>
+                                            break;
+                                        case "Aprobada":
+                                            <span class="badge badge-success">Aprobada</span>
+                                            break;
+                                        case "Rechazada":
+                                            <span class="badge badge-danger">Rechazada</span>
+                                            break;
+                                    }
+                                </td>
+                                <td>
+                                    @if (solicitud.PuntajeEvaluacion.HasValue)
+                                    {
+                                        <span class="badge badge-primary">@solicitud.PuntajeEvaluacion.Value / 100</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">N/A</span>
+                                    }
+                                </td>
+                                <td>
+                                    <a href="@Url.Action("DetallesSolicitud", "Admin", new { id = solicitud.SolicitudId })" class="btn btn-sm btn-info">
+                                        <i class="fas fa-eye"></i> Ver
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="7" class="text-center">No hay solicitudes</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Paginación -->
+@if (ViewBag.TotalPages > 1)
+{
+    <nav aria-label="Paginación" class="mt-4">
+        <ul class="pagination justify-content-center">
+            @if (ViewBag.CurrentPage > 1)
+            {
+                <li class="page-item">
+                    <a class="page-link" href="@Url.Action("SolicitudesAdopcion", new { page = ViewBag.CurrentPage - 1, estado = ViewBag.EstadoSeleccionado })">Anterior</a>
+                </li>
+            }
+
+            @for (int i = 1; i <= ViewBag.TotalPages; i++)
+            {
+                <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                    <a class="page-link" href="@Url.Action("SolicitudesAdopcion", new { page = i, estado = ViewBag.EstadoSeleccionado })">@i</a>
+                </li>
+            }
+
+            @if (ViewBag.CurrentPage < ViewBag.TotalPages)
+            {
+                <li class="page-item">
+                    <a class="page-link" href="@Url.Action("SolicitudesAdopcion", new { page = ViewBag.CurrentPage + 1, estado = ViewBag.EstadoSeleccionado })">Siguiente</a>
+                </li>
+            }
+        </ul>
+    </nav>
+}

@@ -1,250 +1,194 @@
-﻿using System;
+﻿using MVCMASCOTAS.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using MVCMASCOTAS.Models;
 
 namespace MVCMASCOTAS.Services
 {
-    /// <summary>
-    /// Servicio para lógica de negocio de la tienda
-    /// </summary>
     public class TiendaService
     {
-        private RefugioMascotasEntities db;
+        private readonly RefugioMascotasEntities db;
 
         public TiendaService()
         {
             db = new RefugioMascotasEntities();
         }
 
-        public TiendaService(RefugioMascotasEntities context)
+        // Obtener todos los productos activos
+        public List<Productos> ObtenerProductosActivos()
         {
-            db = context;
+            return db.Productos
+                .Where(p => p.Activo == true)
+                .OrderBy(p => p.NombreProducto)
+                .ToList();
         }
 
-        /// <summary>
-        /// Obtiene productos disponibles con filtros
-        /// </summary>
-        public List<Productos> ObtenerProductosDisponibles(int? categoriaId = null, string busqueda = null)
+        // Obtener productos por categoría
+        public List<Productos> ObtenerProductosPorCategoria(int categoriaId)
         {
-            var query = db.Productos.Where(p => p.Stock > 0 && p.Activo);
+            return db.Productos
+                .Where(p => p.CategoriaId == categoriaId && p.Activo == true)
+                .OrderBy(p => p.NombreProducto)
+                .ToList();
+        }
 
-            if (categoriaId.HasValue)
+        // Obtener productos destacados
+        public List<Productos> ObtenerProductosDestacados(int cantidad = 8)
+        {
+            return db.Productos
+                .Where(p => p.Activo == true && p.Destacado == true)
+                .OrderByDescending(p => p.FechaCreacion)
+                .Take(cantidad)
+                .ToList();
+        }
+
+        // Obtener producto por ID
+        public Productos ObtenerProductoPorId(int productoId)
+        {
+            return db.Productos.Find(productoId);
+        }
+
+        // Verificar stock disponible
+        public bool VerificarStockDisponible(int productoId, int cantidad)
+        {
+            var producto = db.Productos.Find(productoId);
+            return producto != null && producto.Stock >= cantidad;
+        }
+
+        // Reducir stock
+        public bool ReducirStock(int productoId, int cantidad)
+        {
+            var producto = db.Productos.Find(productoId);
+            if (producto != null && producto.Stock >= cantidad)
             {
-                query = query.Where(p => p.CategoriaId == categoriaId.Value);
+                producto.Stock -= cantidad;
+                db.SaveChanges();
+                return true;
             }
+            return false;
+        }
 
-            if (!string.IsNullOrEmpty(busqueda))
+        // Aumentar stock
+        public void AumentarStock(int productoId, int cantidad)
+        {
+            var producto = db.Productos.Find(productoId);
+            if (producto != null)
             {
-                query = query.Where(p => p.NombreProducto.Contains(busqueda) ||
-                                        p.Descripcion.Contains(busqueda));
+                producto.Stock += cantidad;
+                db.SaveChanges();
             }
-
-            return query.OrderBy(p => p.NombreProducto).ToList();
         }
 
-        /// <summary>
-        /// Obtiene el carrito activo del usuario
-        /// </summary>
-        public Pedidos ObtenerCarritoActivo(int usuarioId)
+        // Crear pedido
+        public Pedidos CrearPedido(int usuarioId, string direccionEnvio, string metodoPago, decimal total)
         {
-            return db.Pedidos.FirstOrDefault(p => p.UsuarioId == usuarioId && p.Estado == "Pendiente");
-        }
-
-        /// <summary>
-        /// Crea un nuevo carrito para el usuario
-        /// </summary>
-        public Pedidos CrearCarrito(int usuarioId)
-        {
-            var carrito = new Pedidos
+            var pedido = new Pedidos
             {
                 UsuarioId = usuarioId,
                 FechaPedido = DateTime.Now,
                 Estado = "Pendiente",
-                MontoTotal = 0
+                DireccionEnvio = direccionEnvio,
+                MetodoPago = metodoPago,
+                Total = total
             };
 
-            db.Pedidos.Add(carrito);
+            db.Pedidos.Add(pedido);
             db.SaveChanges();
 
-            return carrito;
+            return pedido;
         }
 
-        /// <summary>
-        /// Agrega un producto al carrito
-        /// </summary>
-        public bool AgregarProductoAlCarrito(int pedidoId, int productoId, int cantidad)
+        // Agregar detalle al pedido
+        public void AgregarDetallePedido(int pedidoId, int productoId, int cantidad, decimal precioUnitario)
         {
-            var producto = db.Productos.Find(productoId);
-
-            if (producto == null || cantidad > producto.Stock || cantidad <= 0)
+            var detalle = new PedidoDetalle
             {
-                return false;
-            }
+                PedidoId = pedidoId,
+                ProductoId = productoId,
+                Cantidad = cantidad,
+                PrecioUnitario = precioUnitario,
+                Subtotal = cantidad * precioUnitario
+            };
 
-            // Verificar si el producto ya está en el carrito
-            var detalleExistente = db.PedidoDetalle
-                .FirstOrDefault(pd => pd.PedidoId == pedidoId && pd.ProductoId == productoId);
-
-            if (detalleExistente != null)
-            {
-                detalleExistente.Cantidad += cantidad;
-                detalleExistente.Subtotal = detalleExistente.Cantidad * detalleExistente.PrecioUnitario;
-            }
-            else
-            {
-                var detalle = new PedidoDetalle
-                {
-                    PedidoId = pedidoId,
-                    ProductoId = productoId,
-                    Cantidad = cantidad,
-                    PrecioUnitario = producto.Precio,
-                    Subtotal = cantidad * producto.Precio
-                };
-                db.PedidoDetalle.Add(detalle);
-            }
-
-            ActualizarTotalPedido(pedidoId);
+            db.PedidoDetalle.Add(detalle);
             db.SaveChanges();
-
-            return true;
         }
 
-        /// <summary>
-        /// Actualiza la cantidad de un producto en el carrito
-        /// </summary>
-        public bool ActualizarCantidadEnCarrito(int detalleId, int nuevaCantidad)
+        // Obtener pedidos de un usuario
+        public List<Pedidos> ObtenerPedidosUsuario(int usuarioId)
         {
-            var detalle = db.PedidoDetalle.Find(detalleId);
-
-            if (detalle == null || nuevaCantidad <= 0)
-            {
-                return false;
-            }
-
-            var producto = db.Productos.Find(detalle.ProductoId);
-
-            if (nuevaCantidad > producto.Stock)
-            {
-                return false;
-            }
-
-            detalle.Cantidad = nuevaCantidad;
-            detalle.Subtotal = nuevaCantidad * detalle.PrecioUnitario;
-
-            ActualizarTotalPedido(detalle.PedidoId);
-            db.SaveChanges();
-
-            return true;
+            return db.Pedidos
+                .Where(p => p.UsuarioId == usuarioId)
+                .OrderByDescending(p => p.FechaPedido)
+                .ToList();
         }
 
-        /// <summary>
-        /// Elimina un producto del carrito
-        /// </summary>
-        public bool EliminarProductoDelCarrito(int detalleId)
-        {
-            var detalle = db.PedidoDetalle.Find(detalleId);
-
-            if (detalle == null)
-            {
-                return false;
-            }
-
-            int pedidoId = detalle.PedidoId;
-            db.PedidoDetalle.Remove(detalle);
-
-            ActualizarTotalPedido(pedidoId);
-            db.SaveChanges();
-
-            return true;
-        }
-
-        /// <summary>
-        /// Actualiza el total del pedido
-        /// </summary>
-        private void ActualizarTotalPedido(int pedidoId)
-        {
-            var pedido = db.Pedidos.Find(pedidoId);
-
-            if (pedido != null)
-            {
-                var detalles = db.PedidoDetalle.Where(pd => pd.PedidoId == pedidoId).ToList();
-                pedido.MontoTotal = detalles.Sum(d => d.Subtotal);
-            }
-        }
-
-        /// <summary>
-        /// Confirma el pedido y descuenta el stock
-        /// </summary>
-        public bool ConfirmarPedido(int pedidoId, string direccionEnvio, string metodoPago, string observaciones)
-        {
-            var pedido = db.Pedidos.Find(pedidoId);
-
-            if (pedido == null || pedido.Estado != "Pendiente")
-            {
-                return false;
-            }
-
-            var detalles = db.PedidoDetalle.Where(pd => pd.PedidoId == pedidoId).ToList();
-
-            if (!detalles.Any())
-            {
-                return false;
-            }
-
-            // Verificar stock
-            foreach (var detalle in detalles)
-            {
-                var producto = db.Productos.Find(detalle.ProductoId);
-
-                if (detalle.Cantidad > producto.Stock)
-                {
-                    return false;
-                }
-            }
-
-            // Descontar stock
-            foreach (var detalle in detalles)
-            {
-                var producto = db.Productos.Find(detalle.ProductoId);
-                producto.Stock -= detalle.Cantidad;
-            }
-
-            // Actualizar pedido
-            pedido.Estado = "Confirmado";
-            pedido.DireccionEnvio = direccionEnvio;
-            pedido.MetodoPago = metodoPago;
-            pedido.Observaciones = observaciones;
-            pedido.FechaConfirmacion = DateTime.Now;
-
-            db.SaveChanges();
-
-            return true;
-        }
-
-        /// <summary>
-        /// Obtiene los pedidos de un usuario
-        /// </summary>
-        public List<Pedidos> ObtenerPedidosUsuario(int usuarioId, bool soloConfirmados = true)
-        {
-            var query = db.Pedidos.Where(p => p.UsuarioId == usuarioId);
-
-            if (soloConfirmados)
-            {
-                query = query.Where(p => p.Estado != "Pendiente");
-            }
-
-            return query.OrderByDescending(p => p.FechaPedido).ToList();
-        }
-
-        /// <summary>
-        /// Calcula el total de items en el carrito
-        /// </summary>
-        public int ObtenerCantidadItemsCarrito(int pedidoId)
+        // Obtener detalle del pedido
+        public List<PedidoDetalle> ObtenerDetallePedido(int pedidoId)
         {
             return db.PedidoDetalle
-                .Where(pd => pd.PedidoId == pedidoId)
-                .Sum(pd => (int?)pd.Cantidad) ?? 0;
+                .Where(d => d.PedidoId == pedidoId)
+                .ToList();
+        }
+
+        // Actualizar estado del pedido
+        public void ActualizarEstadoPedido(int pedidoId, string nuevoEstado)
+        {
+            var pedido = db.Pedidos.Find(pedidoId);
+            if (pedido != null)
+            {
+                pedido.Estado = nuevoEstado;
+                if (nuevoEstado == "Entregado")
+                {
+                    pedido.FechaEntrega = DateTime.Now;
+                }
+                db.SaveChanges();
+            }
+        }
+
+        // Obtener productos con bajo stock
+        public List<Productos> ObtenerProductosBajoStock()
+        {
+            return db.Productos
+                .Where(p => p.Activo == true && p.Stock <= p.StockMinimo)
+                .OrderBy(p => p.Stock)
+                .ToList();
+        }
+
+        // Obtener todas las categorías
+        public List<CategoriasProducto> ObtenerCategorias()
+        {
+            return db.CategoriasProducto
+                .Where(c => c.Activo == true)
+                .OrderBy(c => c.NombreCategoria)
+                .ToList();
+        }
+
+        // Buscar productos
+        public List<Productos> BuscarProductos(string termino)
+        {
+            return db.Productos
+                .Where(p => p.Activo == true &&
+                           (p.NombreProducto.Contains(termino) ||
+                            p.Descripcion.Contains(termino)))
+                .OrderBy(p => p.NombreProducto)
+                .ToList();
+        }
+
+        // Obtener estadísticas de ventas
+        public decimal ObtenerVentasMes(int mes, int anio)
+        {
+            return db.Pedidos
+                .Where(p => p.Estado == "Entregado" &&
+                           p.FechaPedido.HasValue &&
+                           p.FechaPedido.Value.Month == mes &&
+                           p.FechaPedido.Value.Year == anio)
+                .Sum(p => (decimal?)p.Total) ?? 0;
+        }
+
+        public int ObtenerPedidosPendientes()
+        {
+            return db.Pedidos.Count(p => p.Estado == "Pendiente");
         }
 
         public void Dispose()
