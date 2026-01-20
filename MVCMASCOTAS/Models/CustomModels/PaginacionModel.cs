@@ -1,8 +1,12 @@
 ﻿using System;
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Web;
 
 namespace MVCMASCOTAS.Models.CustomModels
 {
+    
     public class PaginacionModel<T>
     {
         public List<T> Items { get; set; }
