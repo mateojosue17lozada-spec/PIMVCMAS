@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using System.Web.Mvc;
+﻿using System.Web.Mvc;
 using System.Web.Routing;
 
 namespace MVCMASCOTAS
@@ -13,39 +9,52 @@ namespace MVCMASCOTAS
         {
             routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
 
-            // Ruta para detalle de mascota con nombre amigable
+            // Ruta para detalles de mascota
             routes.MapRoute(
                 name: "MascotaDetalle",
-                url: "Mascotas/Detalle/{id}/{nombre}",
-                defaults: new { controller = "Mascotas", action = "Detalle", nombre = UrlParameter.Optional }
+                url: "Mascotas/Detalle/{id}",
+                defaults: new { controller = "Mascotas", action = "Detalle" },
+                constraints: new { id = @"\d+" }
             );
 
-            // Ruta para solicitud de adopción
+            // Ruta para solicitar adopción
             routes.MapRoute(
                 name: "SolicitarAdopcion",
                 url: "Adopcion/Solicitar/{mascotaId}",
-                defaults: new { controller = "Adopcion", action = "Solicitar" }
+                defaults: new { controller = "Adopcion", action = "Solicitar" },
+                constraints: new { mascotaId = @"\d+" }
             );
 
-            // Ruta para producto detalle
+            // Ruta para historial médico
             routes.MapRoute(
-                name: "ProductoDetalle",
-                url: "Tienda/Producto/{id}/{nombre}",
-                defaults: new { controller = "Tienda", action = "Detalle", nombre = UrlParameter.Optional }
+                name: "HistorialMedico",
+                url: "Veterinario/HistorialMedico/{mascotaId}",
+                defaults: new { controller = "Veterinario", action = "HistorialMedico" },
+                constraints: new { mascotaId = @"\d+" }
             );
 
-            // Ruta para apadrinar mascota
+            // Ruta para detalles de solicitud de adopción
             routes.MapRoute(
-                name: "ApadrinarMascota",
-                url: "Donaciones/Apadrinar/{mascotaId}",
-                defaults: new { controller = "Donaciones", action = "Apadrinar" }
+                name: "DetallesSolicitud",
+                url: "Admin/DetallesSolicitud/{id}",
+                defaults: new { controller = "Admin", action = "DetallesSolicitud" },
+                constraints: new { id = @"\d+" }
             );
 
-            // Ruta para actividades de voluntariado
+            // Ruta para productos de tienda
             routes.MapRoute(
-                name: "ActividadDetalle",
-                url: "Voluntariado/Actividad/{id}",
-                defaults: new { controller = "Voluntariado", action = "DetalleActividad" }
+                name: "TiendaProducto",
+                url: "Tienda/Detalle/{id}",
+                defaults: new { controller = "Tienda", action = "Detalle" },
+                constraints: new { id = @"\d+" }
+            );
+
+            // Ruta para detalle de reporte de rescate
+            routes.MapRoute(
+                name: "DetalleReporte",
+                url: "Rescate/DetalleReporte/{id}",
+                defaults: new { controller = "Rescate", action = "DetalleReporte" },
+                constraints: new { id = @"\d+" }
             );
 
             // Ruta por defecto

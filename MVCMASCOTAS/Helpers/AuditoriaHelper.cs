@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Web;
+using MVCMASCOTAS.Models;
 
 namespace MVCMASCOTAS.Helpers
 {
@@ -11,20 +12,20 @@ namespace MVCMASCOTAS.Helpers
         /// <summary>
         /// Registra una acción en la tabla de auditoría
         /// </summary>
-        public static void RegistrarAccion(string accion, string modulo, string descripcion, int? usuarioId = null)
+        public static void RegistrarAccion(string accion, string controlador, string detalles, int? usuarioId = null)
         {
             try
             {
-                using (var db = new Models.RefugioMascotasEntities())
+                using (var db = new RefugioMascotasEntities())
                 {
-                    var auditoria = new Models.AuditoriaAcciones
+                    var auditoria = new AuditoriaAcciones
                     {
                         UsuarioId = usuarioId,
                         Accion = accion,
-                        Modulo = modulo,
-                        Descripcion = descripcion,
+                        Controlador = controlador,
+                        Detalles = detalles,
                         FechaAccion = DateTime.Now,
-                        DireccionIP = GetClientIP()
+                        DireccionIP = ObtenerDireccionIP()
                     };
 
                     db.AuditoriaAcciones.Add(auditoria);
@@ -33,31 +34,60 @@ namespace MVCMASCOTAS.Helpers
             }
             catch (Exception ex)
             {
-                // No lanzar excepción si falla la auditoría
-                Console.WriteLine($"Error al registrar auditoría: {ex.Message}");
+                // Log del error pero no fallar la operación principal
+                System.Diagnostics.Debug.WriteLine($"Error en auditoría: {ex.Message}");
             }
         }
 
         /// <summary>
         /// Obtiene la dirección IP del cliente
         /// </summary>
-        private static string GetClientIP()
+        private static string ObtenerDireccionIP()
         {
             try
             {
-                string ip = HttpContext.Current?.Request.ServerVariables["HTTP_X_FORWARDED_FOR"];
-
-                if (string.IsNullOrEmpty(ip))
+                if (HttpContext.Current != null && HttpContext.Current.Request != null)
                 {
-                    ip = HttpContext.Current?.Request.ServerVariables["REMOTE_ADDR"];
-                }
+                    string ip = HttpContext.Current.Request.ServerVariables["HTTP_X_FORWARDED_FOR"];
 
-                return ip ?? "Unknown";
+                    if (string.IsNullOrEmpty(ip))
+                    {
+                        ip = HttpContext.Current.Request.ServerVariables["REMOTE_ADDR"];
+                    }
+
+                    return ip;
+                }
             }
             catch
             {
-                return "Unknown";
+                // Ignorar errores
             }
+
+            return "Unknown";
+        }
+
+        /// <summary>
+        /// Registra un inicio de sesión exitoso
+        /// </summary>
+        public static void RegistrarLoginExitoso(string email, int usuarioId)
+        {
+            RegistrarAccion("Login Exitoso", "Account", $"Usuario {email} inició sesión", usuarioId);
+        }
+
+        /// <summary>
+        /// Registra un intento de login fallido
+        /// </summary>
+        public static void RegistrarLoginFallido(string email)
+        {
+            RegistrarAccion("Login Fallido", "Account", $"Intento fallido para {email}");
+        }
+
+        /// <summary>
+        /// Registra un cierre de sesión
+        /// </summary>
+        public static void RegistrarLogout(string email, int usuarioId)
+        {
+            RegistrarAccion("Logout", "Account", $"Usuario {email} cerró sesión", usuarioId);
         }
     }
 }

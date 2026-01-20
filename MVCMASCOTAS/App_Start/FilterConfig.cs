@@ -1,5 +1,4 @@
-﻿using System.Web;
-using System.Web.Mvc;
+﻿using System.Web.Mvc;
 
 namespace MVCMASCOTAS
 {
@@ -7,17 +6,14 @@ namespace MVCMASCOTAS
     {
         public static void RegisterGlobalFilters(GlobalFilterCollection filters)
         {
+            // Filtro de manejo de errores
             filters.Add(new HandleErrorAttribute());
-            filters.Add(new PreventClickjackingAttribute());
-        }
-    }
 
-    public class PreventClickjackingAttribute : ActionFilterAttribute
-    {
-        public override void OnResultExecuting(ResultExecutingContext filterContext)
-        {
-            filterContext.HttpContext.Response.AddHeader("X-Frame-Options", "SAMEORIGIN");
-            base.OnResultExecuting(filterContext);
+            // Filtro para requerir HTTPS en producción (comentado por defecto)
+            // filters.Add(new RequireHttpsAttribute());
+
+            // Filtro de validación de token anti-falsificación
+            filters.Add(new ValidateInputAttribute(true));
         }
     }
 }
