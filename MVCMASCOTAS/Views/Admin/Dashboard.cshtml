@@ -1,6 +1,5 @@
 ﻿@model MVCMASCOTAS.Models.ViewModels.DashboardViewModel
-
-@{
+    @{
     ViewBag.Title = "Dashboard Administrativo";
 }
 
@@ -24,7 +23,7 @@
         <div class="card shadow-custom text-center bg-success text-white">
             <div class="card-body">
                 <i class="fas fa-heart fa-3x mb-3"></i>
-                <h3>@Model.TotalAdopciones</h3>
+                <h3>@Model.MascotasAdoptadas</h3>
                 <p>Adopciones Exitosas</p>
             </div>
         </div>
@@ -42,7 +41,7 @@
         <div class="card shadow-custom text-center bg-info text-white">
             <div class="card-body">
                 <i class="fas fa-users fa-3x mb-3"></i>
-                <h3>@Model.TotalUsuarios</h3>
+                <h3>@ViewBag.TotalUsuarios</h3>
                 <p>Usuarios Registrados</p>
             </div>
         </div>
@@ -55,7 +54,7 @@
         <div class="card shadow-custom text-center">
             <div class="card-body">
                 <i class="fas fa-dollar-sign fa-3x text-success mb-3"></i>
-                <h4>$@Model.MontoRecaudadoMes.ToString("N2")</h4>
+                <h4>$@Model.TotalDonacionesMes.ToString("N2")</h4>
                 <p class="text-muted">Donaciones Este Mes</p>
             </div>
         </div>
@@ -73,7 +72,7 @@
         <div class="card shadow-custom text-center">
             <div class="card-body">
                 <i class="fas fa-box fa-3x text-primary mb-3"></i>
-                <h4>@Model.ProductosEnStock</h4>
+                <h4>@Model.ProductosDisponibles</h4>
                 <p class="text-muted">Productos en Stock</p>
             </div>
         </div>
@@ -82,7 +81,7 @@
         <div class="card shadow-custom text-center">
             <div class="card-body">
                 <i class="fas fa-hands-helping fa-3x text-warning mb-3"></i>
-                <h4>@Model.TotalVoluntarios</h4>
+                <h4>@Model.VoluntariosActivos</h4>
                 <p class="text-muted">Voluntarios Activos</p>
             </div>
         </div>

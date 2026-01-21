@@ -1,18 +1,19 @@
 ﻿using MVCMASCOTAS.Models;
 using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using System.Web;
 
 namespace MVCMASCOTAS.Services
 {
-    public class TiendaService
+    public class TiendaService : IDisposable
     {
-        private readonly RefugioMascotasEntities db;
+        private readonly RefugioMascotasDBEntities db;
 
         public TiendaService()
         {
-            db = new RefugioMascotasEntities();
+            db = new RefugioMascotasDBEntities();
         }
 
         // Obtener todos los productos activos
@@ -80,23 +81,41 @@ namespace MVCMASCOTAS.Services
             }
         }
 
-        // Crear pedido
-        public Pedidos CrearPedido(int usuarioId, string direccionEnvio, string metodoPago, decimal total)
+        // Crear pedido (versión completa según estructura DB)
+        public Pedidos CrearPedido(int usuarioId, string direccionEntrega, string ciudadEntrega,
+                                  string telefonoEntrega, string metodoPago, decimal total,
+                                  string referenciaEntrega = null, decimal descuento = 0)
         {
+            var numeroPedido = GenerarNumeroPedido();
+
             var pedido = new Pedidos
             {
                 UsuarioId = usuarioId,
+                NumeroPedido = numeroPedido,
                 FechaPedido = DateTime.Now,
                 Estado = "Pendiente",
-                DireccionEnvio = direccionEnvio,
+                EstadoPago = "Pendiente",
+                DireccionEntrega = direccionEntrega, // Nombre correcto
+                CiudadEntrega = ciudadEntrega,
+                TelefonoEntrega = telefonoEntrega,
+                ReferenciaEntrega = referenciaEntrega,
                 MetodoPago = metodoPago,
-                Total = total
+                SubTotal = total + descuento, // SubTotal antes de descuento
+                Descuento = descuento,
+                Total = total, // Total después de descuento
+                FechaEntregaEstimada = DateTime.Now.AddDays(3) // Por defecto 3 días
             };
 
             db.Pedidos.Add(pedido);
             db.SaveChanges();
 
             return pedido;
+        }
+
+        // Método simplificado para compatibilidad
+        public Pedidos CrearPedidoSimple(int usuarioId, string direccionEntrega, string metodoPago, decimal total)
+        {
+            return CrearPedido(usuarioId, direccionEntrega, "Quito", "0999999999", metodoPago, total);
         }
 
         // Agregar detalle al pedido
@@ -113,6 +132,9 @@ namespace MVCMASCOTAS.Services
 
             db.PedidoDetalle.Add(detalle);
             db.SaveChanges();
+
+            // Reducir stock del producto
+            ReducirStock(productoId, cantidad);
         }
 
         // Obtener pedidos de un usuario
@@ -129,6 +151,7 @@ namespace MVCMASCOTAS.Services
         {
             return db.PedidoDetalle
                 .Where(d => d.PedidoId == pedidoId)
+                .Include(d => d.Productos) // Incluir información del producto
                 .ToList();
         }
 
@@ -141,8 +164,25 @@ namespace MVCMASCOTAS.Services
                 pedido.Estado = nuevoEstado;
                 if (nuevoEstado == "Entregado")
                 {
-                    pedido.FechaEntrega = DateTime.Now;
+                    pedido.FechaEntregaReal = DateTime.Now; // Nombre correcto
+                    pedido.EstadoPago = "Pagado"; // Asumir que se pagó al entregar
                 }
+                else if (nuevoEstado == "Cancelado")
+                {
+                    // Restaurar stock de productos si se cancela
+                    RestaurarStockPorCancelacion(pedidoId);
+                }
+                db.SaveChanges();
+            }
+        }
+
+        // Actualizar estado de pago
+        public void ActualizarEstadoPago(int pedidoId, string nuevoEstadoPago)
+        {
+            var pedido = db.Pedidos.Find(pedidoId);
+            if (pedido != null)
+            {
+                pedido.EstadoPago = nuevoEstadoPago;
                 db.SaveChanges();
             }
         }
@@ -171,7 +211,8 @@ namespace MVCMASCOTAS.Services
             return db.Productos
                 .Where(p => p.Activo == true &&
                            (p.NombreProducto.Contains(termino) ||
-                            p.Descripcion.Contains(termino)))
+                            p.Descripcion.Contains(termino) ||
+                            p.SKU.Contains(termino)))
                 .OrderBy(p => p.NombreProducto)
                 .ToList();
         }
@@ -190,6 +231,64 @@ namespace MVCMASCOTAS.Services
         public int ObtenerPedidosPendientes()
         {
             return db.Pedidos.Count(p => p.Estado == "Pendiente");
+        }
+
+        public int ObtenerPedidosEnProceso()
+        {
+            return db.Pedidos.Count(p => p.Estado == "En preparación" ||
+                                         p.Estado == "Confirmado" ||
+                                         p.Estado == "Enviado");
+        }
+
+        // Generar número de pedido único
+        private string GenerarNumeroPedido()
+        {
+            var fecha = DateTime.Now.ToString("yyyyMMdd");
+            var consecutivo = db.Pedidos
+                .Count(p => p.FechaPedido.HasValue &&
+                           DbFunctions.TruncateTime(p.FechaPedido) == DbFunctions.TruncateTime(DateTime.Now)) + 1;
+
+            return $"PED-{fecha}-{consecutivo:D4}";
+        }
+
+        // Restaurar stock cuando se cancela un pedido
+        private void RestaurarStockPorCancelacion(int pedidoId)
+        {
+            var detalles = db.PedidoDetalle
+                .Where(d => d.PedidoId == pedidoId)
+                .ToList();
+
+            foreach (var detalle in detalles)
+            {
+                AumentarStock(detalle.ProductoId, detalle.Cantidad);
+            }
+        }
+
+        // Obtener pedido por número de pedido
+        public Pedidos ObtenerPedidoPorNumero(string numeroPedido)
+        {
+            return db.Pedidos
+                .FirstOrDefault(p => p.NumeroPedido == numeroPedido);
+        }
+
+        // Obtener resumen de productos más vendidos
+        public List<Productos> ObtenerProductosMasVendidos(int cantidad = 10)
+        {
+            return db.PedidoDetalle
+                .Where(d => d.Pedidos.Estado == "Entregado")
+                .GroupBy(d => d.ProductoId)
+                .Select(g => new
+                {
+                    ProductoId = g.Key,
+                    TotalVendido = g.Sum(d => d.Cantidad)
+                })
+                .OrderByDescending(x => x.TotalVendido)
+                .Take(cantidad)
+                .Join(db.Productos,
+                      venta => venta.ProductoId,
+                      producto => producto.ProductoId,
+                      (venta, producto) => producto)
+                .ToList();
         }
 
         public void Dispose()

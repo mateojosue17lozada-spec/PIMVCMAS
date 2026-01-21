@@ -15,17 +15,26 @@ namespace MVCMASCOTAS.Controllers
         // GET: Veterinario/Dashboard
         public ActionResult Dashboard()
         {
+            var usuario = db.Usuarios.FirstOrDefault(u => u.Email == User.Identity.Name && u.Activo == true);
+            if (usuario == null)
+            {
+                return RedirectToAction("Logout", "Account");
+            }
+
             // Estadísticas
-            ViewBag.MascotasEnTratamiento = db.Mascotas.Count(m => m.Estado == "En tratamiento" && m.Activo);
+            ViewBag.MascotasEnTratamiento = db.Mascotas.Count(m => m.Estado == "En tratamiento" && m.Activo == true);
             ViewBag.TratamientosActivos = db.Tratamientos.Count(t => t.Estado == "En curso");
+
+            // CORRECTO: HistorialMedico no tiene FechaRegistro, usa FechaConsulta
             ViewBag.CitasHoy = db.HistorialMedico
-                .Count(h => h.FechaRegistro.Year == DateTime.Now.Year &&
-                           h.FechaRegistro.Month == DateTime.Now.Month &&
-                           h.FechaRegistro.Day == DateTime.Now.Day);
+                .Count(h => h.FechaConsulta.HasValue &&
+                           h.FechaConsulta.Value.Year == DateTime.Now.Year &&
+                           h.FechaConsulta.Value.Month == DateTime.Now.Month &&
+                           h.FechaConsulta.Value.Day == DateTime.Now.Day);
 
             // Mascotas que requieren atención
             var mascotasAtencion = db.Mascotas
-                .Where(m => m.Estado == "En tratamiento" && m.Activo)
+                .Where(m => m.Estado == "En tratamiento" && m.Activo == true)
                 .OrderByDescending(m => m.FechaIngreso)
                 .Take(10)
                 .ToList();
@@ -34,7 +43,7 @@ namespace MVCMASCOTAS.Controllers
 
             // Tratamientos pendientes
             var tratamientosPendientes = db.Tratamientos
-                .Where(t => t.Estado == "En curso")
+                .Where(t => t.Estado == "En curso" && t.Mascotas.VeterinarioAsignado == usuario.UsuarioId)
                 .OrderBy(t => t.FechaInicio)
                 .Take(10)
                 .ToList();
@@ -47,8 +56,14 @@ namespace MVCMASCOTAS.Controllers
         // GET: Veterinario/Mascotas
         public ActionResult Mascotas(string estado, int page = 1)
         {
+            var usuario = db.Usuarios.FirstOrDefault(u => u.Email == User.Identity.Name && u.Activo == true);
+            if (usuario == null)
+            {
+                return RedirectToAction("Logout", "Account");
+            }
+
             int pageSize = 20;
-            var query = db.Mascotas.Where(m => m.Activo);
+            var query = db.Mascotas.Where(m => m.Activo == true && m.VeterinarioAsignado == usuario.UsuarioId);
 
             if (!string.IsNullOrEmpty(estado) && estado != "Todos")
             {
@@ -74,9 +89,15 @@ namespace MVCMASCOTAS.Controllers
         // GET: Veterinario/HistorialMedico/5
         public ActionResult HistorialMedico(int mascotaId)
         {
+            var usuario = db.Usuarios.FirstOrDefault(u => u.Email == User.Identity.Name && u.Activo == true);
+            if (usuario == null)
+            {
+                return RedirectToAction("Logout", "Account");
+            }
+
             var mascota = db.Mascotas.Find(mascotaId);
 
-            if (mascota == null)
+            if (mascota == null || mascota.VeterinarioAsignado != usuario.UsuarioId)
             {
                 return HttpNotFound();
             }
@@ -89,7 +110,7 @@ namespace MVCMASCOTAS.Controllers
             // Historial médico
             var historial = db.HistorialMedico
                 .Where(h => h.MascotaId == mascotaId)
-                .OrderByDescending(h => h.FechaRegistro)
+                .OrderByDescending(h => h.FechaConsulta)
                 .ToList();
 
             ViewBag.Historial = historial;
@@ -98,6 +119,7 @@ namespace MVCMASCOTAS.Controllers
             var vacunas = db.MascotaVacunas
                 .Where(v => v.MascotaId == mascotaId)
                 .Include(v => v.Vacunas)
+                .Include(v => v.Usuarios) // Veterinario
                 .OrderByDescending(v => v.FechaAplicacion)
                 .ToList();
 
@@ -118,27 +140,33 @@ namespace MVCMASCOTAS.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult RegistrarConsulta(int mascotaId, string diagnostico, string tratamientoRecetado,
-            decimal? peso, decimal? temperatura, string observaciones)
+            decimal? peso, decimal? temperatura, string estadoGeneral, string observaciones)
         {
+            var usuario = db.Usuarios.FirstOrDefault(u => u.Email == User.Identity.Name && u.Activo == true);
+            if (usuario == null)
+            {
+                return RedirectToAction("Logout", "Account");
+            }
+
             if (string.IsNullOrEmpty(diagnostico))
             {
                 TempData["ErrorMessage"] = "El diagnóstico es requerido";
                 return RedirectToAction("HistorialMedico", new { mascotaId });
             }
 
-            var usuario = db.Usuarios.FirstOrDefault(u => u.Email == User.Identity.Name);
-
             var historial = new HistorialMedico
             {
                 MascotaId = mascotaId,
                 VeterinarioId = usuario.UsuarioId,
-                TipoRegistro = "Consulta",
+                TipoConsulta = "Consulta General", // CORRECTO: es TipoConsulta, no TipoRegistro
                 Diagnostico = diagnostico,
-                TratamientoRecetado = tratamientoRecetado,
+                Tratamiento = tratamientoRecetado, // CORRECTO: es Tratamiento, no TratamientoRecetado
                 Peso = peso,
                 Temperatura = temperatura,
+                EstadoGeneral = estadoGeneral,
                 Observaciones = observaciones,
-                FechaRegistro = DateTime.Now
+                FechaConsulta = DateTime.Now, // CORRECTO: es FechaConsulta, no FechaRegistro
+                ProximaConsulta = DateTime.Now.AddDays(30)
             };
 
             db.HistorialMedico.Add(historial);
@@ -155,9 +183,13 @@ namespace MVCMASCOTAS.Controllers
         // POST: Veterinario/RegistrarVacuna
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult RegistrarVacuna(int mascotaId, int vacunaId, DateTime? fechaProximaDosis)
+        public ActionResult RegistrarVacuna(int mascotaId, int vacunaId, DateTime? proximaConsulta)
         {
-            var usuario = db.Usuarios.FirstOrDefault(u => u.Email == User.Identity.Name);
+            var usuario = db.Usuarios.FirstOrDefault(u => u.Email == User.Identity.Name && u.Activo == true);
+            if (usuario == null)
+            {
+                return RedirectToAction("Logout", "Account");
+            }
 
             var mascotaVacuna = new MascotaVacunas
             {
@@ -165,7 +197,8 @@ namespace MVCMASCOTAS.Controllers
                 VacunaId = vacunaId,
                 FechaAplicacion = DateTime.Now,
                 VeterinarioId = usuario.UsuarioId,
-                FechaProximaDosis = fechaProximaDosis
+                ProximaDosis = proximaConsulta, // CORRECTO: es ProximaDosis, no FechaProximaDosis
+                Lote = "LOTE-" + DateTime.Now.ToString("yyyyMMdd")
             };
 
             db.MascotaVacunas.Add(mascotaVacuna);
@@ -177,9 +210,10 @@ namespace MVCMASCOTAS.Controllers
             {
                 MascotaId = mascotaId,
                 VeterinarioId = usuario.UsuarioId,
-                TipoRegistro = "Vacunación",
+                TipoConsulta = "Vacunación", // CORRECTO: es TipoConsulta
                 Diagnostico = $"Vacuna aplicada: {vacuna.NombreVacuna}",
-                FechaRegistro = DateTime.Now
+                FechaConsulta = DateTime.Now,
+                ProximaConsulta = proximaConsulta
             };
 
             db.HistorialMedico.Add(historial);
@@ -196,9 +230,15 @@ namespace MVCMASCOTAS.Controllers
         // GET: Veterinario/IniciarTratamiento/5
         public ActionResult IniciarTratamiento(int mascotaId)
         {
+            var usuario = db.Usuarios.FirstOrDefault(u => u.Email == User.Identity.Name && u.Activo == true);
+            if (usuario == null)
+            {
+                return RedirectToAction("Logout", "Account");
+            }
+
             var mascota = db.Mascotas.Find(mascotaId);
 
-            if (mascota == null)
+            if (mascota == null || mascota.VeterinarioAsignado != usuario.UsuarioId)
             {
                 return HttpNotFound();
             }
@@ -212,27 +252,31 @@ namespace MVCMASCOTAS.Controllers
         // POST: Veterinario/IniciarTratamiento
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult IniciarTratamiento(int mascotaId, string tipoTratamiento, string descripcion,
-            string medicamentos, int duracionEstimadaDias, decimal? costoEstimado)
+        public ActionResult IniciarTratamiento(int mascotaId, string nombreTratamiento, string descripcion,
+            string medicamentos, DateTime? fechaFin, decimal? costo)
         {
+            var usuario = db.Usuarios.FirstOrDefault(u => u.Email == User.Identity.Name && u.Activo == true);
+            if (usuario == null)
+            {
+                return RedirectToAction("Logout", "Account");
+            }
+
             if (string.IsNullOrEmpty(descripcion))
             {
                 TempData["ErrorMessage"] = "La descripción es requerida";
                 return RedirectToAction("IniciarTratamiento", new { mascotaId });
             }
 
-            var usuario = db.Usuarios.FirstOrDefault(u => u.Email == User.Identity.Name);
-
             var tratamiento = new Tratamientos
             {
                 MascotaId = mascotaId,
-                TipoTratamiento = tipoTratamiento,
+                VeterinarioId = usuario.UsuarioId, // CORRECTO: es VeterinarioId, no VeterinarioResponsableId
+                NombreTratamiento = nombreTratamiento, // CORRECTO: es NombreTratamiento, no TipoTratamiento
                 Descripcion = descripcion,
                 Medicamentos = medicamentos,
                 FechaInicio = DateTime.Now,
-                DuracionEstimadaDias = duracionEstimadaDias,
-                CostoEstimado = costoEstimado,
-                VeterinarioResponsableId = usuario.UsuarioId,
+                FechaFin = fechaFin,
+                Costo = costo, // CORRECTO: es Costo, no CostoEstimado
                 Estado = "En curso"
             };
 
@@ -247,10 +291,10 @@ namespace MVCMASCOTAS.Controllers
             {
                 MascotaId = mascotaId,
                 VeterinarioId = usuario.UsuarioId,
-                TipoRegistro = "Inicio Tratamiento",
-                Diagnostico = $"{tipoTratamiento}: {descripcion}",
-                TratamientoRecetado = medicamentos,
-                FechaRegistro = DateTime.Now
+                TipoConsulta = "Inicio Tratamiento",
+                Diagnostico = $"{nombreTratamiento}: {descripcion}",
+                Tratamiento = medicamentos,
+                FechaConsulta = DateTime.Now
             };
 
             db.HistorialMedico.Add(historial);
@@ -258,7 +302,7 @@ namespace MVCMASCOTAS.Controllers
 
             // Auditoría
             AuditoriaHelper.RegistrarAccion("Iniciar Tratamiento", "Veterinario",
-                $"Mascota ID: {mascotaId}, Tipo: {tipoTratamiento}", usuario.UsuarioId);
+                $"Mascota ID: {mascotaId}, Tratamiento: {nombreTratamiento}", usuario.UsuarioId);
 
             TempData["SuccessMessage"] = "Tratamiento iniciado exitosamente";
             return RedirectToAction("HistorialMedico", new { mascotaId });
@@ -267,18 +311,26 @@ namespace MVCMASCOTAS.Controllers
         // POST: Veterinario/FinalizarTratamiento
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult FinalizarTratamiento(int tratamientoId, string resultados)
+        public ActionResult FinalizarTratamiento(int tratamientoId, string observaciones)
         {
-            var tratamiento = db.Tratamientos.Find(tratamientoId);
+            var usuario = db.Usuarios.FirstOrDefault(u => u.Email == User.Identity.Name && u.Activo == true);
+            if (usuario == null)
+            {
+                return RedirectToAction("Logout", "Account");
+            }
 
-            if (tratamiento == null)
+            var tratamiento = db.Tratamientos
+                .Include(t => t.Mascotas)
+                .FirstOrDefault(t => t.TratamientoId == tratamientoId);
+
+            if (tratamiento == null || tratamiento.Mascotas.VeterinarioAsignado != usuario.UsuarioId)
             {
                 return HttpNotFound();
             }
 
             tratamiento.FechaFin = DateTime.Now;
             tratamiento.Estado = "Completado";
-            tratamiento.Resultados = resultados;
+            tratamiento.Observaciones = observaciones; // CORRECTO: es Observaciones, no Resultados
 
             // Verificar si hay más tratamientos activos para esta mascota
             var otrosTratamientos = db.Tratamientos
@@ -293,17 +345,15 @@ namespace MVCMASCOTAS.Controllers
                 mascota.Estado = "Disponible para adopción";
             }
 
-            var usuario = db.Usuarios.FirstOrDefault(u => u.Email == User.Identity.Name);
-
             // Registrar en historial
             var historial = new HistorialMedico
             {
                 MascotaId = tratamiento.MascotaId,
                 VeterinarioId = usuario.UsuarioId,
-                TipoRegistro = "Fin Tratamiento",
-                Diagnostico = $"Tratamiento completado: {tratamiento.TipoTratamiento}",
-                Observaciones = resultados,
-                FechaRegistro = DateTime.Now
+                TipoConsulta = "Fin Tratamiento",
+                Diagnostico = $"Tratamiento completado: {tratamiento.NombreTratamiento}",
+                Observaciones = observaciones,
+                FechaConsulta = DateTime.Now
             };
 
             db.HistorialMedico.Add(historial);
@@ -320,8 +370,53 @@ namespace MVCMASCOTAS.Controllers
         // GET: Veterinario/ListaVacunas
         public ActionResult ListaVacunas()
         {
-            var vacunas = db.Vacunas.OrderBy(v => v.NombreVacuna).ToList();
+            var vacunas = db.Vacunas.Where(v => v.Activo == true).OrderBy(v => v.NombreVacuna).ToList();
             return View(vacunas);
+        }
+
+        // GET: Veterinario/AgregarVacuna
+        public ActionResult AgregarVacuna()
+        {
+            return View();
+        }
+
+        // POST: Veterinario/AgregarVacuna
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult AgregarVacuna(string nombreVacuna, string descripcion, string especieAplicable,
+            string edadRecomendada, string frecuenciaRefuerzo)
+        {
+            var usuario = db.Usuarios.FirstOrDefault(u => u.Email == User.Identity.Name && u.Activo == true);
+            if (usuario == null)
+            {
+                return RedirectToAction("Logout", "Account");
+            }
+
+            if (string.IsNullOrEmpty(nombreVacuna))
+            {
+                TempData["ErrorMessage"] = "El nombre de la vacuna es requerido";
+                return View();
+            }
+
+            var vacuna = new Vacunas
+            {
+                NombreVacuna = nombreVacuna,
+                Descripcion = descripcion,
+                EspecieAplicable = especieAplicable,
+                EdadRecomendada = edadRecomendada,
+                FrecuenciaRefuerzo = frecuenciaRefuerzo,
+                Activo = true
+            };
+
+            db.Vacunas.Add(vacuna);
+            db.SaveChanges();
+
+            // Auditoría
+            AuditoriaHelper.RegistrarAccion("Agregar Vacuna", "Veterinario",
+                $"Vacuna: {nombreVacuna}", usuario.UsuarioId);
+
+            TempData["SuccessMessage"] = "Vacuna agregada exitosamente";
+            return RedirectToAction("ListaVacunas");
         }
 
         // POST: Veterinario/CambiarEstadoMascota
@@ -329,9 +424,15 @@ namespace MVCMASCOTAS.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult CambiarEstadoMascota(int mascotaId, string nuevoEstado, string observaciones)
         {
+            var usuario = db.Usuarios.FirstOrDefault(u => u.Email == User.Identity.Name && u.Activo == true);
+            if (usuario == null)
+            {
+                return RedirectToAction("Logout", "Account");
+            }
+
             var mascota = db.Mascotas.Find(mascotaId);
 
-            if (mascota == null)
+            if (mascota == null || mascota.VeterinarioAsignado != usuario.UsuarioId)
             {
                 return HttpNotFound();
             }
@@ -339,17 +440,15 @@ namespace MVCMASCOTAS.Controllers
             string estadoAnterior = mascota.Estado;
             mascota.Estado = nuevoEstado;
 
-            var usuario = db.Usuarios.FirstOrDefault(u => u.Email == User.Identity.Name);
-
             // Registrar en historial
             var historial = new HistorialMedico
             {
                 MascotaId = mascotaId,
                 VeterinarioId = usuario.UsuarioId,
-                TipoRegistro = "Cambio Estado",
+                TipoConsulta = "Cambio Estado",
                 Diagnostico = $"Estado cambiado de '{estadoAnterior}' a '{nuevoEstado}'",
                 Observaciones = observaciones,
-                FechaRegistro = DateTime.Now
+                FechaConsulta = DateTime.Now
             };
 
             db.HistorialMedico.Add(historial);
@@ -361,6 +460,77 @@ namespace MVCMASCOTAS.Controllers
 
             TempData["SuccessMessage"] = "Estado actualizado exitosamente";
             return RedirectToAction("HistorialMedico", new { mascotaId });
+        }
+
+        // GET: Veterinario/MisMascotasAsignadas
+        public ActionResult MisMascotasAsignadas()
+        {
+            var usuario = db.Usuarios.FirstOrDefault(u => u.Email == User.Identity.Name && u.Activo == true);
+            if (usuario == null)
+            {
+                return RedirectToAction("Logout", "Account");
+            }
+
+            var mascotas = db.Mascotas
+                .Where(m => m.VeterinarioAsignado == usuario.UsuarioId && m.Activo == true)
+                .OrderBy(m => m.Estado)
+                .ThenBy(m => m.Nombre)
+                .ToList();
+
+            ViewBag.MascotasEnTratamiento = mascotas.Count(m => m.Estado == "En tratamiento");
+            ViewBag.MascotasDisponibles = mascotas.Count(m => m.Estado == "Disponible para adopción");
+            ViewBag.MascotasRescatadas = mascotas.Count(m => m.Estado == "Rescatada");
+
+            return View(mascotas);
+        }
+
+        // GET: Veterinario/ReporteMensual
+        public ActionResult ReporteMensual(int? year, int? month)
+        {
+            var usuario = db.Usuarios.FirstOrDefault(u => u.Email == User.Identity.Name && u.Activo == true);
+            if (usuario == null)
+            {
+                return RedirectToAction("Logout", "Account");
+            }
+
+            if (!year.HasValue) year = DateTime.Now.Year;
+            if (!month.HasValue) month = DateTime.Now.Month;
+
+            DateTime inicioMes = new DateTime(year.Value, month.Value, 1);
+            DateTime finMes = inicioMes.AddMonths(1).AddDays(-1);
+
+            // Consultas del mes
+            var consultas = db.HistorialMedico
+                .Where(h => h.VeterinarioId == usuario.UsuarioId &&
+                           h.FechaConsulta >= inicioMes &&
+                           h.FechaConsulta <= finMes)
+                .ToList();
+
+            // Tratamientos iniciados
+            var tratamientosIniciados = db.Tratamientos
+                .Where(t => t.VeterinarioId == usuario.UsuarioId &&
+                           t.FechaInicio >= inicioMes &&
+                           t.FechaInicio <= finMes)
+                .ToList();
+
+            // Vacunas aplicadas
+            var vacunasAplicadas = db.MascotaVacunas
+                .Where(v => v.VeterinarioId == usuario.UsuarioId &&
+                           v.FechaAplicacion >= inicioMes &&
+                           v.FechaAplicacion <= finMes)
+                .ToList();
+
+            ViewBag.Year = year;
+            ViewBag.Month = month;
+            ViewBag.MonthName = inicioMes.ToString("MMMM");
+            ViewBag.Consultas = consultas;
+            ViewBag.TratamientosIniciados = tratamientosIniciados;
+            ViewBag.VacunasAplicadas = vacunasAplicadas;
+            ViewBag.TotalConsultas = consultas.Count;
+            ViewBag.TotalTratamientos = tratamientosIniciados.Count;
+            ViewBag.TotalVacunas = vacunasAplicadas.Count;
+
+            return View();
         }
 
         protected override void Dispose(bool disposing)

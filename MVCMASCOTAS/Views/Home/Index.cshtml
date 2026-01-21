@@ -1,187 +1,203 @@
-﻿@{
-    ViewBag.Title = "Inicio";
+﻿@using MVCMASCOTAS.Models
+@using MVCMASCOTAS.Helpers
+@{
+    ViewBag.Title = "Inicio - Refugio de Mascotas";
+    var db = new RefugioMascotasDBEntities();
 }
 
-<!-- Hero Section -->
-<div class="jumbotron jumbotron-fluid bg-primary text-white text-center" style="background: linear-gradient(135deg, #3498db, #2c3e50); padding: 100px 0;">
-    <div class="container">
-        <h1 class="display-3"><i class="fas fa-heart"></i> Refugio de Animales Quito</h1>
-        <p class="lead">Salvando vidas, un animal a la vez</p>
-        <hr class="my-4 bg-white">
-        <p>Adopta, dona, apadrina o hazte voluntario. ¡Tu ayuda marca la diferencia!</p>
-        <div class="mt-4">
-            <a class="btn btn-light btn-lg mr-3" href="@Url.Action("Index", "Mascotas")" role="button">
-                <i class="fas fa-dog"></i> Adoptar una Mascota
-            </a>
-            <a class="btn btn-outline-light btn-lg" href="@Url.Action("Index", "Donaciones")" role="button">
-                <i class="fas fa-hand-holding-heart"></i> Hacer una Donación
-            </a>
-        </div>
-    </div>
+<div class="jumbotron bg-light p-5 rounded">
+    <h1 class="display-4">🐾 Refugio de Mascotas</h1>
+    <p class="lead">Damos amor, cuidado y un hogar a mascotas que lo necesitan.</p>
+    <hr class="my-4">
+    <p>Un refugio comprometido con el bienestar animal y la adopción responsable.</p>
+    <a class="btn btn-primary btn-lg" href="@Url.Action("Index", "Mascotas")" role="button">Ver Mascotas Disponibles</a>
+    <a class="btn btn-outline-secondary btn-lg" href="@Url.Action("Index", "Donaciones")" role="button">Hacer una Donación</a>
 </div>
 
 <!-- Estadísticas -->
-<div class="container my-5">
-    <div class="row text-center">
-        <div class="col-md-3">
-            <div class="stat-box bg-success">
-                <div class="stat-value">@ViewBag.TotalMascotas</div>
-                <div class="stat-label">Mascotas Rescatadas</div>
+<div class="row text-center mb-5">
+    <div class="col-md-3">
+        <div class="card text-white bg-primary mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Total Mascotas</h5>
+                <p class="card-text display-4">@ViewBag.TotalMascotas</p>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="stat-box bg-info">
-                <div class="stat-value">@ViewBag.MascotasDisponibles</div>
-                <div class="stat-label">Disponibles para Adopción</div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-success mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Mascotas Adoptadas</h5>
+                <p class="card-text display-4">@ViewBag.MascotasAdoptadas</p>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="stat-box bg-warning">
-                <div class="stat-value">@ViewBag.TotalAdopciones</div>
-                <div class="stat-label">Adopciones Exitosas</div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-warning mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Voluntarios Activos</h5>
+                <p class="card-text display-4">@ViewBag.VoluntariosActivos</p>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="stat-box bg-danger">
-                <div class="stat-value">@ViewBag.TotalVoluntarios</div>
-                <div class="stat-label">Voluntarios Activos</div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-info mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Donaciones Activas</h5>
+                <p class="card-text display-4">@db.Donaciones.Count(d => d.Estado == "Completada")</p>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Mascotas Destacadas -->
-<div class="container my-5">
-    <h2 class="text-center mb-4">
-        <i class="fas fa-star"></i> Mascotas Buscando Hogar
-    </h2>
-    <div class="row">
-        @if (ViewBag.MascotasDestacadas != null)
-        {
-            foreach (var mascota in ViewBag.MascotasDestacadas)
-            {
-                <div class="col-md-4 mb-4">
-                    <div class="card mascota-card">
-                        @if (mascota.ImagenPrincipal != null)
-                        {
-                            <img src="@MVCMASCOTAS.Helpers.ImageHelper.GetImageDataUri(mascota.ImagenPrincipal)" class="card-img-top" alt="@mascota.Nombre">
-                        }
-                        else
-                        {
-                            <img src="~/Content/images/no-image.png" class="card-img-top" alt="Sin imagen">
-                        }
-                        <div class="card-body">
-                            <h5 class="card-title">@mascota.Nombre</h5>
-                            <p class="card-text">
-                                <i class="fas fa-paw"></i> @mascota.Especie<br />
-                                <i class="fas fa-venus-mars"></i> @mascota.Sexo<br />
-                                <i class="fas fa-ruler"></i> @mascota.Tamanio
-                            </p>
-                            <a href="@Url.Action("Detalle", "Mascotas", new { id = mascota.MascotaId })" class="btn btn-primary btn-block">
-                                <i class="fas fa-info-circle"></i> Ver Detalles
-                            </a>
+<!-- Mascotas Disponibles -->
+@if (ViewBag.MascotasDisponibles != null)
+{
+    var mascotasList = ViewBag.MascotasDisponibles as System.Collections.IList;
+    if (mascotasList != null && mascotasList.Count > 0)
+    {
+        <div class="row mt-4">
+            <div class="col-12">
+                <h2 class="mb-4">Mascotas Disponibles para Adopción</h2>
+                <div class="row">
+                    @foreach (var mascota in ViewBag.MascotasDisponibles)
+                    {
+                        <div class="col-md-4 mb-3">
+                            <div class="card h-100">
+                                @if (mascota.ImagenPrincipal != null)
+                                {
+                                    try
+                                    {
+                                        var imagenDataUri = ImageHelper.GetImageDataUri(mascota.ImagenPrincipal);
+                                        if (!string.IsNullOrEmpty(imagenDataUri))
+                                        {
+                                            <img src="@imagenDataUri"
+                                                 class="card-img-top"
+                                                 alt="@mascota.Nombre"
+                                                 style="height: 200px; object-fit: cover;">
+                                        }
+                                        else
+                                        {
+                                            <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                                                <span class="text-muted">Imagen no disponible</span>
+                                            </div>
+                                        }
+                                    }
+                                    catch
+                                    {
+                                        <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                                            <span class="text-muted">Error cargando imagen</span>
+                                        </div>
+                                    }
+                                }
+                                else
+                                {
+                                    <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                                        <span class="text-muted">Sin imagen</span>
+                                    </div>
+                                }
+                                <div class="card-body d-flex flex-column">
+                                    <h5 class="card-title">@mascota.Nombre</h5>
+                                    <p class="card-text">
+                                        <strong>Especie:</strong> @mascota.Especie<br>
+                                        <strong>Edad:</strong> @mascota.EdadAproximada<br>
+                                        <strong>Tamaño:</strong> @mascota.Tamanio
+                                    </p>
+                                    <div class="mt-auto">
+                                        <a href="@Url.Action("Details", "Mascotas", new { id = mascota.MascotaId })"
+                                           class="btn btn-primary btn-block">Ver Detalles</a>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                    </div>
+                    }
                 </div>
-            }
-        }
-    </div>
-    <div class="text-center mt-4">
-        <a href="@Url.Action("Index", "Mascotas")" class="btn btn-primary btn-lg">
-            Ver Todas las Mascotas <i class="fas fa-arrow-right"></i>
-        </a>
-    </div>
-</div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i> No hay mascotas disponibles para adopción en este momento.
+        </div>
+    }
+}
 
-<!-- Cómo Ayudar -->
-<div class="bg-light py-5">
-    <div class="container">
-        <h2 class="text-center mb-5">
-            <i class="fas fa-hands-helping"></i> ¿Cómo Puedes Ayudar?
-        </h2>
-        <div class="row">
-            <div class="col-md-3 text-center mb-4">
-                <div class="card h-100 shadow-custom">
-                    <div class="card-body">
-                        <i class="fas fa-home fa-3x text-primary mb-3"></i>
-                        <h5 class="card-title">Adoptar</h5>
-                        <p class="card-text">Dale un hogar permanente a un animal necesitado.</p>
-                        <a href="@Url.Action("Index", "Mascotas")" class="btn btn-primary">Adoptar</a>
+<!-- Últimas Donaciones -->
+@if (ViewBag.UltimasDonaciones != null)
+{
+    var donacionesList = ViewBag.UltimasDonaciones as System.Collections.IList;
+    if (donacionesList != null && donacionesList.Count > 0)
+    {
+        <div class="container my-5">
+            <h2 class="text-center mb-4"><i class="fas fa-users"></i> Nuestros Donantes Recientes</h2>
+            <div class="card shadow-custom">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Donante</th>
+                                    <th>Tipo</th>
+                                    <th>Monto</th>
+                                    <th>Fecha</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var donante in ViewBag.UltimasDonaciones)
+                                {
+                                    <tr>
+                                        <td>@donante.Nombre</td>
+                                        <td>
+                                            @if (donante.Tipo == "Única")
+                                            {
+                                                <span class="badge badge-primary">Única</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge badge-success">Recurrente</span>
+                                            }
+                                        </td>
+                                        <td>@string.Format("${0:N2}", donante.Monto)</td>
+                                        <td>@donante.Fecha.ToString("dd/MM/yyyy")</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
-            <div class="col-md-3 text-center mb-4">
-                <div class="card h-100 shadow-custom">
-                    <div class="card-body">
-                        <i class="fas fa-dollar-sign fa-3x text-success mb-3"></i>
-                        <h5 class="card-title">Donar</h5>
-                        <p class="card-text">Tu donación nos ayuda a seguir rescatando vidas.</p>
-                        <a href="@Url.Action("Index", "Donaciones")" class="btn btn-success">Donar</a>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3 text-center mb-4">
-                <div class="card h-100 shadow-custom">
-                    <div class="card-body">
-                        <i class="fas fa-heart fa-3x text-danger mb-3"></i>
-                        <h5 class="card-title">Apadrinar</h5>
-                        <p class="card-text">Apadrina una mascota con una contribución mensual.</p>
-                        <a href="@Url.Action("Apadrinar", "Donaciones")" class="btn btn-danger">Apadrinar</a>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3 text-center mb-4">
-                <div class="card h-100 shadow-custom">
-                    <div class="card-body">
-                        <i class="fas fa-hands fa-3x text-warning mb-3"></i>
-                        <h5 class="card-title">Voluntariado</h5>
-                        <p class="card-text">Dona tu tiempo y únete a nuestro equipo.</p>
-                        <a href="@Url.Action("Index", "Voluntariado")" class="btn btn-warning">Ser Voluntario</a>
-                    </div>
-                </div>
+        </div>
+    }
+}
+
+<!-- Sección de información -->
+<div class="row mt-5">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title"><i class="fas fa-clinic-medical"></i> Servicios Veterinarios</h5>
+                <p class="card-text">
+                    Ofrecemos atención veterinaria completa para todas nuestras mascotas,
+                    incluyendo esterilización, vacunación y tratamientos especializados.
+                </p>
             </div>
         </div>
     </div>
-</div>
-
-<!-- Testimonios -->
-<div class="container my-5">
-    <h2 class="text-center mb-5">
-        <i class="fas fa-comments"></i> Historias de Éxito
-    </h2>
-    <div class="row">
-        <div class="col-md-4 mb-4">
-            <div class="card shadow-custom">
-                <div class="card-body">
-                    <p class="card-text">"Adoptar a Luna fue la mejor decisión. ¡Es parte de nuestra familia!"</p>
-                    <footer class="blockquote-footer">María G. - <cite title="Source Title">Adoptante</cite></footer>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4 mb-4">
-            <div class="card shadow-custom">
-                <div class="card-body">
-                    <p class="card-text">"Ser voluntario aquí me ha dado un propósito. ¡Es increíble!"</p>
-                    <footer class="blockquote-footer">Carlos R. - <cite title="Source Title">Voluntario</cite></footer>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4 mb-4">
-            <div class="card shadow-custom">
-                <div class="card-body">
-                    <p class="card-text">"Apadrino a Max desde hace 6 meses. Recibo fotos y me hace muy feliz."</p>
-                    <footer class="blockquote-footer">Ana L. - <cite title="Source Title">Madrina</cite></footer>
-                </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title"><i class="fas fa-hands-helping"></i> Voluntariado</h5>
+                <p class="card-text">
+                    Únete a nuestro equipo de voluntarios y ayuda a cambiar la vida
+                    de estas mascotas. Hay muchas formas de colaborar.
+                </p>
+                <a href="@Url.Action("Contact", "Home")" class="btn btn-outline-success">Quiero ser Voluntario</a>
             </div>
         </div>
     </div>
 </div>
 
-@section scripts {
-    <script>
-        $(document).ready(function () {
-            // Animaciones al cargar
-            $('.stat-box').addClass('fade-in');
-        });
-    </script>
+@{
+    db.Dispose();
 }

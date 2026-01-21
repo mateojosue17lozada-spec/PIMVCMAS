@@ -1,8 +1,9 @@
-﻿using System;
+﻿using MVCMASCOTAS.Helpers;
+using MVCMASCOTAS.Models;
+using System;
+using System.Data.Entity;
 using System.Linq;
 using System.Web.Mvc;
-using MVCMASCOTAS.Helpers;
-using MVCMASCOTAS.Models;
 
 namespace MVCMASCOTAS.Controllers
 {
@@ -88,6 +89,7 @@ namespace MVCMASCOTAS.Controllers
             int totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
 
             var movimientos = query
+                .Include(m => m.Usuarios)  // Para mostrar el nombre del responsable
                 .OrderByDescending(m => m.FechaMovimiento)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
@@ -105,6 +107,13 @@ namespace MVCMASCOTAS.Controllers
             ViewBag.CurrentPage = page;
             ViewBag.TotalPages = totalPages;
 
+            // Lista de categorías únicas para el dropdown
+            ViewBag.Categorias = db.MovimientosContables
+                .Select(m => m.Categoria)
+                .Distinct()
+                .OrderBy(c => c)
+                .ToList();
+
             return View(movimientos);
         }
 
@@ -112,12 +121,19 @@ namespace MVCMASCOTAS.Controllers
         public ActionResult RegistrarMovimiento()
         {
             ViewBag.TiposMovimiento = new SelectList(new[] { "Ingreso", "Egreso" });
+
+            // Categorías según tu base de datos (puedes ajustar estas)
             ViewBag.CategoriasIngreso = new SelectList(new[] {
                 "Donaciones", "Apadrinamientos", "Ventas Tienda", "Eventos", "Otros Ingresos"
             });
             ViewBag.CategoriasEgreso = new SelectList(new[] {
                 "Alimentos", "Medicamentos", "Servicios Veterinarios", "Mantenimiento",
                 "Servicios Básicos", "Personal", "Otros Egresos"
+            });
+
+            ViewBag.MetodosPago = new SelectList(new[] {
+                "Efectivo", "Transferencia Bancaria", "Tarjeta de Crédito",
+                "Tarjeta de Débito", "Cheque", "Depósito"
             });
 
             return View();
@@ -127,7 +143,8 @@ namespace MVCMASCOTAS.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult RegistrarMovimiento(string tipoMovimiento, string categoria, decimal monto,
-            string descripcion, string metodoPago, DateTime? fechaMovimiento, string numeroComprobante)
+            string concepto, string metodoPago, DateTime? fechaMovimiento, string numeroComprobante,
+            string observaciones)
         {
             if (monto <= 0)
             {
@@ -135,24 +152,30 @@ namespace MVCMASCOTAS.Controllers
                 return RedirectToAction("RegistrarMovimiento");
             }
 
-            if (string.IsNullOrEmpty(descripcion))
+            if (string.IsNullOrEmpty(concepto))
             {
-                TempData["ErrorMessage"] = "La descripción es requerida";
+                TempData["ErrorMessage"] = "El concepto es requerido";
                 return RedirectToAction("RegistrarMovimiento");
             }
 
-            var usuario = db.Usuarios.FirstOrDefault(u => u.Email == User.Identity.Name);
+            var usuario = db.Usuarios.FirstOrDefault(u => u.Email == User.Identity.Name && u.Activo == true);
+
+            if (usuario == null)
+            {
+                return RedirectToAction("Logout", "Account");
+            }
 
             var movimiento = new MovimientosContables
             {
                 TipoMovimiento = tipoMovimiento,
                 Categoria = categoria,
                 Monto = monto,
-                Descripcion = descripcion,
+                Concepto = concepto,  // CORRECTO: es 'Concepto' no 'Descripcion'
                 MetodoPago = metodoPago,
                 FechaMovimiento = fechaMovimiento ?? DateTime.Now,
                 NumeroComprobante = numeroComprobante,
-                ResponsableRegistroId = usuario.UsuarioId
+                ResponsableRegistro = usuario.UsuarioId,  // CORRECTO: es 'ResponsableRegistro' no 'ResponsableRegistroId'
+                Observaciones = observaciones
             };
 
             db.MovimientosContables.Add(movimiento);
@@ -163,6 +186,74 @@ namespace MVCMASCOTAS.Controllers
                 $"{tipoMovimiento} - {categoria}: ${monto}", usuario.UsuarioId);
 
             TempData["SuccessMessage"] = "Movimiento registrado exitosamente";
+            return RedirectToAction("Movimientos");
+        }
+
+        // GET: Contabilidad/DetallesMovimiento/5
+        public ActionResult DetallesMovimiento(int id)
+        {
+            var movimiento = db.MovimientosContables
+                .Include(m => m.Usuarios)  // Para mostrar el responsable
+                .FirstOrDefault(m => m.MovimientoId == id);
+
+            if (movimiento == null)
+            {
+                return HttpNotFound();
+            }
+
+            return View(movimiento);
+        }
+
+        // GET: Contabilidad/EditarMovimiento/5
+        public ActionResult EditarMovimiento(int id)
+        {
+            var movimiento = db.MovimientosContables.Find(id);
+
+            if (movimiento == null)
+            {
+                return HttpNotFound();
+            }
+
+            ViewBag.TiposMovimiento = new SelectList(new[] { "Ingreso", "Egreso" }, movimiento.TipoMovimiento);
+            ViewBag.MetodosPago = new SelectList(new[] {
+                "Efectivo", "Transferencia Bancaria", "Tarjeta de Crédito",
+                "Tarjeta de Débito", "Cheque", "Depósito"
+            }, movimiento.MetodoPago);
+
+            return View(movimiento);
+        }
+
+        // POST: Contabilidad/EditarMovimiento/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult EditarMovimiento(int id, MovimientosContables model)
+        {
+            var movimiento = db.MovimientosContables.Find(id);
+
+            if (movimiento == null)
+            {
+                return HttpNotFound();
+            }
+
+            movimiento.TipoMovimiento = model.TipoMovimiento;
+            movimiento.Categoria = model.Categoria;
+            movimiento.Monto = model.Monto;
+            movimiento.Concepto = model.Concepto;
+            movimiento.MetodoPago = model.MetodoPago;
+            movimiento.FechaMovimiento = model.FechaMovimiento;
+            movimiento.NumeroComprobante = model.NumeroComprobante;
+            movimiento.Observaciones = model.Observaciones;
+
+            db.SaveChanges();
+
+            var usuario = db.Usuarios.FirstOrDefault(u => u.Email == User.Identity.Name && u.Activo == true);
+            if (usuario != null)
+            {
+                AuditoriaHelper.RegistrarAccion("Editar Movimiento", "Contabilidad",
+                    $"Movimiento ID: {id} actualizado", usuario.UsuarioId);
+            }
+
+            TempData["SuccessMessage"] = "Movimiento actualizado exitosamente";
             return RedirectToAction("Movimientos");
         }
 
@@ -203,7 +294,7 @@ namespace MVCMASCOTAS.Controllers
             ViewBag.TotalEgresos = egresosPorCategoria.Sum(e => e.Total);
             ViewBag.Balance = ViewBag.TotalIngresos - ViewBag.TotalEgresos;
 
-            return View();
+            return View("ReporteGeneral");
         }
 
         // GET: Contabilidad/ReporteDonaciones
@@ -222,84 +313,219 @@ namespace MVCMASCOTAS.Controllers
 
             ViewBag.FechaInicio = fechaInicio.Value;
             ViewBag.FechaFin = fechaFin.Value;
-            ViewBag.TotalMonetarias = donaciones.Where(d => d.TipoDonacion == "Monetaria").Sum(d => d.MontoEfectivo) ?? 0;
+
+            // CORRECTO: usar Monto, no MontoEfectivo
+            ViewBag.TotalMonetarias = donaciones
+                .Where(d => d.TipoDonacion == "Única" || d.TipoDonacion == "Recurrente")
+                .Sum(d => (decimal?)d.Monto) ?? 0;
+
             ViewBag.CantidadDonaciones = donaciones.Count;
-            ViewBag.DonacionesEspecie = donaciones.Count(d => d.TipoDonacion == "Especie");
+            ViewBag.DonacionesEspecie = donaciones.Count(d => d.TipoDonacion != "Única" && d.TipoDonacion != "Recurrente");
 
             return View(donaciones);
         }
 
-        // POST: Contabilidad/ExportarReportePDF
+        // POST: Contabilidad/ExportarReporteDonacionesPDF
         [HttpPost]
         public ActionResult ExportarReporteDonacionesPDF(DateTime fechaInicio, DateTime fechaFin)
         {
             var donaciones = db.Donaciones
+                .Include(d => d.Usuarios)
                 .Where(d => d.FechaDonacion >= fechaInicio && d.FechaDonacion <= fechaFin)
                 .OrderBy(d => d.FechaDonacion)
                 .ToList();
 
-            byte[] pdfBytes = PdfHelper.GenerarReporteDonaciones(donaciones, fechaInicio, fechaFin);
-
-            return File(pdfBytes, "application/pdf", $"Reporte_Donaciones_{fechaInicio:yyyyMMdd}_{fechaFin:yyyyMMdd}.pdf");
+            // Verificar si el PDFHelper existe, si no, crear un archivo simple
+            try
+            {
+                byte[] pdfBytes = PdfHelper.GenerarReporteDonaciones(donaciones, fechaInicio, fechaFin);
+                return File(pdfBytes, "application/pdf", $"Reporte_Donaciones_{fechaInicio:yyyyMMdd}_{fechaFin:yyyyMMdd}.pdf");
+            }
+            catch
+            {
+                // Si no hay PDFHelper, redirigir a vista HTML
+                TempData["ErrorMessage"] = "El generador de PDF no está disponible. Descargue el reporte en formato HTML.";
+                return RedirectToAction("ReporteDonaciones", new { fechaInicio, fechaFin });
+            }
         }
 
         // GET: Contabilidad/GestionarApadrinamientos
-        public ActionResult GestionarApadrinamientos()
+        public ActionResult GestionarApadrinamientos(string estado, int page = 1)
         {
-            var apadrinamientos = db.Apadrinamientos
-                .Where(a => a.Estado == "Activo")
+            int pageSize = 20;
+            var query = db.Apadrinamientos.AsQueryable();
+
+            if (!string.IsNullOrEmpty(estado) && estado != "Todos")
+            {
+                query = query.Where(a => a.Estado == estado);
+            }
+
+            int totalItems = query.Count();
+            int totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+
+            var apadrinamientos = query
+                .Include(a => a.Mascotas)
+                .Include(a => a.Usuarios)
+                .Include(a => a.PagosApadrinamiento)
                 .OrderBy(a => a.FechaInicio)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
                 .ToList();
 
-            ViewBag.TotalApadrinamientos = apadrinamientos.Count;
-            ViewBag.IngresoMensualEstimado = apadrinamientos.Sum(a => a.MontoMensual);
+            ViewBag.EstadoSeleccionado = estado;
+            ViewBag.TotalApadrinamientos = totalItems;
+            ViewBag.IngresoMensualEstimado = query.Sum(a => (decimal?)a.MontoMensual) ?? 0;
+            ViewBag.CurrentPage = page;
+            ViewBag.TotalPages = totalPages;
 
             return View(apadrinamientos);
         }
 
-        // POST: Contabilidad/RegistrarPagoApadrinamiento
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult RegistrarPagoApadrinamiento(int apadrinamientoId, decimal monto,
-            string metodoPago, DateTime? fechaPago)
+        // GET: Contabilidad/RegistrarPagoApadrinamiento/5
+        public ActionResult RegistrarPagoApadrinamiento(int id)
         {
-            var apadrinamiento = db.Apadrinamientos.Find(apadrinamientoId);
+            var apadrinamiento = db.Apadrinamientos
+                .Include(a => a.Mascotas)
+                .Include(a => a.Usuarios)
+                .FirstOrDefault(a => a.ApadrinamientoId == id);
 
             if (apadrinamiento == null)
             {
                 return HttpNotFound();
             }
 
+            ViewBag.Apadrinamiento = apadrinamiento;
+            ViewBag.MetodosPago = new SelectList(new[] {
+                "Efectivo", "Transferencia Bancaria", "Tarjeta de Crédito",
+                "Tarjeta de Débito", "Cheque", "Depósito"
+            });
+
+            return View();
+        }
+
+        // POST: Contabilidad/RegistrarPagoApadrinamiento
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult RegistrarPagoApadrinamiento(int apadrinamientoId, decimal monto,
+            string metodoPago, DateTime? fechaPago, string mesPagado, string numeroTransaccion)
+        {
+            var apadrinamiento = db.Apadrinamientos
+                .Include(a => a.Mascotas)
+                .Include(a => a.Usuarios)
+                .FirstOrDefault(a => a.ApadrinamientoId == apadrinamientoId);
+
+            if (apadrinamiento == null)
+            {
+                return HttpNotFound();
+            }
+
+            if (monto <= 0)
+            {
+                TempData["ErrorMessage"] = "El monto debe ser mayor a cero";
+                return RedirectToAction("RegistrarPagoApadrinamiento", new { id = apadrinamientoId });
+            }
+
             var pago = new PagosApadrinamiento
             {
                 ApadrinamientoId = apadrinamientoId,
-                MontoPagado = monto,
+                Monto = monto,  // CORRECTO: es 'Monto' no 'MontoPagado'
                 FechaPago = fechaPago ?? DateTime.Now,
-                MetodoPago = metodoPago
+                MetodoPago = metodoPago,
+                MesPagado = mesPagado,
+                NumeroTransaccion = numeroTransaccion,
+                Estado = "Completado"
             };
 
             db.PagosApadrinamiento.Add(pago);
 
             // Registrar en contabilidad
+            var usuario = db.Usuarios.FirstOrDefault(u => u.Email == User.Identity.Name && u.Activo == true);
+
             var movimiento = new MovimientosContables
             {
                 TipoMovimiento = "Ingreso",
                 Categoria = "Apadrinamientos",
                 Monto = monto,
-                Descripcion = $"Pago apadrinamiento - Mascota: {apadrinamiento.Mascotas.Nombre}, Padrino: {apadrinamiento.Usuarios.NombreCompleto}",
+                Concepto = $"Pago apadrinamiento - Mascota: {apadrinamiento.Mascotas?.Nombre}, Padrino: {apadrinamiento.Usuarios?.NombreCompleto}",
                 FechaMovimiento = fechaPago ?? DateTime.Now,
-                MetodoPago = metodoPago
+                MetodoPago = metodoPago,
+                NumeroComprobante = numeroTransaccion,
+                ResponsableRegistro = usuario?.UsuarioId ?? 0,
+                Observaciones = $"Pago correspondiente a {mesPagado}"
             };
 
             db.MovimientosContables.Add(movimiento);
             db.SaveChanges();
 
-            var usuario = db.Usuarios.FirstOrDefault(u => u.Email == User.Identity.Name);
-            AuditoriaHelper.RegistrarAccion("Registrar Pago Apadrinamiento", "Contabilidad",
-                $"Apadrinamiento ID: {apadrinamientoId}, Monto: ${monto}", usuario.UsuarioId);
+            if (usuario != null)
+            {
+                AuditoriaHelper.RegistrarAccion("Registrar Pago Apadrinamiento", "Contabilidad",
+                    $"Apadrinamiento ID: {apadrinamientoId}, Monto: ${monto}", usuario.UsuarioId);
+            }
 
             TempData["SuccessMessage"] = "Pago registrado exitosamente";
             return RedirectToAction("GestionarApadrinamientos");
+        }
+
+        // GET: Contabilidad/DetallesApadrinamiento/5
+        public ActionResult DetallesApadrinamiento(int id)
+        {
+            var apadrinamiento = db.Apadrinamientos
+                .Include(a => a.Mascotas)
+                .Include(a => a.Usuarios)
+                .Include(a => a.PagosApadrinamiento)
+                .FirstOrDefault(a => a.ApadrinamientoId == id);
+
+            if (apadrinamiento == null)
+            {
+                return HttpNotFound();
+            }
+
+            ViewBag.TotalPagado = apadrinamiento.PagosApadrinamiento.Sum(p => (decimal?)p.Monto) ?? 0;
+            ViewBag.PagosRealizados = apadrinamiento.PagosApadrinamiento.Count;
+
+            return View(apadrinamiento);
+        }
+
+        // GET: Contabilidad/ReporteMensual
+        public ActionResult ReporteMensual(int? anio, int? mes)
+        {
+            if (!anio.HasValue)
+                anio = DateTime.Now.Year;
+
+            if (!mes.HasValue)
+                mes = DateTime.Now.Month;
+
+            DateTime inicioMes = new DateTime(anio.Value, mes.Value, 1);
+            DateTime finMes = inicioMes.AddMonths(1).AddDays(-1);
+
+            var movimientos = db.MovimientosContables
+                .Where(m => m.FechaMovimiento >= inicioMes && m.FechaMovimiento <= finMes)
+                .OrderBy(m => m.FechaMovimiento)
+                .ToList();
+
+            var donaciones = db.Donaciones
+                .Where(d => d.FechaDonacion >= inicioMes && d.FechaDonacion <= finMes)
+                .ToList();
+
+            var pagosApadrinamientos = db.PagosApadrinamiento
+                .Where(p => p.FechaPago >= inicioMes && p.FechaPago <= finMes)
+                .ToList();
+
+            ViewBag.Anio = anio.Value;
+            ViewBag.Mes = mes.Value;
+            ViewBag.NombreMes = inicioMes.ToString("MMMM");
+            ViewBag.Movimientos = movimientos;
+            ViewBag.Donaciones = donaciones;
+            ViewBag.PagosApadrinamientos = pagosApadrinamientos;
+
+            ViewBag.TotalIngresos = movimientos.Where(m => m.TipoMovimiento == "Ingreso").Sum(m => m.Monto);
+            ViewBag.TotalEgresos = movimientos.Where(m => m.TipoMovimiento == "Egreso").Sum(m => m.Monto);
+            ViewBag.TotalDonaciones = donaciones.Sum(d => d.Monto);
+            ViewBag.TotalApadrinamientos = pagosApadrinamientos.Sum(p => p.Monto);
+            ViewBag.Balance = ViewBag.TotalIngresos - ViewBag.TotalEgresos;
+
+            return View();
         }
 
         protected override void Dispose(bool disposing)

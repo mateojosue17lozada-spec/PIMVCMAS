@@ -1,35 +1,39 @@
 ﻿using System;
-using MVCMASCOTAS.Models;
-using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Web;
+using MVCMASCOTAS.Models;
 
 namespace MVCMASCOTAS.Services
 {
-    public class ContabilidadService
+    public class ContabilidadService : IDisposable
     {
-        private readonly RefugioMascotasEntities db;
+        private readonly RefugioMascotasDBEntities db;
 
         public ContabilidadService()
         {
-            db = new RefugioMascotasEntities();
+            db = new RefugioMascotasDBEntities();
         }
 
         // Registrar movimiento contable
-        public MovimientosContables RegistrarMovimiento(string tipo, decimal monto, string categoria, string descripcion, int usuarioId, string referencia = null)
+        public MovimientosContables RegistrarMovimiento(string tipo, decimal monto, string categoria, string concepto, int usuarioId,
+                                                       string tipoReferencia = null, int? referenciaId = null,
+                                                       string metodoPago = null, string observaciones = null)
         {
             var movimiento = new MovimientosContables
             {
-                Tipo = tipo, // "Ingreso" o "Egreso"
+                TipoMovimiento = tipo, // "Ingreso" o "Egreso" (nombre correcto según DB)
                 Categoria = categoria,
                 Monto = monto,
-                Descripcion = descripcion,
+                Concepto = concepto, // Nombre correcto según DB
                 FechaMovimiento = DateTime.Now,
-                UsuarioRegistro = usuarioId,
-                Referencia = referencia,
-                Comprobante = GenerarNumeroComprobante(tipo)
+                ResponsableRegistro = usuarioId, // Nombre correcto según DB
+                TipoReferencia = tipoReferencia,
+                ReferenciaId = referenciaId,
+                MetodoPago = metodoPago,
+                Observaciones = observaciones,
+                NumeroComprobante = GenerarNumeroComprobante(tipo) // Nombre correcto según DB
             };
 
             db.MovimientosContables.Add(movimiento);
@@ -50,7 +54,7 @@ namespace MVCMASCOTAS.Services
         public decimal ObtenerIngresosMes(int mes, int anio)
         {
             return db.MovimientosContables
-                .Where(m => m.Tipo == "Ingreso" &&
+                .Where(m => m.TipoMovimiento == "Ingreso" && // Nombre correcto
                            m.FechaMovimiento.HasValue &&
                            m.FechaMovimiento.Value.Month == mes &&
                            m.FechaMovimiento.Value.Year == anio)
@@ -61,7 +65,7 @@ namespace MVCMASCOTAS.Services
         public decimal ObtenerEgresosMes(int mes, int anio)
         {
             return db.MovimientosContables
-                .Where(m => m.Tipo == "Egreso" &&
+                .Where(m => m.TipoMovimiento == "Egreso" && // Nombre correcto
                            m.FechaMovimiento.HasValue &&
                            m.FechaMovimiento.Value.Month == mes &&
                            m.FechaMovimiento.Value.Year == anio)
@@ -93,7 +97,7 @@ namespace MVCMASCOTAS.Services
         public Dictionary<string, decimal> ObtenerResumenPorCategorias(int mes, int anio, string tipo)
         {
             return db.MovimientosContables
-                .Where(m => m.Tipo == tipo &&
+                .Where(m => m.TipoMovimiento == tipo && // Nombre correcto
                            m.FechaMovimiento.HasValue &&
                            m.FechaMovimiento.Value.Month == mes &&
                            m.FechaMovimiento.Value.Year == anio)
@@ -112,15 +116,16 @@ namespace MVCMASCOTAS.Services
         }
 
         // Generar número de comprobante
-        private string GenerarNumeroComprobante(string tipo)
+        private string GenerarNumeroComprobante(string tipoMovimiento)
         {
-            var prefijo = tipo == "Ingreso" ? "ING" : "EGR";
+            var prefijo = tipoMovimiento == "Ingreso" ? "ING" : "EGR";
             var fecha = DateTime.Now.ToString("yyyyMMdd");
-            var consecutivo = db.MovimientosContables
-                .Where(m => m.Tipo == tipo &&
-                           DbFunctions.TruncateTime(m.FechaMovimiento) == DbFunctions.TruncateTime(DateTime.Now))
-                .Count() + 1;
 
+            var conteoHoy = db.MovimientosContables
+                .Count(m => m.TipoMovimiento == tipoMovimiento && // Nombre correcto
+                           DbFunctions.TruncateTime(m.FechaMovimiento) == DbFunctions.TruncateTime(DateTime.Now));
+
+            var consecutivo = conteoHoy + 1;
             return $"{prefijo}-{fecha}-{consecutivo:D4}";
         }
 
@@ -128,7 +133,7 @@ namespace MVCMASCOTAS.Services
         public Dictionary<int, decimal> ObtenerIngresosPorMes(int anio)
         {
             return db.MovimientosContables
-                .Where(m => m.Tipo == "Ingreso" &&
+                .Where(m => m.TipoMovimiento == "Ingreso" && // Nombre correcto
                            m.FechaMovimiento.HasValue &&
                            m.FechaMovimiento.Value.Year == anio)
                 .GroupBy(m => m.FechaMovimiento.Value.Month)
@@ -139,12 +144,52 @@ namespace MVCMASCOTAS.Services
         public Dictionary<int, decimal> ObtenerEgresosPorMes(int anio)
         {
             return db.MovimientosContables
-                .Where(m => m.Tipo == "Egreso" &&
+                .Where(m => m.TipoMovimiento == "Egreso" && // Nombre correcto
                            m.FechaMovimiento.HasValue &&
                            m.FechaMovimiento.Value.Year == anio)
                 .GroupBy(m => m.FechaMovimiento.Value.Month)
                 .Select(g => new { Mes = g.Key, Total = g.Sum(m => m.Monto) })
                 .ToDictionary(x => x.Mes, x => x.Total);
+        }
+
+        // Métodos adicionales útiles
+        public List<MovimientosContables> BuscarMovimientos(string criterio)
+        {
+            return db.MovimientosContables
+                .Where(m => m.Concepto.Contains(criterio) ||
+                           m.Categoria.Contains(criterio) ||
+                           m.NumeroComprobante.Contains(criterio))
+                .OrderByDescending(m => m.FechaMovimiento)
+                .Take(50)
+                .ToList();
+        }
+
+        public decimal ObtenerTotalIngresos(DateTime? fechaInicio = null, DateTime? fechaFin = null)
+        {
+            var query = db.MovimientosContables
+                .Where(m => m.TipoMovimiento == "Ingreso");
+
+            if (fechaInicio.HasValue)
+                query = query.Where(m => m.FechaMovimiento >= fechaInicio);
+
+            if (fechaFin.HasValue)
+                query = query.Where(m => m.FechaMovimiento <= fechaFin);
+
+            return query.Sum(m => (decimal?)m.Monto) ?? 0;
+        }
+
+        public decimal ObtenerTotalEgresos(DateTime? fechaInicio = null, DateTime? fechaFin = null)
+        {
+            var query = db.MovimientosContables
+                .Where(m => m.TipoMovimiento == "Egreso");
+
+            if (fechaInicio.HasValue)
+                query = query.Where(m => m.FechaMovimiento >= fechaInicio);
+
+            if (fechaFin.HasValue)
+                query = query.Where(m => m.FechaMovimiento <= fechaFin);
+
+            return query.Sum(m => (decimal?)m.Monto) ?? 0;
         }
 
         public void Dispose()

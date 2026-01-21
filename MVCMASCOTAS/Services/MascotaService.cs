@@ -9,11 +9,11 @@ namespace MVCMASCOTAS.Services
 {
     public class MascotaService
     {
-        private readonly RefugioMascotasEntities db;
+        private readonly RefugioMascotasDBEntities db;
 
         public MascotaService()
         {
-            db = new RefugioMascotasEntities();
+            db = new RefugioMascotasDBEntities();
         }
 
         // Obtener mascotas disponibles para adopción

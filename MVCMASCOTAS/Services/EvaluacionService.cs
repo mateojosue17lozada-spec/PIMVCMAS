@@ -1,7 +1,6 @@
 ﻿using System;
 using MVCMASCOTAS.Models;
 using MVCMASCOTAS.Models.CustomModels;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -10,11 +9,11 @@ namespace MVCMASCOTAS.Services
 {
     public class EvaluacionService
     {
-        private readonly RefugioMascotasEntities db;
+        private readonly RefugioMascotasDBEntities db;
 
         public EvaluacionService()
         {
-            db = new RefugioMascotasEntities();
+            db = new RefugioMascotasDBEntities();
         }
 
         // Evaluar solicitud de adopción (sistema de 100 puntos)

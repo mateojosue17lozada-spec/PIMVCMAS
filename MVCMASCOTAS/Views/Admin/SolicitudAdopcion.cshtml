@@ -55,7 +55,7 @@
                                 <td>@solicitud.SolicitudId</td>
                                 <td>@solicitud.Usuarios.NombreCompleto</td>
                                 <td>@solicitud.Mascotas.Nombre</td>
-                                <td>@solicitud.FechaSolicitud.ToString("dd/MM/yyyy")</td>
+                                <td>@(solicitud.FechaSolicitud?.ToString("dd/MM/yyyy") ?? "N/A")</td>
                                 <td>
                                     @switch (solicitud.Estado)
                                     {

@@ -7,7 +7,6 @@ using MVCMASCOTAS.Helpers;
 using MVCMASCOTAS.Models;
 using MVCMASCOTAS.Models.ViewModels;
 
-
 namespace MVCMASCOTAS.Controllers
 {
     public class AccountController : Controller
@@ -33,8 +32,8 @@ namespace MVCMASCOTAS.Controllers
                 return View(model);
             }
 
-            // Buscar usuario por email
-            var usuario = db.Usuarios.FirstOrDefault(u => u.Email == model.Email && u.Activo);
+            // Buscar usuario por email - CORREGIDO: Activo puede ser NULL
+            var usuario = db.Usuarios.FirstOrDefault(u => u.Email == model.Email && u.Activo == true);
 
             if (usuario == null)
             {
@@ -77,7 +76,8 @@ namespace MVCMASCOTAS.Controllers
             db.SaveChanges();
 
             // Auditoría
-            AuditoriaHelper.RegistrarAccion("Login Exitoso", "Account", $"Usuario {usuario.Email} inició sesión", usuario.UsuarioId);
+            AuditoriaHelper.RegistrarAccion("Login Exitoso", "Account",
+                $"Usuario {usuario.Email} inició sesión", usuario.UsuarioId);
 
             // Redireccionar
             if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
@@ -173,8 +173,9 @@ namespace MVCMASCOTAS.Controllers
                 Salt = salt,
                 ImagenPerfil = imagenBytes,
                 FechaRegistro = DateTime.Now,
-                Activo = true,
-                EmailConfirmado = false
+                Activo = true,  // Cuando se crea, siempre es true
+                EmailConfirmado = false,
+                TelefonoConfirmado = false
             };
 
             db.Usuarios.Add(usuario);
@@ -195,7 +196,8 @@ namespace MVCMASCOTAS.Controllers
             }
 
             // Auditoría
-            AuditoriaHelper.RegistrarAccion("Registro", "Account", $"Nuevo usuario registrado: {usuario.Email}", usuario.UsuarioId);
+            AuditoriaHelper.RegistrarAccion("Registro", "Account",
+                $"Nuevo usuario registrado: {usuario.Email}", usuario.UsuarioId);
 
             // Enviar email de bienvenida (asíncrono)
             _ = EmailHelper.SendRegistrationConfirmationAsync(usuario.Email, usuario.NombreCompleto);
@@ -225,10 +227,11 @@ namespace MVCMASCOTAS.Controllers
             // Auditoría
             if (User.Identity.IsAuthenticated)
             {
-                var usuario = db.Usuarios.FirstOrDefault(u => u.Email == User.Identity.Name);
+                var usuario = db.Usuarios.FirstOrDefault(u => u.Email == User.Identity.Name && u.Activo == true);
                 if (usuario != null)
                 {
-                    AuditoriaHelper.RegistrarAccion("Logout", "Account", $"Usuario {usuario.Email} cerró sesión", usuario.UsuarioId);
+                    AuditoriaHelper.RegistrarAccion("Logout", "Account",
+                        $"Usuario {usuario.Email} cerró sesión", usuario.UsuarioId);
                 }
             }
 
@@ -239,11 +242,12 @@ namespace MVCMASCOTAS.Controllers
             return RedirectToAction("Index", "Home");
         }
 
-        // GET: Account/Profile
+        // GET: Account/MiPerfil (CAMBIADO DE Profile A MiPerfil)
         [Authorize]
-        public ActionResult Profile()
+        public ActionResult MiPerfil()
         {
-            var usuario = db.Usuarios.FirstOrDefault(u => u.Email == User.Identity.Name);
+            var usuario = db.Usuarios.FirstOrDefault(u =>
+                u.Email == User.Identity.Name && u.Activo == true);
 
             if (usuario == null)
             {
@@ -255,6 +259,201 @@ namespace MVCMASCOTAS.Controllers
                 : null;
 
             return View(usuario);
+        }
+
+        // GET: Account/EditProfile
+        [Authorize]
+        public ActionResult EditProfile()
+        {
+            var usuario = db.Usuarios.FirstOrDefault(u =>
+                u.Email == User.Identity.Name && u.Activo == true);
+
+            if (usuario == null)
+            {
+                return RedirectToAction("Logout");
+            }
+
+            var model = new EditProfileViewModel
+            {
+                NombreCompleto = usuario.NombreCompleto,
+                Telefono = usuario.Telefono,
+                Direccion = usuario.Direccion,
+                Ciudad = usuario.Ciudad,
+                Provincia = usuario.Provincia
+            };
+
+            ViewBag.ImagenBase64 = usuario.ImagenPerfil != null
+                ? ImageHelper.GetImageDataUri(usuario.ImagenPerfil)
+                : null;
+
+            return View(model);
+        }
+
+        // POST: Account/EditProfile
+        [HttpPost]
+        [Authorize]
+        [ValidateAntiForgeryToken]
+        public ActionResult EditProfile(EditProfileViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                // Mantener la imagen actual en la vista si hay error
+                var usuarioActual = db.Usuarios.FirstOrDefault(u => u.Email == User.Identity.Name);
+                if (usuarioActual != null)
+                {
+                    ViewBag.ImagenBase64 = usuarioActual.ImagenPerfil != null
+                        ? ImageHelper.GetImageDataUri(usuarioActual.ImagenPerfil)
+                        : null;
+                }
+                return View(model);
+            }
+
+            var usuario = db.Usuarios.FirstOrDefault(u =>
+                u.Email == User.Identity.Name && u.Activo == true);
+
+            if (usuario == null)
+            {
+                return RedirectToAction("Logout");
+            }
+
+            // Actualizar datos
+            usuario.NombreCompleto = model.NombreCompleto;
+            usuario.Telefono = model.Telefono;
+            usuario.Direccion = model.Direccion;
+            usuario.Ciudad = model.Ciudad;
+            usuario.Provincia = model.Provincia;
+
+            // Actualizar imagen si se proporciona
+            if (model.NuevaImagenPerfil != null)
+            {
+                if (!ImageHelper.IsValidImage(model.NuevaImagenPerfil))
+                {
+                    ModelState.AddModelError("NuevaImagenPerfil", "Archivo de imagen inválido.");
+                    ViewBag.ImagenBase64 = usuario.ImagenPerfil != null
+                        ? ImageHelper.GetImageDataUri(usuario.ImagenPerfil)
+                        : null;
+                    return View(model);
+                }
+
+                if (!ImageHelper.IsFileSizeValid(model.NuevaImagenPerfil, 5))
+                {
+                    ModelState.AddModelError("NuevaImagenPerfil", "La imagen no debe exceder 5 MB.");
+                    ViewBag.ImagenBase64 = usuario.ImagenPerfil != null
+                        ? ImageHelper.GetImageDataUri(usuario.ImagenPerfil)
+                        : null;
+                    return View(model);
+                }
+
+                byte[] imagenBytes = ImageHelper.ConvertImageToByteArray(model.NuevaImagenPerfil);
+                imagenBytes = ImageHelper.ResizeImage(imagenBytes, 400, 400);
+                usuario.ImagenPerfil = imagenBytes;
+            }
+
+            db.SaveChanges();
+
+            // Auditoría
+            AuditoriaHelper.RegistrarAccion("Actualizar Perfil", "Account",
+                $"Usuario {usuario.Email} actualizó su perfil", usuario.UsuarioId);
+
+            TempData["SuccessMessage"] = "Perfil actualizado exitosamente.";
+            return RedirectToAction("MiPerfil"); // CAMBIADO DE Profile A MiPerfil
+        }
+
+        // GET: Account/ChangePassword
+        [Authorize]
+        public ActionResult ChangePassword()
+        {
+            return View();
+        }
+
+        // POST: Account/ChangePassword
+        [HttpPost]
+        [Authorize]
+        [ValidateAntiForgeryToken]
+        public ActionResult ChangePassword(ChangePasswordViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            var usuario = db.Usuarios.FirstOrDefault(u =>
+                u.Email == User.Identity.Name && u.Activo == true);
+
+            if (usuario == null)
+            {
+                return RedirectToAction("Logout");
+            }
+
+            // Verificar contraseña actual
+            if (!PasswordHelper.VerifyPassword(model.CurrentPassword, usuario.PasswordHash, usuario.Salt))
+            {
+                ModelState.AddModelError("CurrentPassword", "La contraseña actual es incorrecta.");
+                return View(model);
+            }
+
+            // Validar nueva contraseña
+            if (!PasswordHelper.IsPasswordValid(model.NewPassword))
+            {
+                ModelState.AddModelError("NewPassword", PasswordHelper.GetPasswordValidationMessage());
+                return View(model);
+            }
+
+            // Generar nueva salt y hash
+            string newSalt = PasswordHelper.GenerateSalt();
+            string newPasswordHash = PasswordHelper.HashPassword(model.NewPassword, newSalt);
+
+            // Actualizar contraseña
+            usuario.PasswordHash = newPasswordHash;
+            usuario.Salt = newSalt;
+            db.SaveChanges();
+
+            // Auditoría
+            AuditoriaHelper.RegistrarAccion("Cambiar Contraseña", "Account",
+                $"Usuario {usuario.Email} cambió su contraseña", usuario.UsuarioId);
+
+            TempData["SuccessMessage"] = "Contraseña cambiada exitosamente.";
+            return RedirectToAction("MiPerfil"); // CAMBIADO DE Profile A MiPerfil
+        }
+
+        // GET: Account/ForgotPassword
+        [AllowAnonymous]
+        public ActionResult ForgotPassword()
+        {
+            return View();
+        }
+
+        // POST: Account/ForgotPassword
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public ActionResult ForgotPassword(ForgotPasswordViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            var usuario = db.Usuarios.FirstOrDefault(u =>
+                u.Email == model.Email && u.Activo == true);
+
+            if (usuario != null)
+            {
+                // Generar token de recuperación
+                string resetToken = Guid.NewGuid().ToString();
+
+                // Guardar token en la base de datos (necesitarías crear una tabla para esto)
+                // Por ahora solo auditoría
+                AuditoriaHelper.RegistrarAccion("Solicitud Recuperación", "Account",
+                    $"Usuario {usuario.Email} solicitó recuperación de contraseña", usuario.UsuarioId);
+
+                // Enviar email con enlace de recuperación
+                _ = EmailHelper.SendPasswordResetAsync(usuario.Email, usuario.NombreCompleto, resetToken);
+            }
+
+            // Mostrar mismo mensaje aunque el email no exista por seguridad
+            TempData["InfoMessage"] = "Si el email existe en nuestro sistema, recibirás instrucciones para recuperar tu contraseña.";
+            return RedirectToAction("Login");
         }
 
         protected override void Dispose(bool disposing)

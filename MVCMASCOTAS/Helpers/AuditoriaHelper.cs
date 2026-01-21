@@ -16,13 +16,13 @@ namespace MVCMASCOTAS.Helpers
         {
             try
             {
-                using (var db = new RefugioMascotasEntities())
+                using (var db = new RefugioMascotasDBEntities())
                 {
                     var auditoria = new AuditoriaAcciones
                     {
                         UsuarioId = usuarioId,
                         Accion = accion,
-                        Controlador = controlador,
+                        Modulo = controlador,
                         Detalles = detalles,
                         FechaAccion = DateTime.Now,
                         DireccionIP = ObtenerDireccionIP()

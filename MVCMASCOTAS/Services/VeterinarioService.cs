@@ -8,11 +8,11 @@ namespace MVCMASCOTAS.Services
 {
     public class VeterinarioService
     {
-        private readonly RefugioMascotasEntities db;
+        private readonly RefugioMascotasDBEntities db;
 
         public VeterinarioService()
         {
-            db = new RefugioMascotasEntities();
+            db = new RefugioMascotasDBEntities();
         }
 
         // Registrar consulta médica
@@ -26,7 +26,6 @@ namespace MVCMASCOTAS.Services
                 TipoConsulta = tipoConsulta,
                 Diagnostico = diagnostico,
                 Tratamiento = tratamiento,
-                Costo = costo,
                 VeterinarioId = veterinarioId,
                 Observaciones = observaciones
             };

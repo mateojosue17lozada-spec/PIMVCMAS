@@ -23,16 +23,16 @@
         <div class="col-md-4">
             <div class="card shadow-custom text-center">
                 <div class="card-body">
-                    <h5>Donaciones Monetarias</h5>
-                    <h2 class="text-success">$@Model.Where(d => d.TipoDonacion == "Monetaria").Sum(d => d.MontoEfectivo ?? 0).ToString("N2")</h2>
+                    <h5>Donaciones Únicas</h5>
+                    <h2 class="text-success">$@Model.Where(d => d.TipoDonacion == "Única").Sum(d => (decimal?)d.Monto ?? 0).ToString("N2")</h2>
                 </div>
             </div>
         </div>
         <div class="col-md-4">
             <div class="card shadow-custom text-center">
                 <div class="card-body">
-                    <h5>Donaciones en Especie</h5>
-                    <h2 class="text-info">@Model.Count(d => d.TipoDonacion == "Especie")</h2>
+                    <h5>Donaciones Recurrentes</h5>
+                    <h2 class="text-info">@Model.Count(d => d.TipoDonacion == "Recurrente")</h2>
                 </div>
             </div>
         </div>
@@ -45,7 +45,7 @@
                 <div class="row">
                     <div class="col-md-8">
                         <h5>
-                            @if (donacion.TipoDonacion == "Monetaria")
+                            @if (donacion.TipoDonacion == "Única")
                             {
                                 <i class="fas fa-dollar-sign text-success"></i>
                             }
@@ -56,24 +56,24 @@
                             Donación @donacion.TipoDonacion
                         </h5>
 
-                        @if (donacion.TipoDonacion == "Monetaria")
+                        @if (donacion.TipoDonacion == "Única")
                         {
-                            <p class="h4 text-success">$@donacion.Monto.Value.ToString("N2")</p>
+                            <p class="h4 text-success">$@donacion.Monto.ToString("N2")</p>
                             <p><strong>Método de Pago:</strong> @donacion.MetodoPago</p>
                         }
                         else
                         {
-                            <p><strong>Descripción:</strong> @donacion.DescripcionDonacion</p>
+                            <p><strong>Mensaje:</strong> @donacion.Mensaje</p>
                         }
 
                         <p class="text-muted">
-                            <i class="fas fa-calendar"></i> @donacion.FechaDonacion.ToString("dd/MM/yyyy HH:mm")
+                            <i class="fas fa-calendar"></i> @donacion.FechaDonacion.Value.ToString("dd/MM/yyyy HH:mm")
                         </p>
                     </div>
 
                     <div class="col-md-4 text-right">
-                        <span class="badge badge-pill @(donacion.EstadoDonacion == "Confirmada" ? "badge-success" : donacion.EstadoDonacion == "Pendiente" ? "badge-warning" : "badge-secondary") p-3">
-                            @donacion.EstadoDonacion
+                        <span class="badge badge-pill @(donacion.Estado == "Completada" ? "badge-success" : donacion.Estado == "Pendiente" ? "badge-warning" : "badge-secondary") p-3">
+                            @donacion.Estado
                         </span>
                     </div>
                 </div>

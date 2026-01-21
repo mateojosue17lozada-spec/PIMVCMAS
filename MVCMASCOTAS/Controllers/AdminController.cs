@@ -5,6 +5,8 @@ using System.Web.Mvc;
 using MVCMASCOTAS.Helpers;
 using MVCMASCOTAS.Models;
 using MVCMASCOTAS.Models.ViewModels;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace MVCMASCOTAS.Controllers
 {
@@ -16,96 +18,102 @@ namespace MVCMASCOTAS.Controllers
         // GET: Admin/Dashboard
         public ActionResult Dashboard()
         {
-            var viewModel = new DashboardViewModel
+            try
             {
-                // Estadísticas de Mascotas (NOMBRES CORRECTOS)
-                TotalMascotas = db.Mascotas.Count(m => m.Activo),
-                MascotasDisponibles = db.Mascotas.Count(m => m.Estado == "Disponible para adopción" && m.Activo),
-                MascotasEnTratamiento = db.Mascotas.Count(m => m.Estado == "En tratamiento" && m.Activo),
-                MascotasAdoptadas = db.Mascotas.Count(m => m.Estado == "Adoptada"), // ✅ CORRECTO
-
-                // Adopciones
-                SolicitudesPendientes = db.SolicitudAdopcion.Count(s => s.Estado == "Pendiente"),
-                SolicitudesAprobadas = db.SolicitudAdopcion.Count(s => s.Estado == "Aprobada"),
-                SolicitudesRechazadas = db.SolicitudAdopcion.Count(s => s.Estado == "Rechazada"),
-                AdopcionesEsteMes = db.Mascotas.Count(m =>
-                    m.Estado == "Adoptada" &&
-                    m.FechaAdopcion.HasValue &&
-                    m.FechaAdopcion.Value.Month == DateTime.Now.Month &&
-                    m.FechaAdopcion.Value.Year == DateTime.Now.Year),
-
-                // Donaciones (CORREGIR NOMBRES Y PROPIEDADES DE BD)
-                NumeroDonantesMes = db.Donaciones.Count(d => // ✅ CORRECTO
-                    d.FechaDonacion != null &&
-                    d.FechaDonacion.Value.Month == DateTime.Now.Month &&
-                    d.FechaDonacion.Value.Year == DateTime.Now.Year),
-                TotalDonacionesMes = db.Donaciones // ✅ CORRECTO
-                    .Where(d => d.FechaDonacion != null &&
-                               d.FechaDonacion.Value.Month == DateTime.Now.Month &&
-                               d.FechaDonacion.Value.Year == DateTime.Now.Year)
-                    .Sum(d => (decimal?)d.Monto) ?? 0, // ✅ 'Monto' no 'MontoEfectivo'
-
-                // Voluntariado
-                VoluntariosActivos = db.UsuariosRoles.Count(ur => ur.Roles.NombreRol == "Voluntario"), // ✅ CORRECTO
-
-                // Apadrinamientos
-                ApadrinamientosActivos = db.Apadrinamientos.Count(a => a.Estado == "Activo"),
-
-                // Tienda
-                ProductosDisponibles = db.Productos.Count(p => p.Stock > 0 && p.Activo), // ✅ CORRECTO
-                ProductosBajoStock = db.Productos.Count(p => p.Stock > 0 && p.Stock <= p.StockMinimo),
-                PedidosPendientes = db.Pedidos.Count(p => p.Estado == "Confirmado"),
-                VentasMes = db.Pedidos
-                    .Where(p => p.Estado == "Entregado" &&
-                               p.FechaPedido != null &&
-                               p.FechaPedido.Value.Month == DateTime.Now.Month &&
-                               p.FechaPedido.Value.Year == DateTime.Now.Year)
-                    .Sum(p => (decimal?)p.Total) ?? 0, // En BD es 'Total', no 'MontoTotal'
-
-                // Rescate
-                ReportesAbiertos = db.ReportesRescate.Count(r => r.Estado == "Pendiente" || r.Estado == "En proceso"),
-
-                // Contabilidad (si quieres calcular)
-                IngresosMes = CalcularIngresosMes(), // Método que debes crear
-                EgresosMes = CalcularEgresosMes(),   // Método que debes crear
-                BalanceMes = 0 // Calcular automáticamente
-            };
-
-            // Calcular Balance
-            viewModel.BalanceMes = viewModel.IngresosMes - viewModel.EgresosMes;
-
-            // Datos para ViewBag
-            ViewBag.ActividadesRecientes = db.AuditoriaAcciones
-                .OrderByDescending(a => a.FechaAccion)
-                .Take(10)
-                .ToList();
-
-            ViewBag.SolicitudesPendientes = db.SolicitudAdopcion
-                .Where(s => s.Estado == "Pendiente" || s.Estado == "En evaluación")
-                .OrderBy(s => s.FechaSolicitud)
-                .Take(5)
-                .ToList();
-
-            // Llenar listas del ViewModel
-            viewModel.UltimasSolicitudes = db.SolicitudAdopcion
-                .Where(s => s.Estado == "Pendiente")
-                .OrderByDescending(s => s.FechaSolicitud)
-                .Take(5)
-                .Select(s => new SolicitudAdopcionViewModel
+                var viewModel = new DashboardViewModel
                 {
-                    // Mapear propiedades
-                })
-                .ToList();
+                    // 1. ESTADÍSTICAS DE MASCOTAS - CORREGIDO: Activo puede ser NULL
+                    TotalMascotas = db.Mascotas.Count(m => m.Activo == true),
+                    MascotasDisponibles = db.Mascotas.Count(m =>
+                        m.Estado == "Disponible para adopción" && m.Activo == true),
+                    MascotasEnTratamiento = db.Mascotas.Count(m =>
+                        m.Estado == "En tratamiento" && m.Activo == true),
+                    MascotasAdoptadas = db.Mascotas.Count(m =>
+                        m.Estado == "Adoptada"),
 
-            return View(viewModel);
+                    // 2. ADOPCIONES
+                    SolicitudesPendientes = db.SolicitudAdopcion.Count(s => s.Estado == "Pendiente"),
+                    SolicitudesAprobadas = db.SolicitudAdopcion.Count(s => s.Estado == "Aprobada"),
+                    SolicitudesRechazadas = db.SolicitudAdopcion.Count(s => s.Estado == "Rechazada"),
+
+                    AdopcionesEsteMes = db.Mascotas.Count(m =>
+                        m.Estado == "Adoptada" &&
+                        m.FechaAdopcion.HasValue &&
+                        m.FechaAdopcion.Value.Month == DateTime.Now.Month &&
+                        m.FechaAdopcion.Value.Year == DateTime.Now.Year),
+
+                    // 3. DONACIONES
+                    NumeroDonantesMes = db.Donaciones.Count(d =>
+                        d.FechaDonacion.HasValue &&
+                        d.FechaDonacion.Value.Month == DateTime.Now.Month &&
+                        d.FechaDonacion.Value.Year == DateTime.Now.Year),
+
+                    TotalDonacionesMes = db.Donaciones
+                        .Where(d => d.FechaDonacion.HasValue &&
+                                   d.FechaDonacion.Value.Month == DateTime.Now.Month &&
+                                   d.FechaDonacion.Value.Year == DateTime.Now.Year)
+                        .Sum(d => (decimal?)d.Monto) ?? 0,
+
+                    // 4. VOLUNTARIADO (Usuarios con rol Voluntario y activos)
+                    VoluntariosActivos = db.UsuariosRoles
+                        .Count(ur => ur.Roles.NombreRol == "Voluntario" &&
+                                   ur.Usuarios.Activo == true),
+
+                    // 5. APADRINAMIENTOS
+                    ApadrinamientosActivos = db.Apadrinamientos.Count(a => a.Estado == "Activo"),
+
+                    // 6. TIENDA - CORREGIDO: Activo puede ser NULL
+                    ProductosDisponibles = db.Productos.Count(p => p.Stock > 0 && p.Activo == true),
+                    ProductosBajoStock = db.Productos.Count(p => p.Stock > 0 && p.Stock <= p.StockMinimo),
+                    PedidosPendientes = db.Pedidos.Count(p => p.Estado == "Confirmado"),
+
+                    VentasMes = db.Pedidos
+                        .Where(p => p.Estado == "Entregado" &&
+                                   p.FechaPedido.HasValue &&
+                                   p.FechaPedido.Value.Month == DateTime.Now.Month &&
+                                   p.FechaPedido.Value.Year == DateTime.Now.Year)
+                        .Sum(p => (decimal?)p.Total) ?? 0,
+
+                    // 7. RESCATE
+                    ReportesAbiertos = db.ReportesRescate.Count(r =>
+                        r.Estado == "Pendiente" || r.Estado == "En proceso"),
+
+                    // 8. CONTABILIDAD
+                    IngresosMes = CalcularIngresosMes(),
+                    EgresosMes = CalcularEgresosMes(),
+                    BalanceMes = 0
+                };
+
+                // Calcular Balance
+                viewModel.BalanceMes = viewModel.IngresosMes - viewModel.EgresosMes;
+
+                // 9. ACTIVIDADES RECIENTES - Auditoría
+                ViewBag.ActividadesRecientes = db.AuditoriaAcciones
+                    .OrderByDescending(a => a.FechaAccion)
+                    .Take(10)
+                    .ToList();
+
+                // 10. SOLICITUDES PENDIENTES
+                ViewBag.SolicitudesPendientes = db.SolicitudAdopcion
+                    .Where(s => s.Estado == "Pendiente")
+                    .OrderBy(s => s.FechaSolicitud)
+                    .Take(5)
+                    .ToList();
+
+                return View(viewModel);
+            }
+            catch (Exception ex)
+            {
+                ViewBag.Error = "Error al cargar el dashboard: " + ex.Message;
+                return View(new DashboardViewModel());
+            }
         }
 
-        // Métodos auxiliares
         private decimal CalcularIngresosMes()
         {
             return db.MovimientosContables
                 .Where(m => m.TipoMovimiento == "Ingreso" &&
-                           m.FechaMovimiento != null &&
+                           m.FechaMovimiento.HasValue &&
                            m.FechaMovimiento.Value.Month == DateTime.Now.Month &&
                            m.FechaMovimiento.Value.Year == DateTime.Now.Year)
                 .Sum(m => (decimal?)m.Monto) ?? 0;
@@ -115,7 +123,7 @@ namespace MVCMASCOTAS.Controllers
         {
             return db.MovimientosContables
                 .Where(m => m.TipoMovimiento == "Egreso" &&
-                           m.FechaMovimiento != null &&
+                           m.FechaMovimiento.HasValue &&
                            m.FechaMovimiento.Value.Month == DateTime.Now.Month &&
                            m.FechaMovimiento.Value.Year == DateTime.Now.Year)
                 .Sum(m => (decimal?)m.Monto) ?? 0;
@@ -125,7 +133,7 @@ namespace MVCMASCOTAS.Controllers
         public ActionResult Usuarios(string rol, string buscar, int page = 1)
         {
             int pageSize = 20;
-            var query = db.Usuarios.Where(u => u.Activo);
+            var query = db.Usuarios.Where(u => u.Activo == true);
 
             // Filtro por búsqueda
             if (!string.IsNullOrEmpty(buscar))
@@ -207,7 +215,8 @@ namespace MVCMASCOTAS.Controllers
                     {
                         UsuarioId = usuarioId,
                         RolId = rolId,
-                        FechaAsignacion = DateTime.Now
+                        FechaAsignacion = DateTime.Now,
+                        AsignadoPor = ObtenerUsuarioActualId()
                     });
                 }
             }
@@ -215,8 +224,11 @@ namespace MVCMASCOTAS.Controllers
             db.SaveChanges();
 
             var usuarioActual = db.Usuarios.FirstOrDefault(u => u.Email == User.Identity.Name);
-            AuditoriaHelper.RegistrarAccion("Actualizar Roles", "Admin",
-                $"Usuario ID: {usuarioId}, Roles: {rolesSeleccionados?.Length ?? 0}", usuarioActual?.UsuarioId);
+            if (usuarioActual != null)
+            {
+                AuditoriaHelper.RegistrarAccion("Actualizar Roles", "Admin",
+                    $"Usuario ID: {usuarioId}, Roles: {rolesSeleccionados?.Length ?? 0}", usuarioActual.UsuarioId);
+            }
 
             TempData["SuccessMessage"] = "Roles actualizados exitosamente";
             return RedirectToAction("EditarUsuario", new { id = usuarioId });
@@ -238,8 +250,11 @@ namespace MVCMASCOTAS.Controllers
             db.SaveChanges();
 
             var usuarioActual = db.Usuarios.FirstOrDefault(u => u.Email == User.Identity.Name);
-            AuditoriaHelper.RegistrarAccion("Desactivar Usuario", "Admin",
-                $"Usuario: {usuario.Email}", usuarioActual?.UsuarioId);
+            if (usuarioActual != null)
+            {
+                AuditoriaHelper.RegistrarAccion("Desactivar Usuario", "Admin",
+                    $"Usuario: {usuario.Email}", usuarioActual.UsuarioId);
+            }
 
             TempData["SuccessMessage"] = "Usuario desactivado exitosamente";
             return RedirectToAction("Usuarios");
@@ -260,6 +275,8 @@ namespace MVCMASCOTAS.Controllers
             int totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
 
             var solicitudes = query
+                .Include(s => s.Mascotas)
+                .Include(s => s.Usuarios)
                 .OrderByDescending(s => s.FechaSolicitud)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
@@ -275,7 +292,10 @@ namespace MVCMASCOTAS.Controllers
         // GET: Admin/DetallesSolicitud/5
         public ActionResult DetallesSolicitud(int id)
         {
-            var solicitud = db.SolicitudAdopcion.Find(id);
+            var solicitud = db.SolicitudAdopcion
+                .Include(s => s.Mascotas)
+                .Include(s => s.Usuarios)
+                .FirstOrDefault(s => s.SolicitudId == id);
 
             if (solicitud == null)
             {
@@ -285,13 +305,18 @@ namespace MVCMASCOTAS.Controllers
             ViewBag.Formulario = db.FormularioAdopcionDetalle
                 .FirstOrDefault(f => f.SolicitudId == id);
 
-            ViewBag.MascotaImagen = solicitud.Mascotas.ImagenPrincipal != null
-                ? ImageHelper.GetImageDataUri(solicitud.Mascotas.ImagenPrincipal)
-                : null;
+            ViewBag.Evaluacion = db.EvaluacionAdopcion
+                .FirstOrDefault(e => e.SolicitudId == id);
 
-            ViewBag.UsuarioImagen = solicitud.Usuarios.ImagenPerfil != null
-                ? ImageHelper.GetImageDataUri(solicitud.Usuarios.ImagenPerfil)
-                : null;
+            if (solicitud.Mascotas != null && solicitud.Mascotas.ImagenPrincipal != null)
+            {
+                ViewBag.MascotaImagen = ImageHelper.GetImageDataUri(solicitud.Mascotas.ImagenPrincipal);
+            }
+
+            if (solicitud.Usuarios != null && solicitud.Usuarios.ImagenPerfil != null)
+            {
+                ViewBag.UsuarioImagen = ImageHelper.GetImageDataUri(solicitud.Usuarios.ImagenPerfil);
+            }
 
             return View(solicitud);
         }
@@ -309,21 +334,27 @@ namespace MVCMASCOTAS.Controllers
             }
 
             solicitud.Estado = "Aprobada";
-            solicitud.ObservacionesEvaluador = observaciones;
-            solicitud.FechaAprobacion = DateTime.Now;
+            solicitud.ResultadoEvaluacion = "Aprobada";
+            solicitud.FechaEvaluacion = DateTime.Now;
+            solicitud.EvaluadoPor = ObtenerUsuarioActualId();
+            solicitud.Observaciones = observaciones;
+
+            // Si está aprobada, actualizar la mascota
+            var mascota = db.Mascotas.Find(solicitud.MascotaId);
+            if (mascota != null)
+            {
+                mascota.Estado = "Adoptada";
+                mascota.FechaAdopcion = DateTime.Now;
+            }
 
             db.SaveChanges();
 
             var usuarioActual = db.Usuarios.FirstOrDefault(u => u.Email == User.Identity.Name);
-            AuditoriaHelper.RegistrarAccion("Aprobar Solicitud", "Admin",
-                $"Solicitud ID: {solicitudId}", usuarioActual?.UsuarioId);
-
-            // Enviar email
-            _ = EmailHelper.SendAdoptionApprovedAsync(
-                solicitud.Usuarios.Email,
-                solicitud.Usuarios.NombreCompleto,
-                solicitud.Mascotas.Nombre
-            );
+            if (usuarioActual != null)
+            {
+                AuditoriaHelper.RegistrarAccion("Aprobar Solicitud", "Admin",
+                    $"Solicitud ID: {solicitudId}", usuarioActual.UsuarioId);
+            }
 
             TempData["SuccessMessage"] = "Solicitud aprobada exitosamente";
             return RedirectToAction("DetallesSolicitud", new { id = solicitudId });
@@ -348,14 +379,19 @@ namespace MVCMASCOTAS.Controllers
             }
 
             solicitud.Estado = "Rechazada";
-            solicitud.ObservacionesEvaluador = motivoRechazo;
-            solicitud.FechaRespuesta = DateTime.Now;
+            solicitud.ResultadoEvaluacion = "Rechazada";
+            solicitud.MotivoRechazo = motivoRechazo;
+            solicitud.FechaEvaluacion = DateTime.Now;
+            solicitud.EvaluadoPor = ObtenerUsuarioActualId();
 
             db.SaveChanges();
 
             var usuarioActual = db.Usuarios.FirstOrDefault(u => u.Email == User.Identity.Name);
-            AuditoriaHelper.RegistrarAccion("Rechazar Solicitud", "Admin",
-                $"Solicitud ID: {solicitudId}", usuarioActual?.UsuarioId);
+            if (usuarioActual != null)
+            {
+                AuditoriaHelper.RegistrarAccion("Rechazar Solicitud", "Admin",
+                    $"Solicitud ID: {solicitudId}", usuarioActual.UsuarioId);
+            }
 
             TempData["SuccessMessage"] = "Solicitud rechazada";
             return RedirectToAction("DetallesSolicitud", new { id = solicitudId });
@@ -364,64 +400,91 @@ namespace MVCMASCOTAS.Controllers
         // GET: Admin/Configuracion
         public ActionResult Configuracion()
         {
-            var config = db.ConfiguracionSistema.FirstOrDefault();
+            var configuraciones = db.ConfiguracionSistema.ToList();
 
-            if (config == null)
+            // Crear un diccionario para fácil acceso
+            var configDict = configuraciones.ToDictionary(c => c.Clave, c => c.Valor);
+
+            // Crear modelo de vista
+            var model = new ConfiguracionViewModel
             {
-                config = new ConfiguracionSistema
-                {
-                    NombreRefugio = "Refugio de Animales Quito",
-                    EmailContacto = "contacto@refugioquito.org",
-                    TelefonoContacto = "0999999999",
-                    DireccionRefugio = "Quito, Ecuador",
-                    CapacidadMaximaMascotas = 100,
-                    MontoMinimoApadrinamiento = 10,
-                    FechaUltimaActualizacion = DateTime.Now
-                };
-            }
+                // Valores por defecto si no existen en la BD
+                NombreRefugio = configDict.ContainsKey("NombreRefugio") ? configDict["NombreRefugio"] : "Refugio de Animales Quito",
+                EmailContacto = configDict.ContainsKey("EmailContacto") ? configDict["EmailContacto"] : "contacto@refugioquito.org",
+                TelefonoContacto = configDict.ContainsKey("TelefonoContacto") ? configDict["TelefonoContacto"] : "0999999999",
+                DireccionRefugio = configDict.ContainsKey("DireccionRefugio") ? configDict["DireccionRefugio"] : "Quito, Ecuador",
+                CapacidadMaximaMascotas = configDict.ContainsKey("CapacidadMaximaMascotas") ?
+                    (int.TryParse(configDict["CapacidadMaximaMascotas"], out int capacidad) ? capacidad : 100) : 100,
+                MontoMinimoApadrinamiento = configDict.ContainsKey("MontoMinimoApadrinamiento") ?
+                    (decimal.TryParse(configDict["MontoMinimoApadrinamiento"], out decimal monto) ? monto : 10) : 10,
+                MensajeBienvenida = configDict.ContainsKey("MensajeBienvenida") ? configDict["MensajeBienvenida"] : "¡Bienvenido a nuestro refugio!"
+            };
 
-            return View(config);
+            return View(model);
         }
 
         // POST: Admin/ActualizarConfiguracion
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult ActualizarConfiguracion(ConfiguracionSistema model)
+        public ActionResult ActualizarConfiguracion(ConfiguracionViewModel model)
         {
-            var config = db.ConfiguracionSistema.FirstOrDefault();
+            if (ModelState.IsValid)
+            {
+                ActualizarConfig("NombreRefugio", model.NombreRefugio);
+                ActualizarConfig("EmailContacto", model.EmailContacto);
+                ActualizarConfig("TelefonoContacto", model.TelefonoContacto);
+                ActualizarConfig("DireccionRefugio", model.DireccionRefugio);
+                ActualizarConfig("CapacidadMaximaMascotas", model.CapacidadMaximaMascotas.ToString());
+                ActualizarConfig("MontoMinimoApadrinamiento", model.MontoMinimoApadrinamiento.ToString());
+                ActualizarConfig("MensajeBienvenida", model.MensajeBienvenida);
+
+                db.SaveChanges();
+
+                var usuarioActual = db.Usuarios.FirstOrDefault(u => u.Email == User.Identity.Name);
+                if (usuarioActual != null)
+                {
+                    AuditoriaHelper.RegistrarAccion("Actualizar Configuración", "Admin",
+                        "Configuración del sistema actualizada", usuarioActual.UsuarioId);
+                }
+
+                TempData["SuccessMessage"] = "Configuración actualizada exitosamente";
+                return RedirectToAction("Configuracion");
+            }
+
+            return View(model);
+        }
+
+        private void ActualizarConfig(string clave, string valor)
+        {
+            var config = db.ConfiguracionSistema.FirstOrDefault(c => c.Clave == clave);
 
             if (config == null)
             {
-                model.FechaUltimaActualizacion = DateTime.Now;
-                db.ConfiguracionSistema.Add(model);
+                config = new ConfiguracionSistema
+                {
+                    Clave = clave,
+                    Valor = valor,
+                    TipoDato = "string",
+                    FechaModificacion = DateTime.Now,
+                    ModificadoPor = ObtenerUsuarioActualId()
+                };
+                db.ConfiguracionSistema.Add(config);
             }
             else
             {
-                config.NombreRefugio = model.NombreRefugio;
-                config.EmailContacto = model.EmailContacto;
-                config.TelefonoContacto = model.TelefonoContacto;
-                config.DireccionRefugio = model.DireccionRefugio;
-                config.CapacidadMaximaMascotas = model.CapacidadMaximaMascotas;
-                config.MontoMinimoApadrinamiento = model.MontoMinimoApadrinamiento;
-                config.MensajeBienvenida = model.MensajeBienvenida;
-                config.FechaUltimaActualizacion = DateTime.Now;
+                config.Valor = valor;
+                config.FechaModificacion = DateTime.Now;
+                config.ModificadoPor = ObtenerUsuarioActualId();
             }
-
-            db.SaveChanges();
-
-            var usuarioActual = db.Usuarios.FirstOrDefault(u => u.Email == User.Identity.Name);
-            AuditoriaHelper.RegistrarAccion("Actualizar Configuración", "Admin",
-                "Configuración del sistema actualizada", usuarioActual?.UsuarioId);
-
-            TempData["SuccessMessage"] = "Configuración actualizada exitosamente";
-            return RedirectToAction("Configuracion");
         }
 
         // GET: Admin/Auditoria
         public ActionResult Auditoria(string accion, DateTime? fechaDesde, DateTime? fechaHasta, int page = 1)
         {
             int pageSize = 50;
-            var query = db.AuditoriaAcciones.AsQueryable();
+            var query = db.AuditoriaAcciones
+                .Include(a => a.Usuarios)
+                .AsQueryable();
 
             if (!string.IsNullOrEmpty(accion))
             {
@@ -456,6 +519,13 @@ namespace MVCMASCOTAS.Controllers
             return View(auditoria);
         }
 
+        // MÉTODOS AUXILIARES
+        private int? ObtenerUsuarioActualId()
+        {
+            var usuario = db.Usuarios.FirstOrDefault(u => u.Email == User.Identity.Name);
+            return usuario?.UsuarioId;
+        }
+
         protected override void Dispose(bool disposing)
         {
             if (disposing)
@@ -464,5 +534,36 @@ namespace MVCMASCOTAS.Controllers
             }
             base.Dispose(disposing);
         }
+    }
+
+    // CLASE DE VIEWMODEL PARA CONFIGURACIÓN
+    public class ConfiguracionViewModel
+    {
+        [Required(ErrorMessage = "El nombre del refugio es requerido")]
+        [StringLength(200, ErrorMessage = "El nombre no puede exceder 200 caracteres")]
+        public string NombreRefugio { get; set; }
+
+        [Required(ErrorMessage = "El email de contacto es requerido")]
+        [EmailAddress(ErrorMessage = "Ingrese un email válido")]
+        public string EmailContacto { get; set; }
+
+        [Required(ErrorMessage = "El teléfono de contacto es requerido")]
+        [StringLength(20, ErrorMessage = "El teléfono no puede exceder 20 caracteres")]
+        public string TelefonoContacto { get; set; }
+
+        [Required(ErrorMessage = "La dirección es requerida")]
+        [StringLength(255, ErrorMessage = "La dirección no puede exceder 255 caracteres")]
+        public string DireccionRefugio { get; set; }
+
+        [Required(ErrorMessage = "La capacidad máxima es requerida")]
+        [Range(1, 1000, ErrorMessage = "La capacidad debe estar entre 1 y 1000")]
+        public int CapacidadMaximaMascotas { get; set; }
+
+        [Required(ErrorMessage = "El monto mínimo es requerido")]
+        [Range(1, 1000, ErrorMessage = "El monto debe estar entre 1 y 1000")]
+        public decimal MontoMinimoApadrinamiento { get; set; }
+
+        [StringLength(1000, ErrorMessage = "El mensaje no puede exceder 1000 caracteres")]
+        public string MensajeBienvenida { get; set; }
     }
 }
