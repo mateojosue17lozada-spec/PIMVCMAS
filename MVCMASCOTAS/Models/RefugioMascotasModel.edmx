@@ -522,6 +522,20 @@
           <Property Name="Activo" Type="bit" />
         </EntityType>
         <!--Errores durante la generación:
+advertencia 6002: La tabla o vista 'RefugioMascotasDB.dbo.vw_BalanceContable' no tiene definida ninguna clave principal. Se ha inferido la clave y la definición se creado como una vista o tabla de solo lectura.-->
+        <EntityType Name="vw_BalanceContable">
+          <Key>
+            <PropertyRef Name="TipoMovimiento" />
+            <PropertyRef Name="Categoria" />
+          </Key>
+          <Property Name="TipoMovimiento" Type="nvarchar" MaxLength="20" Nullable="false" />
+          <Property Name="Categoria" Type="nvarchar" MaxLength="100" Nullable="false" />
+          <Property Name="TotalMovimientos" Type="int" />
+          <Property Name="TotalMonto" Type="decimal" Precision="38" Scale="2" />
+          <Property Name="Anio" Type="int" />
+          <Property Name="Mes" Type="int" />
+        </EntityType>
+        <!--Errores durante la generación:
 advertencia 6002: La tabla o vista 'RefugioMascotasDB.dbo.vw_MascotasDisponibles' no tiene definida ninguna clave principal. Se ha inferido la clave y la definición se creado como una vista o tabla de solo lectura.-->
         <EntityType Name="vw_MascotasDisponibles">
           <Key>
@@ -1131,6 +1145,16 @@ advertencia 6002: La tabla o vista 'RefugioMascotasDB.dbo.vw_ResumenAdopciones' 
           <EntitySet Name="Usuarios" EntityType="Self.Usuarios" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="UsuariosRoles" EntityType="Self.UsuariosRoles" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Vacunas" EntityType="Self.Vacunas" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="vw_BalanceContable" EntityType="Self.vw_BalanceContable" store:Type="Views" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+    [vw_BalanceContable].[TipoMovimiento] AS [TipoMovimiento], 
+    [vw_BalanceContable].[Categoria] AS [Categoria], 
+    [vw_BalanceContable].[TotalMovimientos] AS [TotalMovimientos], 
+    [vw_BalanceContable].[TotalMonto] AS [TotalMonto], 
+    [vw_BalanceContable].[Anio] AS [Anio], 
+    [vw_BalanceContable].[Mes] AS [Mes]
+    FROM [dbo].[vw_BalanceContable] AS [vw_BalanceContable]</DefiningQuery>
+          </EntitySet>
           <EntitySet Name="vw_MascotasDisponibles" EntityType="Self.vw_MascotasDisponibles" store:Type="Views" store:Schema="dbo">
             <DefiningQuery>SELECT 
     [vw_MascotasDisponibles].[MascotaId] AS [MascotaId], 
@@ -1942,6 +1966,18 @@ advertencia 6002: La tabla o vista 'RefugioMascotasDB.dbo.vw_ResumenAdopciones' 
           <Property Name="Activo" Type="Boolean" />
           <NavigationProperty Name="MascotaVacunas" Relationship="Self.FK__MascotaVa__Vacun__4E88ABD4" FromRole="Vacunas" ToRole="MascotaVacunas" />
         </EntityType>
+        <EntityType Name="vw_BalanceContable">
+          <Key>
+            <PropertyRef Name="TipoMovimiento" />
+            <PropertyRef Name="Categoria" />
+          </Key>
+          <Property Name="TipoMovimiento" Type="String" MaxLength="20" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Categoria" Type="String" MaxLength="100" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="TotalMovimientos" Type="Int32" />
+          <Property Name="TotalMonto" Type="Decimal" Precision="38" Scale="2" />
+          <Property Name="Anio" Type="Int32" />
+          <Property Name="Mes" Type="Int32" />
+        </EntityType>
         <EntityType Name="vw_MascotasDisponibles">
           <Key>
             <PropertyRef Name="MascotaId" />
@@ -2517,7 +2553,7 @@ advertencia 6002: La tabla o vista 'RefugioMascotasDB.dbo.vw_ResumenAdopciones' 
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <EntityContainer Name="RefugioMascotasEntities" annotation:LazyLoadingEnabled="true">
+        <EntityContainer Name="RefugioMascotasDBEntities" annotation:LazyLoadingEnabled="true">
           <EntitySet Name="Actividades" EntityType="Self.Actividades" />
           <EntitySet Name="Apadrinamientos" EntityType="Self.Apadrinamientos" />
           <EntitySet Name="ApoyosEmpresariales" EntityType="Self.ApoyosEmpresariales" />
@@ -2548,6 +2584,7 @@ advertencia 6002: La tabla o vista 'RefugioMascotasDB.dbo.vw_ResumenAdopciones' 
           <EntitySet Name="Usuarios" EntityType="Self.Usuarios" />
           <EntitySet Name="UsuariosRoles" EntityType="Self.UsuariosRoles" />
           <EntitySet Name="Vacunas" EntityType="Self.Vacunas" />
+          <EntitySet Name="vw_BalanceContable" EntityType="Self.vw_BalanceContable" />
           <EntitySet Name="vw_MascotasDisponibles" EntityType="Self.vw_MascotasDisponibles" />
           <EntitySet Name="vw_ResumenAdopciones" EntityType="Self.vw_ResumenAdopciones" />
           <AssociationSet Name="FK__Actividad__Respo__41EDCAC5" Association="Self.FK__Actividad__Respo__41EDCAC5">
@@ -2728,7 +2765,7 @@ advertencia 6002: La tabla o vista 'RefugioMascotasDB.dbo.vw_ResumenAdopciones' 
     <!-- C-S mapping content -->
     <edmx:Mappings>
       <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
-        <EntityContainerMapping StorageEntityContainer="RefugioMascotasDBModelStoreContainer" CdmEntityContainer="RefugioMascotasEntities">
+        <EntityContainerMapping StorageEntityContainer="RefugioMascotasDBModelStoreContainer" CdmEntityContainer="RefugioMascotasDBEntities">
           <EntitySetMapping Name="Actividades">
             <EntityTypeMapping TypeName="RefugioMascotasDBModel.Actividades">
               <MappingFragment StoreEntitySet="Actividades">
@@ -3272,6 +3309,18 @@ advertencia 6002: La tabla o vista 'RefugioMascotasDB.dbo.vw_ResumenAdopciones' 
                 <ScalarProperty Name="EdadRecomendada" ColumnName="EdadRecomendada" />
                 <ScalarProperty Name="FrecuenciaRefuerzo" ColumnName="FrecuenciaRefuerzo" />
                 <ScalarProperty Name="Activo" ColumnName="Activo" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="vw_BalanceContable">
+            <EntityTypeMapping TypeName="RefugioMascotasDBModel.vw_BalanceContable">
+              <MappingFragment StoreEntitySet="vw_BalanceContable">
+                <ScalarProperty Name="TipoMovimiento" ColumnName="TipoMovimiento" />
+                <ScalarProperty Name="Categoria" ColumnName="Categoria" />
+                <ScalarProperty Name="TotalMovimientos" ColumnName="TotalMovimientos" />
+                <ScalarProperty Name="TotalMonto" ColumnName="TotalMonto" />
+                <ScalarProperty Name="Anio" ColumnName="Anio" />
+                <ScalarProperty Name="Mes" ColumnName="Mes" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

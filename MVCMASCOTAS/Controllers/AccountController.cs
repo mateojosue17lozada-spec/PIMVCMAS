@@ -12,7 +12,7 @@ namespace MVCMASCOTAS.Controllers
 {
     public class AccountController : Controller
     {
-        private RefugioMascotasEntities db = new RefugioMascotasEntities();
+        private RefugioMascotasDBEntities db = new RefugioMascotasDBEntities();
 
         // GET: Account/Login
         [AllowAnonymous]

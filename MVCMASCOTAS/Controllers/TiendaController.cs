@@ -10,7 +10,7 @@ namespace MVCMASCOTAS.Controllers
 {
     public class TiendaController : Controller
     {
-        private RefugioMascotasEntities db = new RefugioMascotasEntities();
+        private RefugioMascotasDBEntities db = new RefugioMascotasDBEntities();
 
         // GET: Tienda
         public ActionResult Index(int? categoriaId, string buscar, int page = 1)

@@ -10,7 +10,7 @@ namespace MVCMASCOTAS.Controllers
     [Authorize]
     public class AdopcionController : Controller
     {
-        private RefugioMascotasEntities db = new RefugioMascotasEntities();
+        private RefugioMascotasDBEntities db = new RefugioMascotasDBEntities();
 
         // GET: Adopcion/Solicitar/5
         public ActionResult Solicitar(int mascotaId)

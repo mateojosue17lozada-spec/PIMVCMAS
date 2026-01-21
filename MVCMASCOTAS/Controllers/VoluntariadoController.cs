@@ -8,7 +8,7 @@ namespace MVCMASCOTAS.Controllers
 {
     public class VoluntariadoController : Controller
     {
-        private RefugioMascotasEntities db = new RefugioMascotasEntities();
+        private RefugioMascotasDBEntities db = new RefugioMascotasDBEntities();
 
         // GET: Voluntariado
         [AllowAnonymous]

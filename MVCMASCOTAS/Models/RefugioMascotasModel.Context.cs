@@ -13,10 +13,10 @@ namespace MVCMASCOTAS.Models
     using System.Data.Entity;
     using System.Data.Entity.Infrastructure;
     
-    public partial class RefugioMascotasEntities : DbContext
+    public partial class RefugioMascotasDBEntities : DbContext
     {
-        public RefugioMascotasEntities()
-            : base("name=RefugioMascotasEntities")
+        public RefugioMascotasDBEntities()
+            : base("name=RefugioMascotasDBEntities")
         {
         }
     
@@ -55,6 +55,7 @@ namespace MVCMASCOTAS.Models
         public virtual DbSet<Usuarios> Usuarios { get; set; }
         public virtual DbSet<UsuariosRoles> UsuariosRoles { get; set; }
         public virtual DbSet<Vacunas> Vacunas { get; set; }
+        public virtual DbSet<vw_BalanceContable> vw_BalanceContable { get; set; }
         public virtual DbSet<vw_MascotasDisponibles> vw_MascotasDisponibles { get; set; }
         public virtual DbSet<vw_ResumenAdopciones> vw_ResumenAdopciones { get; set; }
     }

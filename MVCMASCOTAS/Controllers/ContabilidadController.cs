@@ -9,7 +9,7 @@ namespace MVCMASCOTAS.Controllers
     [AuthorizeRoles("Contabilidad", "Administrador")]
     public class ContabilidadController : Controller
     {
-        private RefugioMascotasEntities db = new RefugioMascotasEntities();
+        private RefugioMascotasDBEntities db = new RefugioMascotasDBEntities();
 
         // GET: Contabilidad/Dashboard
         public ActionResult Dashboard()

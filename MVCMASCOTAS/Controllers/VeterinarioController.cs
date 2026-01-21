@@ -10,7 +10,7 @@ namespace MVCMASCOTAS.Controllers
     [AuthorizeRoles("Veterinario", "Administrador")]
     public class VeterinarioController : Controller
     {
-        private RefugioMascotasEntities db = new RefugioMascotasEntities();
+        private RefugioMascotasDBEntities db = new RefugioMascotasDBEntities();
 
         // GET: Veterinario/Dashboard
         public ActionResult Dashboard()

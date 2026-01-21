@@ -11,7 +11,7 @@ namespace MVCMASCOTAS.Controllers
     [AuthorizeRoles("Administrador")]
     public class AdminController : Controller
     {
-        private RefugioMascotasEntities db = new RefugioMascotasEntities();
+        private RefugioMascotasDBEntities db = new RefugioMascotasDBEntities();
 
         // GET: Admin/Dashboard
         public ActionResult Dashboard()
