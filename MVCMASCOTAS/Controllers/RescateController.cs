@@ -77,14 +77,14 @@ namespace MVCMASCOTAS.Controllers
             // Crear reporte
             var reporte = new ReportesRescate
             {
-                UsuarioReportanteId = usuarioId,
+                UsuarioReportante = usuarioId,
                 NombreReportante = nombreReportante,
                 TelefonoReportante = telefonoReportante,
                 EmailReportante = emailReportante,
-                Ubicacion = ubicacion,
+                UbicacionReporte = ubicacion,
                 DescripcionSituacion = descripcionSituacion,
-                EspecieAnimal = especieAnimal,
-                EstadoAnimal = estadoAnimal,
+                TipoAnimal = especieAnimal,
+                Estado = estadoAnimal,
                 RequiereUrgencia = requiereUrgencia,
                 ImagenReporte = imagenBytes,
                 FechaReporte = DateTime.Now,
@@ -158,7 +158,7 @@ namespace MVCMASCOTAS.Controllers
             var usuario = db.Usuarios.FirstOrDefault(u => u.Email == User.Identity.Name);
 
             var reportes = db.ReportesRescate
-                .Where(r => r.UsuarioReportanteId == usuario.UsuarioId)
+                .Where(r => r.UsuarioReportante == usuario.UsuarioId)
                 .OrderByDescending(r => r.FechaReporte)
                 .ToList();
 

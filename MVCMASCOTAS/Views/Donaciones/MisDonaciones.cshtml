@@ -58,7 +58,7 @@
 
                         @if (donacion.TipoDonacion == "Monetaria")
                         {
-                            <p class="h4 text-success">$@donacion.MontoEfectivo.Value.ToString("N2")</p>
+                            <p class="h4 text-success">$@donacion.Monto.Value.ToString("N2")</p>
                             <p><strong>Método de Pago:</strong> @donacion.MetodoPago</p>
                         }
                         else

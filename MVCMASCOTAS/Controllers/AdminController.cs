@@ -18,49 +18,107 @@ namespace MVCMASCOTAS.Controllers
         {
             var viewModel = new DashboardViewModel
             {
+                // Estadísticas de Mascotas (NOMBRES CORRECTOS)
                 TotalMascotas = db.Mascotas.Count(m => m.Activo),
                 MascotasDisponibles = db.Mascotas.Count(m => m.Estado == "Disponible para adopción" && m.Activo),
                 MascotasEnTratamiento = db.Mascotas.Count(m => m.Estado == "En tratamiento" && m.Activo),
-                TotalAdopciones = db.Mascotas.Count(m => m.Estado == "Adoptada"),
+                MascotasAdoptadas = db.Mascotas.Count(m => m.Estado == "Adoptada"), // ✅ CORRECTO
 
+                // Adopciones
                 SolicitudesPendientes = db.SolicitudAdopcion.Count(s => s.Estado == "Pendiente"),
-                SolicitudesEnEvaluacion = db.SolicitudAdopcion.Count(s => s.Estado == "En evaluación"),
+                SolicitudesAprobadas = db.SolicitudAdopcion.Count(s => s.Estado == "Aprobada"),
+                SolicitudesRechazadas = db.SolicitudAdopcion.Count(s => s.Estado == "Rechazada"),
+                AdopcionesEsteMes = db.Mascotas.Count(m =>
+                    m.Estado == "Adoptada" &&
+                    m.FechaAdopcion.HasValue &&
+                    m.FechaAdopcion.Value.Month == DateTime.Now.Month &&
+                    m.FechaAdopcion.Value.Year == DateTime.Now.Year),
 
-                TotalUsuarios = db.Usuarios.Count(u => u.Activo),
-                TotalVoluntarios = db.UsuariosRoles.Count(ur => ur.Roles.NombreRol == "Voluntario"),
+                // Donaciones (CORREGIR NOMBRES Y PROPIEDADES DE BD)
+                NumeroDonantesMes = db.Donaciones.Count(d => // ✅ CORRECTO
+                    d.FechaDonacion != null &&
+                    d.FechaDonacion.Value.Month == DateTime.Now.Month &&
+                    d.FechaDonacion.Value.Year == DateTime.Now.Year),
+                TotalDonacionesMes = db.Donaciones // ✅ CORRECTO
+                    .Where(d => d.FechaDonacion != null &&
+                               d.FechaDonacion.Value.Month == DateTime.Now.Month &&
+                               d.FechaDonacion.Value.Year == DateTime.Now.Year)
+                    .Sum(d => (decimal?)d.Monto) ?? 0, // ✅ 'Monto' no 'MontoEfectivo'
 
-                DonacionesEsteMes = db.Donaciones.Count(d =>
-                    d.FechaDonacion.Month == DateTime.Now.Month &&
-                    d.FechaDonacion.Year == DateTime.Now.Year),
-                MontoRecaudadoMes = db.Donaciones
-                    .Where(d => d.FechaDonacion.Month == DateTime.Now.Month &&
-                               d.FechaDonacion.Year == DateTime.Now.Year)
-                    .Sum(d => d.MontoEfectivo) ?? 0,
+                // Voluntariado
+                VoluntariosActivos = db.UsuariosRoles.Count(ur => ur.Roles.NombreRol == "Voluntario"), // ✅ CORRECTO
 
+                // Apadrinamientos
                 ApadrinamientosActivos = db.Apadrinamientos.Count(a => a.Estado == "Activo"),
 
-                ProductosEnStock = db.Productos.Count(p => p.Stock > 0 && p.Activo),
-                PedidosPendientes = db.Pedidos.Count(p => p.Estado == "Confirmado")
+                // Tienda
+                ProductosDisponibles = db.Productos.Count(p => p.Stock > 0 && p.Activo), // ✅ CORRECTO
+                ProductosBajoStock = db.Productos.Count(p => p.Stock > 0 && p.Stock <= p.StockMinimo),
+                PedidosPendientes = db.Pedidos.Count(p => p.Estado == "Confirmado"),
+                VentasMes = db.Pedidos
+                    .Where(p => p.Estado == "Entregado" &&
+                               p.FechaPedido != null &&
+                               p.FechaPedido.Value.Month == DateTime.Now.Month &&
+                               p.FechaPedido.Value.Year == DateTime.Now.Year)
+                    .Sum(p => (decimal?)p.Total) ?? 0, // En BD es 'Total', no 'MontoTotal'
+
+                // Rescate
+                ReportesAbiertos = db.ReportesRescate.Count(r => r.Estado == "Pendiente" || r.Estado == "En proceso"),
+
+                // Contabilidad (si quieres calcular)
+                IngresosMes = CalcularIngresosMes(), // Método que debes crear
+                EgresosMes = CalcularEgresosMes(),   // Método que debes crear
+                BalanceMes = 0 // Calcular automáticamente
             };
 
-            // Actividades recientes (últimas 10)
-            var actividadesRecientes = db.AuditoriaAcciones
+            // Calcular Balance
+            viewModel.BalanceMes = viewModel.IngresosMes - viewModel.EgresosMes;
+
+            // Datos para ViewBag
+            ViewBag.ActividadesRecientes = db.AuditoriaAcciones
                 .OrderByDescending(a => a.FechaAccion)
                 .Take(10)
                 .ToList();
 
-            ViewBag.ActividadesRecientes = actividadesRecientes;
-
-            // Solicitudes pendientes de atención
-            var solicitudesPendientes = db.SolicitudAdopcion
+            ViewBag.SolicitudesPendientes = db.SolicitudAdopcion
                 .Where(s => s.Estado == "Pendiente" || s.Estado == "En evaluación")
                 .OrderBy(s => s.FechaSolicitud)
                 .Take(5)
                 .ToList();
 
-            ViewBag.SolicitudesPendientes = solicitudesPendientes;
+            // Llenar listas del ViewModel
+            viewModel.UltimasSolicitudes = db.SolicitudAdopcion
+                .Where(s => s.Estado == "Pendiente")
+                .OrderByDescending(s => s.FechaSolicitud)
+                .Take(5)
+                .Select(s => new SolicitudAdopcionViewModel
+                {
+                    // Mapear propiedades
+                })
+                .ToList();
 
             return View(viewModel);
+        }
+
+        // Métodos auxiliares
+        private decimal CalcularIngresosMes()
+        {
+            return db.MovimientosContables
+                .Where(m => m.TipoMovimiento == "Ingreso" &&
+                           m.FechaMovimiento != null &&
+                           m.FechaMovimiento.Value.Month == DateTime.Now.Month &&
+                           m.FechaMovimiento.Value.Year == DateTime.Now.Year)
+                .Sum(m => (decimal?)m.Monto) ?? 0;
+        }
+
+        private decimal CalcularEgresosMes()
+        {
+            return db.MovimientosContables
+                .Where(m => m.TipoMovimiento == "Egreso" &&
+                           m.FechaMovimiento != null &&
+                           m.FechaMovimiento.Value.Month == DateTime.Now.Month &&
+                           m.FechaMovimiento.Value.Year == DateTime.Now.Year)
+                .Sum(m => (decimal?)m.Monto) ?? 0;
         }
 
         // GET: Admin/Usuarios

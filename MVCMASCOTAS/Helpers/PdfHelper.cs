@@ -163,7 +163,7 @@ namespace MVCMASCOTAS.Helpers
                     table.AddCell(new Phrase(donacion.TipoDonacion, normalFont));
                     table.AddCell(new Phrase(donacion.MetodoPago ?? "-", normalFont));
 
-                    decimal monto = donacion.MontoEfectivo ?? 0;
+                    decimal monto = donacion.Monto ?? 0;
                     table.AddCell(new Phrase($"${monto:N2}", normalFont) { HorizontalAlignment = Element.ALIGN_RIGHT });
                     total += monto;
                 }
