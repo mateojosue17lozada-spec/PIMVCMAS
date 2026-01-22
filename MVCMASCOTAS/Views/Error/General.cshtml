@@ -1,0 +1,89 @@
+﻿@model System.Exception
+
+@{
+    ViewBag.Title = "Error";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-12 text-center">
+            <h1 class="display-1 text-danger"><i class="fas fa-exclamation-triangle"></i></h1>
+            <h2 class="text-danger">¡Oops! Algo salió mal</h2>
+
+            @if (Model != null)
+            {
+                <div class="alert alert-danger mt-4">
+                    <h4>Detalles del Error:</h4>
+                    <p><strong>Mensaje:</strong> @Model.Message</p>
+
+                    @if (Model.InnerException != null)
+                    {
+                        <p><strong>Error Interno:</strong> @Model.InnerException.Message</p>
+                    }
+
+                    <p><strong>Tipo:</strong> @Model.GetType().Name</p>
+
+                    <!-- Solo mostrar stack trace en desarrollo -->
+                    @if (HttpContext.Current.IsDebuggingEnabled)
+                    {
+                        <hr />
+                        <h5>Stack Trace:</h5>
+                        <pre class="text-left bg-light p-3">@Model.StackTrace</pre>
+                    }
+                </div>
+            }
+            else
+            {
+                <p class="lead">Ha ocurrido un error inesperado en la aplicación.</p>
+            }
+
+            <div class="mt-4">
+                <a href="@Url.Action("Index", "Home")" class="btn btn-primary btn-lg">
+                    <i class="fas fa-home"></i> Volver al Inicio
+                </a>
+                <a href="javascript:history.back()" class="btn btn-secondary btn-lg">
+                    <i class="fas fa-arrow-left"></i> Volver Atrás
+                </a>
+
+                @if (User.IsInRole("Administrador") || HttpContext.Current.IsDebuggingEnabled)
+                {
+                    <button class="btn btn-info btn-lg" onclick="toggleDetails()">
+                        <i class="fas fa-info-circle"></i> Ver Detalles
+                    </button>
+                }
+            </div>
+
+            <!-- Para logging -->
+            @if (Model != null)
+            {
+                <!-- Registro automático del error (ejemplo) -->
+                <script>
+                    console.error("Error: @Model.Message");
+
+                    @if (HttpContext.Current.IsDebuggingEnabled)
+                    {
+                        <text>
+                        console.error("@Model.StackTrace");
+                        </text>
+                    }
+                </script>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function toggleDetails() {
+            var details = document.querySelector('.alert-danger pre');
+            if (details) {
+                if (details.style.display === 'none') {
+                    details.style.display = 'block';
+                } else {
+                    details.style.display = 'none';
+                }
+            }
+        }
+    </script>
+}

@@ -6,87 +6,419 @@
 
 <div class="page-header mb-4">
     <h2><i class="fas fa-box"></i> Mis Pedidos</h2>
+    <p class="text-muted">Historial de tus compras en la tienda solidaria</p>
 </div>
+
+<!-- Filtros -->
+@if (Model != null && Model.Any())
+{
+    <div class="card mb-4 shadow-custom">
+        <div class="card-body">
+            <form method="get" action="@Url.Action("MisPedidos", "Tienda")" class="form-inline">
+                <div class="form-group mr-3 mb-2">
+                    <label class="mr-2">Estado:</label>
+                    <select name="estado" class="form-control" onchange="this.form.submit()">
+                        <option value="Todos" @(ViewBag.EstadoFiltro == "Todos" || string.IsNullOrEmpty(ViewBag.EstadoFiltro) ? "selected" : "")>Todos los estados</option>
+                        <option value="Pendiente" @(ViewBag.EstadoFiltro == "Pendiente" ? "selected" : "")>Pendientes</option>
+                        <option value="Confirmado" @(ViewBag.EstadoFiltro == "Confirmado" ? "selected" : "")>Confirmados</option>
+                        <option value="En preparación" @(ViewBag.EstadoFiltro == "En preparación" ? "selected" : "")>En preparación</option>
+                        <option value="Enviado" @(ViewBag.EstadoFiltro == "Enviado" ? "selected" : "")>Enviados</option>
+                        <option value="Entregado" @(ViewBag.EstadoFiltro == "Entregado" ? "selected" : "")>Entregados</option>
+                        <option value="Cancelado" @(ViewBag.EstadoFiltro == "Cancelado" ? "selected" : "")>Cancelados</option>
+                    </select>
+                </div>
+                <div class="form-group mr-3 mb-2">
+                    <label class="mr-2">Mes:</label>
+                    <input type="month" name="mes" class="form-control" value="@ViewBag.MesFiltro" onchange="this.form.submit()" />
+                </div>
+                <a href="@Url.Action("MisPedidos", "Tienda")" class="btn btn-outline-secondary mb-2">
+                    <i class="fas fa-times"></i> Limpiar filtros
+                </a>
+            </form>
+        </div>
+    </div>
+}
 
 @if (Model != null && Model.Any())
 {
     foreach (var pedido in Model)
     {
         <div class="card mb-4 shadow-custom">
-            <div class="card-header d-flex justify-content-between align-items-center">
+            <div class="card-header d-flex justify-content-between align-items-center bg-light">
                 <div>
-                    <h5 class="mb-0">Pedido #@pedido.PedidoId</h5>
-                    <small class="text-muted">@pedido.FechaPedido.ToString("dd/MM/yyyy HH:mm")</small>
+                    <h5 class="mb-0">
+                        <i class="fas fa-receipt text-primary"></i> Pedido #@pedido.PedidoId
+                    </h5>
+                    <div class="small text-muted">
+                        <i class="fas fa-calendar"></i> @(pedido.FechaPedido?.ToString("dd/MM/yyyy HH:mm") ?? "Fecha no disponible")
+                        @if (!string.IsNullOrEmpty(pedido.NumeroPedido))
+                        {
+                            <span class="ml-2">
+                                <i class="fas fa-hashtag"></i> @pedido.NumeroPedido
+                            </span>
+                        }
+                    </div>
                 </div>
-                <span class="badge badge-pill @(pedido.Estado == "Confirmado" ? "badge-warning" : pedido.Estado == "Enviado" ? "badge-info" : pedido.Estado == "Entregado" ? "badge-success" : "badge-secondary") p-2">
-                    @pedido.Estado
-                </span>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-sm">
-                        <thead>
-                            <tr>
-                                <th>Producto</th>
-                                <th>Precio</th>
-                                <th>Cantidad</th>
-                                <th>Subtotal</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var detalle in pedido.PedidoDetalle)
+                <div class="text-right">
+                    <span class="badge badge-pill @(pedido.Estado == "Confirmado" ? "badge-warning" :
+                                                    pedido.Estado == "En preparación" ? "badge-info" :
+                                                    pedido.Estado == "Enviado" ? "badge-primary" :
+                                                    pedido.Estado == "Entregado" ? "badge-success" :
+                                                    pedido.Estado == "Cancelado" ? "badge-danger" :
+                                                    "badge-secondary") p-2">
+                        <i class="fas @(pedido.Estado == "Entregado" ? "fa-check-circle" :
+                                       pedido.Estado == "Cancelado" ? "fa-times-circle" :
+                                       "fa-clock")"></i> @pedido.Estado
+                                </span>
+                                @if (!string.IsNullOrEmpty(pedido.EstadoPago))
+                                {
+                                    <span class="badge badge-pill @(pedido.EstadoPago == "Pagado" ? "badge-success" :
+                                                        pedido.EstadoPago == "Pendiente" ? "badge-warning" :
+                                                        pedido.EstadoPago == "Fallido" ? "badge-danger" :
+                                                        "badge-light") p-2 ml-1">
+                                        <i class="fas @(pedido.EstadoPago == "Pagado" ? "fa-check-circle" :
+                                           pedido.EstadoPago == "Fallido" ? "fa-exclamation-circle" :
+                                           "fa-money-bill-wave")"></i> @pedido.EstadoPago
+                                    </span>
+                                }
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <!-- Detalles del pedido -->
+                            <div class="table-responsive">
+                                <table class="table table-sm table-hover mb-0">
+                                    <thead class="thead-light">
+                                        <tr>
+                                            <th>Producto</th>
+                                            <th class="text-center">Cantidad</th>
+                                            <th class="text-right">Precio Unit.</th>
+                                            <th class="text-right">Subtotal</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @if (pedido.PedidoDetalle != null && pedido.PedidoDetalle.Any())
+                                        {
+                                            foreach (var detalle in pedido.PedidoDetalle)
+                                            {
+                                                <tr>
+                                                    <td>
+                                                        @if (detalle.Productos != null)
+                                                        {
+                                                            <div class="d-flex align-items-center">
+                                                                @if (detalle.Productos.ImagenPrincipal != null && detalle.Productos.ImagenPrincipal.Length > 0)
+                                                                {
+                                                                    <img src="data:image/jpeg;base64,@Convert.ToBase64String(detalle.Productos.ImagenPrincipal)"
+                                                                         alt="@detalle.Productos.NombreProducto"
+                                                                         class="img-thumbnail mr-2"
+                                                                         style="width: 50px; height: 50px; object-fit: cover;" />
+                                                                }
+                                                                <div>
+                                                                    <strong>@detalle.Productos.NombreProducto</strong>
+                                                                    @if (!string.IsNullOrEmpty(detalle.Productos.SKU))
+                                                                    {
+                                                                        <div class="small text-muted">SKU: @detalle.Productos.SKU</div>
+                                                                    }
+                                                                </div>
+                                                            </div>
+                                                        }
+                                                        else
+                                                        {
+                                                            <span class="text-muted">Producto no disponible</span>
+                                                        }
+                                                    </td>
+                                                    <td class="text-center">@detalle.Cantidad</td>
+                                                    <td class="text-right">$@detalle.PrecioUnitario.ToString("N2")</td>
+                                                    <td class="text-right">$@detalle.Subtotal.ToString("N2")</td>
+                                                </tr>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <tr>
+                                                <td colspan="4" class="text-center text-muted py-3">
+                                                    <i class="fas fa-exclamation-circle"></i> No hay detalles disponibles para este pedido
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <!-- Resumen de totales -->
+                            <div class="row mt-3">
+                                <div class="col-md-6">
+                                    <!-- Información de fechas -->
+                                    <div class="small text-muted">
+                                        @if (pedido.FechaEntregaEstimada.HasValue)
+                                        {
+                                            <div class="mb-1">
+                                                <i class="fas fa-truck text-info"></i>
+                                                <strong>Entrega estimada:</strong>
+                                                @pedido.FechaEntregaEstimada.Value.ToString("dd/MM/yyyy")
+                                            </div>
+                                        }
+                                        @if (pedido.FechaEntregaReal.HasValue)
+                                        {
+                                            <div class="mb-1">
+                                                <i class="fas fa-check-circle text-success"></i>
+                                                <strong>Entregado el:</strong>
+                                                @pedido.FechaEntregaReal.Value.ToString("dd/MM/yyyy")
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <!-- Totales -->
+                                    <div class="text-right">
+                                        <table class="table table-sm table-borderless ml-auto" style="max-width: 300px;">
+                                            <tr>
+                                                <td class="text-right"><strong>Subtotal:</strong></td>
+                                                <td class="text-right">$@pedido.SubTotal.ToString("N2")</td>
+                                            </tr>
+                                            @if (pedido.Descuento.HasValue && pedido.Descuento.Value > 0)
+                                            {
+                                                <tr>
+                                                    <td class="text-right"><strong>Descuento:</strong></td>
+                                                    <td class="text-right text-success">- $@pedido.Descuento.Value.ToString("N2")</td>
+                                                </tr>
+                                            }
+                                            <tr class="border-top">
+                                                <td class="text-right"><h5 class="mb-0"><strong>Total:</strong></h5></td>
+                                                <td class="text-right">
+                                                    <h5 class="text-success mb-0">$@pedido.Total.ToString("N2")</h5>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Información de envío y pago -->
+                            <div class="row mt-4">
+                                <div class="col-md-6">
+                                    <div class="card border">
+                                        <div class="card-header bg-light py-2">
+                                            <h6 class="mb-0"><i class="fas fa-shipping-fast text-primary"></i> Información de Envío</h6>
+                                        </div>
+                                        <div class="card-body py-2">
+                                            <p class="mb-1"><strong>Dirección:</strong> @pedido.DireccionEntrega</p>
+                                            <p class="mb-1"><strong>Ciudad:</strong> @pedido.CiudadEntrega</p>
+                                            <p class="mb-1"><strong>Teléfono:</strong> @pedido.TelefonoEntrega</p>
+                                            @if (!string.IsNullOrEmpty(pedido.ReferenciaEntrega))
+                                            {
+                                                <p class="mb-0"><strong>Referencia:</strong> @pedido.ReferenciaEntrega</p>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="card border">
+                                        <div class="card-header bg-light py-2">
+                                            <h6 class="mb-0"><i class="fas fa-credit-card text-success"></i> Información de Pago</h6>
+                                        </div>
+                                        <div class="card-body py-2">
+                                            @if (!string.IsNullOrEmpty(pedido.MetodoPago))
+                                            {
+                                                <p class="mb-1"><strong>Método:</strong> @pedido.MetodoPago</p>
+                                            }
+                                            @if (!string.IsNullOrEmpty(pedido.EstadoPago))
+                                            {
+                                                <p class="mb-1"><strong>Estado del pago:</strong> @pedido.EstadoPago</p>
+                                            }
+                                            @if (!string.IsNullOrEmpty(pedido.Observaciones))
+                                            {
+                                                <div class="mt-2">
+                                                    <h6 class="mb-1"><i class="fas fa-comment text-info"></i> Observaciones</h6>
+                                                    <p class="mb-0 small">@pedido.Observaciones</p>
+                                                </div>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Acciones del pedido -->
+                            @if (pedido.Estado == "Pendiente" || pedido.Estado == "Confirmado")
                             {
-                                <tr>
-                                    <td>@detalle.Productos.NombreProducto</td>
-                                    <td>$@detalle.PrecioUnitario.ToString("N2")</td>
-                                    <td>@detalle.Cantidad</td>
-                                    <td>$@detalle.Subtotal.ToString("N2")</td>
-                                </tr>
+                                <div class="mt-4 pt-3 border-top">
+                                    <div class="text-right">
+                                        @if (pedido.Estado == "Pendiente" && pedido.EstadoPago == "Pendiente")
+                                        {
+                                            <button type="button" class="btn btn-success btn-sm"
+                                                    data-toggle="modal" data-target="#pagarPedidoModal"
+                                                    data-pedidoid="@pedido.PedidoId" data-total="@pedido.Total">
+                                                <i class="fas fa-money-bill-wave"></i> Pagar Ahora
+                                            </button>
+                                        }
+
+                                        @if (pedido.Estado != "Cancelado" && pedido.Estado != "Entregado")
+                                        {
+                                            <button type="button" class="btn btn-danger btn-sm ml-2"
+                                                    data-toggle="modal" data-target="#cancelarPedidoModal"
+                                                    data-pedidoid="@pedido.PedidoId" data-numeropedido="@pedido.NumeroPedido">
+                                                <i class="fas fa-times-circle"></i> Cancelar Pedido
+                                            </button>
+                                        }
+
+                                        <a href="@Url.Action("DetallePedido", "Tienda", new { id = pedido.PedidoId })" class="btn btn-info btn-sm ml-2">
+                                            <i class="fas fa-eye"></i> Ver Detalles
+                                        </a>
+                                    </div>
+                                </div>
                             }
-                        </tbody>
-                        <tfoot>
-                            <tr>
-                                <td colspan="3" class="text-right"><strong>Total:</strong></td>
-                                <td><strong>$@pedido.MontoTotal.ToString("N2")</strong></td>
-                            </tr>
-                        </tfoot>
-                    </table>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="card shadow-custom">
+                    <div class="card-body text-center py-5">
+                        <i class="fas fa-box-open fa-5x text-muted mb-3"></i>
+                        <h4>No tienes pedidos</h4>
+                        <p class="text-muted mb-4">Empieza a comprar en nuestra tienda solidaria</p>
+                        <a href="@Url.Action("Index", "Tienda")" class="btn btn-primary btn-lg">
+                            <i class="fas fa-shopping-bag"></i> Ir a la Tienda
+                        </a>
+                    </div>
                 </div>
+            }
 
-                @if (!string.IsNullOrEmpty(pedido.DireccionEnvio))
-                {
-                    <p class="mt-3 mb-0">
-                        <strong><i class="fas fa-map-marker-alt"></i> Dirección de Envío:</strong> @pedido.DireccionEnvio
-                    </p>
-                }
-
-                @if (!string.IsNullOrEmpty(pedido.MetodoPago))
-                {
-                    <p class="mb-0">
-                        <strong><i class="fas fa-credit-card"></i> Método de Pago:</strong> @pedido.MetodoPago
-                    </p>
-                }
-
-                @if (!string.IsNullOrEmpty(pedido.Observaciones))
-                {
-                    <p class="mb-0">
-                        <strong><i class="fas fa-comment"></i> Observaciones:</strong> @pedido.Observaciones
-                    </p>
-                }
-            </div>
-        </div>
-    }
-}
-else
+<!-- Paginación -->
+@if (ViewBag.TotalPages != null && ViewBag.TotalPages > 1)
 {
-    <div class="card shadow-custom">
-        <div class="card-body text-center py-5">
-            <i class="fas fa-box-open fa-5x text-muted mb-3"></i>
-            <h4>No tienes pedidos</h4>
-            <p class="text-muted">Empieza a comprar en nuestra tienda solidaria</p>
-            <a href="@Url.Action("Index", "Tienda")" class="btn btn-primary btn-lg">
-                <i class="fas fa-shopping-bag"></i> Ir a la Tienda
-            </a>
+    <nav aria-label="Paginación" class="mt-4">
+        <ul class="pagination justify-content-center">
+            @if (ViewBag.CurrentPage > 1)
+            {
+                <li class="page-item">
+                    <a class="page-link" href="@Url.Action("MisPedidos", "Tienda", new {
+                        page = ViewBag.CurrentPage - 1,
+                        estado = ViewBag.EstadoFiltro,
+                        mes = ViewBag.MesFiltro
+                    })">
+                        <i class="fas fa-chevron-left"></i> Anterior
+                    </a>
+                </li>
+            }
+
+            @for (int i = 1; i <= ViewBag.TotalPages; i++)
+            {
+                <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                    <a class="page-link" href="@Url.Action("MisPedidos", "Tienda", new {
+                        page = i,
+                        estado = ViewBag.EstadoFiltro,
+                        mes = ViewBag.MesFiltro
+                    })">@i</a>
+                </li>
+            }
+
+            @if (ViewBag.CurrentPage < ViewBag.TotalPages)
+            {
+                <li class="page-item">
+                    <a class="page-link" href="@Url.Action("MisPedidos", "Tienda", new {
+                        page = ViewBag.CurrentPage + 1,
+                        estado = ViewBag.EstadoFiltro,
+                        mes = ViewBag.MesFiltro
+                    })">
+                        Siguiente <i class="fas fa-chevron-right"></i>
+                    </a>
+                </li>
+            }
+        </ul>
+    </nav>
+}
+
+<!-- Modales -->
+<div class="modal fade" id="cancelarPedidoModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            @using (Html.BeginForm("CancelarPedido", "Tienda", FormMethod.Post))
+            {
+                @Html.AntiForgeryToken()
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title">
+                        <i class="fas fa-exclamation-triangle"></i> Cancelar Pedido
+                    </h5>
+                    <button type="button" class="close text-white" data-dismiss="modal">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="pedidoId" id="cancelarPedidoId" />
+                    <p>¿Está seguro que desea cancelar el pedido <strong id="cancelarPedidoNumero"></strong>?</p>
+                    <div class="form-group">
+                        <label for="motivoCancelacion">Motivo de cancelación:</label>
+                        <textarea class="form-control" name="motivoCancelacion" rows="3" required
+                                  placeholder="Por favor, indique el motivo de la cancelación"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                        <i class="fas fa-times"></i> No cancelar
+                    </button>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-check"></i> Sí, cancelar pedido
+                    </button>
+                </div>
+            }
         </div>
     </div>
+</div>
+
+@section Styles {
+    <style>
+        .shadow-custom {
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(0,0,0,.125);
+            transition: transform 0.2s ease;
+        }
+
+            .shadow-custom:hover {
+                transform: translateY(-2px);
+            }
+
+        .card-header.bg-light {
+            background-color: #f8f9fa !important;
+        }
+    </style>
+}
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // Modal para cancelar pedido
+            $('#cancelarPedidoModal').on('show.bs.modal', function (event) {
+                var button = $(event.relatedTarget);
+                var pedidoId = button.data('pedidoid');
+                var numeroPedido = button.data('numeropedido') || '#' + pedidoId;
+
+                var modal = $(this);
+                modal.find('#cancelarPedidoId').val(pedidoId);
+                modal.find('#cancelarPedidoNumero').text(numeroPedido);
+            });
+
+            // Modal para pagar pedido
+            $('#pagarPedidoModal').on('show.bs.modal', function (event) {
+                var button = $(event.relatedTarget);
+                var pedidoId = button.data('pedidoid');
+                var total = button.data('total');
+
+                var modal = $(this);
+                modal.find('#pagarPedidoId').val(pedidoId);
+                modal.find('#modalTotalPagar').text('$' + parseFloat(total).toFixed(2));
+            });
+
+            // Validación de formulario de cancelación
+            $('form[name="cancelarPedidoForm"]').submit(function (e) {
+                var motivo = $(this).find('textarea[name="motivoCancelacion"]').val().trim();
+                if (motivo === '') {
+                    e.preventDefault();
+                    alert('Por favor, ingrese un motivo para la cancelación.');
+                    return false;
+                }
+                return true;
+            });
+        });
+    </script>
 }

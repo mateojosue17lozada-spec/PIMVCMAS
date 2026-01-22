@@ -1,0 +1,204 @@
+﻿@model MVCMASCOTAS.Models.MovimientosContables
+
+@{
+    ViewBag.Title = "Editar Movimiento";
+}
+
+<div class="page-header mb-4">
+    <h2><i class="fas fa-edit"></i> Editar Movimiento Contable</h2>
+    <p class="text-muted">Modificar información del movimiento #@Model.MovimientoId</p>
+</div>
+
+<div class="mb-3">
+    <a href="@Url.Action("DetallesMovimiento", "Contabilidad", new { id = Model.MovimientoId })" class="btn btn-outline-secondary">
+        <i class="fas fa-arrow-left"></i> Cancelar
+    </a>
+</div>
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-circle"></i> @TempData["ErrorMessage"]
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+}
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <form method="post" action="@Url.Action("EditarMovimiento", "Contabilidad", new { id = Model.MovimientoId })">
+            @Html.AntiForgeryToken()
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="TipoMovimiento">
+                            Tipo de Movimiento <span class="text-danger">*</span>
+                        </label>
+                        <select name="TipoMovimiento" id="TipoMovimiento" class="form-control" required>
+                            <option value="">Seleccione...</option>
+                            <option value="Ingreso" @(Model.TipoMovimiento == "Ingreso" ? "selected" : "")>Ingreso</option>
+                            <option value="Egreso" @(Model.TipoMovimiento == "Egreso" ? "selected" : "")>Egreso</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="FechaMovimiento">
+                            Fecha del Movimiento <span class="text-danger">*</span>
+                        </label>
+                        <input type="date" name="FechaMovimiento" id="FechaMovimiento" class="form-control"
+                               value="@(Model.FechaMovimiento.HasValue ? Model.FechaMovimiento.Value.ToString("yyyy-MM-dd") : "")" required />
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="Categoria">
+                            Categoría <span class="text-danger">*</span>
+                        </label>
+                        <input type="text" name="Categoria" id="Categoria" class="form-control"
+                               value="@Model.Categoria" placeholder="Ej: Alimentos, Medicamentos, Donaciones" required />
+                        <small class="form-text text-muted">
+                            La categoría ayuda a clasificar el movimiento.
+                        </small>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="Monto">
+                            Monto <span class="text-danger">*</span>
+                        </label>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">$</span>
+                            </div>
+                            <input type="number" name="Monto" id="Monto" class="form-control"
+                                   value="@Model.Monto" step="0.01" min="0.01" required />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="Concepto">
+                    Concepto <span class="text-danger">*</span>
+                </label>
+                <textarea name="Concepto" id="Concepto" class="form-control" rows="3"
+                          placeholder="Describa brevemente el concepto del movimiento..." required>@Model.Concepto</textarea>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="MetodoPago">Método de Pago</label>
+                        <select name="MetodoPago" id="MetodoPago" class="form-control">
+                            <option value="">Seleccione...</option>
+                            @foreach (var metodo in ViewBag.MetodosPago as SelectList)
+                            {
+                                <option value="@metodo.Text" @(Model.MetodoPago == metodo.Text ? "selected" : "")>@metodo.Text</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="NumeroComprobante">Número de Comprobante</label>
+                        <input type="text" name="NumeroComprobante" id="NumeroComprobante" class="form-control"
+                               value="@Model.NumeroComprobante" placeholder="Ej: 001-23456" />
+                        <small class="form-text text-muted">
+                            Número de factura, recibo o comprobante.
+                        </small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="Observaciones">Observaciones</label>
+                <textarea name="Observaciones" id="Observaciones" class="form-control" rows="3"
+                          placeholder="Información adicional (opcional)...">@Model.Observaciones</textarea>
+            </div>
+
+            <hr />
+
+            <div class="form-group text-right">
+                <a href="@Url.Action("DetallesMovimiento", "Contabilidad", new { id = Model.MovimientoId })"
+                   class="btn btn-secondary">
+                    <i class="fas fa-times"></i> Cancelar
+                </a>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Guardar Cambios
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    .shadow-sm {
+        box-shadow: 0 .125rem .25rem rgba(0,0,0,.075) !important;
+    }
+
+    .card {
+        border-radius: 8px;
+        border: none;
+    }
+
+    .page-header h2 {
+        color: #2c3e50;
+        font-weight: 600;
+    }
+
+    .form-control:focus {
+        border-color: #80bdff;
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    }
+
+    label {
+        font-weight: 600;
+        color: #495057;
+    }
+
+    .text-danger {
+        color: #dc3545 !important;
+    }
+</style>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // Validación de formulario
+            $('form').on('submit', function (e) {
+                var monto = parseFloat($('#Monto').val());
+                if (monto <= 0) {
+                    e.preventDefault();
+                    alert('El monto debe ser mayor a cero.');
+                    return false;
+                }
+
+                var concepto = $('#Concepto').val().trim();
+                if (concepto === '') {
+                    e.preventDefault();
+                    alert('El concepto es requerido.');
+                    return false;
+                }
+
+                return true;
+            });
+
+            // Formatear el monto al salir del campo
+            $('#Monto').on('blur', function () {
+                var valor = parseFloat($(this).val());
+                if (!isNaN(valor)) {
+                    $(this).val(valor.toFixed(2));
+                }
+            });
+        });
+    </script>
+}

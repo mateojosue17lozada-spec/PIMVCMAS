@@ -1,7 +1,116 @@
-﻿
-@{
-    ViewBag.Title = "_Paginacion";
+﻿@model MVCMASCOTAS.Models.ViewModels.PaginacionViewModel
+
+@if (Model != null && Model.TotalPages > 1)
+{
+    <div class="pagination-container mt-4">
+        <nav aria-label="Paginación">
+            <ul class="pagination justify-content-center">
+                <!-- Botón Anterior -->
+                @if (Model.CurrentPage > 1)
+                {
+                    <li class="page-item">
+                        <a class="page-link" href="@Model.BaseUrl?page=@(Model.CurrentPage - 1)@Model.QueryString"
+                           aria-label="Anterior">
+                            <i class="fas fa-chevron-left"></i> Anterior
+                        </a>
+                    </li>
+                }
+                else
+                {
+                    <li class="page-item disabled">
+                        <span class="page-link" aria-label="Anterior">
+                            <i class="fas fa-chevron-left"></i> Anterior
+                        </span>
+                    </li>
+                }
+
+                <!-- Números de página -->
+                @{
+                    int startPage = Math.Max(1, Model.CurrentPage - 2);
+                    int endPage = Math.Min(Model.TotalPages, Model.CurrentPage + 2);
+
+                    // Primera página y elipsis si es necesario
+                    if (startPage > 1)
+                    {
+                        <li class="page-item">
+                            <a class="page-link" href="@Model.BaseUrl?page=1@Model.QueryString">1</a>
+                        </li>
+                        if (startPage > 2)
+                        {
+                            <li class="page-item disabled">
+                                <span class="page-link">...</span>
+                            </li>
+                        }
+                    }
+
+                    // Rango de páginas visibles
+                    for (int i = startPage; i <= endPage; i++)
+                    {
+                        <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
+                            @if (i == Model.CurrentPage)
+                            {
+                                <span class="page-link">
+                                    @i
+                                    <span class="visually-hidden">(current)</span>
+                                </span>
+                            }
+                            else
+                            {
+                                <a class="page-link" href="@Model.BaseUrl?page=@i@Model.QueryString">@i</a>
+                            }
+                        </li>
+                    }
+
+                    // Última página y elipsis si es necesario
+                    if (endPage < Model.TotalPages)
+                    {
+                        if (endPage < Model.TotalPages - 1)
+                        {
+                            <li class="page-item disabled">
+                                <span class="page-link">...</span>
+                            </li>
+                        }
+                        <li class="page-item">
+                            <a class="page-link" href="@Model.BaseUrl?page=@Model.TotalPages@Model.QueryString">
+                                @Model.TotalPages
+                            </a>
+                        </li>
+                    }
+                }
+
+                <!-- Botón Siguiente -->
+                @if (Model.CurrentPage < Model.TotalPages)
+                {
+                    <li class="page-item">
+                        <a class="page-link" href="@Model.BaseUrl?page=@(Model.CurrentPage + 1)@Model.QueryString"
+                           aria-label="Siguiente">
+                            Siguiente <i class="fas fa-chevron-right"></i>
+                        </a>
+                    </li>
+                }
+                else
+                {
+                    <li class="page-item disabled">
+                        <span class="page-link" aria-label="Siguiente">
+                            Siguiente <i class="fas fa-chevron-right"></i>
+                        </span>
+                    </li>
+                }
+            </ul>
+
+            <!-- Información de la página -->
+            <div class="text-center text-muted mt-2">
+                <small>
+                    Página @Model.CurrentPage de @Model.TotalPages
+                    (@Model.TotalItems elementos en total)
+                </small>
+                <br />
+                <small>
+                    Mostrando @Model.PageSize elementos por página
+                </small>
+            </div>
+        </nav>
+    </div>
 }
 
-<h2>_Paginacion</h2>
-
+@* Si no hay paginación necesaria, no mostrar nada *@

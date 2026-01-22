@@ -1,7 +1,176 @@
-﻿
+﻿@model MVCMASCOTAS.Models.Configuracion
+
 @{
     ViewBag.Title = "Configuracion";
+    ViewBag.Title = "Configuración del Sistema";
 }
 
 <h2>Configuracion</h2>
+<div class="page-header mb-4">
+    <h2><i class="fas fa-cog"></i> Configuración del Sistema</h2>
+    <p class="text-muted">Ajustes generales del refugio de mascotas</p>
+</div>
 
+<div class="mb-4">
+    <a href="@Url.Action("Dashboard", "Admin")" class="btn btn-outline-secondary">
+        <i class="fas fa-arrow-left"></i> Volver al Dashboard
+    </a>
+</div>
+
+<div class="row">
+    <!-- Información del refugio -->
+    <div class="col-md-6">
+        <div class="card shadow-custom mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-building"></i> Información del Refugio</h5>
+            </div>
+            <div class="card-body">
+                @using (Html.BeginForm("ActualizarConfiguracion", "Admin", FormMethod.Post))
+                {
+                    @Html.AntiForgeryToken()
+
+                    <div class="form-group">
+                        <label><i class="fas fa-tag"></i> Nombre del Refugio</label>
+                        <input type="text" name="NombreRefugio" value="@ViewBag.NombreRefugio" class="form-control" required />
+                    </div>
+
+                    <div class="form-group">
+                        <label><i class="fas fa-envelope"></i> Email de Contacto</label>
+                        <input type="email" name="EmailContacto" value="@ViewBag.EmailContacto" class="form-control" required />
+                    </div>
+
+                    <div class="form-group">
+                        <label><i class="fas fa-phone"></i> Teléfono</label>
+                        <input type="text" name="Telefono" value="@ViewBag.Telefono" class="form-control" required />
+                    </div>
+
+                    <div class="form-group">
+                        <label><i class="fas fa-map-marker-alt"></i> Dirección</label>
+                        <textarea name="Direccion" class="form-control" rows="3" required>@ViewBag.Direccion</textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Guardar Cambios
+                    </button>
+                }
+            </div>
+        </div>
+
+        <!-- Configuración de notificaciones -->
+        <div class="card shadow-custom mb-4">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0"><i class="fas fa-bell"></i> Notificaciones</h5>
+            </div>
+            <div class="card-body">
+                @using (Html.BeginForm("ActualizarNotificaciones", "Admin", FormMethod.Post))
+                {
+                    @Html.AntiForgeryToken()
+
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" name="NotificacionesSolicitudes" id="notifSolicitudes" @(ViewBag.NotificacionesSolicitudes ? "checked" : "") />
+                        <label class="form-check-label" for="notifSolicitudes">
+                            Notificar nuevas solicitudes de adopción
+                        </label>
+                    </div>
+
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" name="NotificacionesDonaciones" id="notifDonaciones" @(ViewBag.NotificacionesDonaciones ? "checked" : "") />
+                        <label class="form-check-label" for="notifDonaciones">
+                            Notificar nuevas donaciones
+                        </label>
+                    </div>
+
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" name="NotificacionesRescates" id="notifRescates" @(ViewBag.NotificacionesRescates ? "checked" : "") />
+                        <label class="form-check-label" for="notifRescates">
+                            Notificar reportes de rescate
+                        </label>
+                    </div>
+
+                    <button type="submit" class="btn btn-info">
+                        <i class="fas fa-save"></i> Guardar Preferencias
+                    </button>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- Configuración de sistema -->
+    <div class="col-md-6">
+        <div class="card shadow-custom mb-4">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="fas fa-sliders-h"></i> Configuración del Sistema</h5>
+            </div>
+            <div class="card-body">
+                @using (Html.BeginForm("ActualizarSistema", "Admin", FormMethod.Post))
+                {
+                    @Html.AntiForgeryToken()
+
+                    <div class="form-group">
+                        <label><i class="fas fa-list"></i> Mascotas por página</label>
+                        <input type="number" name="MascotasPorPagina" value="@ViewBag.MascotasPorPagina" class="form-control" min="6" max="50" />
+                    </div>
+
+                    <div class="form-group">
+                        <label><i class="fas fa-dollar-sign"></i> Monto mínimo de donación</label>
+                        <input type="number" name="MontoMinimoDonacion" value="@ViewBag.MontoMinimoDonacion" class="form-control" min="1" step="0.01" />
+                    </div>
+
+                    <div class="form-group">
+                        <label><i class="fas fa-clock"></i> Días de validez de solicitud</label>
+                        <input type="number" name="DiasValidezSolicitud" value="@ViewBag.DiasValidezSolicitud" class="form-control" min="1" max="365" />
+                    </div>
+
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-save"></i> Guardar Configuración
+                    </button>
+                }
+            </div>
+        </div>
+
+        <!-- Estadísticas del sistema -->
+        <div class="card shadow-custom mb-4">
+            <div class="card-header bg-dark text-white">
+                <h5 class="mb-0"><i class="fas fa-chart-bar"></i> Estadísticas del Sistema</h5>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-6 mb-3">
+                        <h3 class="text-primary">@ViewBag.TotalRegistros</h3>
+                        <p class="text-muted">Total Registros</p>
+                    </div>
+                    <div class="col-6 mb-3">
+                        <h3 class="text-success">@ViewBag.EspacioUtilizado</h3>
+                        <p class="text-muted">Espacio en DB</p>
+                    </div>
+                    <div class="col-6 mb-3">
+                        <h3 class="text-info">@ViewBag.UsuariosActivos</h3>
+                        <p class="text-muted">Usuarios Activos</p>
+                    </div>
+                    <div class="col-6 mb-3">
+                        <h3 class="text-warning">@ViewBag.AccionesHoy</h3>
+                        <p class="text-muted">Acciones Hoy</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mantenimiento -->
+        <div class="card shadow-custom mb-4">
+            <div class="card-header bg-warning text-white">
+                <h5 class="mb-0"><i class="fas fa-tools"></i> Mantenimiento</h5>
+            </div>
+            <div class="card-body">
+                <a href="@Url.Action("LimpiarCache", "Admin")" class="btn btn-warning btn-block mb-2">
+                    <i class="fas fa-trash-alt"></i> Limpiar Caché
+                </a>
+                <a href="@Url.Action("RespaldarDB", "Admin")" class="btn btn-info btn-block mb-2">
+                    <i class="fas fa-database"></i> Respaldar Base de Datos
+                </a>
+                <a href="@Url.Action("OptimizarDB", "Admin")" class="btn btn-primary btn-block">
+                    <i class="fas fa-cog"></i> Optimizar Base de Datos
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,7 +1,299 @@
-﻿
+﻿@model IEnumerable<MVCMASCOTAS.Models.MascotaVacunas>
+
 @{
-    ViewBag.Title = "Vacunas";
+    ViewBag.Title = "Registro de Vacunas";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>Vacunas</h2>
+<div class="page-header mb-4">
+    <h2><i class="fas fa-syringe"></i> @ViewBag.Title</h2>
+</div>
 
+<div class="mb-4">
+    <button type="button" class="btn btn-success" data-toggle="modal" data-target="#modalRegistrarVacuna">
+        <i class="fas fa-plus"></i> Registrar Nueva Vacuna
+    </button>
+    <a href="@Url.Action("ListaVacunas", "Veterinario")" class="btn btn-info ml-2">
+        <i class="fas fa-list"></i> Tipos de Vacunas
+    </a>
+</div>
+
+<div class="card shadow-custom">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>Mascota</th>
+                        <th>Vacuna</th>
+                        <th>Fecha Aplicación</th>
+                        <th>Próxima Dosis</th>
+                        <th>Veterinario</th>
+                        <th>Lote</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var mascotaVacuna in Model)
+                        {
+                            var estaVencida = mascotaVacuna.ProximaDosis.HasValue &&
+                                            mascotaVacuna.ProximaDosis.Value < DateTime.Now;
+                            var estaProxima = mascotaVacuna.ProximaDosis.HasValue &&
+                                            (mascotaVacuna.ProximaDosis.Value - DateTime.Now).Days <= 30;
+
+                            <tr class="@(estaVencida ? "table-danger" : estaProxima ? "table-warning" : "")">
+                                <td>
+                                    @if (mascotaVacuna.Mascotas != null)
+                                    {
+                                        <strong>@mascotaVacuna.Mascotas.Nombre</strong><br />
+                                        <small class="text-muted">@mascotaVacuna.Mascotas.Especie</small>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">N/A</span>
+                                    }
+                                </td>
+                                <td>
+                                    @if (mascotaVacuna.Vacunas != null)
+                                    {
+                                        <strong>@mascotaVacuna.Vacunas.NombreVacuna</strong><br />
+                                        <small class="text-muted">@mascotaVacuna.Vacunas.EspecieAplicable</small>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">N/A</span>
+                                    }
+                                </td>
+                                <td>@mascotaVacuna.FechaAplicacion.ToString("dd/MM/yyyy")</td>
+                                <td>
+                                    @if (mascotaVacuna.ProximaDosis.HasValue)
+                                    {
+                                        @mascotaVacuna.ProximaDosis.Value.ToString("dd/MM/yyyy")
+                                        <br />
+                                        <small class="text-muted">
+                                            @((mascotaVacuna.ProximaDosis.Value - DateTime.Now).Days) días
+                                        </small>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">N/A</span>
+                                    }
+                                </td>
+                                <td>
+                                    @if (mascotaVacuna.Usuarios != null)
+                                    {
+                                        @mascotaVacuna.Usuarios.NombreCompleto
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">N/A</span>
+                                    }
+                                </td>
+                                <td>
+                                    @if (!string.IsNullOrEmpty(mascotaVacuna.Lote))
+                                    {
+                                        <span class="badge badge-secondary">@mascotaVacuna.Lote</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">N/A</span>
+                                    }
+                                </td>
+                                <td>
+                                    @if (estaVencida)
+                                    {
+                                        <span class="badge badge-danger">Vencida</span>
+                                    }
+                                    else if (estaProxima)
+                                    {
+                                        <span class="badge badge-warning">Próxima</span>
+                                    }
+                                    else if (mascotaVacuna.ProximaDosis.HasValue)
+                                    {
+                                        <span class="badge badge-success">Al día</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge badge-info">Sin refuerzo</span>
+                                    }
+                                </td>
+                                <td>
+                                    @if (mascotaVacuna.MascotaId > 0)
+                                    {
+                                        <a href="@Url.Action("HistorialMedico", "Veterinario", new { mascotaId = mascotaVacuna.MascotaId })"
+                                           class="btn btn-sm btn-info" title="Ver historial">
+                                            <i class="fas fa-history"></i>
+                                        </a>
+                                    }
+                                    @if (!string.IsNullOrEmpty(mascotaVacuna.Observaciones))
+                                    {
+                                        <button type="button" class="btn btn-sm btn-secondary"
+                                                title="Observaciones"
+                                                data-toggle="popover"
+                                                data-content="@mascotaVacuna.Observaciones">
+                                            <i class="fas fa-sticky-note"></i>
+                                        </button>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="8" class="text-center text-muted py-4">
+                                <i class="fas fa-syringe fa-3x mb-3"></i><br />
+                                <h5>No hay vacunas registradas</h5>
+                                <p>Comience registrando una vacuna usando el botón "Registrar Nueva Vacuna"</p>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Registrar Vacuna -->
+<div class="modal fade" id="modalRegistrarVacuna" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title"><i class="fas fa-syringe"></i> Registrar Vacuna</h5>
+                <button type="button" class="close text-white" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            @using (Html.BeginForm("RegistrarVacunaCompleta", "Veterinario", FormMethod.Post))
+            {
+                @Html.AntiForgeryToken()
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Mascota *</label>
+                        <select name="MascotaId" class="form-control" required>
+                            <option value="">Seleccione...</option>
+                            @if (ViewBag.Mascotas != null)
+                            {
+                                foreach (var mascota in ViewBag.Mascotas)
+                                {
+                                    <option value="@mascota.MascotaId">
+                                        @mascota.Nombre (@mascota.Especie - @mascota.Raza)
+                                    </option>
+                                }
+                            }
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Tipo de Vacuna *</label>
+                        <select name="VacunaId" class="form-control" required>
+                            <option value="">Seleccione...</option>
+                            @if (ViewBag.TiposVacuna != null)
+                            {
+                                foreach (var vacuna in ViewBag.TiposVacuna)
+                                {
+                                    <option value="@vacuna.VacunaId">
+                                        @vacuna.NombreVacuna (@vacuna.EspecieAplicable)
+                                    </option>
+                                }
+                            }
+                        </select>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Fecha de Aplicación *</label>
+                                <input type="date" name="FechaAplicacion" class="form-control"
+                                       value="@DateTime.Now.ToString("yyyy-MM-dd")" required
+                                       max="@DateTime.Now.ToString("yyyy-MM-dd")" />
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Próxima Dosis</label>
+                                <input type="date" name="ProximaDosis" class="form-control"
+                                       min="@DateTime.Now.AddDays(1).ToString("yyyy-MM-dd")" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Lote</label>
+                                <input type="text" name="Lote" class="form-control"
+                                       placeholder="Ej: LOTE-20240101" />
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Laboratorio</label>
+                                <input type="text" name="Laboratorio" class="form-control"
+                                       placeholder="Nombre del laboratorio" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Observaciones</label>
+                        <textarea name="Observaciones" class="form-control" rows="3"
+                                  placeholder="Observaciones adicionales..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-save"></i> Guardar
+                    </button>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Activar popovers
+            $('[data-toggle="popover"]').popover({
+                trigger: 'hover',
+                placement: 'top'
+            });
+
+            // Validar fechas en el modal
+            $('input[name="FechaAplicacion"]').on('change', function() {
+                var fechaAplicacion = new Date($(this).val());
+                var proximaDosisInput = $('input[name="ProximaDosis"]');
+
+                if (proximaDosisInput.val()) {
+                    var proximaDosis = new Date(proximaDosisInput.val());
+
+                    if (proximaDosis <= fechaAplicacion) {
+                        alert('La próxima dosis debe ser posterior a la fecha de aplicación');
+                        proximaDosisInput.val('');
+                    }
+                }
+
+                // Actualizar mínimo de próxima dosis
+                var minFecha = new Date(fechaAplicacion);
+                minFecha.setDate(minFecha.getDate() + 1);
+                proximaDosisInput.attr('min', minFecha.toISOString().split('T')[0]);
+            });
+
+            // Filtrar tipos de vacuna según la mascota seleccionada
+            $('select[name="MascotaId"]').on('change', function() {
+                var mascotaId = $(this).val();
+                var vacunaSelect = $('select[name="VacunaId"]');
+
+                if (mascotaId) {
+                    // Aquí podrías implementar filtro por especie si lo necesitas
+                    // Por ahora solo reseteamos y habilitamos
+                    vacunaSelect.prop('disabled', false);
+                } else {
+                    vacunaSelect.prop('disabled', true);
+                    vacunaSelect.val('');
+                }
+            });
+        });
+    </script>
+}

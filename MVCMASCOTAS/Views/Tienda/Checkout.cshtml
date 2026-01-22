@@ -1,7 +1,228 @@
-﻿
+﻿@model MVCMASCOTAS.Models.ViewModels.CarritoViewModel
+
 @{
-    ViewBag.Title = "Checkout";
+    ViewBag.Title = "Finalizar Compra";
 }
 
-<h2>Checkout</h2>
+<div class="page-header mb-4">
+    <h2><i class="fas fa-shopping-cart"></i> Finalizar Compra</h2>
+</div>
 
+<div class="row">
+    <div class="col-md-8">
+        <div class="card shadow-custom mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5><i class="fas fa-user"></i> Información de Envío</h5>
+            </div>
+            <div class="card-body">
+                @using (Html.BeginForm("ProcesarPedido", "Tienda", FormMethod.Post))
+                {
+                    @Html.AntiForgeryToken()
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Nombre Completo *</label>
+                                <input type="text" name="NombreCompleto" class="form-control" value="@ViewBag.NombreUsuario" required />
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Teléfono *</label>
+                                <input type="tel" name="Telefono" class="form-control" value="@ViewBag.TelefonoUsuario" required />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Dirección de Envío *</label>
+                        <textarea name="DireccionEnvio" class="form-control" rows="3" required>@Model.DireccionEnvio</textarea>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Ciudad *</label>
+                                <input type="text" name="Ciudad" class="form-control" value="@Model.Ciudad" required />
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Provincia *</label>
+                                <input type="text" name="Provincia" class="form-control" value="@Model.Provincia" required />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Método de Pago *</label>
+                        <select name="MetodoPago" class="form-control" required>
+                            <option value="">Seleccione...</option>
+                            <option value="Transferencia" @(Model.MetodoPago == "Transferencia" ? "selected" : "")>Transferencia Bancaria</option>
+                            <option value="Tarjeta" @(Model.MetodoPago == "Tarjeta" ? "selected" : "")>Tarjeta de Crédito/Débito</option>
+                            <option value="Efectivo" @(Model.MetodoPago == "Efectivo" ? "selected" : "")>Efectivo (contra entrega)</option>
+                            <option value="PayPal" @(Model.MetodoPago == "PayPal" ? "selected" : "")>PayPal</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Notas del Pedido (opcional)</label>
+                        <textarea name="NotasAdicionales" class="form-control" rows="2" placeholder="Instrucciones especiales para el envío...">@Model.NotasAdicionales</textarea>
+                    </div>
+
+                    <div class="form-group form-check">
+                        <input type="checkbox" class="form-check-input" id="terminos" required />
+                        <label class="form-check-label" for="terminos">
+                            Acepto los <a href="@Url.Action("Terminos", "Home")" target="_blank">términos y condiciones</a> de compra
+                        </label>
+                    </div>
+
+                    <button type="submit" class="btn btn-success btn-lg btn-block">
+                        <i class="fas fa-check"></i> Confirmar Pedido
+                    </button>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card shadow-custom mb-4">
+            <div class="card-header bg-success text-white">
+                <h5><i class="fas fa-receipt"></i> Resumen del Pedido</h5>
+            </div>
+            <div class="card-body">
+                @if (Model != null && Model.Items != null && Model.Items.Any())
+                {
+                    <div class="mb-3">
+                        @foreach (var item in Model.Items)
+                        {
+                            <div class="d-flex align-items-center mb-3 pb-2 border-bottom">
+                                @if (!string.IsNullOrEmpty(item.ImagenBase64))
+                                {
+                                    <img src="data:image/jpeg;base64,@item.ImagenBase64"
+                                         alt="@item.NombreProducto"
+                                         class="rounded"
+                                         style="width: 60px; height: 60px; object-fit: cover;" />
+                                }
+                                else
+                                {
+                                    <div class="bg-secondary rounded d-flex align-items-center justify-content-center"
+                                         style="width: 60px; height: 60px;">
+                                        <i class="fas fa-box text-white"></i>
+                                    </div>
+                                }
+                                <div class="ml-3 flex-grow-1">
+                                    <h6 class="mb-1">@item.NombreProducto</h6>
+                                    <div class="d-flex justify-content-between">
+                                        <span class="text-muted">Cantidad: @item.Cantidad</span>
+                                        <strong>$@item.PrecioUnitario.ToString("N2") c/u</strong>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+
+                    <div class="resumen-totales">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Subtotal:</span>
+                            <span>$@Model.Subtotal.ToString("N2")</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>IVA (15%):</span>
+                            <span>$@Model.IVA.ToString("N2")</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Envío:</span>
+                            <span>$@Model.CostoEnvio.ToString("N2")</span>
+                        </div>
+                        <hr />
+                        <div class="d-flex justify-content-between">
+                            <h5 class="mb-0">Total:</h5>
+                            <h5 class="mb-0 text-success">$@Model.Total.ToString("N2")</h5>
+                        </div>
+                        <p class="text-muted small mt-2">
+                            <i class="fas fa-info-circle"></i>
+                            @Model.CantidadItems artículo(s) en total
+                        </p>
+                    </div>
+                }
+                else
+                {
+                    <div class="alert alert-warning text-center">
+                        <i class="fas fa-shopping-cart fa-2x mb-2"></i>
+                        <h5>Carrito vacío</h5>
+                        <p class="mb-0">No hay productos en tu carrito.</p>
+                        <a href="@Url.Action("Productos", "Tienda")" class="btn btn-primary btn-sm mt-2">
+                            <i class="fas fa-store"></i> Ir a Tienda
+                        </a>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="card shadow-custom">
+            <div class="card-header bg-info text-white">
+                <h5><i class="fas fa-shipping-fast"></i> Información de Envío</h5>
+            </div>
+            <div class="card-body">
+                <p><i class="fas fa-clock"></i> <strong>Tiempo estimado:</strong> 3-5 días hábiles</p>
+                <p><i class="fas fa-money-bill-wave"></i> <strong>Pago contra entrega:</strong> Disponible</p>
+                <p><i class="fas fa-phone"></i> <strong>Soporte:</strong> (02) 123-4567</p>
+                <div class="alert alert-light mt-3">
+                    <small>
+                        <i class="fas fa-exclamation-circle"></i>
+                        Los pedidos se procesan de lunes a viernes de 9:00 a 17:00
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        .shadow-custom {
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+            border: none;
+            border-radius: 10px;
+        }
+
+        .resumen-totales {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+        }
+
+        .border-bottom {
+            border-bottom: 1px solid #dee2e6;
+        }
+    </style>
+}
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // Validar formulario
+            $('form').submit(function (e) {
+                var terminos = $('#terminos').is(':checked');
+                if (!terminos) {
+                    e.preventDefault();
+                    alert('Debe aceptar los términos y condiciones para continuar.');
+                    return false;
+                }
+            });
+
+            // Actualizar total en tiempo real si hay cambios
+            $('select[name="MetodoPago"]').change(function () {
+                // Aquí puedes agregar lógica para calcular costos adicionales según método de pago
+                var metodo = $(this).val();
+                console.log('Método de pago seleccionado: ' + metodo);
+            });
+
+            // Máscara para teléfono
+            $('input[name="Telefono"]').inputmask('999-999-9999', {
+                placeholder: '_'
+            });
+        });
+    </script>
+}

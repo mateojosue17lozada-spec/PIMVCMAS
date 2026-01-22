@@ -1,9 +1,94 @@
 ﻿@{
-    ViewBag.Title = "About";
+    ViewBag.Title = "Sobre Nosotros";
 }
+
 <main aria-labelledby="title">
     <h2 id="title">@ViewBag.Title.</h2>
     <h3>@ViewBag.Message</h3>
-
     <p>Use this area to provide additional information.</p>
 </main>
+
+<div class="jumbotron bg-light">
+    <h1 class="display-4"><i class="fas fa-heart"></i> Sobre Refugio de Mascotas</h1>
+    <p class="lead">Dedicados al rescate, cuidado y adopción responsable de animales.</p>
+</div>
+
+<div class="row mb-5">
+    <div class="col-md-6">
+        <h2><i class="fas fa-flag"></i> Nuestra Misión</h2>
+        <p>Somos una organización sin fines de lucro dedicada al rescate, rehabilitación y reubicación de animales en situación de abandono o maltrato. Trabajamos incansablemente para brindarles una segunda oportunidad y encontrarles un hogar lleno de amor.</p>
+
+        <h2 class="mt-4"><i class="fas fa-eye"></i> Nuestra Visión</h2>
+        <p>Aspiramos a ser el refugio de referencia en la región, reconocido por nuestro compromiso con el bienestar animal y la promoción de la tenencia responsable de mascotas.</p>
+    </div>
+    <div class="col-md-6">
+        <h2><i class="fas fa-star"></i> Nuestros Valores</h2>
+        <ul class="list-unstyled">
+            <li class="mb-3"><i class="fas fa-check-circle text-success"></i> <strong>Compasión:</strong> Tratamos a cada animal con amor y respeto</li>
+            <li class="mb-3"><i class="fas fa-check-circle text-success"></i> <strong>Responsabilidad:</strong> Nos comprometemos con el cuidado integral</li>
+            <li class="mb-3"><i class="fas fa-check-circle text-success"></i> <strong>Transparencia:</strong> Actuamos con honestidad en todas nuestras acciones</li>
+            <li class="mb-3"><i class="fas fa-check-circle text-success"></i> <strong>Colaboración:</strong> Trabajamos en equipo con la comunidad</li>
+        </ul>
+    </div>
+</div>
+
+<div class="row mb-5">
+    <div class="col-12">
+        <h2 class="text-center mb-4"><i class="fas fa-history"></i> Nuestra Historia</h2>
+        <p>Fundado en 2015, el Refugio de Mascotas nació del sueño de un grupo de amantes de los animales que querían hacer la diferencia. Desde entonces, hemos rescatado y rehomado a más de 500 animales, brindándoles la atención médica, alimentación y amor que merecen.</p>
+    </div>
+</div>
+
+<div class="row mb-5 text-center">
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body">
+                <h3 class="text-primary">@(ViewBag.TotalRescates ?? "500+")</h3>
+                <p>Animales Rescatados</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body">
+                <h3 class="text-success">@(ViewBag.TotalAdopciones ?? "350+")</h3>
+                <p>Adopciones Exitosas</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body">
+                <h3 class="text-warning">@(ViewBag.TotalVoluntarios ?? "50+")</h3>
+                <p>Voluntarios Activos</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body">
+                <h3 class="text-info">@(ViewBag.TotalDonantes ?? "200+")</h3>
+                <p>Donantes Solidarios</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12 text-center">
+        <h2><i class="fas fa-hands-helping"></i> ¿Cómo Puedes Ayudar?</h2>
+        <p class="lead mb-4">Hay muchas formas de apoyar nuestra misión</p>
+        <a href="@Url.Action("Index", "Donaciones")" class="btn btn-primary btn-lg m-2">
+            <i class="fas fa-donate"></i> Hacer una Donación
+        </a>
+        <a href="@Url.Action("Index", "Mascotas")" class="btn btn-success btn-lg m-2">
+            <i class="fas fa-heart"></i> Adoptar una Mascota
+        </a>
+        <a href="@Url.Action("Index", "Voluntariado")" class="btn btn-warning btn-lg m-2">
+            <i class="fas fa-hands-helping"></i> Ser Voluntario
+        </a>
+        <a href="@Url.Action("Contact", "Home")" class="btn btn-info btn-lg m-2">
+            <i class="fas fa-envelope"></i> Contactarnos
+        </a>
+    </div>
+</div>

@@ -1,7 +1,113 @@
-﻿
+﻿@model IEnumerable<MVCMASCOTAS.Models.Roles>
+
 @{
-    ViewBag.Title = "Roles";
+    ViewBag.Title = "Gestión de Roles";
 }
 
 <h2>Roles</h2>
+<div class="page-header mb-4">
+    <h2><i class="fas fa-user-tag"></i> Gestión de Roles y Permisos</h2>
+    <p class="text-muted">Administra los roles del sistema y sus permisos</p>
+</div>
 
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <a href="@Url.Action("CrearRol", "Admin")" class="btn btn-success">
+        <i class="fas fa-plus-circle"></i> Crear Nuevo Rol
+    </a>
+    <a href="@Url.Action("Dashboard", "Admin")" class="btn btn-outline-secondary">
+        <i class="fas fa-arrow-left"></i> Volver al Dashboard
+    </a>
+</div>
+
+<!-- Roles del sistema -->
+<div class="row">
+    @if (Model != null && Model.Any())
+    {
+        foreach (var rol in Model)
+        {
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card shadow-custom h-100">
+                    <div class="card-header @(rol.NombreRol == "Administrador" ? "bg-danger" : rol.NombreRol == "Veterinario" ? "bg-success" : rol.NombreRol == "Voluntario" ? "bg-info" : "bg-secondary") text-white">
+                        <h5 class="mb-0">
+                            <i class="fas @(rol.NombreRol == "Administrador" ? "fa-user-shield" : rol.NombreRol == "Veterinario" ? "fa-user-md" : rol.NombreRol == "Voluntario" ? "fa-hands-helping" : "fa-user")"></i>
+                            @rol.NombreRol
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">@(rol.Descripcion ?? "Sin descripción")</p>
+                        <hr />
+                        <h6><i class="fas fa-calendar-alt"></i> Información:</h6>
+                        <ul class="list-unstyled">
+                            <li><i class="fas fa-calendar-plus"></i> Creado: @(rol.FechaCreacion?.ToString("dd/MM/yyyy") ?? "No registrado")</li>
+                            <li>
+                                <i class="fas fa-check-circle"></i> Estado:
+                                @if (rol.Activo == true)
+                                {
+                                    <span class="badge badge-success">Activo</span>
+                                }
+                                else if (rol.Activo == false)
+                                {
+                                    <span class="badge badge-danger">Inactivo</span>
+                                }
+                                else
+                                {
+                                    <span class="badge badge-secondary">No definido</span>
+                                }
+                            </li>
+                        </ul>
+                        <hr />
+                        <p class="text-muted mb-0">
+                            <i class="fas fa-users"></i>
+                            @if (ViewBag.UsuariosPorRol != null && ViewBag.UsuariosPorRol.ContainsKey(rol.RolId))
+                            {
+                                <strong>@ViewBag.UsuariosPorRol[rol.RolId]</strong>
+                            }
+                            else
+                            {
+                                <strong>0</strong>
+                            }
+                            usuarios con este rol
+                        </p>
+                    </div>
+                    <div class="card-footer">
+                        <a href="@Url.Action("EditarRol", "Admin", new { id = rol.RolId })" class="btn btn-warning btn-sm">
+                            <i class="fas fa-edit"></i> Editar
+                        </a>
+                        <a href="@Url.Action("PermisosRol", "Admin", new { id = rol.RolId })" class="btn btn-info btn-sm">
+                            <i class="fas fa-key"></i> Permisos
+                        </a>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="col-12">
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i> No hay roles configurados en el sistema.
+            </div>
+        </div>
+    }
+</div>
+
+<!-- Información adicional -->
+<div class="card shadow-custom mt-4">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0"><i class="fas fa-info-circle"></i> Información sobre Roles</h5>
+    </div>
+    <div class="card-body">
+        <h6>Roles del sistema:</h6>
+        <ul>
+            <li><strong>Administrador:</strong> Control total del sistema, gestión de usuarios, mascotas y configuración</li>
+            <li><strong>Veterinario:</strong> Gestión de historiales médicos, vacunas, tratamientos y consultas</li>
+            <li><strong>Voluntario:</strong> Acceso a actividades de voluntariado y reportes de rescate</li>
+            <li><strong>Usuario:</strong> Solicitudes de adopción, donaciones y apadrinamientos</li>
+            <li><strong>Rescatista:</strong> Reportes de rescate y seguimiento de animales rescatados</li>
+        </ul>
+
+        <div class="alert alert-info mt-3">
+            <i class="fas fa-lightbulb"></i> <strong>Nota:</strong> Para asignar permisos específicos a cada rol, usa la opción "Permisos" en cada tarjeta.
+        </div>
+    </div>
+</div>

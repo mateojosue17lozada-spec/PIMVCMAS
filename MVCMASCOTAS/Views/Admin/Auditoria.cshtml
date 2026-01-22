@@ -1,7 +1,485 @@
-﻿
+﻿@model IEnumerable<MVCMASCOTAS.Models.AuditoriaAcciones>
+
 @{
-    ViewBag.Title = "Auditoria";
+    ViewBag.Title = "Auditoría del Sistema";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>Auditoria</h2>
+<div class="container-fluid">
+    <!-- Encabezado -->
+    <div class="page-header mb-4">
+        <h2><i class="fas fa-history me-2"></i> Auditoría del Sistema</h2>
+        <p class="text-muted">Registro de todas las acciones realizadas en el sistema</p>
+    </div>
 
+    <!-- Botones de acción -->
+    <div class="mb-4">
+        <a href="@Url.Action("Dashboard", "Admin")" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-1"></i> Volver al Dashboard
+        </a>
+        <a href="@Url.Action("ExportarAuditoria", "Admin")" class="btn btn-success">
+            <i class="fas fa-file-excel me-1"></i> Exportar a Excel
+        </a>
+        <button type="button" class="btn btn-danger" onclick="limpiarAuditoria()">
+            <i class="fas fa-trash-alt me-1"></i> Limpiar Registros Antiguos
+        </button>
+    </div>
+
+    <!-- Filtros -->
+    <div class="card shadow-custom mb-4">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0"><i class="fas fa-filter me-2"></i> Filtros</h5>
+        </div>
+        <div class="card-body">
+            @using (Html.BeginForm("Auditoria", "Admin", FormMethod.Get, new { @class = "row g-3" }))
+            {
+                <div class="col-md-3">
+                    <label class="form-label">Módulo:</label>
+                    <input type="text" name="modulo" value="@ViewBag.FiltroModulo"
+                           class="form-control" placeholder="Nombre del módulo" />
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Acción:</label>
+                    <input type="text" name="accion" value="@ViewBag.FiltroAccion"
+                           class="form-control" placeholder="Nombre de la acción" />
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Fecha Desde:</label>
+                    <input type="date" name="fechaDesde" value="@ViewBag.FechaDesde"
+                           class="form-control" />
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Fecha Hasta:</label>
+                    <input type="date" name="fechaHasta" value="@ViewBag.FechaHasta"
+                           class="form-control" />
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-search me-1"></i> Buscar
+                    </button>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Estadísticas -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="card-title">Total Registros</h6>
+                            <h2 class="mb-0">@ViewBag.TotalRegistros</h2>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-database fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="card-title">Acciones Hoy</h6>
+                            <h2 class="mb-0">@ViewBag.AccionesHoy</h2>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-calendar-day fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="card-title">Usuarios Activos</h6>
+                            <h2 class="mb-0">@ViewBag.UsuariosActivos</h2>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-users fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="card-title">Última Acción</h6>
+                            <p class="mb-0 small">@(ViewBag.UltimaAccion != null ? ViewBag.UltimaAccion.ToString("dd/MM/yyyy HH:mm") : "N/A")</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-clock fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabla de auditoría -->
+    <div class="card shadow-custom">
+        <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+            <h5 class="mb-0"><i class="fas fa-table me-2"></i> Registro de Actividades</h5>
+            <div>
+                <span class="badge bg-light text-dark">
+                    Mostrando @(Model != null ? Model.Count() : 0) registros
+                </span>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover table-striped table-sm">
+                    <thead class="table-dark">
+                        <tr>
+                            <th width="80">ID</th>
+                            <th width="150">Fecha/Hora</th>
+                            <th width="150">Usuario</th>
+                            <th width="120">Módulo</th>
+                            <th width="120">Acción</th>
+                            <th>Descripción</th>
+                            <th width="120">IP</th>
+                            <th width="80" class="text-center">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model != null && Model.Any())
+                        {
+                            foreach (var registro in Model)
+                            {
+                                <tr>
+                                    <td><span class="badge bg-secondary">#@registro.AuditoriaId</span></td>
+                                    <td>
+                                        @if (registro.FechaAccion.HasValue)
+                                        {
+                                            <span class="text-nowrap">
+                                                @registro.FechaAccion.Value.ToString("dd/MM/yyyy")<br>
+                                                <small class="text-muted">@registro.FechaAccion.Value.ToString("HH:mm:ss")</small>
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">N/A</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (registro.UsuarioId.HasValue && registro.Usuarios != null)
+                                        {
+                                            <div>
+                                                <span class="badge bg-info">@registro.Usuarios.NombreCompleto</span>
+                                                <br>
+                                                <small class="text-muted">@registro.Usuarios.Email</small>
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary">Sistema</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-primary">
+                                            @(!string.IsNullOrEmpty(registro.Modulo) ? registro.Modulo : "General")
+                                        </span>
+                                    </td>
+                                    <td>
+                                        @{
+                                            var badgeClass = "bg-success";
+                                            if (registro.Accion.Contains("Error") || registro.Accion.Contains("Fallido"))
+                                            {
+                                                badgeClass = "bg-danger";
+                                            }
+                                            else if (registro.Accion.Contains("Advertencia") || registro.Accion.Contains("Warning"))
+                                            {
+                                                badgeClass = "bg-warning";
+                                            }
+                                        }
+                                        <span class="badge @badgeClass">@registro.Accion</span>
+                                    </td>
+                                    <td>
+                                        <div class="text-truncate" style="max-width: 300px;"
+                                             title="@registro.Descripcion">
+                                            @(!string.IsNullOrEmpty(registro.Descripcion) ? registro.Descripcion : "-")
+                                        </div>
+                                        @if (!string.IsNullOrEmpty(registro.Detalles))
+                                        {
+                                            <button type="button" class="btn btn-sm btn-link p-0"
+                                                    onclick="mostrarDetalles(@registro.AuditoriaId, '@registro.Detalles')">
+                                                <small><i class="fas fa-eye"></i> Ver detalles</small>
+                                            </button>
+                                        }
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-dark">
+                                            @(!string.IsNullOrEmpty(registro.DireccionIP) ? registro.DireccionIP : "N/A")
+                                        </span>
+                                    </td>
+                                    <td class="text-center">
+                                        <button type="button" class="btn btn-sm btn-outline-info"
+                                                onclick="mostrarDetalleCompleto(@registro.AuditoriaId)"
+                                                title="Ver detalle completo">
+                                            <i class="fas fa-search"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="8" class="text-center py-5">
+                                    <div class="alert alert-info mb-0">
+                                        <i class="fas fa-info-circle fa-2x mb-3"></i>
+                                        <h5>No se encontraron registros de auditoría</h5>
+                                        <p class="mb-0">No hay actividades registradas con los filtros seleccionados.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Paginación -->
+    @if (ViewBag.TotalPages != null && ViewBag.TotalPages > 1)
+    {
+        <nav aria-label="Paginación" class="mt-4">
+            <ul class="pagination justify-content-center">
+                @if (ViewBag.CurrentPage > 1)
+                {
+                    <li class="page-item">
+                        <a class="page-link" href="@Url.Action("Auditoria", "Admin", new {
+                            page = ViewBag.CurrentPage - 1,
+                            modulo = ViewBag.FiltroModulo,
+                            accion = ViewBag.FiltroAccion,
+                            fechaDesde = ViewBag.FechaDesde,
+                            fechaHasta = ViewBag.FechaHasta
+                        })">
+                            <i class="fas fa-chevron-left"></i> Anterior
+                        </a>
+                    </li>
+                }
+
+                @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                {
+                    <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                        <a class="page-link" href="@Url.Action("Auditoria", "Admin", new {
+                            page = i,
+                            modulo = ViewBag.FiltroModulo,
+                            accion = ViewBag.FiltroAccion,
+                            fechaDesde = ViewBag.FechaDesde,
+                            fechaHasta = ViewBag.FechaHasta
+                        })">@i</a>
+                    </li>
+                }
+
+                @if (ViewBag.CurrentPage < ViewBag.TotalPages)
+                {
+                    <li class="page-item">
+                        <a class="page-link" href="@Url.Action("Auditoria", "Admin", new {
+                            page = ViewBag.CurrentPage + 1,
+                            modulo = ViewBag.FiltroModulo,
+                            accion = ViewBag.FiltroAccion,
+                            fechaDesde = ViewBag.FechaDesde,
+                            fechaHasta = ViewBag.FechaHasta
+                        })">
+                            Siguiente <i class="fas fa-chevron-right"></i>
+                        </a>
+                    </li>
+                }
+            </ul>
+        </nav>
+    }
+</div>
+
+<!-- Modal para detalles -->
+<div class="modal fade" id="detallesModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-dark text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-info-circle me-2"></i>Detalles de Auditoría
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="detallesContenido"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function mostrarDetalles(id, detalles) {
+            $('#detallesContenido').html(`
+                <div class="mb-3">
+                    <h6><i class="fas fa-id-badge me-2"></i>ID de Registro: <span class="badge bg-primary">#${id}</span></h6>
+                </div>
+                <div class="mb-3">
+                    <h6><i class="fas fa-align-left me-2"></i>Detalles:</h6>
+                    <div class="border p-3 bg-light rounded" style="max-height: 300px; overflow-y: auto;">
+                        <pre class="mb-0">${detalles}</pre>
+                    </div>
+                </div>
+            `);
+            var modal = new bootstrap.Modal(document.getElementById('detallesModal'));
+            modal.show();
+        }
+
+        function mostrarDetalleCompleto(id) {
+            $.ajax({
+                url: '@Url.Action("ObtenerDetalleAuditoria", "Admin")',
+                type: 'GET',
+                data: { id: id },
+                success: function (data) {
+                    if (data.success) {
+                        $('#detallesContenido').html(`
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <h6><i class="fas fa-id-badge me-2"></i>ID</h6>
+                                        <p class="mb-0"><span class="badge bg-primary">#${data.registro.AuditoriaId}</span></p>
+                                    </div>
+                                    <div class="mb-3">
+                                        <h6><i class="fas fa-calendar me-2"></i>Fecha y Hora</h6>
+                                        <p class="mb-0">${data.registro.FechaAccion}</p>
+                                    </div>
+                                    <div class="mb-3">
+                                        <h6><i class="fas fa-user me-2"></i>Usuario</h6>
+                                        <p class="mb-0">
+                                            ${data.registro.UsuarioNombre ?
+                                                `<span class="badge bg-info">${data.registro.UsuarioNombre}</span>` :
+                                                `<span class="badge bg-secondary">Sistema</span>`}
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <h6><i class="fas fa-cube me-2"></i>Módulo</h6>
+                                        <p class="mb-0"><span class="badge bg-primary">${data.registro.Modulo || 'General'}</span></p>
+                                    </div>
+                                    <div class="mb-3">
+                                        <h6><i class="fas fa-play me-2"></i>Acción</h6>
+                                        <p class="mb-0"><span class="badge bg-success">${data.registro.Accion}</span></p>
+                                    </div>
+                                    <div class="mb-3">
+                                        <h6><i class="fas fa-desktop me-2"></i>Dirección IP</h6>
+                                        <p class="mb-0"><span class="badge bg-dark">${data.registro.DireccionIP || 'N/A'}</span></p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <h6><i class="fas fa-align-left me-2"></i>Descripción</h6>
+                                <p class="mb-0">${data.registro.Descripcion || 'Sin descripción'}</p>
+                            </div>
+                            ${data.registro.Detalles ? `
+                            <div class="mb-3">
+                                <h6><i class="fas fa-info-circle me-2"></i>Detalles Adicionales</h6>
+                                <div class="border p-3 bg-light rounded" style="max-height: 200px; overflow-y: auto;">
+                                    <pre class="mb-0">${data.registro.Detalles}</pre>
+                                </div>
+                            </div>` : ''}
+                        `);
+                        var modal = new bootstrap.Modal(document.getElementById('detallesModal'));
+                        modal.show();
+                    } else {
+                        mostrarAlerta('Error', 'No se pudo obtener el detalle del registro.', 'error');
+                    }
+                },
+                error: function () {
+                    mostrarAlerta('Error', 'Error al cargar los detalles.', 'error');
+                }
+            });
+        }
+
+        function limpiarAuditoria() {
+            if (confirm('¿Está seguro de que desea eliminar los registros de auditoría con más de 30 días?\nEsta acción no se puede deshacer.')) {
+                $.ajax({
+                    url: '@Url.Action("LimpiarAuditoria", "Admin")',
+                    type: 'POST',
+                    data: { dias: 30 },
+                    success: function (data) {
+                        if (data.success) {
+                            mostrarAlerta('Éxito', `Se eliminaron ${data.registrosEliminados} registros.`, 'success');
+                            setTimeout(function () {
+                                location.reload();
+                            }, 2000);
+                        } else {
+                            mostrarAlerta('Error', 'No se pudieron eliminar los registros.', 'error');
+                        }
+                    },
+                    error: function () {
+                        mostrarAlerta('Error', 'Error al procesar la solicitud.', 'error');
+                    }
+                });
+            }
+        }
+
+        function mostrarAlerta(titulo, mensaje, tipo) {
+            Swal.fire({
+                title: titulo,
+                text: mensaje,
+                icon: tipo,
+                confirmButtonText: 'Aceptar'
+            });
+        }
+
+        // Función para exportar a Excel
+        function exportarExcel() {
+            window.location.href = '@Url.Action("ExportarAuditoria", "Admin")' +
+                '?modulo=' + encodeURIComponent('@ViewBag.FiltroModulo') +
+                '&accion=' + encodeURIComponent('@ViewBag.FiltroAccion') +
+                '&fechaDesde=' + encodeURIComponent('@ViewBag.FechaDesde') +
+                '&fechaHasta=' + encodeURIComponent('@ViewBag.FechaHasta');
+        }
+
+        // Configurar tooltips
+        $(document).ready(function () {
+            $('[title]').tooltip();
+        });
+    </script>
+
+    <style>
+        .shadow-custom {
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+            border: 1px solid rgba(0, 0, 0, 0.125);
+        }
+
+        .table-hover tbody tr:hover {
+            background-color: rgba(0, 123, 255, 0.05);
+            cursor: pointer;
+        }
+
+        .badge {
+            font-size: 0.85em;
+            font-weight: 500;
+        }
+
+        pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 0.9em;
+        }
+
+        .text-truncate {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+    </style>
+}

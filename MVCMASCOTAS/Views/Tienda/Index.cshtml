@@ -45,9 +45,9 @@
         {
             <div class="col-md-4 mb-4">
                 <div class="card h-100 shadow-custom">
-                    @if (producto.ImagenProducto != null)
+                    @if (producto.ImagenPrincipal != null)
                     {
-                        <img src="@MVCMASCOTAS.Helpers.ImageHelper.GetImageDataUri(producto.ImagenProducto)" class="card-img-top" style="height: 250px; object-fit: cover;" alt="@producto.NombreProducto">
+                        <img src="@MVCMASCOTAS.Helpers.ImageHelper.GetImageDataUri(producto.ImagenPrincipal)" class="card-img-top" style="height: 250px; object-fit: cover;" alt="@producto.NombreProducto">
                     }
                     else
                     {

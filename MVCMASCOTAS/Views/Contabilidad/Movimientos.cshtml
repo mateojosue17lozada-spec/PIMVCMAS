@@ -1,7 +1,301 @@
-﻿
+﻿@model IEnumerable<MVCMASCOTAS.Models.MovimientosContables>
+
 @{
-    ViewBag.Title = "Movimientos";
+    ViewBag.Title = "Movimientos Contables";
 }
 
-<h2>Movimientos</h2>
+<div class="page-header mb-4">
+    <h2><i class="fas fa-exchange-alt"></i> Movimientos Contables</h2>
+    <p class="text-muted">Registro de ingresos y egresos</p>
+</div>
 
+<div class="mb-4">
+    <a href="@Url.Action("RegistrarMovimiento", "Contabilidad")" class="btn btn-success">
+        <i class="fas fa-plus"></i> Nuevo Movimiento
+    </a>
+    <a href="@Url.Action("Dashboard", "Contabilidad")" class="btn btn-outline-secondary">
+        <i class="fas fa-arrow-left"></i> Volver al Dashboard
+    </a>
+</div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="fas fa-check-circle"></i> @TempData["SuccessMessage"]
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-circle"></i> @TempData["ErrorMessage"]
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+}
+
+<!-- Resumen de totales -->
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card text-white bg-success shadow-sm">
+            <div class="card-body text-center">
+                <h4 class="mb-0">$@ViewBag.TotalIngresos.ToString("N2")</h4>
+                <p class="mb-0"><i class="fas fa-arrow-up"></i> Total Ingresos</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-white bg-danger shadow-sm">
+            <div class="card-body text-center">
+                <h4 class="mb-0">$@ViewBag.TotalEgresos.ToString("N2")</h4>
+                <p class="mb-0"><i class="fas fa-arrow-down"></i> Total Egresos</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-white bg-primary shadow-sm">
+            <div class="card-body text-center">
+                <h4 class="mb-0">$@ViewBag.Balance.ToString("N2")</h4>
+                <p class="mb-0"><i class="fas fa-balance-scale"></i> Balance</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Filtros -->
+<div class="card mb-4 shadow-sm">
+    <div class="card-body">
+        <h5 class="card-title"><i class="fas fa-filter"></i> Filtros</h5>
+        <form method="get" action="@Url.Action("Movimientos", "Contabilidad")">
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label>Tipo de Movimiento</label>
+                        <select name="tipo" class="form-control">
+                            <option value="">Todos</option>
+                            <option value="Ingreso" @(ViewBag.TipoSeleccionado == "Ingreso" ? "selected" : "")>Ingreso</option>
+                            <option value="Egreso" @(ViewBag.TipoSeleccionado == "Egreso" ? "selected" : "")>Egreso</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label>Categoría</label>
+                        <select name="categoria" class="form-control">
+                            <option value="">Todas</option>
+                            @if (ViewBag.Categorias != null)
+                            {
+                                foreach (var cat in ViewBag.Categorias)
+                                {
+                                    <option value="@cat" @(ViewBag.CategoriaSeleccionada == cat ? "selected" : "")>@cat</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-group">
+                        <label>Fecha Desde</label>
+                        <input type="date" name="fechaDesde" class="form-control"
+                               value="@(ViewBag.FechaDesde != null ? ((DateTime)ViewBag.FechaDesde).ToString("yyyy-MM-dd") : "")" />
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-group">
+                        <label>Fecha Hasta</label>
+                        <input type="date" name="fechaHasta" class="form-control"
+                               value="@(ViewBag.FechaHasta != null ? ((DateTime)ViewBag.FechaHasta).ToString("yyyy-MM-dd") : "")" />
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-group">
+                        <label>&nbsp;</label>
+                        <button type="submit" class="btn btn-primary btn-block">
+                            <i class="fas fa-search"></i> Buscar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Tabla de movimientos -->
+<div class="card shadow-sm">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover table-striped">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Tipo</th>
+                        <th>Categoría</th>
+                        <th>Concepto</th>
+                        <th>Método Pago</th>
+                        <th class="text-right">Monto</th>
+                        <th>Responsable</th>
+                        <th class="text-center">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var mov in Model)
+                        {
+                            <tr>
+                                <td>@(mov.FechaMovimiento.HasValue ? mov.FechaMovimiento.Value.ToString("dd/MM/yyyy") : "-")</td>
+                                <td>
+                                    @if (mov.TipoMovimiento == "Ingreso")
+                                    {
+                                        <span class="badge badge-success"><i class="fas fa-arrow-up"></i> Ingreso</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge badge-danger"><i class="fas fa-arrow-down"></i> Egreso</span>
+                                    }
+                                </td>
+                                <td>@mov.Categoria</td>
+                                <td>@mov.Concepto</td>
+                                <td>
+                                    <small class="text-muted">
+                                        @if (!string.IsNullOrEmpty(mov.MetodoPago))
+                                        {
+                                            @mov.MetodoPago
+                                        }
+                                        else
+                                        {
+                                            <text>-</text>
+                                        }
+                                    </small>
+                                </td>
+                                <td class="text-right @(mov.TipoMovimiento == "Ingreso" ? "text-success font-weight-bold" : "text-danger font-weight-bold")">
+                                    @(mov.TipoMovimiento == "Ingreso" ? "+" : "-")$@mov.Monto.ToString("N2")
+                                </td>
+                                <td>
+                                    @if (mov.Usuarios != null)
+                                    {
+                                        <small>@mov.Usuarios.NombreCompleto</small>
+                                    }
+                                    else
+                                    {
+                                        <small class="text-muted">No especificado</small>
+                                    }
+                                </td>
+                                <td class="text-center">
+                                    <a href="@Url.Action("DetallesMovimiento", "Contabilidad", new { id = mov.MovimientoId })"
+                                       class="btn btn-sm btn-info" title="Ver detalles">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a href="@Url.Action("EditarMovimiento", "Contabilidad", new { id = mov.MovimientoId })"
+                                       class="btn btn-sm btn-warning" title="Editar">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="8" class="text-center text-muted">
+                                <i class="fas fa-inbox fa-3x mb-3 d-block"></i>
+                                No hay movimientos registrados con los filtros seleccionados.
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Paginación -->
+@if (ViewBag.TotalPages > 1)
+{
+    <div class="mt-4">
+        <nav aria-label="Navegación de páginas">
+            <ul class="pagination justify-content-center">
+                @if (ViewBag.CurrentPage > 1)
+                {
+                    <li class="page-item">
+                        <a class="page-link" href="@Url.Action("Movimientos", "Contabilidad",
+                            new { tipo = ViewBag.TipoSeleccionado, categoria = ViewBag.CategoriaSeleccionada,
+                                  fechaDesde = ViewBag.FechaDesde, fechaHasta = ViewBag.FechaHasta, page = ViewBag.CurrentPage - 1 })">
+                            <i class="fas fa-chevron-left"></i> Anterior
+                        </a>
+                    </li>
+                }
+
+                @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                {
+                    if (i == 1 || i == ViewBag.TotalPages || (i >= ViewBag.CurrentPage - 2 && i <= ViewBag.CurrentPage + 2))
+                    {
+                        <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                            <a class="page-link" href="@Url.Action("Movimientos", "Contabilidad",
+                                new { tipo = ViewBag.TipoSeleccionado, categoria = ViewBag.CategoriaSeleccionada,
+                                      fechaDesde = ViewBag.FechaDesde, fechaHasta = ViewBag.FechaHasta, page = i })">
+                                @i
+                            </a>
+                        </li>
+                    }
+                    else if (i == ViewBag.CurrentPage - 3 || i == ViewBag.CurrentPage + 3)
+                    {
+                        <li class="page-item disabled">
+                            <span class="page-link">...</span>
+                        </li>
+                    }
+                }
+
+                @if (ViewBag.CurrentPage < ViewBag.TotalPages)
+                {
+                    <li class="page-item">
+                        <a class="page-link" href="@Url.Action("Movimientos", "Contabilidad",
+                            new { tipo = ViewBag.TipoSeleccionado, categoria = ViewBag.CategoriaSeleccionada,
+                                  fechaDesde = ViewBag.FechaDesde, fechaHasta = ViewBag.FechaHasta, page = ViewBag.CurrentPage + 1 })">
+                            Siguiente <i class="fas fa-chevron-right"></i>
+                        </a>
+                    </li>
+                }
+            </ul>
+        </nav>
+        <p class="text-center text-muted">
+            Página @ViewBag.CurrentPage de @ViewBag.TotalPages
+        </p>
+    </div>
+}
+
+<style>
+    .shadow-sm {
+        box-shadow: 0 .125rem .25rem rgba(0,0,0,.075) !important;
+    }
+
+    .card {
+        border-radius: 8px;
+        border: none;
+    }
+
+    .table th {
+        font-weight: 600;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .page-header h2 {
+        color: #2c3e50;
+        font-weight: 600;
+    }
+
+    .badge {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.85rem;
+    }
+
+    .btn-sm {
+        margin: 0 2px;
+    }
+</style>

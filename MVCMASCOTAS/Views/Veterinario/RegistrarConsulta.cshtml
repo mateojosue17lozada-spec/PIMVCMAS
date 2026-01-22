@@ -1,7 +1,101 @@
-﻿
+﻿@model MVCMASCOTAS.Models.HistorialMedico
+
 @{
     ViewBag.Title = "RegistrarConsulta";
+    ViewBag.Title = "Registrar Consulta Veterinaria";
 }
 
 <h2>RegistrarConsulta</h2>
+<div class="page-header mb-4">
+    <h2><i class="fas fa-stethoscope"></i> Registrar Consulta Veterinaria</h2>
+</div>
 
+<div class="row">
+    <div class="col-md-8">
+        <div class="card shadow-custom">
+            <div class="card-body">
+                @using (Html.BeginForm("RegistrarConsulta", "Veterinario", FormMethod.Post))
+                {
+                    @Html.AntiForgeryToken()
+
+                    <div class="form-group">
+                        <label><i class="fas fa-paw"></i> Mascota *</label>
+                        <select name="MascotaId" class="form-control" required>
+                            <option value="">Seleccione una mascota...</option>
+                            @if (ViewBag.Mascotas != null)
+                            {
+                                foreach (var mascota in ViewBag.Mascotas)
+                                {
+                                    <option value="@mascota.MascotaId">@mascota.Nombre - @mascota.Especie</option>
+                                }
+                            }
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label><i class="fas fa-calendar"></i> Fecha de Consulta *</label>
+                        <input type="date" name="FechaConsulta" class="form-control" value="@DateTime.Now.ToString("yyyy-MM-dd")" required />
+                    </div>
+
+                    <div class="form-group">
+                        <label><i class="fas fa-weight"></i> Peso (kg):</label>
+                        <input type="number" name="Peso" class="form-control" step="0.1" min="0" />
+                    </div>
+
+                    <div class="form-group">
+                        <label><i class="fas fa-thermometer-half"></i> Temperatura (°C):</label>
+                        <input type="number" name="Temperatura" class="form-control" step="0.1" min="30" max="45" />
+                    </div>
+
+                    <div class="form-group">
+                        <label><i class="fas fa-notes-medical"></i> Motivo de Consulta *</label>
+                        <textarea name="MotivoConsulta" class="form-control" rows="3" required></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label><i class="fas fa-diagnoses"></i> Diagnóstico *</label>
+                        <textarea name="Diagnostico" class="form-control" rows="3" required></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label><i class="fas fa-pills"></i> Tratamiento *</label>
+                        <textarea name="Tratamiento" class="form-control" rows="3" required></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label><i class="fas fa-comment-medical"></i> Observaciones:</label>
+                        <textarea name="Observaciones" class="form-control" rows="2"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label><i class="fas fa-calendar-check"></i> Próxima Consulta:</label>
+                        <input type="date" name="ProximaConsulta" class="form-control" />
+                    </div>
+
+                    <button type="submit" class="btn btn-success btn-lg btn-block">
+                        <i class="fas fa-save"></i> Guardar Consulta
+                    </button>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card shadow-custom">
+            <div class="card-header bg-info text-white">
+                <h5><i class="fas fa-info-circle"></i> Información</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>Veterinario:</strong> @User.Identity.Name</p>
+                <p><strong>Fecha:</strong> @DateTime.Now.ToString("dd/MM/yyyy")</p>
+                <hr />
+                <h6>Valores de Referencia:</h6>
+                <ul class="small">
+                    <li>Temperatura normal: 38-39°C</li>
+                    <li>Frecuencia cardíaca: 60-140 lpm</li>
+                    <li>Frecuencia respiratoria: 10-30 rpm</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>

@@ -6,6 +6,7 @@ namespace MVCMASCOTAS.Models.ViewModels
     {
         [Required(ErrorMessage = "El email es requerido")]
         [EmailAddress(ErrorMessage = "Email inválido")]
+        [StringLength(150, ErrorMessage = "El email no puede exceder 150 caracteres")]
         [Display(Name = "Email")]
         public string Email { get; set; }
 

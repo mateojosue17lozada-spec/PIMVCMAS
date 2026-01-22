@@ -10,7 +10,7 @@ namespace MVCMASCOTAS.Models.ViewModels
         public string CurrentPassword { get; set; }
 
         [Required(ErrorMessage = "La nueva contraseña es requerida")]
-        [StringLength(100, ErrorMessage = "La contraseña debe tener al menos {2} caracteres", MinimumLength = 6)]
+        [StringLength(100, ErrorMessage = "La contraseña debe tener al menos {2} caracteres", MinimumLength = 8)]
         [DataType(DataType.Password)]
         [Display(Name = "Nueva Contraseña")]
         public string NewPassword { get; set; }

@@ -6,84 +6,235 @@
 
 <div class="page-header mb-4">
     <h2><i class="fas fa-file-alt"></i> Mis Solicitudes de Adopción</h2>
+    <p class="lead text-muted">Historial de tus solicitudes para adoptar una mascota</p>
 </div>
+
+<!-- Filtros -->
+@if (Model != null && Model.Any())
+{
+    <div class="card mb-4 shadow-custom">
+        <div class="card-body">
+            <form method="get" action="@Url.Action("MisSolicitudes", "Adopcion")" class="form-inline justify-content-center">
+                <div class="form-group mx-2 mb-2">
+                    <label class="mr-2">Filtrar por:</label>
+                    <select name="estado" class="form-control" onchange="this.form.submit()">
+                        <option value="Todos" @(ViewBag.EstadoFiltro == "Todos" || string.IsNullOrEmpty(ViewBag.EstadoFiltro) ? "selected" : "")>Todos los estados</option>
+                        <option value="Pendiente" @(ViewBag.EstadoFiltro == "Pendiente" ? "selected" : "")>Pendientes</option>
+                        <option value="En evaluación" @(ViewBag.EstadoFiltro == "En evaluación" ? "selected" : "")>En evaluación</option>
+                        <option value="Aprobada" @(ViewBag.EstadoFiltro == "Aprobada" ? "selected" : "")>Aprobadas</option>
+                        <option value="Rechazada" @(ViewBag.EstadoFiltro == "Rechazada" ? "selected" : "")>Rechazadas</option>
+                        <option value="Cancelada" @(ViewBag.EstadoFiltro == "Cancelada" ? "selected" : "")>Canceladas</option>
+                    </select>
+                </div>
+                <div class="form-group mx-2 mb-2">
+                    <input type="month" name="mes" class="form-control" value="@ViewBag.MesFiltro" onchange="this.form.submit()" />
+                </div>
+                <a href="@Url.Action("MisSolicitudes", "Adopcion")" class="btn btn-outline-secondary mb-2">
+                    <i class="fas fa-times"></i> Limpiar filtros
+                </a>
+            </form>
+        </div>
+    </div>
+}
 
 @if (Model != null && Model.Any())
 {
     foreach (var solicitud in Model)
     {
         <div class="card mb-4 shadow-custom">
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-3">
-                        @if (solicitud.Mascotas.ImagenPrincipal != null)
+            <div class="card-header d-flex justify-content-between align-items-center bg-light">
+                <div>
+                    <h5 class="mb-0">
+                        <i class="fas fa-file-contract text-primary"></i> Solicitud #@solicitud.SolicitudId
+                    </h5>
+                    <small class="text-muted">
+                        <i class="fas fa-calendar"></i> @solicitud.FechaSolicitud?.ToString("dd/MM/yyyy HH:mm")
+                    </small>
+                </div>
+                <div>
+                    <span class="badge badge-pill @(solicitud.Estado == "Aprobada" ? "badge-success" :
+                                                    solicitud.Estado == "Rechazada" ? "badge-danger" :
+                                                    solicitud.Estado == "En evaluación" ? "badge-warning" :
+                                                    solicitud.Estado == "Pendiente" ? "badge-info" :
+                                                    "badge-secondary") p-2">
+                        @if (solicitud.Estado == "Aprobada")
                         {
-                            <img src="@MVCMASCOTAS.Helpers.ImageHelper.GetImageDataUri(solicitud.Mascotas.ImagenPrincipal)" class="img-fluid rounded" alt="@solicitud.Mascotas.Nombre">
+                            <i class="fas fa-check-circle"></i>
+                        }
+                        else if (solicitud.Estado == "Rechazada")
+                        {
+                            <i class="fas fa-times-circle"></i>
+                        }
+                        else if (solicitud.Estado == "En evaluación")
+                        {
+                            <i class="fas fa-clock"></i>
                         }
                         else
                         {
-                            <img src="~/Content/images/no-image.png" class="img-fluid rounded" alt="Sin imagen">
+                            <i class="fas fa-hourglass-half"></i>
                         }
-                    </div>
-                    <div class="col-md-9">
-                        <h4>@solicitud.Mascotas.Nombre</h4>
-                        <p class="text-muted">@solicitud.Mascotas.Especie - @solicitud.Mascotas.Raza</p>
+                        @solicitud.Estado
+                    </span>
 
-                        <div class="row mt-3">
-                            <div class="col-md-6">
-                                <p><strong><i class="fas fa-calendar"></i> Fecha de Solicitud:</strong> @solicitud.FechaSolicitud.ToString("dd/MM/yyyy")</p>
-                                <p>
-                                    <strong><i class="fas fa-info-circle"></i> Estado:</strong>
-                                    @switch (solicitud.Estado)
-                                    {
-                                        case "Pendiente":
-                                            <span class="badge badge-warning">Pendiente</span>
-                                            break;
-                                        case "En evaluación":
-                                            <span class="badge badge-info">En Evaluación</span>
-                                            break;
-                                        case "Aprobada":
-                                            <span class="badge badge-success">Aprobada</span>
-                                            break;
-                                        case "Rechazada":
-                                            <span class="badge badge-danger">Rechazada</span>
-                                            break;
-                                        default:
-                                            <span class="badge badge-secondary">@solicitud.Estado</span>
-                                            break;
-                                    }
-                                </p>
+                    @if (!string.IsNullOrEmpty(solicitud.ResultadoEvaluacion))
+                    {
+                        <span class="badge badge-pill badge-light p-2 ml-1">
+                            <i class="fas fa-star text-warning"></i> @solicitud.ResultadoEvaluacion
+                        </span>
+                    }
+                </div>
+            </div>
+
+            <div class="card-body">
+                <div class="row">
+                    <!-- Imagen de la mascota -->
+                    <div class="col-md-3">
+                        <div class="text-center">
+                            @if (solicitud.Mascotas?.ImagenPrincipal != null && solicitud.Mascotas.ImagenPrincipal.Length > 0)
+                            {
+                                <img src="data:image/jpeg;base64,@Convert.ToBase64String(solicitud.Mascotas.ImagenPrincipal)"
+                                     class="img-fluid rounded shadow-sm mb-3"
+                                     alt="@solicitud.Mascotas.Nombre"
+                                     style="max-height: 200px; object-fit: cover;" />
+                            }
+                            else
+                            {
+                                <div class="bg-light rounded d-flex align-items-center justify-content-center mb-3"
+                                     style="height: 200px;">
+                                    <i class="fas fa-paw fa-3x text-muted"></i>
+                                </div>
+                            }
+
+                            <div class="small text-center">
+                                <strong>@(solicitud.Mascotas?.Nombre ?? "Mascota no disponible")</strong>
+                                <div class="text-muted">
+                                    @(solicitud.Mascotas?.Especie ?? "") @(solicitud.Mascotas?.Raza != null ? "• " + solicitud.Mascotas.Raza : "")
+                                </div>
                             </div>
+                        </div>
+                    </div>
+
+                    <!-- Información de la solicitud -->
+                    <div class="col-md-9">
+                        <div class="row">
                             <div class="col-md-6">
-                                @if (solicitud.PuntajeEvaluacion.HasValue)
-                                {
-                                    <p><strong><i class="fas fa-star"></i> Puntaje:</strong> @solicitud.PuntajeEvaluacion.Value / 100</p>
-                                }
-                                @if (solicitud.FechaAprobacion.HasValue)
-                                {
-                                    <p><strong><i class="fas fa-check"></i> Aprobada:</strong> @solicitud.FechaAprobacion.Value.ToString("dd/MM/yyyy")</p>
-                                }
-                                @if (solicitud.FechaRespuesta.HasValue && solicitud.Estado == "Rechazada")
-                                {
-                                    <p><strong><i class="fas fa-times"></i> Rechazada:</strong> @solicitud.FechaRespuesta.Value.ToString("dd/MM/yyyy")</p>
-                                }
+                                <div class="mb-3">
+                                    <h6><i class="fas fa-info-circle text-primary"></i> Información de la Mascota</h6>
+                                    <ul class="list-unstyled">
+                                        <li><strong>Especie:</strong> @(solicitud.Mascotas?.Especie ?? "N/A")</li>
+                                        <li><strong>Raza:</strong> @(solicitud.Mascotas?.Raza ?? "Mestizo")</li>
+                                        <li><strong>Edad:</strong> @(solicitud.Mascotas?.EdadAproximada ?? "N/A")</li>
+                                        <li><strong>Sexo:</strong> @(solicitud.Mascotas?.Sexo == "M" ? "Macho" : "Hembra")</li>
+                                        <li><strong>Tamaño:</strong> @(solicitud.Mascotas?.Tamanio ?? "N/A")</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <h6><i class="fas fa-chart-bar text-success"></i> Información de Evaluación</h6>
+                                    <ul class="list-unstyled">
+                                        <li><strong>Fecha solicitud:</strong> @(solicitud.FechaSolicitud?.ToString("dd/MM/yyyy") ?? "N/A")</li>
+
+                                        @if (solicitud.FechaEvaluacion.HasValue)
+                                        {
+                                            <li><strong>Fecha evaluación:</strong> @solicitud.FechaEvaluacion.Value.ToString("dd/MM/yyyy")</li>
+                                        }
+
+                                        @if (solicitud.PuntajeEvaluacion.HasValue)
+                                        {
+                                            <li>
+                                                <strong>Puntaje:</strong>
+                                                <span class="badge @(solicitud.PuntajeEvaluacion >= 80 ? "badge-success" :
+                                                                    solicitud.PuntajeEvaluacion >= 60 ? "badge-warning" :
+                                                                    "badge-danger")">
+                                                    @solicitud.PuntajeEvaluacion.Value / 100
+                                                </span>
+                                            </li>
+                                        }
+
+                                        @if (solicitud.FechaRespuesta.HasValue)
+                                        {
+                                            <li><strong>Fecha respuesta:</strong> @solicitud.FechaRespuesta.Value.ToString("dd/MM/yyyy")</li>
+                                        }
+                                    </ul>
+                                </div>
                             </div>
                         </div>
 
-                        @if (!string.IsNullOrEmpty(solicitud.ObservacionesEvaluador))
+                        <!-- Observaciones y mensajes -->
+                        @if (!string.IsNullOrEmpty(solicitud.Observaciones))
                         {
-                            <div class="alert alert-info mt-3">
-                                <strong><i class="fas fa-comment"></i> Observaciones del Evaluador:</strong><br />
-                                @solicitud.ObservacionesEvaluador
+                            <div class="alert @(solicitud.Estado == "Aprobada" ? "alert-success" :
+                                                solicitud.Estado == "Rechazada" ? "alert-danger" :
+                                                "alert-info") mt-3">
+                                <h6 class="alert-heading">
+                                    <i class="fas @(solicitud.Estado == "Aprobada" ? "fa-check-circle" :
+                                                    solicitud.Estado == "Rechazada" ? "fa-exclamation-circle" :
+                                                    "fa-info-circle")"></i>
+                                    @(solicitud.Estado == "Aprobada" ? "¡Felicidades!" :
+                                      solicitud.Estado == "Rechazada" ? "Información importante" :
+                                      "Observaciones")
+                                </h6>
+                                <p class="mb-0">@solicitud.Observaciones</p>
                             </div>
                         }
 
-                        @if (solicitud.Estado == "Aprobada")
+                        @if (!string.IsNullOrEmpty(solicitud.MotivoRechazo))
                         {
-                            <div class="alert alert-success mt-3">
-                                <i class="fas fa-check-circle"></i> ¡Felicitaciones! Tu solicitud ha sido aprobada. Nos pondremos en contacto contigo pronto para coordinar la entrega.
+                            <div class="alert alert-warning mt-3">
+                                <h6 class="alert-heading">
+                                    <i class="fas fa-exclamation-triangle"></i> Motivo de Rechazo
+                                </h6>
+                                <p class="mb-0">@solicitud.MotivoRechazo</p>
                             </div>
                         }
+
+                        <!-- Información del evaluador -->
+                        @if (solicitud.EvaluadoPor.HasValue)
+                        {
+                            <div class="small text-muted mt-3">
+                                <i class="fas fa-user-check"></i> Evaluado por: #@solicitud.EvaluadoPor.Value
+                            </div>
+                        }
+
+                        <!-- Botones de acción -->
+                        <div class="mt-4 pt-3 border-top">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <a href="@Url.Action("DetallesMascota", "Mascotas", new { id = solicitud.MascotaId })"
+                                       class="btn btn-outline-primary btn-sm">
+                                        <i class="fas fa-eye"></i> Ver Mascota
+                                    </a>
+
+                                    @if (solicitud.Estado == "Pendiente" || solicitud.Estado == "En evaluación")
+                                    {
+                                        <button type="button" class="btn btn-outline-danger btn-sm ml-2"
+                                                data-toggle="modal" data-target="#cancelarSolicitudModal"
+                                                data-solicitudid="@solicitud.SolicitudId"
+                                                data-mascotanombre="@solicitud.Mascotas?.Nombre">
+                                            <i class="fas fa-times"></i> Cancelar Solicitud
+                                        </button>
+                                    }
+                                </div>
+
+                                <div class="col-md-6 text-right">
+                                    @if (solicitud.Estado == "Aprobada")
+                                    {
+                                        <div class="alert alert-success d-inline-block mb-0 py-2">
+                                            <i class="fas fa-check-circle"></i>
+                                            <strong>¡Aprobada!</strong> Pronto nos pondremos en contacto contigo.
+                                        </div>
+                                    }
+                                    else if (solicitud.Estado == "Rechazada")
+                                    {
+                                        <a href="@Url.Action("Index", "Mascotas")" class="btn btn-primary btn-sm">
+                                            <i class="fas fa-paw"></i> Buscar otra mascota
+                                        </a>
+                                    }
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -96,10 +247,149 @@ else
         <div class="card-body text-center py-5">
             <i class="fas fa-folder-open fa-5x text-muted mb-3"></i>
             <h4>No tienes solicitudes de adopción</h4>
-            <p class="text-muted">¿Qué esperas para darle un hogar a un animal necesitado?</p>
+            <p class="text-muted mb-4">¿Qué esperas para darle un hogar a un animal necesitado?</p>
             <a href="@Url.Action("Index", "Mascotas")" class="btn btn-primary btn-lg">
                 <i class="fas fa-paw"></i> Ver Mascotas Disponibles
             </a>
         </div>
     </div>
+}
+
+<!-- Paginación -->
+@if (ViewBag.TotalPages != null && ViewBag.TotalPages > 1)
+{
+    <nav aria-label="Paginación" class="mt-4">
+        <ul class="pagination justify-content-center">
+            @if (ViewBag.CurrentPage > 1)
+            {
+                <li class="page-item">
+                    <a class="page-link" href="@Url.Action("MisSolicitudes", "Adopcion", new {
+                        page = ViewBag.CurrentPage - 1,
+                        estado = ViewBag.EstadoFiltro,
+                        mes = ViewBag.MesFiltro
+                    })">
+                        <i class="fas fa-chevron-left"></i> Anterior
+                    </a>
+                </li>
+            }
+
+            @for (int i = 1; i <= ViewBag.TotalPages; i++)
+            {
+                <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                    <a class="page-link" href="@Url.Action("MisSolicitudes", "Adopcion", new {
+                        page = i,
+                        estado = ViewBag.EstadoFiltro,
+                        mes = ViewBag.MesFiltro
+                    })">@i</a>
+                </li>
+            }
+
+            @if (ViewBag.CurrentPage < ViewBag.TotalPages)
+            {
+                <li class="page-item">
+                    <a class="page-link" href="@Url.Action("MisSolicitudes", "Adopcion", new {
+                        page = ViewBag.CurrentPage + 1,
+                        estado = ViewBag.EstadoFiltro,
+                        mes = ViewBag.MesFiltro
+                    })">
+                        Siguiente <i class="fas fa-chevron-right"></i>
+                    </a>
+                </li>
+            }
+        </ul>
+    </nav>
+}
+
+<!-- Modal para cancelar solicitud -->
+<div class="modal fade" id="cancelarSolicitudModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            @using (Html.BeginForm("CancelarSolicitud", "Adopcion", FormMethod.Post))
+            {
+                @Html.AntiForgeryToken()
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title">
+                        <i class="fas fa-exclamation-triangle"></i> Cancelar Solicitud
+                    </h5>
+                    <button type="button" class="close text-white" data-dismiss="modal">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="solicitudId" id="cancelarSolicitudId" />
+                    <p>¿Está seguro que desea cancelar la solicitud para adoptar a <strong id="cancelarMascotaNombre"></strong>?</p>
+                    <div class="form-group">
+                        <label for="motivoCancelacion">Motivo de cancelación:</label>
+                        <textarea class="form-control" name="motivoCancelacion" rows="3" required
+                                  placeholder="Por favor, indique el motivo de la cancelación"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                        <i class="fas fa-times"></i> No cancelar
+                    </button>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-check"></i> Sí, cancelar solicitud
+                    </button>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        .shadow-custom {
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(0,0,0,.125);
+            transition: transform 0.2s ease;
+        }
+
+            .shadow-custom:hover {
+                transform: translateY(-2px);
+            }
+
+        .card-header.bg-light {
+            background-color: #f8f9fa !important;
+        }
+
+        .badge-pill {
+            font-size: 0.9em;
+        }
+    </style>
+}
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // Modal para cancelar solicitud
+            $('#cancelarSolicitudModal').on('show.bs.modal', function (event) {
+                var button = $(event.relatedTarget);
+                var solicitudId = button.data('solicitudid');
+                var mascotaNombre = button.data('mascotanombre') || 'la mascota';
+
+                var modal = $(this);
+                modal.find('#cancelarSolicitudId').val(solicitudId);
+                modal.find('#cancelarMascotaNombre').text(mascotaNombre);
+            });
+
+            // Validación de formulario de cancelación
+            $('form[name="cancelarSolicitudForm"]').submit(function (e) {
+                var motivo = $(this).find('textarea[name="motivoCancelacion"]').val().trim();
+                if (motivo === '') {
+                    e.preventDefault();
+                    alert('Por favor, ingrese un motivo para la cancelación.');
+                    return false;
+                }
+                return true;
+            });
+
+            // Configurar fechas en inputs month
+            var mesInput = $('input[name="mes"]');
+            if (!mesInput.val()) {
+                var now = new Date();
+                mesInput.val(now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0'));
+            }
+        });
+    </script>
 }

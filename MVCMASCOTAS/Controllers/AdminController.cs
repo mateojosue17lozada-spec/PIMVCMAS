@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Data.Entity;
 using System.Linq;
+using System.Web;
 using System.Web.Mvc;
+using System.ComponentModel.DataAnnotations;
+using System.Collections.Generic;
 using MVCMASCOTAS.Helpers;
 using MVCMASCOTAS.Models;
 using MVCMASCOTAS.Models.ViewModels;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 
 namespace MVCMASCOTAS.Controllers
 {
@@ -22,7 +23,7 @@ namespace MVCMASCOTAS.Controllers
             {
                 var viewModel = new DashboardViewModel
                 {
-                    // 1. ESTADÍSTICAS DE MASCOTAS - CORREGIDO: Activo puede ser NULL
+                    // 1. ESTADÍSTICAS DE MASCOTAS
                     TotalMascotas = db.Mascotas.Count(m => m.Activo == true),
                     MascotasDisponibles = db.Mascotas.Count(m =>
                         m.Estado == "Disponible para adopción" && m.Activo == true),
@@ -54,7 +55,7 @@ namespace MVCMASCOTAS.Controllers
                                    d.FechaDonacion.Value.Year == DateTime.Now.Year)
                         .Sum(d => (decimal?)d.Monto) ?? 0,
 
-                    // 4. VOLUNTARIADO (Usuarios con rol Voluntario y activos)
+                    // 4. VOLUNTARIADO
                     VoluntariosActivos = db.UsuariosRoles
                         .Count(ur => ur.Roles.NombreRol == "Voluntario" &&
                                    ur.Usuarios.Activo == true),
@@ -62,7 +63,7 @@ namespace MVCMASCOTAS.Controllers
                     // 5. APADRINAMIENTOS
                     ApadrinamientosActivos = db.Apadrinamientos.Count(a => a.Estado == "Activo"),
 
-                    // 6. TIENDA - CORREGIDO: Activo puede ser NULL
+                    // 6. TIENDA
                     ProductosDisponibles = db.Productos.Count(p => p.Stock > 0 && p.Activo == true),
                     ProductosBajoStock = db.Productos.Count(p => p.Stock > 0 && p.Stock <= p.StockMinimo),
                     PedidosPendientes = db.Pedidos.Count(p => p.Estado == "Confirmado"),
@@ -87,7 +88,7 @@ namespace MVCMASCOTAS.Controllers
                 // Calcular Balance
                 viewModel.BalanceMes = viewModel.IngresosMes - viewModel.EgresosMes;
 
-                // 9. ACTIVIDADES RECIENTES - Auditoría
+                // 9. ACTIVIDADES RECIENTES
                 ViewBag.ActividadesRecientes = db.AuditoriaAcciones
                     .OrderByDescending(a => a.FechaAccion)
                     .Take(10)
@@ -130,10 +131,24 @@ namespace MVCMASCOTAS.Controllers
         }
 
         // GET: Admin/Usuarios
-        public ActionResult Usuarios(string rol, string buscar, int page = 1)
+        public ActionResult Usuarios(string rol = "Todos", string activo = "Todos", string buscar = "", int page = 1)
         {
-            int pageSize = 20;
-            var query = db.Usuarios.Where(u => u.Activo == true);
+            int pageSize = 10;
+            IQueryable<Usuarios> query = db.Usuarios
+                .Include(u => u.UsuariosRoles.Select(ur => ur.Roles));
+
+            // Filtro por rol
+            if (!string.IsNullOrEmpty(rol) && rol != "Todos")
+            {
+                query = query.Where(u => u.UsuariosRoles.Any(ur => ur.Roles.NombreRol == rol));
+            }
+
+            // Filtro por estado activo
+            if (!string.IsNullOrEmpty(activo) && activo != "Todos")
+            {
+                bool esActivo = activo == "true";
+                query = query.Where(u => u.Activo == esActivo);
+            }
 
             // Filtro por búsqueda
             if (!string.IsNullOrEmpty(buscar))
@@ -141,12 +156,6 @@ namespace MVCMASCOTAS.Controllers
                 query = query.Where(u => u.NombreCompleto.Contains(buscar) ||
                                         u.Email.Contains(buscar) ||
                                         u.Cedula.Contains(buscar));
-            }
-
-            // Filtro por rol
-            if (!string.IsNullOrEmpty(rol) && rol != "Todos")
-            {
-                query = query.Where(u => u.UsuariosRoles.Any(ur => ur.Roles.NombreRol == rol));
             }
 
             int totalItems = query.Count();
@@ -158,112 +167,340 @@ namespace MVCMASCOTAS.Controllers
                 .Take(pageSize)
                 .ToList();
 
-            ViewBag.Roles = db.Roles.OrderBy(r => r.NombreRol).ToList();
-            ViewBag.RolSeleccionado = rol;
-            ViewBag.Buscar = buscar;
+            // Calcular estadísticas
+            ViewBag.TotalUsuarios = db.Usuarios.Count();
+            ViewBag.UsuariosActivos = db.Usuarios.Count(u => u.Activo == true);
+            ViewBag.TotalAdministradores = db.UsuariosRoles.Count(ur => ur.Roles.NombreRol == "Administrador" && ur.Usuarios.Activo == true);
+            ViewBag.TotalVeterinarios = db.UsuariosRoles.Count(ur => ur.Roles.NombreRol == "Veterinario" && ur.Usuarios.Activo == true);
+
+            // Pasar filtros a la vista
+            ViewBag.FiltroRol = rol;
+            ViewBag.FiltroActivo = activo;
+            ViewBag.FiltroBuscar = buscar;
             ViewBag.CurrentPage = page;
             ViewBag.TotalPages = totalPages;
+            ViewBag.TotalItems = totalItems;
 
             return View(usuarios);
+        }
+
+        // GET: Admin/CrearUsuario
+        public ActionResult CrearUsuario()
+        {
+            ViewBag.Roles = db.Roles.OrderBy(r => r.NombreRol).ToList();
+            return View();
+        }
+
+        // POST: Admin/CrearUsuario
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult CrearUsuario(RegistroUsuarioViewModel model, int[] rolesSeleccionados)
+        {
+            if (ModelState.IsValid)
+            {
+                // Verificar si el email ya existe
+                if (db.Usuarios.Any(u => u.Email == model.Email))
+                {
+                    ModelState.AddModelError("Email", "Este email ya está registrado.");
+                    ViewBag.Roles = db.Roles.OrderBy(r => r.NombreRol).ToList();
+                    return View(model);
+                }
+
+                // Verificar si la cédula ya existe
+                if (!string.IsNullOrEmpty(model.Cedula) && db.Usuarios.Any(u => u.Cedula == model.Cedula))
+                {
+                    ModelState.AddModelError("Cedula", "Esta cédula ya está registrada.");
+                    ViewBag.Roles = db.Roles.OrderBy(r => r.NombreRol).ToList();
+                    return View(model);
+                }
+
+                // Generar salt y hash de contraseña
+                string salt = PasswordHelper.GenerateSalt();
+                string passwordHash = PasswordHelper.HashPassword(model.Password, salt);
+
+                byte[] imagenBytes = null;
+                if (model.ImagenPerfil != null && model.ImagenPerfil.ContentLength > 0)
+                {
+                    if (!ImageHelper.IsValidImage(model.ImagenPerfil))
+                    {
+                        ModelState.AddModelError("ImagenPerfil", "Formato de imagen inválido.");
+                        ViewBag.Roles = db.Roles.OrderBy(r => r.NombreRol).ToList();
+                        return View(model);
+                    }
+
+                    imagenBytes = ImageHelper.ConvertImageToByteArray(model.ImagenPerfil);
+                    imagenBytes = ImageHelper.ResizeImage(imagenBytes, 400, 400);
+                }
+
+                // Crear usuario
+                var usuario = new Usuarios
+                {
+                    NombreCompleto = model.NombreCompleto,
+                    Email = model.Email,
+                    Telefono = model.Telefono,
+                    Cedula = model.Cedula,
+                    Direccion = model.Direccion,
+                    Ciudad = model.Ciudad,
+                    Provincia = model.Provincia,
+                    PasswordHash = passwordHash,
+                    Salt = salt,
+                    ImagenPerfil = imagenBytes,
+                    FechaRegistro = DateTime.Now,
+                    Activo = true,
+                    EmailConfirmado = true,
+                    TelefonoConfirmado = true
+                };
+
+                try
+                {
+                    db.Usuarios.Add(usuario);
+                    db.SaveChanges();
+
+                    // Asignar roles seleccionados
+                    if (rolesSeleccionados != null && rolesSeleccionados.Length > 0)
+                    {
+                        foreach (var rolId in rolesSeleccionados)
+                        {
+                            db.UsuariosRoles.Add(new UsuariosRoles
+                            {
+                                UsuarioId = usuario.UsuarioId,
+                                RolId = rolId,
+                                FechaAsignacion = DateTime.Now,
+                                AsignadoPor = ObtenerUsuarioActualId()
+                            });
+                        }
+                        db.SaveChanges();
+                    }
+
+                    // Auditoría
+                    AuditoriaHelper.RegistrarAccion("Crear Usuario", "Admin",
+                        $"Usuario creado: {usuario.Email}", ObtenerUsuarioActualId() ?? 0);
+
+                    TempData["SuccessMessage"] = "Usuario creado exitosamente.";
+                    return RedirectToAction("Usuarios");
+                }
+                catch (Exception ex)
+                {
+                    ModelState.AddModelError("", "Error al crear usuario: " + ex.Message);
+                }
+            }
+
+            ViewBag.Roles = db.Roles.OrderBy(r => r.NombreRol).ToList();
+            return View(model);
+        }
+
+        // GET: Admin/VerUsuario/5
+        public ActionResult VerUsuario(int id)
+        {
+            var usuario = db.Usuarios
+                .Include(u => u.UsuariosRoles.Select(ur => ur.Roles))
+                .FirstOrDefault(u => u.UsuarioId == id);
+
+            if (usuario == null)
+            {
+                return HttpNotFound();
+            }
+
+            ViewBag.RolesUsuario = usuario.UsuariosRoles.Select(ur => ur.Roles.NombreRol).ToList();
+            ViewBag.ImagenBase64 = usuario.ImagenPerfil != null ?
+                ImageHelper.GetImageDataUri(usuario.ImagenPerfil) : null;
+
+            return View(usuario);
         }
 
         // GET: Admin/EditarUsuario/5
         public ActionResult EditarUsuario(int id)
         {
-            var usuario = db.Usuarios.Find(id);
+            var usuario = db.Usuarios
+                .Include(u => u.UsuariosRoles)
+                .FirstOrDefault(u => u.UsuarioId == id);
 
             if (usuario == null)
             {
                 return HttpNotFound();
             }
 
-            ViewBag.TodosLosRoles = db.Roles.OrderBy(r => r.NombreRol).ToList();
-            ViewBag.RolesDelUsuario = db.UsuariosRoles
-                .Where(ur => ur.UsuarioId == id)
-                .Select(ur => ur.RolId)
-                .ToList();
+            var model = new EditarUsuarioViewModel
+            {
+                UsuarioId = usuario.UsuarioId,
+                NombreCompleto = usuario.NombreCompleto,
+                Email = usuario.Email,
+                Telefono = usuario.Telefono,
+                Cedula = usuario.Cedula,
+                Direccion = usuario.Direccion,
+                Ciudad = usuario.Ciudad,
+                Provincia = usuario.Provincia,
+                Activo = usuario.Activo ?? true,
+                EmailConfirmado = usuario.EmailConfirmado ?? false,
+                TelefonoConfirmado = usuario.TelefonoConfirmado ?? false
+            };
 
-            ViewBag.ImagenBase64 = usuario.ImagenPerfil != null
-                ? ImageHelper.GetImageDataUri(usuario.ImagenPerfil)
-                : null;
+            if (usuario.ImagenPerfil != null)
+            {
+                model.ImagenPerfilBase64 = ImageHelper.GetImageDataUri(usuario.ImagenPerfil);
+            }
 
-            return View(usuario);
+            ViewBag.Roles = db.Roles.OrderBy(r => r.NombreRol).ToList();
+            ViewBag.RolesSeleccionados = usuario.UsuariosRoles.Select(ur => ur.RolId).ToList();
+
+            return View(model);
         }
 
-        // POST: Admin/ActualizarRolesUsuario
+        // POST: Admin/EditarUsuario
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult ActualizarRolesUsuario(int usuarioId, int[] rolesSeleccionados)
+        public ActionResult EditarUsuario(EditarUsuarioViewModel model, int[] rolesSeleccionados)
         {
-            var usuario = db.Usuarios.Find(usuarioId);
-
-            if (usuario == null)
+            if (ModelState.IsValid)
             {
-                return HttpNotFound();
-            }
-
-            // Eliminar roles existentes
-            var rolesActuales = db.UsuariosRoles.Where(ur => ur.UsuarioId == usuarioId).ToList();
-            db.UsuariosRoles.RemoveRange(rolesActuales);
-
-            // Agregar nuevos roles
-            if (rolesSeleccionados != null)
-            {
-                foreach (var rolId in rolesSeleccionados)
+                var usuario = db.Usuarios.Find(model.UsuarioId);
+                if (usuario == null)
                 {
-                    db.UsuariosRoles.Add(new UsuariosRoles
+                    return HttpNotFound();
+                }
+
+                // Actualizar datos básicos
+                usuario.NombreCompleto = model.NombreCompleto;
+                usuario.Telefono = model.Telefono;
+                usuario.Direccion = model.Direccion;
+                usuario.Ciudad = model.Ciudad;
+                usuario.Provincia = model.Provincia;
+                usuario.Activo = model.Activo;
+                usuario.EmailConfirmado = model.EmailConfirmado;
+                usuario.TelefonoConfirmado = model.TelefonoConfirmado;
+
+                // Actualizar imagen si se proporciona
+                if (model.NuevaImagenPerfil != null && model.NuevaImagenPerfil.ContentLength > 0)
+                {
+                    if (!ImageHelper.IsValidImage(model.NuevaImagenPerfil))
                     {
-                        UsuarioId = usuarioId,
-                        RolId = rolId,
-                        FechaAsignacion = DateTime.Now,
-                        AsignadoPor = ObtenerUsuarioActualId()
-                    });
+                        ModelState.AddModelError("NuevaImagenPerfil", "Formato de imagen inválido.");
+                        ViewBag.Roles = db.Roles.OrderBy(r => r.NombreRol).ToList();
+                        ViewBag.RolesSeleccionados = rolesSeleccionados;
+                        return View(model);
+                    }
+
+                    byte[] imagenBytes = ImageHelper.ConvertImageToByteArray(model.NuevaImagenPerfil);
+                    imagenBytes = ImageHelper.ResizeImage(imagenBytes, 400, 400);
+                    usuario.ImagenPerfil = imagenBytes;
+                }
+
+                // Actualizar roles
+                var rolesActuales = db.UsuariosRoles.Where(ur => ur.UsuarioId == model.UsuarioId).ToList();
+                db.UsuariosRoles.RemoveRange(rolesActuales);
+
+                if (rolesSeleccionados != null)
+                {
+                    foreach (var rolId in rolesSeleccionados)
+                    {
+                        db.UsuariosRoles.Add(new UsuariosRoles
+                        {
+                            UsuarioId = model.UsuarioId,
+                            RolId = rolId,
+                            FechaAsignacion = DateTime.Now,
+                            AsignadoPor = ObtenerUsuarioActualId()
+                        });
+                    }
+                }
+
+                try
+                {
+                    db.SaveChanges();
+
+                    AuditoriaHelper.RegistrarAccion("Editar Usuario", "Admin",
+                        $"Usuario editado: {usuario.Email}", ObtenerUsuarioActualId() ?? 0);
+
+                    TempData["SuccessMessage"] = "Usuario actualizado exitosamente.";
+                    return RedirectToAction("Usuarios");
+                }
+                catch (Exception ex)
+                {
+                    ModelState.AddModelError("", "Error al actualizar usuario: " + ex.Message);
                 }
             }
 
-            db.SaveChanges();
-
-            var usuarioActual = db.Usuarios.FirstOrDefault(u => u.Email == User.Identity.Name);
-            if (usuarioActual != null)
-            {
-                AuditoriaHelper.RegistrarAccion("Actualizar Roles", "Admin",
-                    $"Usuario ID: {usuarioId}, Roles: {rolesSeleccionados?.Length ?? 0}", usuarioActual.UsuarioId);
-            }
-
-            TempData["SuccessMessage"] = "Roles actualizados exitosamente";
-            return RedirectToAction("EditarUsuario", new { id = usuarioId });
+            ViewBag.Roles = db.Roles.OrderBy(r => r.NombreRol).ToList();
+            ViewBag.RolesSeleccionados = rolesSeleccionados;
+            return View(model);
         }
 
-        // POST: Admin/DesactivarUsuario
+        // POST: Admin/ToggleUsuario/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult DesactivarUsuario(int id)
+        public ActionResult ToggleUsuario(int id)
         {
             var usuario = db.Usuarios.Find(id);
-
             if (usuario == null)
             {
                 return HttpNotFound();
             }
 
-            usuario.Activo = false;
-            db.SaveChanges();
+            // Cambiar estado
+            usuario.Activo = !(usuario.Activo ?? true);
 
-            var usuarioActual = db.Usuarios.FirstOrDefault(u => u.Email == User.Identity.Name);
-            if (usuarioActual != null)
+            // Si está siendo activado, asegurar que EmailConfirmado y TelefonoConfirmado sean true
+            if (usuario.Activo == true)
             {
-                AuditoriaHelper.RegistrarAccion("Desactivar Usuario", "Admin",
-                    $"Usuario: {usuario.Email}", usuarioActual.UsuarioId);
+                usuario.EmailConfirmado = true;
+                usuario.TelefonoConfirmado = true;
             }
 
-            TempData["SuccessMessage"] = "Usuario desactivado exitosamente";
+            try
+            {
+                db.SaveChanges();
+
+                string accion = usuario.Activo == true ? "Activado" : "Desactivado";
+                AuditoriaHelper.RegistrarAccion($"{accion} Usuario", "Admin",
+                    $"Usuario {accion.ToLower()}: {usuario.Email}", ObtenerUsuarioActualId() ?? 0);
+
+                TempData["SuccessMessage"] = $"Usuario {accion.ToLower()} exitosamente.";
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"Error al cambiar estado del usuario: {ex.Message}";
+            }
+
+            return RedirectToAction("Usuarios");
+        }
+
+        // POST: Admin/EliminarUsuario/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult EliminarUsuario(int id)
+        {
+            var usuario = db.Usuarios.Find(id);
+            if (usuario == null)
+            {
+                return HttpNotFound();
+            }
+
+            try
+            {
+                // Primero eliminar roles asociados
+                var roles = db.UsuariosRoles.Where(ur => ur.UsuarioId == id).ToList();
+                db.UsuariosRoles.RemoveRange(roles);
+
+                // Luego eliminar usuario
+                db.Usuarios.Remove(usuario);
+                db.SaveChanges();
+
+                AuditoriaHelper.RegistrarAccion("Eliminar Usuario", "Admin",
+                    $"Usuario eliminado: {usuario.Email}", ObtenerUsuarioActualId() ?? 0);
+
+                TempData["SuccessMessage"] = "Usuario eliminado exitosamente.";
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"Error al eliminar usuario: {ex.Message}";
+            }
+
             return RedirectToAction("Usuarios");
         }
 
         // GET: Admin/SolicitudesAdopcion
         public ActionResult SolicitudesAdopcion(string estado, int page = 1)
         {
-            int pageSize = 20;
+            int pageSize = 10;
             var query = db.SolicitudAdopcion.AsQueryable();
 
             if (!string.IsNullOrEmpty(estado) && estado != "Todos")
@@ -285,6 +522,7 @@ namespace MVCMASCOTAS.Controllers
             ViewBag.EstadoSeleccionado = estado;
             ViewBag.CurrentPage = page;
             ViewBag.TotalPages = totalPages;
+            ViewBag.TotalItems = totalItems;
 
             return View(solicitudes);
         }
@@ -339,7 +577,7 @@ namespace MVCMASCOTAS.Controllers
             solicitud.EvaluadoPor = ObtenerUsuarioActualId();
             solicitud.Observaciones = observaciones;
 
-            // Si está aprobada, actualizar la mascota
+            // Actualizar la mascota
             var mascota = db.Mascotas.Find(solicitud.MascotaId);
             if (mascota != null)
             {
@@ -349,12 +587,8 @@ namespace MVCMASCOTAS.Controllers
 
             db.SaveChanges();
 
-            var usuarioActual = db.Usuarios.FirstOrDefault(u => u.Email == User.Identity.Name);
-            if (usuarioActual != null)
-            {
-                AuditoriaHelper.RegistrarAccion("Aprobar Solicitud", "Admin",
-                    $"Solicitud ID: {solicitudId}", usuarioActual.UsuarioId);
-            }
+            AuditoriaHelper.RegistrarAccion("Aprobar Solicitud", "Admin",
+                $"Solicitud ID: {solicitudId}", ObtenerUsuarioActualId() ?? 0);
 
             TempData["SuccessMessage"] = "Solicitud aprobada exitosamente";
             return RedirectToAction("DetallesSolicitud", new { id = solicitudId });
@@ -386,12 +620,8 @@ namespace MVCMASCOTAS.Controllers
 
             db.SaveChanges();
 
-            var usuarioActual = db.Usuarios.FirstOrDefault(u => u.Email == User.Identity.Name);
-            if (usuarioActual != null)
-            {
-                AuditoriaHelper.RegistrarAccion("Rechazar Solicitud", "Admin",
-                    $"Solicitud ID: {solicitudId}", usuarioActual.UsuarioId);
-            }
+            AuditoriaHelper.RegistrarAccion("Rechazar Solicitud", "Admin",
+                $"Solicitud ID: {solicitudId}", ObtenerUsuarioActualId() ?? 0);
 
             TempData["SuccessMessage"] = "Solicitud rechazada";
             return RedirectToAction("DetallesSolicitud", new { id = solicitudId });
@@ -401,14 +631,10 @@ namespace MVCMASCOTAS.Controllers
         public ActionResult Configuracion()
         {
             var configuraciones = db.ConfiguracionSistema.ToList();
-
-            // Crear un diccionario para fácil acceso
             var configDict = configuraciones.ToDictionary(c => c.Clave, c => c.Valor);
 
-            // Crear modelo de vista
             var model = new ConfiguracionViewModel
             {
-                // Valores por defecto si no existen en la BD
                 NombreRefugio = configDict.ContainsKey("NombreRefugio") ? configDict["NombreRefugio"] : "Refugio de Animales Quito",
                 EmailContacto = configDict.ContainsKey("EmailContacto") ? configDict["EmailContacto"] : "contacto@refugioquito.org",
                 TelefonoContacto = configDict.ContainsKey("TelefonoContacto") ? configDict["TelefonoContacto"] : "0999999999",
@@ -440,12 +666,8 @@ namespace MVCMASCOTAS.Controllers
 
                 db.SaveChanges();
 
-                var usuarioActual = db.Usuarios.FirstOrDefault(u => u.Email == User.Identity.Name);
-                if (usuarioActual != null)
-                {
-                    AuditoriaHelper.RegistrarAccion("Actualizar Configuración", "Admin",
-                        "Configuración del sistema actualizada", usuarioActual.UsuarioId);
-                }
+                AuditoriaHelper.RegistrarAccion("Actualizar Configuración", "Admin",
+                    "Configuración del sistema actualizada", ObtenerUsuarioActualId() ?? 0);
 
                 TempData["SuccessMessage"] = "Configuración actualizada exitosamente";
                 return RedirectToAction("Configuracion");
@@ -515,13 +737,17 @@ namespace MVCMASCOTAS.Controllers
             ViewBag.FechaHasta = fechaHasta;
             ViewBag.CurrentPage = page;
             ViewBag.TotalPages = totalPages;
+            ViewBag.TotalItems = totalItems;
 
             return View(auditoria);
         }
 
-        // MÉTODOS AUXILIARES
+        // MÉTODO AUXILIAR
         private int? ObtenerUsuarioActualId()
         {
+            if (!User.Identity.IsAuthenticated)
+                return null;
+
             var usuario = db.Usuarios.FirstOrDefault(u => u.Email == User.Identity.Name);
             return usuario?.UsuarioId;
         }
@@ -536,7 +762,80 @@ namespace MVCMASCOTAS.Controllers
         }
     }
 
-    // CLASE DE VIEWMODEL PARA CONFIGURACIÓN
+    // VIEWMODELS NECESARIOS
+    public class RegistroUsuarioViewModel
+    {
+        [Required(ErrorMessage = "El nombre completo es requerido")]
+        [StringLength(200, ErrorMessage = "El nombre no puede exceder 200 caracteres")]
+        public string NombreCompleto { get; set; }
+
+        [Required(ErrorMessage = "El email es requerido")]
+        [EmailAddress(ErrorMessage = "Ingrese un email válido")]
+        public string Email { get; set; }
+
+        [Required(ErrorMessage = "La contraseña es requerida")]
+        [StringLength(100, MinimumLength = 6, ErrorMessage = "La contraseña debe tener al menos 6 caracteres")]
+        public string Password { get; set; }
+
+        [Required(ErrorMessage = "La confirmación de contraseña es requerida")]
+        [System.ComponentModel.DataAnnotations.Compare("Password", ErrorMessage = "Las contraseñas no coinciden")]
+        public string ConfirmPassword { get; set; }
+
+        [Required(ErrorMessage = "El teléfono es requerido")]
+        [StringLength(20, ErrorMessage = "El teléfono no puede exceder 20 caracteres")]
+        public string Telefono { get; set; }
+
+        [StringLength(13, ErrorMessage = "La cédula no puede exceder 13 caracteres")]
+        public string Cedula { get; set; }
+
+        [StringLength(255, ErrorMessage = "La dirección no puede exceder 255 caracteres")]
+        public string Direccion { get; set; }
+
+        [StringLength(100, ErrorMessage = "La ciudad no puede exceder 100 caracteres")]
+        public string Ciudad { get; set; }
+
+        [StringLength(100, ErrorMessage = "La provincia no puede exceder 100 caracteres")]
+        public string Provincia { get; set; }
+
+        public HttpPostedFileBase ImagenPerfil { get; set; }
+    }
+
+    public class EditarUsuarioViewModel
+    {
+        public int UsuarioId { get; set; }
+
+        [Required(ErrorMessage = "El nombre completo es requerido")]
+        [StringLength(200, ErrorMessage = "El nombre no puede exceder 200 caracteres")]
+        public string NombreCompleto { get; set; }
+
+        [Required(ErrorMessage = "El email es requerido")]
+        [EmailAddress(ErrorMessage = "Ingrese un email válido")]
+        public string Email { get; set; }
+
+        [Required(ErrorMessage = "El teléfono es requerido")]
+        [StringLength(20, ErrorMessage = "El teléfono no puede exceder 20 caracteres")]
+        public string Telefono { get; set; }
+
+        [StringLength(13, ErrorMessage = "La cédula no puede exceder 13 caracteres")]
+        public string Cedula { get; set; }
+
+        [StringLength(255, ErrorMessage = "La dirección no puede exceder 255 caracteres")]
+        public string Direccion { get; set; }
+
+        [StringLength(100, ErrorMessage = "La ciudad no puede exceder 100 caracteres")]
+        public string Ciudad { get; set; }
+
+        [StringLength(100, ErrorMessage = "La provincia no puede exceder 100 caracteres")]
+        public string Provincia { get; set; }
+
+        public bool Activo { get; set; }
+        public bool EmailConfirmado { get; set; }
+        public bool TelefonoConfirmado { get; set; }
+
+        public string ImagenPerfilBase64 { get; set; }
+        public HttpPostedFileBase NuevaImagenPerfil { get; set; }
+    }
+
     public class ConfiguracionViewModel
     {
         [Required(ErrorMessage = "El nombre del refugio es requerido")]

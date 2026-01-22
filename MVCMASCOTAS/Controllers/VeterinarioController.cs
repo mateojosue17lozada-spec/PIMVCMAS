@@ -484,6 +484,169 @@ namespace MVCMASCOTAS.Controllers
             return View(mascotas);
         }
 
+        public ActionResult Vacunas()
+        {
+            var usuario = db.Usuarios.FirstOrDefault(u =>
+                u.Email == User.Identity.Name &&
+                (u.Activo == null || u.Activo == true));
+
+            if (usuario == null)
+            {
+                return RedirectToAction("Logout", "Account");
+            }
+
+            // Obtener todas las vacunas aplicadas por este veterinario
+            var vacunasAplicadas = db.MascotaVacunas
+                .Include(v => v.Mascotas)        // Incluir datos de la mascota
+                .Include(v => v.Vacunas)         // Incluir datos del tipo de vacuna
+                .Include(v => v.Usuarios)        // Incluir datos del veterinario
+                .Where(v => v.VeterinarioId == usuario.UsuarioId)
+                .OrderByDescending(v => v.FechaAplicacion)
+                .ToList();
+
+            // Obtener mascotas asignadas para el dropdown
+            var mascotasAsignadas = db.Mascotas
+                .Where(m => m.VeterinarioAsignado == usuario.UsuarioId &&
+                           m.Activo == true)
+                .OrderBy(m => m.Nombre)
+                .ToList();
+
+            ViewBag.Mascotas = mascotasAsignadas;
+
+            // Obtener tipos de vacuna para el dropdown
+            var tiposVacuna = db.Vacunas
+                .Where(v => v.Activo == true)
+                .OrderBy(v => v.NombreVacuna)
+                .ToList();
+
+            ViewBag.TiposVacuna = tiposVacuna;
+
+            return View(vacunasAplicadas);
+        }
+
+        // POST: Veterinario/RegistrarVacunaCompleta
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult RegistrarVacunaCompleta(int MascotaId, int VacunaId,
+            DateTime FechaAplicacion, DateTime? ProximaDosis,
+            string Lote, string Laboratorio, string Observaciones)
+        {
+            var usuario = db.Usuarios.FirstOrDefault(u =>
+                u.Email == User.Identity.Name &&
+                (u.Activo == null || u.Activo == true));
+
+            if (usuario == null)
+            {
+                return RedirectToAction("Logout", "Account");
+            }
+
+            // Verificar que la mascota esté asignada a este veterinario
+            var mascota = db.Mascotas.Find(MascotaId);
+            if (mascota == null || mascota.VeterinarioAsignado != usuario.UsuarioId)
+            {
+                TempData["ErrorMessage"] = "Mascota no válida o no asignada a usted.";
+                return RedirectToAction("Vacunas");
+            }
+
+            // Crear registro de vacuna
+            var mascotaVacuna = new MascotaVacunas
+            {
+                MascotaId = MascotaId,
+                VacunaId = VacunaId,
+                FechaAplicacion = FechaAplicacion,
+                VeterinarioId = usuario.UsuarioId,
+                ProximaDosis = ProximaDosis,
+                Lote = Lote,
+                Laboratorio = Laboratorio,
+                Observaciones = Observaciones
+            };
+
+            db.MascotaVacunas.Add(mascotaVacuna);
+            db.SaveChanges();
+
+            // Registrar en historial médico
+            var vacuna = db.Vacunas.Find(VacunaId);
+            var historial = new HistorialMedico
+            {
+                MascotaId = MascotaId,
+                VeterinarioId = usuario.UsuarioId,
+                TipoConsulta = "Vacunación",
+                Diagnostico = $"Vacuna aplicada: {vacuna?.NombreVacuna ?? "Vacuna"}",
+                Observaciones = $"Lote: {Lote}, Laboratorio: {Laboratorio}. {Observaciones}",
+                FechaConsulta = DateTime.Now,
+                ProximaConsulta = ProximaDosis
+            };
+
+            db.HistorialMedico.Add(historial);
+            db.SaveChanges();
+
+            // Auditoría
+            AuditoriaHelper.RegistrarAccion("Registrar Vacuna Completa", "Veterinario",
+                $"Mascota: {mascota.Nombre}, Vacuna: {vacuna?.NombreVacuna}", usuario.UsuarioId);
+
+            TempData["SuccessMessage"] = "Vacuna registrada exitosamente";
+            return RedirectToAction("Vacunas");
+        }
+
+        // GET: Veterinario/Tratamientos
+        public ActionResult Tratamientos()
+        {
+            var usuario = db.Usuarios.FirstOrDefault(u =>
+                u.Email == User.Identity.Name &&
+                (u.Activo == null || u.Activo == true));
+
+            if (usuario == null)
+            {
+                return RedirectToAction("Logout", "Account");
+            }
+
+            // Obtener tratamientos donde este veterinario es responsable
+            var tratamientos = db.Tratamientos
+                .Include(t => t.Mascotas)
+                .Include(t => t.Usuarios)
+                .Where(t => t.VeterinarioId == usuario.UsuarioId)
+                .OrderByDescending(t => t.FechaInicio)
+                .ToList();
+
+            // Obtener mascotas asignadas para el dropdown
+            var mascotasAsignadas = db.Mascotas
+                .Where(m => m.VeterinarioAsignado == usuario.UsuarioId &&
+                           m.Activo == true)
+                .OrderBy(m => m.Nombre)
+                .ToList();
+
+            ViewBag.Mascotas = mascotasAsignadas;
+
+            return View(tratamientos);
+        }
+
+        // GET: Veterinario/ObtenerDetalleTratamiento/5
+        public ActionResult ObtenerDetalleTratamiento(int id)
+        {
+            var usuario = db.Usuarios.FirstOrDefault(u =>
+                u.Email == User.Identity.Name &&
+                (u.Activo == null || u.Activo == true));
+
+            if (usuario == null)
+            {
+                return Content("<div class='alert alert-danger'>No autorizado</div>");
+            }
+
+            var tratamiento = db.Tratamientos
+                .Include(t => t.Mascotas)
+                .Include(t => t.Usuarios)
+                .FirstOrDefault(t => t.TratamientoId == id &&
+                                   t.VeterinarioId == usuario.UsuarioId);
+
+            if (tratamiento == null)
+            {
+                return Content("<div class='alert alert-danger'>Tratamiento no encontrado</div>");
+            }
+
+            return PartialView("_DetalleTratamiento", tratamiento);
+        }
+
+
         // GET: Veterinario/ReporteMensual
         public ActionResult ReporteMensual(int? year, int? month)
         {

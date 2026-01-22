@@ -81,7 +81,8 @@
                                             break;
                                     }
                                 </td>
-                                <td>@mascota.FechaIngreso.ToString("dd/MM/yyyy")</td>
+                                <!-- LÍNEA CORREGIDA AQUÍ -->
+                                <td>@(mascota.FechaIngreso?.ToString("dd/MM/yyyy") ?? "No especificada")</td>
                                 <td>
                                     <a href="@Url.Action("Detalle", "Mascotas", new { id = mascota.MascotaId })" class="btn btn-sm btn-info" title="Ver">
                                         <i class="fas fa-eye"></i>

@@ -1,7 +1,108 @@
-﻿
+﻿@model IEnumerable<MVCMASCOTAS.Models.ReportesRescate>
+
 @{
-    ViewBag.Title = "MisReportes";
+    ViewBag.Title = "Mis Reportes de Rescate";
 }
 
-<h2>MisReportes</h2>
+<div class="page-header mb-4">
+    <h2><i class="fas fa-ambulance"></i> Mis Reportes de Rescate</h2>
+    <p class="text-muted">Historial de reportes de rescate realizados</p>
+</div>
 
+<div class="mb-4">
+    <a href="@Url.Action("ReportarRescate", "Rescate")" class="btn btn-success">
+        <i class="fas fa-plus"></i> Nuevo Reporte
+    </a>
+</div>
+
+<div class="row">
+    @if (Model != null && Model.Any())
+    {
+        foreach (var reporte in Model)
+        {
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card shadow-custom h-100">
+                    <div class="card-header bg-@(reporte.Estado == "Pendiente" ? "warning" : reporte.Estado == "En proceso" ? "primary" : reporte.Estado == "Rescatado" ? "success" : "secondary") text-white">
+                        <h6 class="mb-0">Reporte #@reporte.ReporteId - @reporte.Estado</h6>
+                    </div>
+                    <div class="card-body">
+                        <p><i class="fas fa-calendar"></i> <strong>Fecha:</strong> @(reporte.FechaReporte?.ToString("dd/MM/yyyy HH:mm") ?? "N/A")</p>
+                        <p><i class="fas fa-map-marker-alt"></i> <strong>Ubicación:</strong> @reporte.UbicacionReporte</p>
+                        <p><i class="fas fa-paw"></i> <strong>Tipo:</strong> @reporte.TipoAnimal</p>
+                        <p><i class="fas fa-info-circle"></i> <strong>Condición:</strong> @reporte.CondicionAnimal</p>
+                        <p><i class="fas fa-user"></i> <strong>Reportante:</strong> @reporte.NombreReportante</p>
+
+                        @if (!string.IsNullOrEmpty(reporte.DescripcionAnimal))
+                        {
+                            <p><strong>Descripción:</strong></p>
+                            <p class="text-muted small">@(reporte.DescripcionAnimal.Length > 100 ? reporte.DescripcionAnimal.Substring(0, 100) + "..." : reporte.DescripcionAnimal)</p>
+                        }
+
+                        @if (reporte.Urgencia == "Crítica" || reporte.Urgencia == "Alta")
+                        {
+                            <span class="badge badge-danger"><i class="fas fa-exclamation-triangle"></i> @reporte.Urgencia.ToUpper()</span>
+                        }
+                        else if (reporte.Urgencia == "Media")
+                        {
+                            <span class="badge badge-warning"><i class="fas fa-exclamation-circle"></i> @reporte.Urgencia</span>
+                        }
+                        else
+                        {
+                            <span class="badge badge-info"><i class="fas fa-info-circle"></i> @(reporte.Urgencia ?? "Normal")</span>
+                        }
+                    </div>
+                    <div class="card-footer">
+                        <a href="@Url.Action("DetalleReporte", "Rescate", new { id = reporte.ReporteId })" class="btn btn-info btn-sm btn-block">
+                            <i class="fas fa-eye"></i> Ver Detalles
+                        </a>
+                        @if (reporte.Estado == "Pendiente")
+                        {
+                            <a href="@Url.Action("EditarReporte", "Rescate", new { id = reporte.ReporteId })" class="btn btn-warning btn-sm btn-block mt-2">
+                                <i class="fas fa-edit"></i> Editar
+                            </a>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="col-12">
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i> No has realizado ningún reporte de rescate aún.
+                <a href="@Url.Action("ReportarRescate", "Rescate")" class="alert-link">¿Necesitas reportar un rescate?</a>
+            </div>
+        </div>
+    }
+</div>
+
+@if (ViewBag.TotalPages != null && ViewBag.TotalPages > 1)
+{
+    <nav aria-label="Paginación" class="mt-4">
+        <ul class="pagination justify-content-center">
+            @if (ViewBag.CurrentPage > 1)
+            {
+                <li class="page-item">
+                    <a class="page-link" href="@Url.Action("MisReportes", new { page = ViewBag.CurrentPage - 1 })">
+                        <i class="fas fa-chevron-left"></i> Anterior
+                    </a>
+                </li>
+            }
+            @for (int i = 1; i <= ViewBag.TotalPages; i++)
+            {
+                <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                    <a class="page-link" href="@Url.Action("MisReportes", new { page = i })">@i</a>
+                </li>
+            }
+            @if (ViewBag.CurrentPage < ViewBag.TotalPages)
+            {
+                <li class="page-item">
+                    <a class="page-link" href="@Url.Action("MisReportes", new { page = ViewBag.CurrentPage + 1 })">
+                        Siguiente <i class="fas fa-chevron-right"></i>
+                    </a>
+                </li>
+            }
+        </ul>
+    </nav>
+}

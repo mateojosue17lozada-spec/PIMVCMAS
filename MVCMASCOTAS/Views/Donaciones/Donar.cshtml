@@ -24,15 +24,19 @@
 
                     <div class="form-group">
                         <label><i class="fas fa-gift"></i> Tipo *</label>
-                        @Html.DropDownListFor(m => m.TipoDonacion, new SelectList(new[] { "Monetaria", "Especie" }), "Seleccionar...", new { @class = "form-control", id = "TipoDonacion", required = "required" })
+                        @Html.DropDownListFor(m => m.TipoDonacion, new SelectList(new[] {
+                            new SelectListItem { Text = "Monetaria", Value = "Monetaria" },
+                            new SelectListItem { Text = "Especie", Value = "Especie" },
+                            new SelectListItem { Text = "Apadrinamiento", Value = "Apadrinamiento" }
+                        }, "Value", "Text"), "Seleccionar...", new { @class = "form-control", id = "TipoDonacion", required = "required" })
                         @Html.ValidationMessageFor(m => m.TipoDonacion, "", new { @class = "text-danger" })
                     </div>
 
                     <div id="donacion-monetaria" style="display: none;">
                         <div class="form-group">
                             <label><i class="fas fa-dollar-sign"></i> Monto *</label>
-                            @Html.TextBoxFor(m => m.MontoEfectivo, new { @class = "form-control", type = "number", step = "0.01", min = "1", placeholder = "0.00" })
-                            @Html.ValidationMessageFor(m => m.MontoEfectivo, "", new { @class = "text-danger" })
+                            @Html.TextBoxFor(m => m.Monto, new { @class = "form-control", type = "number", step = "0.01", min = "1", placeholder = "0.00", id = "MontoMonetaria" })
+                            @Html.ValidationMessageFor(m => m.Monto, "", new { @class = "text-danger" })
                         </div>
 
                         <div class="form-group">
@@ -43,8 +47,18 @@
                                 "PayPal",
                                 "Tarjeta de Crédito",
                                 "Efectivo"
-                            }), "Seleccionar...", new { @class = "form-control" })
+                            }), "Seleccionar...", new { @class = "form-control", id = "MetodoPagoMonetaria" })
                             @Html.ValidationMessageFor(m => m.MetodoPago, "", new { @class = "text-danger" })
+                        </div>
+
+                        <div class="form-group">
+                            <label><i class="fas fa-sync-alt"></i> Frecuencia</label>
+                            @Html.DropDownListFor(m => m.Frecuencia, new SelectList(new[] {
+                                "Única",
+                                "Mensual",
+                                "Trimestral",
+                                "Anual"
+                            }), "Seleccionar...", new { @class = "form-control" })
                         </div>
 
                         <div class="alert alert-warning">
@@ -58,9 +72,14 @@
 
                     <div id="donacion-especie" style="display: none;">
                         <div class="form-group">
-                            <label><i class="fas fa-box"></i> Descripción de la Donación *</label>
-                            @Html.TextAreaFor(m => m.DescripcionDonacion, new { @class = "form-control", rows = "4", placeholder = "Describe qué vas a donar (alimento, medicamentos, juguetes, etc.)" })
-                            @Html.ValidationMessageFor(m => m.DescripcionDonacion, "", new { @class = "text-danger" })
+                            <label><i class="fas fa-box"></i> Descripción del Artículo *</label>
+                            @Html.TextAreaFor(m => m.DescripcionArticulo, new { @class = "form-control", rows = "4", placeholder = "Describe qué vas a donar (alimento, medicamentos, juguetes, etc.)", id = "DescripcionEspecie" })
+                            @Html.ValidationMessageFor(m => m.DescripcionArticulo, "", new { @class = "text-danger" })
+                        </div>
+
+                        <div class="form-group">
+                            <label><i class="fas fa-calculator"></i> Cantidad</label>
+                            @Html.TextBoxFor(m => m.Cantidad, new { @class = "form-control", type = "number", min = "1", placeholder = "1" })
                         </div>
 
                         <div class="alert alert-info">
@@ -68,11 +87,43 @@
                         </div>
                     </div>
 
+                    <div id="donacion-apadrinamiento" style="display: none;">
+                        <div class="form-group">
+                            <label><i class="fas fa-dog"></i> Mascota a Apadrinar *</label>
+                            @Html.DropDownListFor(m => m.MascotaId, (SelectList)ViewBag.Mascotas, "Seleccionar mascota...", new { @class = "form-control", id = "MascotaId", required = "required" })
+                            @Html.ValidationMessageFor(m => m.MascotaId, "", new { @class = "text-danger" })
+                        </div>
+
+                        <div class="form-group">
+                            <label><i class="fas fa-dollar-sign"></i> Monto Mensual *</label>
+                            @Html.TextBoxFor(m => m.Monto, new { @class = "form-control", type = "number", step = "0.01", min = "10", placeholder = "0.00", id = "MontoApadrinamiento" })
+                        </div>
+
+                        <div class="form-group">
+                            <label><i class="fas fa-credit-card"></i> Método de Pago *</label>
+                            @Html.DropDownListFor(m => m.MetodoPago, new SelectList(new[] {
+                                "Transferencia Bancaria",
+                                "Depósito",
+                                "PayPal",
+                                "Tarjeta de Crédito"
+                            }), "Seleccionar...", new { @class = "form-control", id = "MetodoPagoApadrinamiento" })
+                        </div>
+
+                        <div class="form-group">
+                            <label><i class="fas fa-calendar-alt"></i> Duración (meses)</label>
+                            @Html.TextBoxFor(m => m.DuracionMeses, new { @class = "form-control", type = "number", min = "1", max = "36", placeholder = "12" })
+                        </div>
+
+                        <div class="alert alert-success">
+                            <i class="fas fa-heart"></i> Al apadrinar una mascota, estás contribuyendo mensualmente con su cuidado, alimentación y salud.
+                        </div>
+                    </div>
+
                     <h5 class="border-bottom pb-2 mb-3 mt-4">Información del Donante</h5>
 
                     <div class="form-group">
                         <label><i class="fas fa-user"></i> Nombre Completo *</label>
-                        @Html.TextBoxFor(m => m.NombreDonante, new { @class = "form-control", required = "required" })
+                        @Html.TextBoxFor(m => m.NombreDonante, new { @class = "form-control", required = "required", placeholder = "Ingresa tu nombre completo" })
                         @Html.ValidationMessageFor(m => m.NombreDonante, "", new { @class = "text-danger" })
                     </div>
 
@@ -80,7 +131,7 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label><i class="fas fa-envelope"></i> Email *</label>
-                                @Html.TextBoxFor(m => m.EmailDonante, new { @class = "form-control", type = "email", required = "required" })
+                                @Html.TextBoxFor(m => m.EmailDonante, new { @class = "form-control", type = "email", required = "required", placeholder = "ejemplo@correo.com" })
                                 @Html.ValidationMessageFor(m => m.EmailDonante, "", new { @class = "text-danger" })
                             </div>
                         </div>
@@ -88,25 +139,28 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label><i class="fas fa-phone"></i> Teléfono *</label>
-                                @Html.TextBoxFor(m => m.TelefonoDonante, new { @class = "form-control", required = "required" })
+                                @Html.TextBoxFor(m => m.TelefonoDonante, new { @class = "form-control", required = "required", placeholder = "0999999999" })
                                 @Html.ValidationMessageFor(m => m.TelefonoDonante, "", new { @class = "text-danger" })
                             </div>
                         </div>
                     </div>
 
+                    <div class="form-group">
+                        <label><i class="fas fa-comment"></i> Mensaje (Opcional)</label>
+                        @Html.TextAreaFor(m => m.Mensaje, new { @class = "form-control", rows = "3", placeholder = "Déjanos un mensaje o dedicación..." })
+                    </div>
+
+                    <div class="form-group">
+                        <label><i class="fas fa-receipt"></i> Número de Transacción (Opcional)</label>
+                        @Html.TextBoxFor(m => m.NumeroTransaccion, new { @class = "form-control", placeholder = "Número de transferencia, depósito, etc." })
+                    </div>
+
                     <h5 class="border-bottom pb-2 mb-3 mt-4">Preferencias</h5>
 
                     <div class="form-check mb-3">
-                        @Html.CheckBoxFor(m => m.AnonimatoDonante, new { @class = "form-check-input" })
+                        @Html.CheckBoxFor(m => m.Anonima, new { @class = "form-check-input" })
                         <label class="form-check-label">
                             Prefiero mantener mi donación anónima
-                        </label>
-                    </div>
-
-                    <div class="form-check mb-3">
-                        @Html.CheckBoxFor(m => m.PublicarEnWeb, new { @class = "form-check-input" })
-                        <label class="form-check-label">
-                            Autorizo publicar mi donación en la página web (respetando el anonimato si fue seleccionado)
                         </label>
                     </div>
 
@@ -129,17 +183,89 @@
     <script>
         $(document).ready(function () {
             // Mostrar/ocultar campos según tipo de donación
-            $('#TipoDonacion').change(function () {
-                var tipo = $(this).val();
+            function mostrarCamposSegunTipo() {
+                var tipo = $('#TipoDonacion').val();
+
+                // Ocultar todos los paneles primero
+                $('#donacion-monetaria').slideUp();
+                $('#donacion-especie').slideUp();
+                $('#donacion-apadrinamiento').slideUp();
+
+                // Resetear campos obligatorios
+                $('#MontoMonetaria').removeAttr('required');
+                $('#MetodoPagoMonetaria').removeAttr('required');
+                $('#DescripcionEspecie').removeAttr('required');
+                $('#MascotaId').removeAttr('required');
+                $('#MontoApadrinamiento').removeAttr('required');
+                $('#MetodoPagoApadrinamiento').removeAttr('required');
+
+                // Mostrar el panel correspondiente y establecer requeridos
                 if (tipo === 'Monetaria') {
                     $('#donacion-monetaria').slideDown();
-                    $('#donacion-especie').slideUp();
+                    $('#MontoMonetaria').attr('required', 'required');
+                    $('#MetodoPagoMonetaria').attr('required', 'required');
                 } else if (tipo === 'Especie') {
                     $('#donacion-especie').slideDown();
-                    $('#donacion-monetaria').slideUp();
-                } else {
-                    $('#donacion-monetaria').slideUp();
-                    $('#donacion-especie').slideUp();
+                    $('#DescripcionEspecie').attr('required', 'required');
+                } else if (tipo === 'Apadrinamiento') {
+                    $('#donacion-apadrinamiento').slideDown();
+                    $('#MascotaId').attr('required', 'required');
+                    $('#MontoApadrinamiento').attr('required', 'required');
+                    $('#MetodoPagoApadrinamiento').attr('required', 'required');
+                }
+            }
+
+            $('#TipoDonacion').change(mostrarCamposSegunTipo);
+
+            // Mostrar campos iniciales si ya hay un valor seleccionado
+            mostrarCamposSegunTipo();
+
+            // Validación antes de enviar
+            $('form').submit(function (e) {
+                var tipo = $('#TipoDonacion').val();
+                var isValid = true;
+
+                if (tipo === 'Monetaria') {
+                    var monto = $('#MontoMonetaria').val();
+                    var metodo = $('#MetodoPagoMonetaria').val();
+
+                    if (!monto || parseFloat(monto) <= 0) {
+                        alert('Debe ingresar un monto válido para donación monetaria');
+                        isValid = false;
+                    }
+                    if (!metodo) {
+                        alert('Debe seleccionar un método de pago');
+                        isValid = false;
+                    }
+                }
+                else if (tipo === 'Especie') {
+                    var descripcion = $('#DescripcionEspecie').val();
+                    if (!descripcion || descripcion.trim() === '') {
+                        alert('Debe ingresar una descripción del artículo');
+                        isValid = false;
+                    }
+                }
+                else if (tipo === 'Apadrinamiento') {
+                    var mascotaId = $('#MascotaId').val();
+                    var monto = $('#MontoApadrinamiento').val();
+                    var metodo = $('#MetodoPagoApadrinamiento').val();
+
+                    if (!mascotaId) {
+                        alert('Debe seleccionar una mascota para apadrinar');
+                        isValid = false;
+                    }
+                    if (!monto || parseFloat(monto) < 10) {
+                        alert('El monto mínimo de apadrinamiento es $10/mes');
+                        isValid = false;
+                    }
+                    if (!metodo) {
+                        alert('Debe seleccionar un método de pago');
+                        isValid = false;
+                    }
+                }
+
+                if (!isValid) {
+                    e.preventDefault();
                 }
             });
         });

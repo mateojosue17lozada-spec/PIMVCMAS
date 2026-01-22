@@ -1,7 +1,38 @@
-﻿
-@{
+﻿@{
     ViewBag.Title = "Reportes";
+    ViewBag.Title = "Reportes Contables";
 }
 
 <h2>Reportes</h2>
+<div class="page-header mb-4">
+    <h2><i class="fas fa-chart-line"></i> Reportes Contables</h2>
+</div>
 
+<div class="row">
+    <div class="col-md-6 mb-4">
+        <div class="card shadow-custom">
+            <div class="card-header bg-primary text-white">
+                <h5><i class="fas fa-file-alt"></i> Reporte Mensual</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="chartMensual" height="200"></canvas>
+                <a href="@Url.Action("DescargarReporte", "Contabilidad", new { tipo = "mensual" })" class="btn btn-primary btn-block mt-3">
+                    <i class="fas fa-download"></i> Descargar Reporte Mensual
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 mb-4">
+        <div class="card shadow-custom">
+            <div class="card-header bg-success text-white">
+                <h5><i class="fas fa-chart-pie"></i> Por Categorías</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="chartCategorias" height="200"></canvas>
+                <a href="@Url.Action("DescargarReporte", "Contabilidad", new { tipo = "categorias" })" class="btn btn-success btn-block mt-3">
+                    <i class="fas fa-download"></i> Descargar Reporte por Categorías
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

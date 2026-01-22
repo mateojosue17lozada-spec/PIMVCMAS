@@ -10,12 +10,15 @@
 
 @if (Model != null && Model.Any())
 {
+    int activosCount = Model.Count(a => a.Estado == "Activo");
+    decimal totalActivo = Model.Where(a => a.Estado == "Activo").Sum(a => a.MontoMensual);
+
     <div class="row mb-4">
         <div class="col-md-6">
             <div class="card shadow-custom text-center">
                 <div class="card-body">
                     <h5>Apadrinamientos Activos</h5>
-                    <h2 class="text-danger">@Model.Count(a => a.Estado == "Activo")</h2>
+                    <h2 class="text-danger">@activosCount</h2>
                 </div>
             </div>
         </div>
@@ -23,7 +26,7 @@
             <div class="card shadow-custom text-center">
                 <div class="card-body">
                     <h5>Contribución Mensual Total</h5>
-                    <h2 class="text-success">$@Model.Where(a => a.Estado == "Activo").Sum(a => a.MontoMensual).ToString("N2")</h2>
+                    <h2 class="text-success">$@totalActivo.ToString("N2")</h2>
                 </div>
             </div>
         </div>
@@ -35,56 +38,119 @@
             <div class="card-body">
                 <div class="row">
                     <div class="col-md-3">
-                        @if (apadrinamiento.Mascotas.ImagenPrincipal != null)
+                        @if (apadrinamiento.Mascotas != null && apadrinamiento.Mascotas.ImagenPrincipal != null && apadrinamiento.Mascotas.ImagenPrincipal.Length > 0)
                         {
-                            <img src="@MVCMASCOTAS.Helpers.ImageHelper.GetImageDataUri(apadrinamiento.Mascotas.ImagenPrincipal)" class="img-fluid rounded" alt="@apadrinamiento.Mascotas.Nombre">
+                            string base64 = Convert.ToBase64String(apadrinamiento.Mascotas.ImagenPrincipal);
+                            string imgSrc = string.Format("data:image/jpeg;base64,{0}", base64);
+                            <img src="@imgSrc" class="img-fluid rounded" alt="@apadrinamiento.Mascotas.Nombre" style="max-height: 200px; object-fit: cover;">
                         }
                         else
                         {
-                            <img src="~/Content/images/no-image.png" class="img-fluid rounded" alt="Sin imagen">
+                            <img src="~/Content/images/no-image.png" class="img-fluid rounded" alt="Sin imagen" style="max-height: 200px; object-fit: cover;">
                         }
                     </div>
                     <div class="col-md-9">
-                        <div class="d-flex justify-content-between">
-                            <h4><i class="fas fa-paw"></i> @apadrinamiento.Mascotas.Nombre</h4>
-                            <span class="badge badge-pill @(apadrinamiento.Estado == "Activo" ? "badge-success" : "badge-secondary") p-2">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h4 class="mb-0">
+                                <i class="fas fa-paw"></i>
+                                @if (apadrinamiento.Mascotas != null)
+                                {
+                                    @apadrinamiento.Mascotas.Nombre
+                                }
+                                else
+                                {
+                                    <text>Mascota no disponible</text>
+                                }
+                            </h4>
+                            <span class="badge badge-pill @(apadrinamiento.Estado == "Activo" ? "badge-success" : apadrinamiento.Estado == "Completado" ? "badge-info" : "badge-secondary") p-2">
                                 @apadrinamiento.Estado
                             </span>
                         </div>
 
-                        <p class="text-muted">
-                            @apadrinamiento.Mascotas.Especie - @apadrinamiento.Mascotas.Raza - @apadrinamiento.Mascotas.Sexo
-                        </p>
+                        @if (apadrinamiento.Mascotas != null)
+                        {
+                            <p class="text-muted mt-2">
+                                @apadrinamiento.Mascotas.Especie
+                                @if (!string.IsNullOrEmpty(apadrinamiento.Mascotas.Raza))
+                                {
+                                    <text>- @apadrinamiento.Mascotas.Raza</text>
+                                }
+                                @if (!string.IsNullOrEmpty(apadrinamiento.Mascotas.Sexo))
+                                {
+                                    <text>- @apadrinamiento.Mascotas.Sexo</text>
+                                }
+                            </p>
+                        }
 
                         <div class="row mt-3">
                             <div class="col-md-6">
-                                <p>
-                                    <strong><i class="fas fa-calendar-plus"></i> Desde:</strong> @apadrinamiento.FechaInicio.ToString("dd/MM/yyyy")<br />
-                                    <strong><i class="fas fa-dollar-sign"></i> Contribución Mensual:</strong> $@apadrinamiento.MontoMensual.ToString("N2")
+                                <p class="mb-2">
+                                    <strong><i class="fas fa-calendar-plus"></i> Desde:</strong>
+                                    @if (apadrinamiento.FechaInicio.HasValue)
+                                    {
+                                        @apadrinamiento.FechaInicio.Value.ToString("dd/MM/yyyy")
+                                    }
+                                    else
+                                    {
+                                        <text>No especificada</text>
+                                    }
+                                </p>
+                                <p class="mb-2">
+                                    <strong><i class="fas fa-dollar-sign"></i> Contribución Mensual:</strong>
+                                    $@apadrinamiento.MontoMensual.ToString("N2")
                                 </p>
                             </div>
                             <div class="col-md-6">
                                 @if (apadrinamiento.Estado == "Activo")
                                 {
-                                    <a href="@Url.Action("Detalle", "Mascotas", new { id = apadrinamiento.MascotaId })" class="btn btn-info btn-sm">
+                                    <a href="@Url.Action("Detalle", "Mascotas", new { id = apadrinamiento.MascotaId })" class="btn btn-info btn-sm mr-2">
                                         <i class="fas fa-eye"></i> Ver Mascota
+                                    </a>
+                                    <a href="@Url.Action("SuspenderApadrinamiento", "Donaciones", new { id = apadrinamiento.ApadrinamientoId })" class="btn btn-warning btn-sm" onclick="return confirm('¿Estás seguro de que quieres suspender este apadrinamiento?');">
+                                        <i class="fas fa-pause"></i> Suspender
                                     </a>
                                 }
                                 else if (apadrinamiento.FechaFin.HasValue)
                                 {
-                                    <p><strong><i class="fas fa-calendar-times"></i> Finalizado:</strong> @apadrinamiento.FechaFin.Value.ToString("dd/MM/yyyy")</p>
-                                    @if (!string.IsNullOrEmpty(apadrinamiento.MotivoFinalizacion))
+                                    <p class="mb-2">
+                                        <strong><i class="fas fa-calendar-times"></i> Finalizado:</strong>
+                                        @apadrinamiento.FechaFin.Value.ToString("dd/MM/yyyy")
+                                    </p>
+                                    if (!string.IsNullOrEmpty(apadrinamiento.Observaciones))
                                     {
-                                        <p><strong>Motivo:</strong> @apadrinamiento.MotivoFinalizacion</p>
+                                        <p class="mb-0">
+                                            <strong>Observaciones:</strong> @apadrinamiento.Observaciones
+                                        </p>
                                     }
+                                }
+                                else
+                                {
+                                    <span class="text-muted"><i class="fas fa-info-circle"></i> Sin acciones disponibles</span>
                                 }
                             </div>
                         </div>
 
                         @if (apadrinamiento.Estado == "Activo")
                         {
-                            <div class="alert alert-success mt-3">
-                                <i class="fas fa-heart"></i> ¡Gracias por apadrinar a @apadrinamiento.Mascotas.Nombre! Tu ayuda mensual de $@apadrinamiento.MontoMensual.ToString("N2") está marcando una gran diferencia.
+                            <div class="alert alert-success mt-3 mb-0">
+                                <i class="fas fa-heart"></i>
+                                ¡Gracias por apadrinar a
+                                @if (apadrinamiento.Mascotas != null)
+                                {
+                                    @apadrinamiento.Mascotas.Nombre
+                                }
+                                else
+                                {
+                                    <text>esta mascota</text>
+                                }!
+                                Tu ayuda mensual de $@apadrinamiento.MontoMensual.ToString("N2") está marcando una gran diferencia.
+                            </div>
+                        }
+                        else if (apadrinamiento.Estado == "Completado")
+                        {
+                            <div class="alert alert-info mt-3 mb-0">
+                                <i class="fas fa-check-circle"></i>
+                                Este apadrinamiento ha sido completado. ¡Gracias por tu apoyo!
                             </div>
                         }
                     </div>
@@ -99,10 +165,15 @@ else
         <div class="card-body text-center py-5">
             <i class="fas fa-heart fa-5x text-muted mb-3"></i>
             <h4>Aún no apadrinas ninguna mascota</h4>
-            <p class="text-muted">¿Te gustaría apadrinar a un animal del refugio?</p>
-            <a href="@Url.Action("Apadrinar", "Donaciones")" class="btn btn-danger btn-lg">
-                <i class="fas fa-heart"></i> Ver Mascotas Disponibles
-            </a>
+            <p class="text-muted">Tu apoyo mensual puede cambiar la vida de un animal del refugio.</p>
+            <div class="mt-4">
+                <a href="@Url.Action("Index", "Mascotas")" class="btn btn-danger btn-lg mr-3">
+                    <i class="fas fa-paw"></i> Ver Mascotas
+                </a>
+                <a href="@Url.Action("Apadrinar", "Donaciones")" class="btn btn-outline-danger btn-lg">
+                    <i class="fas fa-heart"></i> Más Información
+                </a>
+            </div>
         </div>
     </div>
 }

@@ -1,0 +1,97 @@
+﻿@{
+    ViewBag.Title = "Acceso No Autorizado";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-danger text-white">
+                    <h2 class="mb-0">
+                        <i class="fas fa-exclamation-triangle"></i> Acceso No Autorizado
+                    </h2>
+                </div>
+                <div class="card-body text-center py-5">
+                    <div class="mb-4">
+                        <i class="fas fa-user-lock fa-5x text-danger mb-4"></i>
+                        <h3 class="text-danger">Acceso Restringido</h3>
+                    </div>
+
+                    <div class="alert alert-warning" role="alert">
+                        <h4 class="alert-heading">
+                            <i class="fas fa-info-circle"></i> Información Importante
+                        </h4>
+                        <p class="mb-0">
+                            No tiene los permisos necesarios para acceder a esta página o realizar esta acción.
+                        </p>
+                    </div>
+
+                    <div class="mt-4">
+                        <p class="text-muted">
+                            Si cree que esto es un error, por favor contacte al administrador del sistema.
+                        </p>
+                    </div>
+
+                    <div class="mt-4">
+                        <h5>Opciones disponibles:</h5>
+                        <div class="btn-group mt-2" role="group">
+                            <a href="@Url.Action("Index", "Home")" class="btn btn-primary">
+                                <i class="fas fa-home"></i> Página de Inicio
+                            </a>
+                            <a href="@Url.Action("Dashboard", "Admin")" class="btn btn-info">
+                                <i class="fas fa-tachometer-alt"></i> Dashboard
+                            </a>
+                            <a href="@Url.Action("Logout", "Account")" class="btn btn-secondary">
+                                <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Información técnica para debugging (opcional) -->
+                    @if (Request.IsLocal || User.IsInRole("Administrador"))
+                    {
+                        <div class="mt-5">
+                            <button class="btn btn-sm btn-outline-info" type="button" data-toggle="collapse"
+                                    data-target="#debugInfo" aria-expanded="false" aria-controls="debugInfo">
+                                <i class="fas fa-bug"></i> Información de Depuración
+                            </button>
+
+                            <div class="collapse mt-3" id="debugInfo">
+                                <div class="card card-body">
+                                    <h6>Detalles Técnicos:</h6>
+                                    <ul class="list-unstyled">
+                                        <li><strong>Usuario:</strong> @User.Identity.Name</li>
+                                        <li><strong>Fecha/Hora:</strong> @DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss")</li>
+                                        <li><strong>URL Solicitada:</strong> @Request.Url?.AbsoluteUri</li>
+                                        <li><strong>User Agent:</strong> @Request.UserAgent</li>
+                                        <li><strong>IP:</strong> @Request.UserHostAddress</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+                <div class="card-footer text-center text-muted">
+                    <small>
+                        <i class="fas fa-shield-alt"></i> Sistema de Seguridad - @DateTime.Now.Year
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // Opcional: Registrar evento de acceso no autorizado
+            console.log('Acceso no autorizado detectado para: @User.Identity.Name');
+
+            // Opcional: Redirección automática después de 30 segundos
+            setTimeout(function() {
+                window.location.href = '@Url.Action("Index", "Home")';
+            }, 30000); // 30 segundos
+        });
+    </script>
+}

@@ -4,109 +4,425 @@
     ViewBag.Title = "Registrarse";
 }
 
-<div class="row justify-content-center" style="padding: 30px 0;">
+<div class="row justify-content-center py-5">
     <div class="col-md-8">
-        <div class="card shadow-custom">
-            <div class="card-header text-center">
-                <h3><i class="fas fa-user-plus"></i> Crear Cuenta Nueva</h3>
+        <div class="card shadow-lg">
+            <div class="card-header bg-primary text-white text-center py-4">
+                <h3><i class="fas fa-user-plus fa-lg"></i> Crear Cuenta Nueva</h3>
+                <p class="mb-0">Únete a nuestra comunidad solidaria</p>
             </div>
-            <div class="card-body p-4">
+            <div class="card-body p-4 p-md-5">
                 @using (Html.BeginForm("Register", "Account", FormMethod.Post, new { @class = "needs-validation", enctype = "multipart/form-data", novalidate = "novalidate" }))
                 {
                     @Html.AntiForgeryToken()
-                    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                    @Html.ValidationSummary(true, "", new { @class = "alert alert-danger" })
 
+                    <!-- Información Personal -->
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label><i class="fas fa-user"></i> Nombre Completo *</label>
-                                @Html.TextBoxFor(m => m.NombreCompleto, new { @class = "form-control", required = "required" })
-                                @Html.ValidationMessageFor(m => m.NombreCompleto, "", new { @class = "text-danger" })
+                                <label class="font-weight-bold">
+                                    <i class="fas fa-user text-primary"></i> Nombre Completo *
+                                </label>
+                                @Html.TextBoxFor(m => m.NombreCompleto, new
+                                {
+                                    @class = "form-control",
+                                    placeholder = "Ej: Juan Pérez",
+                                    required = "required",
+                                    maxlength = "150"
+                                })
+                                @Html.ValidationMessageFor(m => m.NombreCompleto, "", new { @class = "text-danger small" })
                             </div>
                         </div>
 
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label><i class="fas fa-id-card"></i> Cédula *</label>
-                                @Html.TextBoxFor(m => m.Cedula, new { @class = "form-control", id = "Cedula", maxlength = "10", required = "required" })
-                                @Html.ValidationMessageFor(m => m.Cedula, "", new { @class = "text-danger" })
+                                <label class="font-weight-bold">
+                                    <i class="fas fa-id-card text-primary"></i> Cédula *
+                                </label>
+                                @Html.TextBoxFor(m => m.Cedula, new
+                                {
+                                    @class = "form-control",
+                                    id = "Cedula",
+                                    placeholder = "Ej: 1712345678",
+                                    maxlength = "13",
+                                    required = "required"
+                                })
+                                @Html.ValidationMessageFor(m => m.Cedula, "", new { @class = "text-danger small" })
+                                <small class="form-text text-muted">10 dígitos sin guiones</small>
                             </div>
                         </div>
                     </div>
 
+                    <!-- Contacto -->
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label><i class="fas fa-envelope"></i> Email *</label>
-                                @Html.TextBoxFor(m => m.Email, new { @class = "form-control", type = "email", required = "required" })
-                                @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger" })
+                                <label class="font-weight-bold">
+                                    <i class="fas fa-envelope text-primary"></i> Email *
+                                </label>
+                                @Html.TextBoxFor(m => m.Email, new
+                                {
+                                    @class = "form-control",
+                                    type = "email",
+                                    placeholder = "Ej: juan@email.com",
+                                    required = "required",
+                                    maxlength = "150"
+                                })
+                                @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger small" })
                             </div>
                         </div>
 
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label><i class="fas fa-phone"></i> Teléfono *</label>
-                                @Html.TextBoxFor(m => m.Telefono, new { @class = "form-control", required = "required" })
-                                @Html.ValidationMessageFor(m => m.Telefono, "", new { @class = "text-danger" })
+                                <label class="font-weight-bold">
+                                    <i class="fas fa-phone text-primary"></i> Teléfono *
+                                </label>
+                                @Html.TextBoxFor(m => m.Telefono, new
+                                {
+                                    @class = "form-control",
+                                    placeholder = "Ej: 0987654321",
+                                    required = "required",
+                                    maxlength = "20"
+                                })
+                                @Html.ValidationMessageFor(m => m.Telefono, "", new { @class = "text-danger small" })
                             </div>
                         </div>
                     </div>
 
+                    <!-- Dirección -->
                     <div class="form-group">
-                        <label><i class="fas fa-map-marker-alt"></i> Dirección *</label>
-                        @Html.TextAreaFor(m => m.Direccion, new { @class = "form-control", rows = "2", required = "required" })
-                        @Html.ValidationMessageFor(m => m.Direccion, "", new { @class = "text-danger" })
+                        <label class="font-weight-bold">
+                            <i class="fas fa-map-marker-alt text-primary"></i> Dirección *
+                        </label>
+                        @Html.TextAreaFor(m => m.Direccion, new
+                        {
+                            @class = "form-control",
+                            rows = "2",
+                            placeholder = "Dirección completa incluyendo calles, sector...",
+                            required = "required",
+                            maxlength = "255"
+                        })
+                        @Html.ValidationMessageFor(m => m.Direccion, "", new { @class = "text-danger small" })
                     </div>
 
+                    <!-- Ciudad y Provincia -->
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label><i class="fas fa-lock"></i> Contraseña *</label>
-                                @Html.PasswordFor(m => m.Password, new { @class = "form-control", required = "required" })
-                                @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger" })
-                                <small class="form-text text-muted">Mínimo 6 caracteres</small>
+                                <label class="font-weight-bold">
+                                    <i class="fas fa-city text-primary"></i> Ciudad
+                                </label>
+                                @Html.TextBoxFor(m => m.Ciudad, new
+                                {
+                                    @class = "form-control",
+                                    placeholder = "Ej: Quito",
+                                    maxlength = "100"
+                                })
+                                @Html.ValidationMessageFor(m => m.Ciudad, "", new { @class = "text-danger small" })
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="font-weight-bold">
+                                    <i class="fas fa-map text-primary"></i> Provincia
+                                </label>
+                                @Html.TextBoxFor(m => m.Provincia, new
+                                {
+                                    @class = "form-control",
+                                    placeholder = "Ej: Pichincha",
+                                    maxlength = "100"
+                                })
+                                @Html.ValidationMessageFor(m => m.Provincia, "", new { @class = "text-danger small" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Contraseñas -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="font-weight-bold">
+                                    <i class="fas fa-lock text-primary"></i> Contraseña *
+                                </label>
+                                @Html.PasswordFor(m => m.Password, new
+                                {
+                                    @class = "form-control",
+                                    placeholder = "Mínimo 8 caracteres",
+                                    required = "required",
+                                    minlength = "8",
+                                    maxlength = "100"
+                                })
+                                @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger small" })
+                                <div class="password-requirements small text-muted mt-1">
+                                    <i class="fas fa-info-circle"></i> Debe tener al menos 8 caracteres
+                                </div>
                             </div>
                         </div>
 
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label><i class="fas fa-lock"></i> Confirmar Contraseña *</label>
-                                @Html.PasswordFor(m => m.ConfirmPassword, new { @class = "form-control", required = "required" })
-                                @Html.ValidationMessageFor(m => m.ConfirmPassword, "", new { @class = "text-danger" })
+                                <label class="font-weight-bold">
+                                    <i class="fas fa-lock text-primary"></i> Confirmar Contraseña *
+                                </label>
+                                @Html.PasswordFor(m => m.ConfirmPassword, new
+                                {
+                                    @class = "form-control",
+                                    placeholder = "Repite tu contraseña",
+                                    required = "required"
+                                })
+                                @Html.ValidationMessageFor(m => m.ConfirmPassword, "", new { @class = "text-danger small" })
                             </div>
                         </div>
                     </div>
 
+                    <!-- Foto de Perfil -->
                     <div class="form-group">
-                        <label><i class="fas fa-calendar"></i> Fecha de Nacimiento</label>
-                        @Html.TextBoxFor(m => m.FechaNacimiento, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date" })
-                        @Html.ValidationMessageFor(m => m.FechaNacimiento, "", new { @class = "text-danger" })
+                        <label class="font-weight-bold">
+                            <i class="fas fa-camera text-primary"></i> Foto de Perfil (Opcional)
+                        </label>
+                        <div class="custom-file">
+                            @Html.TextBoxFor(m => m.ImagenPerfil, new
+                            {
+                                type = "file",
+                                @class = "custom-file-input",
+                                id = "ImagenPerfil",
+                                accept = "image/*",
+                                lang = "es"
+                            })
+                            <label class="custom-file-label" for="ImagenPerfil">
+                                <i class="fas fa-cloud-upload-alt"></i> Seleccionar imagen...
+                            </label>
+                        </div>
+                        <small class="form-text text-muted">
+                            <i class="fas fa-info-circle"></i> Formatos: JPG, PNG, GIF. Tamaño máximo: 5MB
+                        </small>
+                        @Html.ValidationMessageFor(m => m.ImagenPerfil, "", new { @class = "text-danger small" })
+
+                        <!-- Vista previa de imagen -->
+                        <div id="imagePreview" class="text-center mt-3" style="display: none;">
+                            <p class="mb-2">
+                                <i class="fas fa-eye"></i> Vista Previa:
+                            </p>
+                            <img id="previewImage" class="img-thumbnail rounded-circle" style="width: 150px; height: 150px; object-fit: cover;" />
+                        </div>
                     </div>
 
-                    <div class="form-group">
-                        <label><i class="fas fa-image"></i> Foto de Perfil (Opcional)</label>
-                        <input type="file" name="ImagenPerfilFile" class="form-control-file" accept="image/*" data-preview="#preview-img" />
-                        <img id="preview-img" src="#" alt="Preview" style="max-width: 200px; margin-top: 10px; display: none;" />
+                    <!-- Términos y Condiciones -->
+                    <div class="form-group form-check mt-4">
+                        @Html.CheckBoxFor(m => m.AceptaTerminos, new
+                        {
+                            @class = "form-check-input",
+                            id = "AceptaTerminos",
+                            required = "required"
+                        })
+                        <label class="form-check-label" for="AceptaTerminos">
+                            Acepto los <a href="@Url.Action("Terminos", "Home")" target="_blank" class="font-weight-bold">términos y condiciones</a> *
+                        </label>
+                        @Html.ValidationMessageFor(m => m.AceptaTerminos, "", new { @class = "text-danger d-block" })
                     </div>
 
-                    <button type="submit" class="btn btn-primary btn-block btn-lg mt-4">
-                        <i class="fas fa-user-plus"></i> Registrarse
+                    <!-- Botón de Registro -->
+                    <button type="submit" class="btn btn-primary btn-lg btn-block mt-4 py-3">
+                        <i class="fas fa-user-plus fa-lg"></i> Crear Cuenta
                     </button>
                 }
 
-                <hr />
+                <hr class="my-4" />
 
                 <div class="text-center">
-                    <p>¿Ya tienes una cuenta?</p>
-                    <a href="@Url.Action("Login", "Account")" class="btn btn-outline-primary">
+                    <p class="mb-2">¿Ya tienes una cuenta?</p>
+                    <a href="@Url.Action("Login", "Account")" class="btn btn-outline-primary btn-lg">
                         <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
                     </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Información adicional -->
+        <div class="text-center mt-4">
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <div class="card border-info">
+                        <div class="card-body">
+                            <i class="fas fa-shield-alt fa-2x text-info mb-2"></i>
+                            <h6 class="mb-0">Seguridad</h6>
+                            <small class="text-muted">Datos protegidos</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="card border-success">
+                        <div class="card-body">
+                            <i class="fas fa-heart fa-2x text-success mb-2"></i>
+                            <h6 class="mb-0">Solidaridad</h6>
+                            <small class="text-muted">Ayuda a los animales</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="card border-warning">
+                        <div class="card-body">
+                            <i class="fas fa-users fa-2x text-warning mb-2"></i>
+                            <h6 class="mb-0">Comunidad</h6>
+                            <small class="text-muted">Únete a otros amantes de animales</small>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
+@section Styles {
+    <style>
+        .shadow-lg {
+            box-shadow: 0 1rem 3rem rgba(0,0,0,.175) !important;
+            border-radius: 15px;
+        }
+
+        .card-header.bg-primary {
+            border-radius: 15px 15px 0 0 !important;
+        }
+
+        .form-control:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+        }
+
+        .custom-file-label::after {
+            content: "Examinar";
+        }
+
+        .password-requirements {
+            background-color: #f8f9fa;
+            padding: 8px 12px;
+            border-radius: 5px;
+            border-left: 4px solid #17a2b8;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #007bff, #0056b3);
+            border: none;
+            transition: all 0.3s ease;
+        }
+
+            .btn-primary:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(0,123,255,.3);
+            }
+
+        .form-check-input:checked {
+            background-color: #007bff;
+            border-color: #007bff;
+        }
+    </style>
+}
+
 @section Scripts {
     @Scripts.Render("~/bundles/jqueryval")
+    <script>
+        $(document).ready(function () {
+            // Bootstrap file input preview
+            $('.custom-file-input').on('change', function() {
+                var fileName = $(this).val().split('\\').pop();
+                $(this).next('.custom-file-label').html('<i class="fas fa-image"></i> ' + fileName);
+
+                // Vista previa de imagen
+                var input = this;
+                if (input.files && input.files[0]) {
+                    var reader = new FileReader();
+                    reader.onload = function(e) {
+                        $('#previewImage').attr('src', e.target.result);
+                        $('#imagePreview').show();
+                    };
+                    reader.readAsDataURL(input.files[0]);
+                } else {
+                    $('#imagePreview').hide();
+                }
+            });
+
+            // Validación de formulario
+            (function() {
+                'use strict';
+                var forms = document.getElementsByClassName('needs-validation');
+                var validation = Array.prototype.filter.call(forms, function(form) {
+                    form.addEventListener('submit', function(event) {
+                        if (form.checkValidity() === false) {
+                            event.preventDefault();
+                            event.stopPropagation();
+
+                            // Mostrar mensaje para términos y condiciones
+                            var terminos = document.getElementById('AceptaTerminos');
+                            if (!terminos.checked) {
+                                alert('Debe aceptar los términos y condiciones para continuar.');
+                            }
+                        }
+                        form.classList.add('was-validated');
+                    }, false);
+                });
+            })();
+
+            // Máscara para cédula
+            $('#Cedula').inputmask('9999999999', {
+                placeholder: '',
+                showMaskOnHover: false,
+                oncomplete: function() {
+                    // Validar longitud exacta
+                    if ($(this).val().replace(/_/g, '').length !== 10) {
+                        this.setCustomValidity('La cédula debe tener exactamente 10 dígitos');
+                    } else {
+                        this.setCustomValidity('');
+                    }
+                }
+            });
+
+            // Máscara para teléfono
+            $('#Telefono').inputmask('999-999-9999', {
+                placeholder: '_',
+                showMaskOnHover: false
+            });
+
+            // Validación de contraseña en tiempo real
+            $('#Password').on('input', function() {
+                var password = $(this).val();
+                if (password.length < 8) {
+                    this.setCustomValidity('La contraseña debe tener al menos 8 caracteres');
+                } else {
+                    this.setCustomValidity('');
+                }
+            });
+
+            // Validar que las contraseñas coincidan
+            $('#ConfirmPassword').on('input', function() {
+                var password = $('#Password').val();
+                var confirmPassword = $(this).val();
+
+                if (password !== confirmPassword) {
+                    this.setCustomValidity('Las contraseñas no coinciden');
+                } else {
+                    this.setCustomValidity('');
+                }
+            });
+
+            // Auto-completar ciudad y provincia basado en patrones comunes en Ecuador
+            $('#Direccion').on('blur', function() {
+                var direccion = $(this).val().toLowerCase();
+
+                // Si no se ha especificado ciudad, intentar detectarla
+                if (!$('#Ciudad').val()) {
+                    if (direccion.includes('quito') || direccion.includes('quicentro') || direccion.includes('carapungo')) {
+                        $('#Ciudad').val('Quito');
+                        $('#Provincia').val('Pichincha');
+                    } else if (direccion.includes('guayaquil') || direccion.includes('urdesa') || direccion.includes('samborondón')) {
+                        $('#Ciudad').val('Guayaquil');
+                        $('#Provincia').val('Guayas');
+                    } else if (direccion.includes('cuenca') || direccion.includes('azogues')) {
+                        $('#Ciudad').val('Cuenca');
+                        $('#Provincia').val('Azuay');
+                    }
+                }
+            });
+        });
+    </script>
 }

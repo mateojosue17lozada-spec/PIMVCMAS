@@ -149,6 +149,9 @@
     <Reference Include="Microsoft.Net.Http.Headers, Version=2.3.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Net.Http.Headers.2.3.0\lib\netstandard2.0\Microsoft.Net.Http.Headers.dll</HintPath>
     </Reference>
+    <Reference Include="PagedList, Version=1.17.0.0, Culture=neutral, PublicKeyToken=abbb863e9397c5e1, processorArchitecture=MSIL">
+      <HintPath>..\packages\PagedList.1.17.0.0\lib\net40\PagedList.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Buffers, Version=4.0.4.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Buffers.4.6.0\lib\net462\System.Buffers.dll</HintPath>
@@ -260,6 +263,7 @@
     <Compile Include="Controllers\AdopcionController.cs" />
     <Compile Include="Controllers\ContabilidadController.cs" />
     <Compile Include="Controllers\DonacionesController.cs" />
+    <Compile Include="Controllers\ErrorController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\RescateController.cs" />
     <Compile Include="Controllers\TiendaController.cs" />
@@ -274,6 +278,7 @@
     <Compile Include="Helpers\ImageHelper.cs" />
     <Compile Include="Helpers\PasswordHelper.cs" />
     <Compile Include="Helpers\PdfHelper.cs" />
+    <Compile Include="Helpers\UserHelper.cs" />
     <Compile Include="Models\Actividades.cs">
       <DependentUpon>RefugioMascotasModel.tt</DependentUpon>
     </Compile>
@@ -289,6 +294,7 @@
     <Compile Include="Models\CategoriasProducto.cs">
       <DependentUpon>RefugioMascotasModel.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\Configuracion.cs" />
     <Compile Include="Models\ConfiguracionSistema.cs">
       <DependentUpon>RefugioMascotasModel.tt</DependentUpon>
     </Compile>
@@ -392,8 +398,10 @@
     <Compile Include="Models\ViewModels\LoginViewModel.cs" />
     <Compile Include="Models\ViewModels\MascotaDetalleViewModel.cs" />
     <Compile Include="Models\ViewModels\MascotaViewModel.cs" />
+    <Compile Include="Models\ViewModels\PaginacionViewModel.cs" />
     <Compile Include="Models\ViewModels\ProductoViewModel.cs" />
     <Compile Include="Models\ViewModels\RegisterViewModel.cs" />
+    <Compile Include="Models\ViewModels\ResetPasswordViewModel.cs" />
     <Compile Include="Models\ViewModels\SolicitudAdopcionViewModel.cs" />
     <Compile Include="Models\vw_BalanceContable.cs">
       <DependentUpon>RefugioMascotasModel.tt</DependentUpon>
@@ -438,7 +446,7 @@
     <Content Include="Content\custom.css" />
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
-    <Content Include="Content\Site.css" />
+    <Content Include="Content\site.css" />
     <Content Include="Models\RefugioMascotasModel.Context.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <DependentUpon>RefugioMascotasModel.edmx</DependentUpon>
@@ -568,6 +576,12 @@
     <Content Include="Views\Rescate\Index.cshtml" />
     <Content Include="Views\Admin\SolicitudAdopcion.cshtml" />
     <Content Include="Views\Admin\DetallesSolicitud.cshtml" />
+    <Content Include="Views\Admin\Mascotas.cshtml" />
+    <Content Include="Views\Contabilidad\DetallesMovimientos.cshtml" />
+    <Content Include="Views\Contabilidad\EditarMovimiento.cshtml" />
+    <Content Include="Views\Account\EditProfile.cshtml" />
+    <Content Include="Views\Shared\Unauthorized.cshtml" />
+    <Content Include="Views\Error\General.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\Uploads\Documentos\" />

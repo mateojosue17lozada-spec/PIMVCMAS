@@ -1,7 +1,63 @@
-﻿
+﻿@model IEnumerable<MVCMASCOTAS.Models.Actividades>
+
 @{
-    ViewBag.Title = "Actividades";
+    ViewBag.Title = "Actividades de Voluntariado";
 }
 
 <h2>Actividades</h2>
+<div class="page-header mb-4">
+    <h2><i class="fas fa-calendar-alt"></i> Actividades de Voluntariado</h2>
+    <p class="text-muted">Próximas actividades y eventos del refugio</p>
+</div>
 
+<div class="row">
+    @if (Model != null && Model.Any())
+    {
+        foreach (var actividad in Model)
+        {
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card shadow-custom h-100">
+                    <div class="card-header bg-@(actividad.Estado == "Programada" ? "primary" : actividad.Estado == "En curso" ? "warning" : "secondary") text-white">
+                        <h5 class="mb-0">@actividad.NombreActividad</h5>
+                    </div>
+                    <div class="card-body">
+                        <p><i class="fas fa-calendar"></i> <strong>Fecha:</strong> @actividad.FechaActividad.ToString("dd/MM/yyyy")</p>
+                        <p><i class="fas fa-clock"></i> <strong>Hora:</strong> @(actividad.HoraInicio != null ? actividad.HoraInicio.ToString() : "Por definir") - @(actividad.HoraFin != null ? actividad.HoraFin.ToString() : "")</p>
+                        <p><i class="fas fa-map-marker-alt"></i> <strong>Lugar:</strong> @(actividad.LugarActividad ?? "Por definir")</p>
+                        <p><i class="fas fa-users"></i> <strong>Cupos:</strong> @(actividad.CuposDisponibles ?? 0)/@(actividad.CupoMaximo ?? 0)</p>
+                        <p class="text-muted">@(actividad.Descripcion ?? "Sin descripción")</p>
+                        <span class="badge badge-@(actividad.Estado == "Programada" ? "primary" : actividad.Estado == "En curso" ? "warning" : "secondary")">@(actividad.Estado ?? "Sin estado")</span>
+                    </div>
+                    <div class="card-footer">
+                        @if ((actividad.Estado == "Programada" || actividad.Estado == null) && (actividad.CuposDisponibles ?? 0) > 0)
+                        {
+                            <a href="@Url.Action("Inscribirse", "Voluntariado", new { id = actividad.ActividadId })" class="btn btn-success btn-block">
+                                <i class="fas fa-user-plus"></i> Inscribirse
+                            </a>
+                        }
+                        else if ((actividad.CuposDisponibles ?? 0) == 0)
+                        {
+                            <button class="btn btn-secondary btn-block" disabled>
+                                <i class="fas fa-times"></i> Cupos Agotados
+                            </button>
+                        }
+                        else
+                        {
+                            <button class="btn btn-secondary btn-block" disabled>
+                                @(actividad.Estado ?? "No disponible")
+                            </button>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="col-12">
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i> No hay actividades programadas en este momento.
+            </div>
+        </div>
+    }
+</div>

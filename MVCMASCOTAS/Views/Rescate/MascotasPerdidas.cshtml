@@ -12,7 +12,7 @@
 <!-- Filtros -->
 <div class="card mb-4 shadow-custom">
     <div class="card-body">
-        <form method="get" action="@Url.Action("MascotasPerdidas")" class="form-inline justify-content-center">
+        <form method="get" action="@Url.Action("MascotasPerdidas", "Rescate")" class="form-inline justify-content-center">
             <div class="form-group mx-2 mb-2">
                 <label class="mr-2">Especie:</label>
                 <select name="especie" class="form-control">
@@ -23,8 +23,18 @@
             </div>
 
             <div class="form-group mx-2 mb-2">
-                <label class="mr-2">Ciudad:</label>
-                <input type="text" name="ciudad" class="form-control" placeholder="Ciudad" value="@ViewBag.CiudadSeleccionada" />
+                <label class="mr-2">Estado:</label>
+                <select name="estado" class="form-control">
+                    <option value="Todos" @(ViewBag.EstadoSeleccionado == "Todos" ? "selected" : "")>Todos</option>
+                    <option value="Perdida" @(ViewBag.EstadoSeleccionado == "Perdida" ? "selected" : "")>Perdidas</option>
+                    <option value="Encontrada" @(ViewBag.EstadoSeleccionado == "Encontrada" ? "selected" : "")>Encontradas</option>
+                    <option value="Cerrado" @(ViewBag.EstadoSeleccionado == "Cerrado" ? "selected" : "")>Cerrados</option>
+                </select>
+            </div>
+
+            <div class="form-group mx-2 mb-2">
+                <label class="mr-2">Ubicación:</label>
+                <input type="text" name="ubicacion" class="form-control" placeholder="Ubicación aproximada" value="@ViewBag.UbicacionSeleccionada" />
             </div>
 
             <button type="submit" class="btn btn-primary mx-2 mb-2">
@@ -41,6 +51,12 @@
             <i class="fas fa-exclamation-circle"></i> Reportar Mascota Perdida
         </a>
     }
+    else
+    {
+        <a href="@Url.Action("Login", "Account", new { returnUrl = Url.Action("ReportarMascotaPerdida", "Rescate") })" class="btn btn-outline-danger">
+            <i class="fas fa-sign-in-alt"></i> Inicia sesión para reportar
+        </a>
+    }
 </div>
 
 <!-- Listado de Mascotas Perdidas -->
@@ -50,47 +66,132 @@
         foreach (var mascota in Model)
         {
             <div class="col-md-4 mb-4">
-                <div class="card shadow-custom">
-                    @if (mascota.ImagenMascota != null)
+                <div class="card shadow-custom h-100">
+                    <!-- Imagen -->
+                    @if (mascota.ImagenMascota != null && mascota.ImagenMascota.Length > 0)
                     {
-                        <img src="@MVCMASCOTAS.Helpers.ImageHelper.GetImageDataUri(mascota.ImagenMascota)" class="card-img-top" style="height: 250px; object-fit: cover;" alt="@mascota.NombreMascota">
+                        <img src="data:image/jpeg;base64,@Convert.ToBase64String(mascota.ImagenMascota)"
+                             class="card-img-top"
+                             style="height: 250px; object-fit: cover;"
+                             alt="@mascota.NombreMascota">
                     }
                     else
                     {
-                        <img src="~/Content/images/no-image.png" class="card-img-top" alt="Sin imagen">
+                        <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 250px;">
+                            <i class="fas fa-paw fa-5x text-muted"></i>
+                        </div>
                     }
-                    <div class="card-body">
-                        <h5 class="text-danger"><i class="fas fa-exclamation-triangle"></i> PERDIDO: @mascota.NombreMascota</h5>
 
-                        <p class="mb-1"><strong>Especie:</strong> @mascota.Especie</p>
-                        <p class="mb-1"><strong>Raza:</strong> @(mascota.Raza ?? "Mestizo")</p>
-                        <p class="mb-1"><strong>Sexo:</strong> @mascota.Sexo</p>
-                        <p class="mb-1"><strong>Color:</strong> @mascota.Color</p>
+                    <!-- Badge de estado -->
+                    <div class="card-img-overlay">
+                        @if (mascota.Estado == "Perdida")
+                        {
+                            <span class="badge badge-danger"><i class="fas fa-exclamation-triangle"></i> PERDIDA</span>
+                        }
+                        else if (mascota.Estado == "Encontrada")
+                        {
+                            <span class="badge badge-success"><i class="fas fa-check-circle"></i> ENCONTRADA</span>
+                        }
+                        else
+                        {
+                            <span class="badge badge-secondary"><i class="fas fa-times-circle"></i> CERRADO</span>
+                        }
+                    </div>
+
+                    <div class="card-body">
+                        <h5 class="card-title">@mascota.NombreMascota</h5>
+
+                        <div class="mb-2">
+                            <span class="badge badge-info">
+                                <i class="fas @(mascota.Especie == "Perro" ? "fa-dog" : "fa-cat")"></i> @mascota.Especie
+                            </span>
+                            @if (!string.IsNullOrEmpty(mascota.Raza))
+                            {
+                                <span class="badge badge-light">@mascota.Raza</span>
+                            }
+                            <span class="badge badge-light">
+                                <i class="fas @(mascota.Sexo == "M" ? "fa-mars" : "fa-venus")"></i>
+                                @(mascota.Sexo == "M" ? "Macho" : "Hembra")
+                            </span>
+                        </div>
+
+                        <div class="mb-3">
+                            <p class="mb-1"><strong>Color:</strong> @mascota.Color</p>
+                            <p class="mb-1"><strong>Edad:</strong> @mascota.Edad</p>
+                        </div>
 
                         <hr />
 
-                        <p class="mb-1"><strong><i class="fas fa-calendar"></i> Perdido:</strong> @mascota.FechaPerdida.ToString("dd/MM/yyyy")</p>
-                        <p class="mb-1"><strong><i class="fas fa-map-marker-alt"></i> Lugar:</strong> @mascota.UbicacionPerdida</p>
-                        <p class="mb-1"><strong><i class="fas fa-city"></i> Ciudad:</strong> @mascota.CiudadPerdida</p>
+                        <div class="mb-3">
+                            <h6><i class="fas fa-map-marker-alt text-danger"></i> Información de Pérdida</h6>
+                            <p class="mb-1"><strong>Fecha:</strong> @mascota.FechaPerdida.ToString("dd/MM/yyyy")</p>
+                            <p class="mb-1"><strong>Lugar:</strong> @mascota.UbicacionPerdida</p>
 
-                        @if (!string.IsNullOrEmpty(mascota.CaracteristicasDistintivas))
-                        {
-                            <hr />
-                            <p class="small"><strong>Características:</strong> @mascota.CaracteristicasDistintivas</p>
-                        }
+                            @if (!string.IsNullOrEmpty(mascota.CaracteristicasDistintivas))
+                            {
+                                <p class="mb-1">
+                                    <strong>Características:</strong>
+                                    @if (mascota.CaracteristicasDistintivas.Length > 100)
+                                    {
+                                        @(mascota.CaracteristicasDistintivas.Substring(0, 100) + "...")
+                                    }
+                                    else
+                                    {
+                                        @mascota.CaracteristicasDistintivas
+                                    }
+                                </p>
+                            }
+                        </div>
 
+                        <!-- Recompensa -->
                         @if (mascota.Recompensa.HasValue && mascota.Recompensa > 0)
                         {
-                            <div class="alert alert-success text-center mt-2">
-                                <strong>Recompensa: $@mascota.Recompensa.Value.ToString("N2")</strong>
+                            <div class="alert alert-warning text-center py-2 mb-3">
+                                <i class="fas fa-award"></i> <strong>Recompensa:</strong>
+                                $@mascota.Recompensa.Value.ToString("N2")
                             </div>
                         }
 
-                        <hr />
+                        <!-- Contacto -->
+                        @if (mascota.Usuarios != null)
+                        {
+                            <div class="contacto-info">
+                                <h6><i class="fas fa-user text-primary"></i> Información de Contacto</h6>
+                                <p class="mb-1"><strong>Dueño:</strong> @mascota.Usuarios.NombreCompleto</p>
+                                <p class="mb-0"><i class="fas fa-phone text-success"></i> @mascota.Usuarios.Telefono</p>
+                                @if (!string.IsNullOrEmpty(mascota.Usuarios.Email))
+                                {
+                                    <p class="mb-0"><i class="fas fa-envelope text-info"></i> @mascota.Usuarios.Email</p>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="alert alert-secondary">
+                                <i class="fas fa-user-slash"></i> Información de contacto no disponible
+                            </div>
+                        }
+                    </div>
 
-                        <p class="mb-1"><strong>Contacto:</strong></p>
-                        <p class="mb-0">@mascota.Usuarios.NombreCompleto</p>
-                        <p class="mb-0"><i class="fas fa-phone"></i> @mascota.Usuarios.Telefono</p>
+                    <div class="card-footer text-center">
+                        <button type="button" class="btn btn-sm btn-outline-primary"
+                                data-toggle="modal" data-target="#infoContactoModal"
+                                data-nombre="@mascota.NombreMascota"
+                                data-dueno="@mascota.Usuarios?.NombreCompleto"
+                                data-telefono="@mascota.Usuarios?.Telefono"
+                                data-email="@mascota.Usuarios?.Email">
+                            <i class="fas fa-phone-alt"></i> Ver Contacto
+                        </button>
+
+                        @if (mascota.Estado == "Perdida" && Request.IsAuthenticated)
+                        {
+                            <button type="button" class="btn btn-sm btn-outline-success ml-2"
+                                    data-toggle="modal" data-target="#reportarAvistamientoModal"
+                                    data-mascotaid="@mascota.MascotaPerdidaId"
+                                    data-nombremascota="@mascota.NombreMascota">
+                                <i class="fas fa-eye"></i> Reportar Avistamiento
+                            </button>
+                        }
                     </div>
                 </div>
             </div>
@@ -99,38 +200,218 @@
     else
     {
         <div class="col-12">
-            <div class="alert alert-info text-center">
-                <i class="fas fa-info-circle"></i> No hay mascotas perdidas reportadas en este momento.
+            <div class="alert alert-info text-center py-5">
+                <i class="fas fa-info-circle fa-3x mb-3"></i>
+                <h4>No hay mascotas perdidas reportadas</h4>
+                <p class="lead">Si encontraste una mascota perdida, por favor repórtala.</p>
+                @if (Request.IsAuthenticated)
+                {
+                    <a href="@Url.Action("ReportarMascotaPerdida", "Rescate")" class="btn btn-danger btn-lg">
+                        <i class="fas fa-exclamation-circle"></i> Reportar Mascota Perdida
+                    </a>
+                }
             </div>
         </div>
     }
 </div>
 
 <!-- Paginación -->
-@if (ViewBag.TotalPages > 1)
+@if (ViewBag.TotalPages != null && ViewBag.TotalPages > 1)
 {
-    <nav aria-label="Paginación">
+    <nav aria-label="Paginación" class="mt-4">
         <ul class="pagination justify-content-center">
             @if (ViewBag.CurrentPage > 1)
             {
                 <li class="page-item">
-                    <a class="page-link" href="@Url.Action("MascotasPerdidas", new { page = ViewBag.CurrentPage - 1, especie = ViewBag.EspecieSeleccionada, ciudad = ViewBag.CiudadSeleccionada })">Anterior</a>
+                    <a class="page-link" href="@Url.Action("MascotasPerdidas", "Rescate", new {
+                        page = ViewBag.CurrentPage - 1,
+                        especie = ViewBag.EspecieSeleccionada,
+                        estado = ViewBag.EstadoSeleccionado,
+                        ubicacion = ViewBag.UbicacionSeleccionada
+                    })">
+                        <i class="fas fa-chevron-left"></i> Anterior
+                    </a>
                 </li>
             }
 
             @for (int i = 1; i <= ViewBag.TotalPages; i++)
             {
                 <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
-                    <a class="page-link" href="@Url.Action("MascotasPerdidas", new { page = i, especie = ViewBag.EspecieSeleccionada, ciudad = ViewBag.CiudadSeleccionada })">@i</a>
+                    <a class="page-link" href="@Url.Action("MascotasPerdidas", "Rescate", new {
+                        page = i,
+                        especie = ViewBag.EspecieSeleccionada,
+                        estado = ViewBag.EstadoSeleccionado,
+                        ubicacion = ViewBag.UbicacionSeleccionada
+                    })">@i</a>
                 </li>
             }
 
             @if (ViewBag.CurrentPage < ViewBag.TotalPages)
             {
                 <li class="page-item">
-                    <a class="page-link" href="@Url.Action("MascotasPerdidas", new { page = ViewBag.CurrentPage + 1, especie = ViewBag.EspecieSeleccionada, ciudad = ViewBag.CiudadSeleccionada })">Siguiente</a>
+                    <a class="page-link" href="@Url.Action("MascotasPerdidas", "Rescate", new {
+                        page = ViewBag.CurrentPage + 1,
+                        especie = ViewBag.EspecieSeleccionada,
+                        estado = ViewBag.EstadoSeleccionado,
+                        ubicacion = ViewBag.UbicacionSeleccionada
+                    })">
+                        Siguiente <i class="fas fa-chevron-right"></i>
+                    </a>
                 </li>
             }
         </ul>
     </nav>
+}
+
+<!-- Modal para mostrar contacto -->
+<div class="modal fade" id="infoContactoModal" tabindex="-1" role="dialog" aria-labelledby="infoContactoModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="infoContactoModalLabel">
+                    <i class="fas fa-phone-alt"></i> Información de Contacto
+                </h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p><strong>Mascota:</strong> <span id="modalMascotaNombre"></span></p>
+                <p><strong>Dueño:</strong> <span id="modalDuenoNombre"></span></p>
+                <p><strong>Teléfono:</strong> <span id="modalTelefono"></span></p>
+                <p><strong>Email:</strong> <span id="modalEmail"></span></p>
+                <div class="alert alert-info mt-3">
+                    <small>
+                        <i class="fas fa-info-circle"></i>
+                        Por favor, contacta solo si tienes información relevante sobre la mascota.
+                    </small>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                    <i class="fas fa-times"></i> Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para reportar avistamiento -->
+<div class="modal fade" id="reportarAvistamientoModal" tabindex="-1" role="dialog" aria-labelledby="reportarAvistamientoModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            @using (Html.BeginForm("ReportarAvistamiento", "Rescate", FormMethod.Post))
+            {
+                @Html.AntiForgeryToken()
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title" id="reportarAvistamientoModalLabel">
+                        <i class="fas fa-eye"></i> Reportar Avistamiento
+                    </h5>
+                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="mascotaPerdidaId" id="mascotaPerdidaIdInput" />
+                    <p>Estás reportando un avistamiento de: <strong id="modalMascotaNombreAvistamiento"></strong></p>
+
+                    <div class="form-group">
+                        <label for="ubicacionAvistamiento">Ubicación del avistamiento *</label>
+                        <input type="text" class="form-control" name="ubicacionAvistamiento" id="ubicacionAvistamiento" required placeholder="Ej: Parque La Carolina, Quito" />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="fechaAvistamiento">Fecha del avistamiento *</label>
+                        <input type="date" class="form-control" name="fechaAvistamiento" id="fechaAvistamiento" required value="@DateTime.Now.ToString("yyyy-MM-dd")" />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="descripcionAvistamiento">Descripción *</label>
+                        <textarea class="form-control" name="descripcionAvistamiento" id="descripcionAvistamiento" rows="3" required placeholder="Describe cómo viste a la mascota, en qué condiciones, etc."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="telefonoContacto">Tu teléfono de contacto *</label>
+                        <input type="tel" class="form-control" name="telefonoContacto" id="telefonoContacto" required placeholder="Ej: 0987654321" />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                        <i class="fas fa-times"></i> Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-paper-plane"></i> Enviar Reporte
+                    </button>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        .shadow-custom {
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+            transition: transform 0.3s ease;
+            border: none;
+            border-radius: 10px;
+        }
+
+            .shadow-custom:hover {
+                transform: translateY(-5px);
+            }
+
+        .card-img-overlay .badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 0.9rem;
+        }
+
+        .contacto-info {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            border-left: 4px solid #007bff;
+        }
+    </style>
+}
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // Modal de información de contacto
+            $('#infoContactoModal').on('show.bs.modal', function (event) {
+                var button = $(event.relatedTarget);
+                var modal = $(this);
+                modal.find('#modalMascotaNombre').text(button.data('nombre'));
+                modal.find('#modalDuenoNombre').text(button.data('dueno') || 'No disponible');
+                modal.find('#modalTelefono').text(button.data('telefono') || 'No disponible');
+                modal.find('#modalEmail').text(button.data('email') || 'No disponible');
+            });
+
+            // Modal de reportar avistamiento
+            $('#reportarAvistamientoModal').on('show.bs.modal', function (event) {
+                var button = $(event.relatedTarget);
+                var modal = $(this);
+                modal.find('#modalMascotaNombreAvistamiento').text(button.data('nombremascota'));
+                modal.find('#mascotaPerdidaIdInput').val(button.data('mascotaid'));
+
+                // Si el usuario está autenticado, obtener su teléfono
+                @if (Request.IsAuthenticated)
+                {
+                    <text>
+                    $.get('@Url.Action("ObtenerTelefonoUsuario", "Account")', function (data) {
+                        if (data.success && data.telefono) {
+                            modal.find('#telefonoContacto').val(data.telefono);
+                        }
+                    });
+                    </text>
+                }
+            });
+
+            // Formato de fecha para input date
+            $('#fechaAvistamiento').val(new Date().toISOString().split('T')[0]);
+        });
+    </script>
 }

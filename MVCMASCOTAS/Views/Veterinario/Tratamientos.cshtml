@@ -1,7 +1,228 @@
-﻿
+﻿@model IEnumerable<MVCMASCOTAS.Models.Tratamientos>
+
 @{
-    ViewBag.Title = "Tratamientos";
+    ViewBag.Title = "Tratamientos Médicos";
 }
 
-<h2>Tratamientos</h2>
+<div class="container mt-4">
+    <h2><i class="fas fa-pills"></i> @ViewBag.Title</h2>
+    <hr />
 
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["SuccessMessage"]
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["ErrorMessage"]
+        </div>
+    }
+
+    <div class="mb-3">
+        <a href="@Url.Action("Dashboard", "Veterinario")" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Volver
+        </a>
+        <button type="button" class="btn btn-success" data-toggle="modal" data-target="#modalNuevoTratamiento">
+            <i class="fas fa-plus"></i> Nuevo Tratamiento
+        </button>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Mascota</th>
+                            <th>Tratamiento</th>
+                            <th>Medicamentos</th>
+                            <th>Inicio</th>
+                            <th>Fin</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model != null && Model.Any())
+                        {
+                            foreach (var tratamiento in Model)
+                            {
+                                <tr>
+                                    <td>
+                                        @if (tratamiento.Mascotas != null)
+                                        {
+                                            @tratamiento.Mascotas.Nombre
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">N/A</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        <strong>@tratamiento.NombreTratamiento</strong>
+                                        @if (!string.IsNullOrEmpty(tratamiento.Descripcion))
+                                        {
+                                            <br />
+                                            <small class="text-muted">@tratamiento.Descripcion</small>
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (!string.IsNullOrEmpty(tratamiento.Medicamentos))
+                                        {
+                                            @tratamiento.Medicamentos
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">No especificado</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (tratamiento.FechaInicio.HasValue)
+                                        {
+                                            @tratamiento.FechaInicio.Value.ToString("dd/MM/yyyy")
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">N/A</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (tratamiento.FechaFin.HasValue)
+                                        {
+                                            @tratamiento.FechaFin.Value.ToString("dd/MM/yyyy")
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">Pendiente</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (tratamiento.Estado == "En curso")
+                                        {
+                                            <span class="badge bg-success">@tratamiento.Estado</span>
+                                        }
+                                        else if (tratamiento.Estado == "Completado")
+                                        {
+                                            <span class="badge bg-secondary">@tratamiento.Estado</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-info">@tratamiento.Estado</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm">
+                                            @if (tratamiento.Estado == "En curso")
+                                            {
+                                                <form action="@Url.Action("FinalizarTratamiento", "Veterinario")" method="post" style="display:inline;">
+                                                    @Html.AntiForgeryToken()
+                                                    <input type="hidden" name="tratamientoId" value="@tratamiento.TratamientoId" />
+                                                    <input type="hidden" name="observaciones" value="Tratamiento finalizado" />
+                                                    <button type="submit" class="btn btn-warning btn-sm"
+                                                            onclick="return confirm('¿Finalizar tratamiento para @tratamiento.Mascotas?.Nombre?')">
+                                                        <i class="fas fa-flag-checkered"></i>
+                                                    </button>
+                                                </form>
+                                            }
+                                            <a href="@Url.Action("HistorialMedico", "Veterinario", new { mascotaId = tratamiento.MascotaId })"
+                                               class="btn btn-info btn-sm">
+                                                <i class="fas fa-history"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="7" class="text-center text-muted">
+                                    No hay tratamientos registrados
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Nuevo Tratamiento (Simple) -->
+<div class="modal fade" id="modalNuevoTratamiento" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title">Nuevo Tratamiento</h5>
+                <button type="button" class="close text-white" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            @using (Html.BeginForm("IniciarTratamiento", "Veterinario", FormMethod.Post))
+            {
+                @Html.AntiForgeryToken()
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Mascota *</label>
+                        <select name="mascotaId" class="form-control" required>
+                            <option value="">Seleccione...</option>
+                            @if (ViewBag.Mascotas != null)
+                            {
+                                foreach (var mascota in ViewBag.Mascotas)
+                                {
+                                    <option value="@mascota.MascotaId">@mascota.Nombre</option>
+                                }
+                            }
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Nombre del Tratamiento *</label>
+                        <input type="text" name="nombreTratamiento" class="form-control" required />
+                    </div>
+
+                    <div class="form-group">
+                        <label>Descripción *</label>
+                        <textarea name="descripcion" class="form-control" rows="2" required></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Medicamentos</label>
+                        <textarea name="medicamentos" class="form-control" rows="2"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Fecha Inicio</label>
+                        <input type="date" name="fechaInicio" class="form-control"
+                               value="@DateTime.Now.ToString("yyyy-MM-dd")" />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-success">Guardar</button>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<!-- Scripts básicos -->
+<script>
+    $(document).ready(function () {
+        // Validación simple de fechas
+        $('form').on('submit', function () {
+            var fechaInicio = $('input[name="fechaInicio"]').val();
+            var fechaFin = $('input[name="fechaFin"]').val();
+
+            if (fechaFin && fechaInicio && new Date(fechaFin) <= new Date(fechaInicio)) {
+                alert('La fecha fin debe ser posterior a la fecha de inicio');
+                return false;
+            }
+            return true;
+        });
+    });
+</script>

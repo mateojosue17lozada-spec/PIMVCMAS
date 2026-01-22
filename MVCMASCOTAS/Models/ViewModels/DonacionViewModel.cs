@@ -39,9 +39,25 @@ namespace MVCMASCOTAS.Models.ViewModels
 
         public DateTime FechaDonacion { get; set; }
 
-        // Para mostrar en vistas
+        // Datos del donante (REQUERIDOS)
+        [Required(ErrorMessage = "El nombre del donante es requerido")]
+        [Display(Name = "Nombre Completo")]
+        [StringLength(150, ErrorMessage = "El nombre no puede exceder 150 caracteres")]
         public string NombreDonante { get; set; }
+
+        [Required(ErrorMessage = "El email es requerido")]
+        [EmailAddress(ErrorMessage = "Email inválido")]
+        [Display(Name = "Email")]
+        [StringLength(150, ErrorMessage = "El email no puede exceder 150 caracteres")]
         public string EmailDonante { get; set; }
+
+        [Required(ErrorMessage = "El teléfono es requerido")]
+        [Phone(ErrorMessage = "Teléfono inválido")]
+        [Display(Name = "Teléfono")]
+        [StringLength(20, ErrorMessage = "El teléfono no puede exceder 20 caracteres")]
+        public string TelefonoDonante { get; set; }
+
+        [Display(Name = "Comprobante Electrónico")]
         public string ComprobanteElectronico { get; set; }
 
         // Datos del apadrinamiento (si aplica)
@@ -49,16 +65,23 @@ namespace MVCMASCOTAS.Models.ViewModels
         public string NombreMascota { get; set; }
         public string ImagenMascotaBase64 { get; set; }
 
-        [Display(Name = "Duración del Apadrinamiento (meses)")]
+        [Display(Name = "Duración (meses)")]
+        [Range(1, 36, ErrorMessage = "La duración debe ser entre 1 y 36 meses")]
         public int? DuracionMeses { get; set; }
 
-        // Descripción para donaciones en especie
+        // Datos para donaciones en especie
         [Display(Name = "Descripción del Artículo")]
         [DataType(DataType.MultilineText)]
         [StringLength(500)]
         public string DescripcionArticulo { get; set; }
 
         [Display(Name = "Cantidad")]
+        [Range(1, 1000, ErrorMessage = "La cantidad debe ser entre 1 y 1000")]
         public int? Cantidad { get; set; }
+
+        // Propiedades auxiliares para validación condicional
+        public bool EsDonacionMonetaria => TipoDonacion == "Monetaria";
+        public bool EsDonacionEspecie => TipoDonacion == "Especie";
+        public bool EsApadrinamiento => TipoDonacion == "Apadrinamiento";
     }
 }

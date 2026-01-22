@@ -1,7 +1,127 @@
-﻿
+﻿@model MVCMASCOTAS.Models.SolicitudAdopcion
+
 @{
-    ViewBag.Title = "Contrato";
+    ViewBag.Title = "Contrato de Adopción";
 }
 
 <h2>Contrato</h2>
+<style>
+    .contrato-section {
+        page-break-inside: avoid;
+        margin-bottom: 20px;
+    }
 
+    .firma-box {
+        border-top: 2px solid #000;
+        width: 200px;
+        margin-top: 50px;
+        padding-top: 5px;
+        text-align: center;
+    }
+
+    @@media print {
+        .no-print {
+            display: none;
+        }
+    }
+</style>
+
+<div class="page-header mb-4 no-print">
+    <h2><i class="fas fa-file-contract"></i> Contrato de Adopción</h2>
+    <p class="text-muted">Contrato de adopción #@Model.SolicitudId</p>
+</div>
+
+<div class="card shadow-custom mb-4">
+    <div class="card-body">
+        <div class="text-center mb-4">
+            <h3>CONTRATO DE ADOPCIÓN DE MASCOTA</h3>
+            <p><strong>Refugio de Mascotas</strong></p>
+            <p>Fecha: @DateTime.Now.ToString("dd/MM/yyyy")</p>
+        </div>
+
+        <div class="contrato-section">
+            <h5>1. PARTES DEL CONTRATO</h5>
+            <p><strong>EL REFUGIO:</strong> Refugio de Mascotas, con domicilio en @ViewBag.DireccionRefugio</p>
+            <p><strong>EL ADOPTANTE:</strong> @Model.Usuarios.NombreCompleto, con cédula @Model.Usuarios.Cedula, domiciliado en @Model.Usuarios.Direccion</p>
+        </div>
+
+        <div class="contrato-section">
+            <h5>2. OBJETO DEL CONTRATO</h5>
+            <p>El presente contrato tiene por objeto la adopción de la mascota identificada como:</p>
+            <ul>
+                <li><strong>Nombre:</strong> @Model.Mascotas.Nombre</li>
+                <li><strong>Especie:</strong> @Model.Mascotas.Especie</li>
+                <li><strong>Raza:</strong> @Model.Mascotas.Raza</li>
+                <li><strong>Sexo:</strong> @Model.Mascotas.Sexo</li>
+                <li><strong>Edad Aproximada:</strong> @Model.Mascotas.EdadAproximada</li>
+            </ul>
+        </div>
+
+        <div class="contrato-section">
+            <h5>3. OBLIGACIONES DEL ADOPTANTE</h5>
+            <ol>
+                <li>Proporcionar alimentación adecuada y agua fresca diariamente.</li>
+                <li>Brindar atención veterinaria cuando sea necesario.</li>
+                <li>Mantener al día las vacunas y desparasitaciones.</li>
+                <li>Proporcionar un ambiente seguro y adecuado para la mascota.</li>
+                <li>No abandonar, maltratar o ceder la mascota sin autorización del refugio.</li>
+                <li>Permitir visitas de seguimiento por parte del refugio.</li>
+                <li>Notificar al refugio en caso de pérdida, enfermedad grave o fallecimiento.</li>
+                <li>Esterilizar a la mascota si aún no lo está (dentro de 60 días).</li>
+            </ol>
+        </div>
+
+        <div class="contrato-section">
+            <h5>4. DERECHOS DEL REFUGIO</h5>
+            <ol>
+                <li>Realizar visitas de seguimiento durante el primer año.</li>
+                <li>Recuperar la mascota en caso de incumplimiento del contrato.</li>
+                <li>Solicitar informes sobre el estado de la mascota.</li>
+            </ol>
+        </div>
+
+        <div class="contrato-section">
+            <h5>5. CLÁUSULAS ESPECIALES</h5>
+            <!-- OPCIÓN 1: Si quieres usar una propiedad que SÍ existe en tu modelo -->
+            <p>@Model.Observaciones</p> <!-- Usando Observaciones que SÍ existe en tu tabla -->
+            <!-- OPCIÓN 2: Texto fijo -->
+            <!-- <p>No se aplican cláusulas especiales adicionales a las ya mencionadas.</p> -->
+            <!-- OPCIÓN 3: Si quieres crear la propiedad CondicionesEspeciales -->
+            <!-- <p>@ViewBag.CondicionesEspeciales</p> -->
+        </div>
+
+        <div class="contrato-section">
+            <h5>6. ACEPTACIÓN</h5>
+            <p>El adoptante declara haber leído y comprendido todas las cláusulas del presente contrato y se compromete a cumplirlas fielmente.</p>
+        </div>
+
+        <div class="row mt-5">
+            <div class="col-md-6 text-center">
+                <div class="firma-box mx-auto">
+                    Firma del Adoptante
+                </div>
+                <p class="mt-2"><strong>@Model.Usuarios.NombreCompleto</strong></p>
+                <p>C.I.: @Model.Usuarios.Cedula</p>
+            </div>
+            <div class="col-md-6 text-center">
+                <div class="firma-box mx-auto">
+                    Firma del Refugio
+                </div>
+                <p class="mt-2"><strong>Representante Legal</strong></p>
+                <p>Refugio de Mascotas</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="no-print text-center mb-4">
+    <button onclick="window.print()" class="btn btn-primary btn-lg">
+        <i class="fas fa-print"></i> Imprimir Contrato
+    </button>
+    <a href="@Url.Action("DescargarContrato", "Adopcion", new { id = Model.SolicitudId })" class="btn btn-success btn-lg">
+        <i class="fas fa-download"></i> Descargar PDF
+    </a>
+    <a href="@Url.Action("MisSolicitudes", "Adopcion")" class="btn btn-outline-secondary btn-lg">
+        <i class="fas fa-arrow-left"></i> Volver
+    </a>
+</div>
