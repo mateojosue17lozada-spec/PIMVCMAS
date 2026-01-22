@@ -1,0 +1,662 @@
+@{
+    ViewBag.Title = "Página de Prueba - Todas las Vistas";
+}
+
+<style>
+    .section-title {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 15px;
+        border-radius: 5px;
+        margin-top: 30px;
+        margin-bottom: 20px;
+    }
+    .view-card {
+        transition: transform 0.2s, box-shadow 0.2s;
+        border-left: 4px solid #667eea;
+    }
+    .view-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+    .view-link {
+        text-decoration: none;
+        color: #333;
+    }
+    .view-link:hover {
+        text-decoration: none;
+        color: #667eea;
+    }
+    .badge-count {
+        background: #667eea;
+        color: white;
+    }
+    .controller-icon {
+        font-size: 24px;
+        margin-right: 10px;
+    }
+</style>
+
+<div class="container-fluid">
+    <div class="jumbotron bg-gradient text-white" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+        <h1 class="display-4">🧪 Página de Prueba de Vistas</h1>
+        <p class="lead">Navegación rápida a todas las vistas del sistema PIMVCMAS</p>
+        <hr class="my-4" style="border-color: rgba(255,255,255,0.3);">
+        <p>Total de vistas disponibles: <strong>63 vistas</strong> en <strong>11 controladores</strong></p>
+    </div>
+
+    <!-- Home -->
+    <h2 class="section-title">
+        <span class="controller-icon">🏠</span> Home <span class="badge badge-count">3 vistas</span>
+    </h2>
+    <div class="row">
+        <div class="col-md-4 mb-3">
+            <div class="card view-card">
+                <div class="card-body">
+                    <h5 class="card-title">Index</h5>
+                    <p class="card-text">Página principal del sitio</p>
+                    <a href="@Url.Action("Index", "Home")" class="btn btn-primary btn-block">Ver Vista</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card view-card">
+                <div class="card-body">
+                    <h5 class="card-title">About</h5>
+                    <p class="card-text">Acerca de nosotros</p>
+                    <a href="@Url.Action("About", "Home")" class="btn btn-primary btn-block">Ver Vista</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card view-card">
+                <div class="card-body">
+                    <h5 class="card-title">Contact</h5>
+                    <p class="card-text">Página de contacto</p>
+                    <a href="@Url.Action("Contact", "Home")" class="btn btn-primary btn-block">Ver Vista</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Account -->
+    <h2 class="section-title">
+        <span class="controller-icon">👤</span> Account <span class="badge badge-count">5 vistas</span>
+    </h2>
+    <div class="row">
+        <div class="col-md-4 mb-3">
+            <div class="card view-card">
+                <div class="card-body">
+                    <h5 class="card-title">Login</h5>
+                    <p class="card-text">Inicio de sesión</p>
+                    <a href="@Url.Action("Login", "Account")" class="btn btn-primary btn-block">Ver Vista</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card view-card">
+                <div class="card-body">
+                    <h5 class="card-title">Register</h5>
+                    <p class="card-text">Registro de nuevos usuarios</p>
+                    <a href="@Url.Action("Register", "Account")" class="btn btn-primary btn-block">Ver Vista</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card view-card">
+                <div class="card-body">
+                    <h5 class="card-title">Profile</h5>
+                    <p class="card-text">Perfil de usuario</p>
+                    <a href="@Url.Action("Profile", "Account")" class="btn btn-primary btn-block">Ver Vista</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card view-card">
+                <div class="card-body">
+                    <h5 class="card-title">EditProfile</h5>
+                    <p class="card-text">Editar perfil</p>
+                    <a href="@Url.Action("EditProfile", "Account")" class="btn btn-primary btn-block">Ver Vista</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card view-card">
+                <div class="card-body">
+                    <h5 class="card-title">ForgotPassword</h5>
+                    <p class="card-text">Recuperar contraseña</p>
+                    <a href="@Url.Action("ForgotPassword", "Account")" class="btn btn-primary btn-block">Ver Vista</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin -->
+    <h2 class="section-title">
+        <span class="controller-icon">⚙️</span> Admin <span class="badge badge-count">8 vistas</span>
+    </h2>
+    <div class="row">
+        <div class="col-md-4 mb-3">
+            <div class="card view-card">
+                <div class="card-body">
+                    <h5 class="card-title">Dashboard</h5>
+                    <p class="card-text">Panel administrativo principal</p>
+                    <a href="@Url.Action("Dashboard", "Admin")" class="btn btn-primary btn-block">Ver Vista</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card view-card">
+                <div class="card-body">
+                    <h5 class="card-title">Usuarios</h5>
+                    <p class="card-text">Gestión de usuarios</p>
+                    <a href="@Url.Action("Usuarios", "Admin")" class="btn btn-primary btn-block">Ver Vista</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card view-card">
+                <div class="card-body">
+                    <h5 class="card-title">Mascotas</h5>
+                    <p class="card-text">Gestión de mascotas</p>
+                    <a href="@Url.Action("Mascotas", "Admin")" class="btn btn-primary btn-block">Ver Vista</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card view-card">
+                <div class="card-body">
+                    <h5 class="card-title">SolicitudAdopcion</h5>
+                    <p class="card-text">Solicitudes de adopción</p>
+                    <a href="@Url.Action("SolicitudAdopcion", "Admin")" class="btn btn-primary btn-block">Ver Vista</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card view-card">
+                <div class="card-body">
+                    <h5 class="card-title">DetallesSolicitud</h5>
+                    <p class="card-text">Detalles de solicitudes</p>
+                    <a href="@Url.Action("DetallesSolicitud", "Admin")" class="btn btn-primary btn-block">Ver Vista</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card view-card">
+                <div class="card-body">
+                    <h5 class="card-title">Roles</h5>
+                    <p class="card-text">Gestión de roles</p>
+                    <a href="@Url.Action("Roles", "Admin")" class="btn btn-primary btn-block">Ver Vista</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card view-card">
+                <div class="card-body">
+                    <h5 class="card-title">Configuracion</h5>
+                    <p class="card-text">Configuración del sistema</p>
+                    <a href="@Url.Action("Configuracion", "Admin")" class="btn btn-primary btn-block">Ver Vista</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card view-card">
+                <div class="card-body">
+                    <h5 class="card-title">Auditoria</h5>
+                    <p class="card-text">Auditoría del sistema</p>
+                    <a href="@Url.Action("Auditoria", "Admin")" class="btn btn-primary btn-block">Ver Vista</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Adopción -->
+    <h2 class="section-title">
+        <span class="controller-icon">❤️</span> Adopción <span class="badge badge-count">5 vistas</span>
+    </h2>
+    <div class="row">
+        <div class="col-md-4 mb-3">
+            <div class="card view-card">
+                <div class="card-body">
+                    <h5 class="card-title">Solicitar</h5>
+                    <p class="card-text">Solicitar adopción</p>
+                    <a href="@Url.Action("Solicitar", "Adopcion")" class="btn btn-primary btn-block">Ver Vista</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card view-card">
+                <div class="card-body">
+                    <h5 class="card-title">MisSolicitudes</h5>
+                    <p class="card-text">Mis solicitudes de adopción</p>
+                    <a href="@Url.Action("MisSolicitudes", "Adopcion")" class="btn btn-primary btn-block">Ver Vista</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card view-card">
+                <div class="card-body">
+                    <h5 class="card-title">Evaluar</h5>
+                    <p class="card-text">Evaluar solicitudes</p>
+                    <a href="@Url.Action("Evaluar", "Adopcion")" class="btn btn-primary btn-block">Ver Vista</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card view-card">
+                <div class="card-body">
+                    <h5 class="card-title">Seguimiento</h5>
+                    <p class="card-text">Seguimiento post-adopción</p>
+                    <a href="@Url.Action("Seguimiento", "Adopcion")" class="btn btn-primary btn-block">Ver Vista</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card view-card">
+                <div class="card-body">
+                    <h5 class="card-title">Contrato</h5>
+                    <p class="card-text">Contrato de adopción</p>
+                    <a href="@Url.Action("Contrato", "Adopcion")" class="btn btn-primary btn-block">Ver Vista</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mascotas -->
+    <h2 class="section-title">
+        <span class="controller-icon">🐶</span> Mascotas <span class="badge badge-count">5 vistas</span>
+    </h2>
+    <div class="row">
+        <div class="col-md-4 mb-3">
+            <div class="card view-card">
+                <div class="card-body">
+                    <h5 class="card-title">Index</h5>
+                    <p class="card-text">Lista de mascotas</p>
+                    <a href="@Url.Action("Index", "Mascotas")" class="btn btn-primary btn-block">Ver Vista</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card view-card">
+                <div class="card-body">
+                    <h5 class="card-title">Detalle</h5>
+                    <p class="card-text">Detalles de mascota</p>
+                    <a href="@Url.Action("Detalle", "Mascotas")" class="btn btn-primary btn-block">Ver Vista</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card view-card">
+                <div class="card-body">
+                    <h5 class="card-title">Crear</h5>
+                    <p class="card-text">Crear nueva mascota</p>
+                    <a href="@Url.Action("Crear", "Mascotas")" class="btn btn-primary btn-block">Ver Vista</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card view-card">
+                <div class="card-body">
+                    <h5 class="card-title">Editar</h5>
+                    <p class="card-text">Editar mascota</p>
+                    <a href="@Url.Action("Editar", "Mascotas")" class="btn btn-primary btn-block">Ver Vista</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card view-card">
+                <div class="card-body">
+                    <h5 class="card-title">Gestionar</h5>
+                    <p class="card-text">Gestionar mascotas</p>
+                    <a href="@Url.Action("Gestionar", "Mascotas")" class="btn btn-primary btn-block">Ver Vista</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rescate -->
+    <h2 class="section-title">
+        <span class="controller-icon">🚑</span> Rescate <span class="badge badge-count">4 vistas</span>
+    </h2>
+    <div class="row">
+        <div class="col-md-4 mb-3">
+            <div class="card view-card">
+                <div class="card-body">
+                    <h5 class="card-title">Index</h5>
+                    <p class="card-text">Rescates</p>
+                    <a href="@Url.Action("Index", "Rescate")" class="btn btn-primary btn-block">Ver Vista</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card view-card">
+                <div class="card-body">
+                    <h5 class="card-title">ReportarRescate</h5>
+                    <p class="card-text">Reportar un rescate</p>
+                    <a href="@Url.Action("ReportarRescate", "Rescate")" class="btn btn-primary btn-block">Ver Vista</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card view-card">
+                <div class="card-body">
+                    <h5 class="card-title">MisReportes</h5>
+                    <p class="card-text">Mis reportes</p>
+                    <a href="@Url.Action("MisReportes", "Rescate")" class="btn btn-primary btn-block">Ver Vista</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card view-card">
+                <div class="card-body">
+                    <h5 class="card-title">MascotasPerdidas</h5>
+                    <p class="card-text">Mascotas perdidas</p>
+                    <a href="@Url.Action("MascotasPerdidas", "Rescate")" class="btn btn-primary btn-block">Ver Vista</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Veterinario -->
+    <h2 class="section-title">
+        <span class="controller-icon">🏥</span> Veterinario <span class="badge badge-count">5 vistas</span>
+    </h2>
+    <div class="row">
+        <div class="col-md-4 mb-3">
+            <div class="card view-card">
+                <div class="card-body">
+                    <h5 class="card-title">Dashboard</h5>
+                    <p class="card-text">Panel veterinario</p>
+                    <a href="@Url.Action("Dashboard", "Veterinario")" class="btn btn-primary btn-block">Ver Vista</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card view-card">
+                <div class="card-body">
+                    <h5 class="card-title">HistorialMedico</h5>
+                    <p class="card-text">Historial médico</p>
+                    <a href="@Url.Action("HistorialMedico", "Veterinario")" class="btn btn-primary btn-block">Ver Vista</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card view-card">
+                <div class="card-body">
+                    <h5 class="card-title">RegistrarConsulta</h5>
+                    <p class="card-text">Registrar consulta</p>
+                    <a href="@Url.Action("RegistrarConsulta", "Veterinario")" class="btn btn-primary btn-block">Ver Vista</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card view-card">
+                <div class="card-body">
+                    <h5 class="card-title">Tratamientos</h5>
+                    <p class="card-text">Tratamientos</p>
+                    <a href="@Url.Action("Tratamientos", "Veterinario")" class="btn btn-primary btn-block">Ver Vista</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card view-card">
+                <div class="card-body">
+                    <h5 class="card-title">Vacunas</h5>
+                    <p class="card-text">Vacunas</p>
+                    <a href="@Url.Action("Vacunas", "Veterinario")" class="btn btn-primary btn-block">Ver Vista</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Donaciones -->
+    <h2 class="section-title">
+        <span class="controller-icon">💰</span> Donaciones <span class="badge badge-count">5 vistas</span>
+    </h2>
+    <div class="row">
+        <div class="col-md-4 mb-3">
+            <div class="card view-card">
+                <div class="card-body">
+                    <h5 class="card-title">Index</h5>
+                    <p class="card-text">Donaciones</p>
+                    <a href="@Url.Action("Index", "Donaciones")" class="btn btn-primary btn-block">Ver Vista</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card view-card">
+                <div class="card-body">
+                    <h5 class="card-title">Donar</h5>
+                    <p class="card-text">Hacer una donación</p>
+                    <a href="@Url.Action("Donar", "Donaciones")" class="btn btn-primary btn-block">Ver Vista</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card view-card">
+                <div class="card-body">
+                    <h5 class="card-title">Apadrinar</h5>
+                    <p class="card-text">Apadrinar mascota</p>
+                    <a href="@Url.Action("Apadrinar", "Donaciones")" class="btn btn-primary btn-block">Ver Vista</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card view-card">
+                <div class="card-body">
+                    <h5 class="card-title">MisDonaciones</h5>
+                    <p class="card-text">Mis donaciones</p>
+                    <a href="@Url.Action("MisDonaciones", "Donaciones")" class="btn btn-primary btn-block">Ver Vista</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card view-card">
+                <div class="card-body">
+                    <h5 class="card-title">MisApadrinamientos</h5>
+                    <p class="card-text">Mis apadrinamientos</p>
+                    <a href="@Url.Action("MisApadrinamientos", "Donaciones")" class="btn btn-primary btn-block">Ver Vista</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tienda -->
+    <h2 class="section-title">
+        <span class="controller-icon">🛒</span> Tienda <span class="badge badge-count">5 vistas</span>
+    </h2>
+    <div class="row">
+        <div class="col-md-4 mb-3">
+            <div class="card view-card">
+                <div class="card-body">
+                    <h5 class="card-title">Index</h5>
+                    <p class="card-text">Catálogo de productos</p>
+                    <a href="@Url.Action("Index", "Tienda")" class="btn btn-primary btn-block">Ver Vista</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card view-card">
+                <div class="card-body">
+                    <h5 class="card-title">Detalle</h5>
+                    <p class="card-text">Detalle de producto</p>
+                    <a href="@Url.Action("Detalle", "Tienda")" class="btn btn-primary btn-block">Ver Vista</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card view-card">
+                <div class="card-body">
+                    <h5 class="card-title">Carrito</h5>
+                    <p class="card-text">Carrito de compras</p>
+                    <a href="@Url.Action("Carrito", "Tienda")" class="btn btn-primary btn-block">Ver Vista</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card view-card">
+                <div class="card-body">
+                    <h5 class="card-title">Checkout</h5>
+                    <p class="card-text">Finalizar compra</p>
+                    <a href="@Url.Action("Checkout", "Tienda")" class="btn btn-primary btn-block">Ver Vista</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card view-card">
+                <div class="card-body">
+                    <h5 class="card-title">MisPedidos</h5>
+                    <p class="card-text">Mis pedidos</p>
+                    <a href="@Url.Action("MisPedidos", "Tienda")" class="btn btn-primary btn-block">Ver Vista</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Voluntariado -->
+    <h2 class="section-title">
+        <span class="controller-icon">🤝</span> Voluntariado <span class="badge badge-count">4 vistas</span>
+    </h2>
+    <div class="row">
+        <div class="col-md-4 mb-3">
+            <div class="card view-card">
+                <div class="card-body">
+                    <h5 class="card-title">Index</h5>
+                    <p class="card-text">Voluntariado</p>
+                    <a href="@Url.Action("Index", "Voluntariado")" class="btn btn-primary btn-block">Ver Vista</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card view-card">
+                <div class="card-body">
+                    <h5 class="card-title">Inscribirse</h5>
+                    <p class="card-text">Inscripción de voluntarios</p>
+                    <a href="@Url.Action("Inscribirse", "Voluntariado")" class="btn btn-primary btn-block">Ver Vista</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card view-card">
+                <div class="card-body">
+                    <h5 class="card-title">Actividades</h5>
+                    <p class="card-text">Actividades disponibles</p>
+                    <a href="@Url.Action("Actividades", "Voluntariado")" class="btn btn-primary btn-block">Ver Vista</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card view-card">
+                <div class="card-body">
+                    <h5 class="card-title">MisActividades</h5>
+                    <p class="card-text">Mis actividades</p>
+                    <a href="@Url.Action("MisActividades", "Voluntariado")" class="btn btn-primary btn-block">Ver Vista</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contabilidad -->
+    <h2 class="section-title">
+        <span class="controller-icon">📊</span> Contabilidad <span class="badge badge-count">6 vistas</span>
+    </h2>
+    <div class="row">
+        <div class="col-md-4 mb-3">
+            <div class="card view-card">
+                <div class="card-body">
+                    <h5 class="card-title">Dashboard</h5>
+                    <p class="card-text">Panel contable</p>
+                    <a href="@Url.Action("Dashboard", "Contabilidad")" class="btn btn-primary btn-block">Ver Vista</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card view-card">
+                <div class="card-body">
+                    <h5 class="card-title">Movimientos</h5>
+                    <p class="card-text">Movimientos contables</p>
+                    <a href="@Url.Action("Movimientos", "Contabilidad")" class="btn btn-primary btn-block">Ver Vista</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card view-card">
+                <div class="card-body">
+                    <h5 class="card-title">RegistrarMovimiento</h5>
+                    <p class="card-text">Registrar movimiento</p>
+                    <a href="@Url.Action("RegistrarMovimiento", "Contabilidad")" class="btn btn-primary btn-block">Ver Vista</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card view-card">
+                <div class="card-body">
+                    <h5 class="card-title">EditarMovimiento</h5>
+                    <p class="card-text">Editar movimiento</p>
+                    <a href="@Url.Action("EditarMovimiento", "Contabilidad")" class="btn btn-primary btn-block">Ver Vista</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card view-card">
+                <div class="card-body">
+                    <h5 class="card-title">DetallesMovimientos</h5>
+                    <p class="card-text">Detalles de movimientos</p>
+                    <a href="@Url.Action("DetallesMovimientos", "Contabilidad")" class="btn btn-primary btn-block">Ver Vista</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card view-card">
+                <div class="card-body">
+                    <h5 class="card-title">Reportes</h5>
+                    <p class="card-text">Reportes financieros</p>
+                    <a href="@Url.Action("Reportes", "Contabilidad")" class="btn btn-primary btn-block">Ver Vista</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Shared & Error Views -->
+    <h2 class="section-title">
+        <span class="controller-icon">🔧</span> Vistas Compartidas y Errores <span class="badge badge-count">7 vistas</span>
+    </h2>
+    <div class="row">
+        <div class="col-md-4 mb-3">
+            <div class="card view-card">
+                <div class="card-body">
+                    <h5 class="card-title">Error</h5>
+                    <p class="card-text">Página de error genérico</p>
+                    <a href="@Url.Action("Index", "Error")" class="btn btn-secondary btn-block">Ver Vista</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card view-card">
+                <div class="card-body">
+                    <h5 class="card-title">NotFound</h5>
+                    <p class="card-text">Error 404 - No encontrado</p>
+                    <a href="@Url.Action("NotFound", "Error")" class="btn btn-secondary btn-block">Ver Vista</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card view-card">
+                <div class="card-body">
+                    <h5 class="card-title">Unauthorized</h5>
+                    <p class="card-text">Error 401 - No autorizado</p>
+                    <a href="@Url.Action("Unauthorized", "Error")" class="btn btn-secondary btn-block">Ver Vista</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="alert alert-info mt-5">
+        <h5>📝 Notas:</h5>
+        <ul>
+            <li>Algunas vistas pueden requerir autenticación o permisos específicos</li>
+            <li>Las vistas con parámetros (como detalles o edición) pueden mostrar errores si no se proporcionan IDs válidos</li>
+            <li>Esta página es solo para pruebas y navegación rápida durante el desarrollo</li>
+        </ul>
+    </div>
+</div>
