@@ -1,0 +1,782 @@
+﻿@model MVCMASCOTAS.Models.Roles
+@{
+    ViewBag.Title = "Permisos del Rol";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var permisosActuales = ViewBag.PermisosActuales as List<string> ?? new List<string>();
+}
+
+<div class="permisos-section fade-in-up">
+    <div class="container">
+        <!-- Encabezado -->
+        <div class="page-header text-center mb-4">
+            <h2 class="display-5 text-brown">
+                <i class="fa fa-key text-green mr-2"></i> Permisos del Rol: <span class="text-green">@Model.NombreRol</span>
+            </h2>
+            <p class="text-secondary mt-2">Configura los permisos de acceso para este rol en el sistema</p>
+        </div>
+
+        <div class="row">
+            <!-- Información del Rol -->
+            <div class="col-md-4 mb-4">
+                <div class="card shadow-hover border-green h-100">
+                    <div class="card-header bg-green text-white">
+                        <h5 class="mb-0">
+                            <i class="fa fa-info-circle mr-2"></i> Información del Rol
+                        </h5>
+                    </div>
+                    <div class="card-body bg-light-mint">
+                        <h5 class="text-brown mb-3">
+                            <i class="fa fa-user-tag mr-2 text-green"></i>@Model.NombreRol
+                        </h5>
+
+                        <p class="text-secondary mb-4">
+                            <i class="fa fa-align-left mr-2 text-green"></i>
+                            @(Model.Descripcion ?? "Sin descripción")
+                        </p>
+
+                        <hr class="border-green" />
+
+                        <!-- Detalles del rol -->
+                        <h6 class="text-brown mb-3">
+                            <i class="fa fa-cog mr-2 text-green"></i> Detalles del Rol
+                        </h6>
+
+                        <ul class="info-list mb-4">
+                            <li class="text-brown">
+                                <i class="fa fa-hashtag text-green"></i>
+                                <strong class="mr-2">ID:</strong>
+                                <span class="ml-auto">@Model.RolId</span>
+                            </li>
+                            <li class="text-brown">
+                                <i class="fa fa-calendar-plus text-green"></i>
+                                <strong class="mr-2">Creado:</strong>
+                                <span class="ml-auto">@(Model.FechaCreacion?.ToString("dd/MM/yyyy") ?? "No registrado")</span>
+                            </li>
+                            <li class="text-brown">
+                                <i class="fa fa-check-circle text-green"></i>
+                                <strong class="mr-2">Estado:</strong>
+                                <span class="ml-auto">
+                                    @if (Model.Activo == true)
+                                    {
+                                        <span class="badge bg-green">Activo</span>
+                                    }
+                                    else if (Model.Activo == false)
+                                    {
+                                        <span class="badge bg-pink">Inactivo</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">No definido</span>
+                                    }
+                                </span>
+                            </li>
+                        </ul>
+
+                        <hr class="border-green" />
+
+                        <!-- Botón volver -->
+                        <div class="text-center mt-4">
+                            <a href="@Url.Action("Roles", "Admin")" class="btn btn-outline-green">
+                                <i class="fa fa-arrow-left mr-2"></i> Volver a Roles
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Consejo informativo -->
+                <div class="alert alert-green border-green mt-4">
+                    <div class="d-flex">
+                        <i class="fa fa-lightbulb fa-2x text-green mr-3"></i>
+                        <div>
+                            <strong class="text-brown">Consejo:</strong>
+                            <p class="text-secondary mb-0 small">
+                                Los permisos definen qué acciones puede realizar un usuario con este rol en el sistema.
+                                Asigna solo los permisos necesarios según las responsabilidades del rol.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Permisos del Sistema -->
+            <div class="col-md-8 mb-4">
+                <div class="card shadow-hover border-green h-100">
+                    <div class="card-header bg-green text-white">
+                        <h5 class="mb-0">
+                            <i class="fa fa-shield-alt mr-2"></i> Permisos del Sistema
+                        </h5>
+                    </div>
+                    <div class="card-body bg-light-mint">
+                        @using (Html.BeginForm("GuardarPermisos", "Admin", FormMethod.Post, new { id = "formPermisos" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            @Html.Hidden("rolId", Model.RolId)
+
+                            <!-- Módulo: Mascotas -->
+                            <div class="card mb-4 border-green shadow-hover">
+                                <div class="card-header module-header bg-light-mint d-flex justify-content-between align-items-center" data-toggle="collapse" data-target="#mascotasPermisos">
+                                    <h6 class="mb-0 text-brown">
+                                        <i class="fa fa-paw mr-2 text-green"></i> Módulo: Mascotas
+                                    </h6>
+                                    <span class="select-all-module" data-target="mascotas">Seleccionar Todo</span>
+                                </div>
+                                <div id="mascotasPermisos" class="collapse show">
+                                    <div class="card-body bg-light-mint">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-check mb-3">
+                                                    <input class="form-check-input permiso-checkbox"
+                                                           type="checkbox"
+                                                           name="permisos"
+                                                           value="Mascotas_Ver"
+                                                           id="permiso1"
+                                                           data-module="mascotas"
+                                                           @(permisosActuales.Contains("Mascotas_Ver") ? "checked" : "")>
+                                                    <label class="form-check-label d-flex align-items-center text-brown" for="permiso1">
+                                                        <span class="permiso-icon icon-ver">
+                                                            <i class="fa fa-eye"></i>
+                                                        </span>
+                                                        Ver mascotas
+                                                    </label>
+                                                </div>
+                                                <div class="form-check mb-3">
+                                                    <input class="form-check-input permiso-checkbox"
+                                                           type="checkbox"
+                                                           name="permisos"
+                                                           value="Mascotas_Crear"
+                                                           id="permiso2"
+                                                           data-module="mascotas"
+                                                           @(permisosActuales.Contains("Mascotas_Crear") ? "checked" : "")>
+                                                    <label class="form-check-label d-flex align-items-center text-brown" for="permiso2">
+                                                        <span class="permiso-icon icon-crear">
+                                                            <i class="fa fa-plus-circle"></i>
+                                                        </span>
+                                                        Crear mascotas
+                                                    </label>
+                                                </div>
+                                                <div class="form-check mb-3">
+                                                    <input class="form-check-input permiso-checkbox"
+                                                           type="checkbox"
+                                                           name="permisos"
+                                                           value="Mascotas_Editar"
+                                                           id="permiso3"
+                                                           data-module="mascotas"
+                                                           @(permisosActuales.Contains("Mascotas_Editar") ? "checked" : "")>
+                                                    <label class="form-check-label d-flex align-items-center text-brown" for="permiso3">
+                                                        <span class="permiso-icon icon-editar">
+                                                            <i class="fa fa-edit"></i>
+                                                        </span>
+                                                        Editar mascotas
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-check mb-3">
+                                                    <input class="form-check-input permiso-checkbox"
+                                                           type="checkbox"
+                                                           name="permisos"
+                                                           value="Mascotas_Eliminar"
+                                                           id="permiso4"
+                                                           data-module="mascotas"
+                                                           @(permisosActuales.Contains("Mascotas_Eliminar") ? "checked" : "")>
+                                                    <label class="form-check-label d-flex align-items-center text-brown" for="permiso4">
+                                                        <span class="permiso-icon icon-eliminar">
+                                                            <i class="fa fa-trash-alt"></i>
+                                                        </span>
+                                                        Eliminar mascotas
+                                                    </label>
+                                                </div>
+                                                <div class="form-check mb-3">
+                                                    <input class="form-check-input permiso-checkbox"
+                                                           type="checkbox"
+                                                           name="permisos"
+                                                           value="Mascotas_Exportar"
+                                                           id="permiso5"
+                                                           data-module="mascotas"
+                                                           @(permisosActuales.Contains("Mascotas_Exportar") ? "checked" : "")>
+                                                    <label class="form-check-label d-flex align-items-center text-brown" for="permiso5">
+                                                        <span class="permiso-icon icon-exportar">
+                                                            <i class="fa fa-file-export"></i>
+                                                        </span>
+                                                        Exportar datos
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Módulo: Usuarios -->
+                            <div class="card mb-4 border-green shadow-hover">
+                                <div class="card-header module-header bg-light-mint d-flex justify-content-between align-items-center" data-toggle="collapse" data-target="#usuariosPermisos">
+                                    <h6 class="mb-0 text-brown">
+                                        <i class="fa fa-users mr-2 text-green"></i> Módulo: Usuarios
+                                    </h6>
+                                    <span class="select-all-module" data-target="usuarios">Seleccionar Todo</span>
+                                </div>
+                                <div id="usuariosPermisos" class="collapse show">
+                                    <div class="card-body bg-light-mint">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-check mb-3">
+                                                    <input class="form-check-input permiso-checkbox"
+                                                           type="checkbox"
+                                                           name="permisos"
+                                                           value="Usuarios_Ver"
+                                                           id="permiso6"
+                                                           data-module="usuarios"
+                                                           @(permisosActuales.Contains("Usuarios_Ver") ? "checked" : "")>
+                                                    <label class="form-check-label d-flex align-items-center text-brown" for="permiso6">
+                                                        <span class="permiso-icon icon-ver">
+                                                            <i class="fa fa-eye"></i>
+                                                        </span>
+                                                        Ver usuarios
+                                                    </label>
+                                                </div>
+                                                <div class="form-check mb-3">
+                                                    <input class="form-check-input permiso-checkbox"
+                                                           type="checkbox"
+                                                           name="permisos"
+                                                           value="Usuarios_Crear"
+                                                           id="permiso7"
+                                                           data-module="usuarios"
+                                                           @(permisosActuales.Contains("Usuarios_Crear") ? "checked" : "")>
+                                                    <label class="form-check-label d-flex align-items-center text-brown" for="permiso7">
+                                                        <span class="permiso-icon icon-crear">
+                                                            <i class="fa fa-plus-circle"></i>
+                                                        </span>
+                                                        Crear usuarios
+                                                    </label>
+                                                </div>
+                                                <div class="form-check mb-3">
+                                                    <input class="form-check-input permiso-checkbox"
+                                                           type="checkbox"
+                                                           name="permisos"
+                                                           value="Usuarios_Editar"
+                                                           id="permiso8"
+                                                           data-module="usuarios"
+                                                           @(permisosActuales.Contains("Usuarios_Editar") ? "checked" : "")>
+                                                    <label class="form-check-label d-flex align-items-center text-brown" for="permiso8">
+                                                        <span class="permiso-icon icon-editar">
+                                                            <i class="fa fa-edit"></i>
+                                                        </span>
+                                                        Editar usuarios
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-check mb-3">
+                                                    <input class="form-check-input permiso-checkbox"
+                                                           type="checkbox"
+                                                           name="permisos"
+                                                           value="Usuarios_Eliminar"
+                                                           id="permiso9"
+                                                           data-module="usuarios"
+                                                           @(permisosActuales.Contains("Usuarios_Eliminar") ? "checked" : "")>
+                                                    <label class="form-check-label d-flex align-items-center text-brown" for="permiso9">
+                                                        <span class="permiso-icon icon-eliminar">
+                                                            <i class="fa fa-trash-alt"></i>
+                                                        </span>
+                                                        Eliminar usuarios
+                                                    </label>
+                                                </div>
+                                                <div class="form-check mb-3">
+                                                    <input class="form-check-input permiso-checkbox"
+                                                           type="checkbox"
+                                                           name="permisos"
+                                                           value="Usuarios_Roles"
+                                                           id="permiso10"
+                                                           data-module="usuarios"
+                                                           @(permisosActuales.Contains("Usuarios_Roles") ? "checked" : "")>
+                                                    <label class="form-check-label d-flex align-items-center text-brown" for="permiso10">
+                                                        <span class="permiso-icon icon-crear">
+                                                            <i class="fa fa-user-tag"></i>
+                                                        </span>
+                                                        Asignar roles
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Módulo: Administración -->
+                            <div class="card mb-4 border-green shadow-hover">
+                                <div class="card-header module-header bg-light-mint d-flex justify-content-between align-items-center" data-toggle="collapse" data-target="#adminPermisos">
+                                    <h6 class="mb-0 text-brown">
+                                        <i class="fa fa-cogs mr-2 text-green"></i> Módulo: Administración
+                                    </h6>
+                                    <span class="select-all-module" data-target="admin">Seleccionar Todo</span>
+                                </div>
+                                <div id="adminPermisos" class="collapse show">
+                                    <div class="card-body bg-light-mint">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-check mb-3">
+                                                    <input class="form-check-input permiso-checkbox"
+                                                           type="checkbox"
+                                                           name="permisos"
+                                                           value="Admin_Dashboard"
+                                                           id="permiso11"
+                                                           data-module="admin"
+                                                           @(permisosActuales.Contains("Admin_Dashboard") ? "checked" : "")>
+                                                    <label class="form-check-label d-flex align-items-center text-brown" for="permiso11">
+                                                        <span class="permiso-icon icon-ver">
+                                                            <i class="fa fa-tachometer-alt"></i>
+                                                        </span>
+                                                        Ver dashboard
+                                                    </label>
+                                                </div>
+                                                <div class="form-check mb-3">
+                                                    <input class="form-check-input permiso-checkbox"
+                                                           type="checkbox"
+                                                           name="permisos"
+                                                           value="Admin_Configuracion"
+                                                           id="permiso12"
+                                                           data-module="admin"
+                                                           @(permisosActuales.Contains("Admin_Configuracion") ? "checked" : "")>
+                                                    <label class="form-check-label d-flex align-items-center text-brown" for="permiso12">
+                                                        <span class="permiso-icon icon-config">
+                                                            <i class="fa fa-cog"></i>
+                                                        </span>
+                                                        Configuración
+                                                    </label>
+                                                </div>
+                                                <div class="form-check mb-3">
+                                                    <input class="form-check-input permiso-checkbox"
+                                                           type="checkbox"
+                                                           name="permisos"
+                                                           value="Admin_Auditoria"
+                                                           id="permiso13"
+                                                           data-module="admin"
+                                                           @(permisosActuales.Contains("Admin_Auditoria") ? "checked" : "")>
+                                                    <label class="form-check-label d-flex align-items-center text-brown" for="permiso13">
+                                                        <span class="permiso-icon icon-auditoria">
+                                                            <i class="fa fa-clipboard-list"></i>
+                                                        </span>
+                                                        Ver auditoría
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-check mb-3">
+                                                    <input class="form-check-input permiso-checkbox"
+                                                           type="checkbox"
+                                                           name="permisos"
+                                                           value="Admin_Reportes"
+                                                           id="permiso14"
+                                                           data-module="admin"
+                                                           @(permisosActuales.Contains("Admin_Reportes") ? "checked" : "")>
+                                                    <label class="form-check-label d-flex align-items-center text-brown" for="permiso14">
+                                                        <span class="permiso-icon icon-reportes">
+                                                            <i class="fa fa-chart-bar"></i>
+                                                        </span>
+                                                        Generar reportes
+                                                    </label>
+                                                </div>
+                                                <div class="form-check mb-3">
+                                                    <input class="form-check-input permiso-checkbox"
+                                                           type="checkbox"
+                                                           name="permisos"
+                                                           value="Admin_Backup"
+                                                           id="permiso15"
+                                                           data-module="admin"
+                                                           @(permisosActuales.Contains("Admin_Backup") ? "checked" : "")>
+                                                    <label class="form-check-label d-flex align-items-center text-brown" for="permiso15">
+                                                        <span class="permiso-icon icon-backup">
+                                                            <i class="fa fa-database"></i>
+                                                        </span>
+                                                        Backup sistema
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Botones de acción -->
+                            <div class="form-group mt-5 pt-4 border-top border-green">
+                                <div class="d-flex justify-content-between align-items-center flex-wrap">
+                                    <a href="@Url.Action("Roles", "Admin")" class="btn btn-outline-green mb-2">
+                                        <i class="fa fa-times mr-2"></i> Cancelar
+                                    </a>
+                                    <button type="submit" class="btn btn-green mb-2" id="btnGuardarPermisos">
+                                        <i class="fa fa-save mr-2"></i> Guardar Permisos
+                                    </button>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        .permisos-section {
+            background: linear-gradient(135deg, var(--bg-light) 0%, white 100%);
+            min-height: 100vh;
+            padding: 2rem 0;
+        }
+
+        .page-header {
+            border-bottom: 3px solid var(--green);
+            padding-bottom: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            border-radius: 12px !important;
+            border: 2px solid var(--green) !important;
+        }
+
+        .card-header {
+            border-radius: 10px 10px 0 0 !important;
+            padding: 1rem 1.35rem;
+        }
+
+        .info-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+            .info-list li {
+                padding: 0.75rem;
+                border-bottom: 1px solid rgba(151, 199, 139, 0.3);
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+            }
+
+                .info-list li:last-child {
+                    border-bottom: none;
+                }
+
+                .info-list li i {
+                    color: var(--green);
+                    margin-right: 0.5rem;
+                    min-width: 20px;
+                }
+
+        .module-header {
+            background-color: var(--bg-light);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-radius: 8px 8px 0 0;
+            padding: 1rem;
+        }
+
+            .module-header:hover {
+                background-color: rgba(151, 199, 139, 0.1);
+            }
+
+        .form-check {
+            padding: 0.75rem;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+
+            .form-check:hover {
+                background-color: var(--bg-light);
+            }
+
+        .form-check-input {
+            width: 1.25rem;
+            height: 1.25rem;
+            margin-top: 0.15rem;
+            border: 2px solid var(--green);
+            cursor: pointer;
+        }
+
+            .form-check-input:checked {
+                background-color: var(--green);
+                border-color: var(--green);
+            }
+
+            .form-check-input:focus {
+                border-color: var(--green);
+                box-shadow: 0 0 0 0.2rem rgba(151, 199, 139, 0.25);
+            }
+
+        .form-check-label {
+            cursor: pointer;
+            margin-left: 0.5rem;
+            font-weight: 500;
+        }
+
+        .permiso-icon {
+            width: 35px;
+            height: 35px;
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 0.75rem;
+            font-size: 1rem;
+        }
+
+        .icon-ver {
+            background-color: rgba(151, 199, 139, 0.2);
+            color: var(--green);
+        }
+
+        .icon-crear {
+            background-color: rgba(242, 198, 109, 0.2);
+            color: var(--yellow);
+        }
+
+        .icon-editar {
+            background-color: rgba(251, 205, 192, 0.2);
+            color: var(--pink);
+        }
+
+        .icon-eliminar {
+            background-color: rgba(251, 205, 192, 0.3);
+            color: #D32F2F;
+        }
+
+        .icon-exportar {
+            background-color: rgba(151, 199, 139, 0.3);
+            color: var(--green);
+        }
+
+        .icon-config {
+            background-color: rgba(242, 198, 109, 0.3);
+            color: var(--yellow);
+        }
+
+        .icon-auditoria {
+            background-color: rgba(251, 205, 192, 0.2);
+            color: var(--pink);
+        }
+
+        .icon-reportes {
+            background-color: rgba(151, 199, 139, 0.3);
+            color: var(--green);
+        }
+
+        .icon-backup {
+            background-color: rgba(242, 198, 109, 0.2);
+            color: var(--yellow);
+        }
+
+        .select-all-module {
+            color: var(--green);
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+        }
+
+            .select-all-module:hover {
+                color: var(--brown);
+                text-decoration: underline;
+            }
+
+        .gap-3 {
+            gap: 1rem;
+        }
+
+        @@media (max-width: 768px) {
+            .btn-action {
+                min-width: 100%;
+                margin-bottom: 0.5rem;
+            }
+
+            .d-flex.justify-content-between.flex-wrap {
+                flex-direction: column;
+            }
+
+            .card-header {
+                padding: 0.75rem;
+            }
+
+            .display-5 {
+                font-size: 1.8rem;
+            }
+        }
+
+        /* Animación para los elementos */
+        .fade-in-up {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        .animate__pulse {
+            animation: pulse 0.3s ease-in-out;
+        }
+
+        @@keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.02);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        /* Estilos para el scroll suave */
+        .collapse {
+            transition: all 0.3s ease;
+        }
+    </style>
+}
+
+@section Scripts {
+    <script type="text/javascript">
+        $(document).ready(function () {
+            console.log('Vista Permisos del Rol cargada');
+
+            // Función para actualizar el texto "Seleccionar Todo"
+            function updateSelectAllText(target) {
+                var checkboxes = $('.permiso-checkbox[data-module="' + target + '"]');
+                var allChecked = checkboxes.length === checkboxes.filter(':checked').length;
+                var text = allChecked ? 'Deseleccionar Todo' : 'Seleccionar Todo';
+                $('.select-all-module[data-target="' + target + '"]').text(text);
+            }
+
+            // Inicializar textos
+            updateSelectAllText('mascotas');
+            updateSelectAllText('usuarios');
+            updateSelectAllText('admin');
+
+            // Seleccionar/Deseleccionar todos los checkboxes de un módulo
+            $('.select-all-module').click(function (e) {
+                e.stopPropagation();
+                var target = $(this).data('target');
+                var checkboxes = $('.permiso-checkbox[data-module="' + target + '"]');
+                var allChecked = checkboxes.length === checkboxes.filter(':checked').length;
+                checkboxes.prop('checked', !allChecked);
+                checkboxes.trigger('change');
+                updateSelectAllText(target);
+            });
+
+            // Actualizar texto cuando se marca/desmarca un checkbox individual
+            $('.permiso-checkbox').change(function () {
+                var target = $(this).data('module');
+                updateSelectAllText(target);
+
+                // Animación suave al marcar/desmarcar
+                $(this).parent().addClass('animate__pulse');
+                setTimeout(function () {
+                    $(this).parent().removeClass('animate__pulse');
+                }.bind(this), 300);
+            });
+
+            // Validación del formulario con SweetAlert2
+            $('#formPermisos').submit(function (e) {
+                var permisosSeleccionados = $('input[name="permisos"]:checked').length;
+
+                if (permisosSeleccionados === 0) {
+                    e.preventDefault();
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Permisos requeridos',
+                        text: 'Debe seleccionar al menos un permiso para el rol.',
+                        confirmButtonColor: '#97C78B',
+                        confirmButtonText: 'Entendido'
+                    });
+                    return false;
+                }
+
+                // Mostrar confirmación antes de guardar
+                e.preventDefault();
+
+                Swal.fire({
+                    title: '¿Guardar permisos?',
+                    text: "Se actualizarán los permisos para el rol " + '@Model.NombreRol',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#97C78B',
+                    cancelButtonColor: '#FBCDC0',
+                    confirmButtonText: '<i class="fa fa-save"></i> Sí, guardar',
+                    cancelButtonText: '<i class="fa fa-times"></i> Cancelar',
+                    showClass: {
+                        popup: 'animate__animated animate__fadeInDown'
+                    },
+                    hideClass: {
+                        popup: 'animate__animated animate__fadeOutUp'
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Mostrar loader en el botón
+                        $('#btnGuardarPermisos').prop('disabled', true)
+                            .html('<i class="fa fa-spinner fa-spin mr-2"></i> Guardando...')
+                            .removeClass('btn-green')
+                            .addClass('btn-secondary');
+
+                        // Enviar formulario
+                        $(this).unbind('submit').submit();
+                    }
+                });
+
+                return false;
+            });
+
+            // Tooltip para los módulos
+            $('.module-header').tooltip({
+                title: "Click para expandir/contraer",
+                placement: "top"
+            });
+
+            // Colapsar/expandir módulos al hacer click
+            $('.module-header').click(function () {
+                var target = $(this).data('target');
+                $('#' + target).collapse('toggle');
+
+                // Cambiar icono
+                var icon = $(this).find('.fa');
+                if ($('#' + target).hasClass('show')) {
+                    icon.removeClass('fa-chevron-up').addClass('fa-chevron-down');
+                } else {
+                    icon.removeClass('fa-chevron-down').addClass('fa-chevron-up');
+                }
+            });
+
+            // Efecto hover en tarjetas
+            $('.shadow-hover').hover(
+                function () {
+                    $(this).addClass('shadow-lg');
+                },
+                function () {
+                    $(this).removeClass('shadow-lg');
+                }
+            );
+
+            // Notificaciones de TempData
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <text>
+                Swal.fire({
+                    icon: 'success',
+                    title: '¡Éxito!',
+                    text: '@Html.Raw(TempData["SuccessMessage"])',
+                    confirmButtonColor: '#97C78B',
+                    timer: 3000
+                });
+                </text>
+            }
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <text>
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: '@Html.Raw(TempData["ErrorMessage"])',
+                    confirmButtonColor: '#FBCDC0'
+                });
+                </text>
+            }
+        });
+    </script>
+}

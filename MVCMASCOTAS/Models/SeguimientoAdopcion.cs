@@ -24,7 +24,7 @@ namespace MVCMASCOTAS.Models
         public string RelacionConAdoptante { get; set; }
         public string Observaciones { get; set; }
         public string Recomendaciones { get; set; }
-        public Nullable<bool> RequiereIntervencion { get; set; }
+        public bool RequiereIntervencion { get; set; }
         public Nullable<System.DateTime> ProximoSeguimiento { get; set; }
         public string FotosEvidencia { get; set; }
     

@@ -4,175 +4,795 @@
     ViewBag.Title = "Realizar una Donación";
 }
 
-<div class="row justify-content-center">
-    <div class="col-md-8">
-        <div class="card shadow-custom">
-            <div class="card-header bg-success text-white">
-                <h3><i class="fas fa-hand-holding-heart"></i> Realizar una Donación</h3>
-            </div>
-            <div class="card-body">
-                <div class="alert alert-info">
-                    <i class="fas fa-info-circle"></i> <strong>¡Gracias por tu generosidad!</strong> Cada donación nos ayuda a continuar rescatando y cuidando animales necesitados.
+<style>
+    /* ESTILOS ESPECÍFICOS PARA FORMULARIO DE DONACIÓN */
+    .donacion-section {
+        background: linear-gradient(135deg, var(--bg-light) 0%, white 100%);
+        min-height: 100vh;
+        padding: 40px 0;
+    }
+
+    /* CARD PRINCIPAL */
+    .donacion-card {
+        border: 2px solid var(--green);
+        border-radius: 20px;
+        overflow: hidden;
+        background: white;
+        box-shadow: 0 15px 40px rgba(151, 199, 139, 0.2);
+        transition: all 0.3s ease;
+    }
+
+        .donacion-card:hover {
+            box-shadow: 0 20px 50px rgba(151, 199, 139, 0.3);
+        }
+
+    .card-header-donacion {
+        background: linear-gradient(135deg, var(--green) 0%, #86b57a 100%);
+        color: white;
+        padding: 25px 30px;
+        position: relative;
+        overflow: hidden;
+    }
+
+        .card-header-donacion::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+        }
+
+    .header-icon {
+        font-size: 2.5rem;
+        margin-bottom: 15px;
+        color: white;
+        filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
+    }
+
+    .header-title {
+        font-weight: 700;
+        margin-bottom: 10px;
+        position: relative;
+        z-index: 1;
+    }
+
+    /* ALERTA INFORMATIVA */
+    .alert-info-custom {
+        background: linear-gradient(135deg, rgba(93, 173, 226, 0.1) 0%, rgba(46, 134, 193, 0.1) 100%);
+        border: 2px solid #5DADE2;
+        border-radius: 12px;
+        padding: 20px;
+        color: var(--brown);
+        margin-bottom: 25px;
+    }
+
+        .alert-info-custom i {
+            color: #5DADE2;
+            font-size: 1.3rem;
+            margin-right: 10px;
+        }
+
+    /* SECCIONES DEL FORMULARIO */
+    .section-title {
+        color: var(--brown);
+        font-weight: 700;
+        margin: 30px 0 20px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid var(--green);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+        .section-title i {
+            color: var(--green);
+            font-size: 1.2rem;
+        }
+
+    /* FORM CONTROLS */
+    .form-label {
+        color: var(--brown);
+        font-weight: 600;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+        .form-label i {
+            width: 20px;
+            text-align: center;
+        }
+
+    .form-control, .form-select {
+        border: 2px solid rgba(151, 199, 139, 0.3);
+        border-radius: 10px;
+        padding: 12px 15px;
+        transition: all 0.3s ease;
+        color: var(--brown);
+        font-size: 1rem;
+    }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--green);
+            box-shadow: 0 0 0 0.3rem rgba(151, 199, 139, 0.25);
+            transform: translateY(-2px);
+        }
+
+    /* TIPOS DE DONACIÓN */
+    .tipo-seccion {
+        border: 2px solid rgba(151, 199, 139, 0.2);
+        border-radius: 12px;
+        padding: 25px;
+        margin-top: 20px;
+        background-color: rgba(151, 199, 139, 0.05);
+        transition: all 0.4s ease;
+        display: none;
+    }
+
+        .tipo-seccion.active {
+            display: block;
+            animation: slideDown 0.5s ease-out;
+        }
+
+    @@keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* ALERTAS ESPECÍFICAS */
+    .alert-banco {
+        background: linear-gradient(135deg, rgba(242, 198, 109, 0.1) 0%, rgba(230, 184, 92, 0.1) 100%);
+        border: 2px solid var(--yellow);
+        border-radius: 12px;
+        padding: 20px;
+        color: var(--brown);
+        margin-top: 20px;
+    }
+
+        .alert-banco strong {
+            color: var(--brown);
+        }
+
+        .alert-banco i {
+            color: var(--yellow);
+            margin-right: 8px;
+        }
+
+    .alert-coordinacion {
+        background: linear-gradient(135deg, rgba(251, 205, 192, 0.1) 0%, rgba(249, 194, 176, 0.1) 100%);
+        border: 2px solid var(--pink);
+        border-radius: 12px;
+        padding: 20px;
+        color: var(--brown);
+        margin-top: 20px;
+    }
+
+        .alert-coordinacion i {
+            color: var(--pink);
+            margin-right: 8px;
+        }
+
+    .alert-apadrinamiento {
+        background: linear-gradient(135deg, rgba(151, 199, 139, 0.1) 0%, rgba(134, 181, 122, 0.1) 100%);
+        border: 2px solid var(--green);
+        border-radius: 12px;
+        padding: 20px;
+        color: var(--brown);
+        margin-top: 20px;
+    }
+
+        .alert-apadrinamiento i {
+            color: var(--green);
+            margin-right: 8px;
+        }
+
+    /* CHECKBOX PERSONALIZADO */
+    .form-check {
+        padding-left: 2.5rem;
+        margin-top: 20px;
+    }
+
+    .form-check-input {
+        width: 1.5rem;
+        height: 1.5rem;
+        margin-left: -2.5rem;
+        margin-top: 0.2rem;
+        border: 2px solid var(--green);
+        border-radius: 6px;
+    }
+
+        .form-check-input:checked {
+            background-color: var(--green);
+            border-color: var(--green);
+        }
+
+        .form-check-input:focus {
+            box-shadow: 0 0 0 0.2rem rgba(151, 199, 139, 0.25);
+            border-color: var(--green);
+        }
+
+    .form-check-label {
+        color: var(--brown);
+        font-weight: 500;
+        padding-left: 10px;
+        cursor: pointer;
+    }
+
+    /* BOTONES */
+    .btn-submit {
+        background: linear-gradient(135deg, var(--green) 0%, #86b57a 100%);
+        color: white !important;
+        border: none;
+        padding: 18px 40px;
+        border-radius: 12px;
+        font-weight: 700;
+        font-size: 1.2rem;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        width: 100%;
+        margin-bottom: 15px;
+        box-shadow: 0 5px 15px rgba(151, 199, 139, 0.3);
+    }
+
+        .btn-submit:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(151, 199, 139, 0.4);
+        }
+
+        .btn-submit:active {
+            transform: translateY(-2px);
+        }
+
+    .btn-cancel {
+        background: linear-gradient(135deg, #95A5A6 0%, #7F8C8D 100%);
+        color: white !important;
+        border: none;
+        padding: 18px 40px;
+        border-radius: 12px;
+        font-weight: 700;
+        font-size: 1.2rem;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        width: 100%;
+        box-shadow: 0 5px 15px rgba(149, 165, 166, 0.3);
+    }
+
+        .btn-cancel:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(149, 165, 166, 0.4);
+            color: white !important;
+        }
+
+    /* VALIDACIÓN */
+    .text-danger {
+        color: #E74C3C !important;
+        font-size: 0.9rem;
+        margin-top: 5px;
+        display: block;
+        font-weight: 500;
+    }
+
+    .field-validation-error {
+        background-color: rgba(231, 76, 60, 0.1);
+        padding: 8px 12px;
+        border-radius: 6px;
+        border-left: 3px solid #E74C3C;
+        margin-top: 5px;
+    }
+
+    /* MASCOTA SELECTOR */
+    .mascota-selector {
+        position: relative;
+    }
+
+    .mascota-info {
+        background-color: rgba(151, 199, 139, 0.1);
+        padding: 15px;
+        border-radius: 10px;
+        margin-top: 10px;
+        border-left: 3px solid var(--green);
+        display: none;
+    }
+
+    /* ANIMACIONES */
+    .fade-in {
+        animation: fadeIn 0.5s ease-out;
+    }
+
+    .pulse-once {
+        animation: pulseOnce 0.5s ease-out;
+    }
+
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @@keyframes pulseOnce {
+        0% {
+            transform: scale(1);
+        }
+
+        50% {
+            transform: scale(1.02);
+        }
+
+        100% {
+            transform: scale(1);
+        }
+    }
+
+    /* RESPONSIVE */
+    @@media (max-width: 768px) {
+        .donacion-section {
+            padding: 20px 0;
+        }
+
+        .card-header-donacion {
+            padding: 20px;
+        }
+
+        .header-icon {
+            font-size: 2rem;
+        }
+
+        .header-title {
+            font-size: 1.5rem;
+        }
+
+        .tipo-seccion {
+            padding: 15px;
+        }
+
+        .section-title {
+            margin: 20px 0 15px;
+            font-size: 1.1rem;
+        }
+
+        .form-control, .form-select {
+            padding: 10px 12px;
+            font-size: 0.95rem;
+        }
+
+        .btn-submit,
+        .btn-cancel {
+            padding: 15px 20px;
+            font-size: 1rem;
+        }
+
+        .alert-info-custom,
+        .alert-banco,
+        .alert-coordinacion,
+        .alert-apadrinamiento {
+            padding: 15px;
+            font-size: 0.95rem;
+        }
+    }
+
+    /* ESTILOS PARA VALIDACIÓN CLIENTE */
+    .input-error {
+        border-color: #E74C3C !important;
+        background-color: rgba(231, 76, 60, 0.05);
+    }
+
+    .input-success {
+        border-color: var(--green) !important;
+        background-color: rgba(151, 199, 139, 0.05);
+    }
+</style>
+
+<div class="donacion-section fade-in">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-xl-10 col-lg-12">
+                <div class="donacion-card">
+                    <!-- Header -->
+                    <div class="card-header-donacion text-center">
+                        <div class="header-icon">
+                            <i class="fas fa-hand-holding-heart"></i>
+                        </div>
+                        <h1 class="header-title mb-2">Realizar una Donación</h1>
+                        <p class="mb-0 opacity-90" style="position: relative; z-index: 1;">
+                            Tu generosidad cambia vidas
+                        </p>
+                    </div>
+
+                    <!-- Body -->
+                    <div class="card-body p-4 p-md-5">
+                        <!-- Alerta Informativa -->
+                        <div class="alert-info-custom fade-in">
+                            <div class="d-flex">
+                                <i class="fas fa-info-circle mt-1"></i>
+                                <div>
+                                    <strong class="d-block mb-2">¡Gracias por tu generosidad!</strong>
+                                    Cada donación nos ayuda a continuar rescatando, cuidando y dando una segunda oportunidad a animales necesitados.
+                                </div>
+                            </div>
+                        </div>
+
+                        @using (Html.BeginForm("Donar", "Donaciones", FormMethod.Post, new { id = "formDonacion" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            @Html.ValidationSummary(true, "", new { @class = "alert alert-danger" })
+
+                            <!-- Sección 1: Tipo de Donación -->
+                            <div class="section-title">
+                                <i class="fas fa-gift"></i>
+                                <span>Tipo de Donación</span>
+                            </div>
+
+                            <div class="form-group mb-4">
+                                <label class="form-label">
+                                    <i class="fas fa-heart"></i> Tipo de Donación *
+                                </label>
+                                @Html.DropDownListFor(m => m.TipoDonacion, new SelectList(new[] {
+                                    new SelectListItem { Text = "💰 Donación Monetaria", Value = "Monetaria" },
+                                    new SelectListItem { Text = "📦 Donación en Especie", Value = "Especie" },
+                                    new SelectListItem { Text = "🐾 Apadrinamiento", Value = "Apadrinamiento" }
+                                }, "Value", "Text"), "👉 Selecciona el tipo de donación...", new
+                                                {
+                                    @class = "form-select form-control-lg",
+                                    id = "TipoDonacion",
+                                    required = "required",
+                                    style = "font-weight: 500;"
+                                })
+                                @Html.ValidationMessageFor(m => m.TipoDonacion, "", new { @class = "text-danger" })
+                            </div>
+
+                            <!-- Sección de Donación Monetaria -->
+                            <div id="donacion-monetaria" class="tipo-seccion">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="form-label">
+                                                <i class="fas fa-dollar-sign"></i> Monto de Donación *
+                                            </label>
+                                            <div class="input-group">
+                                                <span class="input-group-text" style="background-color: rgba(151, 199, 139, 0.1); border-color: rgba(151, 199, 139, 0.3); color: var(--brown); font-weight: 600;">$</span>
+                                                @Html.TextBoxFor(m => m.Monto, new
+                                                {
+                                                    @class = "form-control",
+                                                    type = "number",
+                                                    step = "0.01",
+                                                    min = "1",
+                                                    placeholder = "0.00",
+                                                    id = "MontoMonetaria",
+                                                    style = "padding-left: 10px;"
+                                                })
+                                            </div>
+                                            @Html.ValidationMessageFor(m => m.Monto, "", new { @class = "text-danger" })
+                                            <small class="text-muted mt-1 d-block">Monto mínimo: $1.00</small>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="form-label">
+                                                <i class="fas fa-credit-card"></i> Método de Pago *
+                                            </label>
+                                            @Html.DropDownListFor(m => m.MetodoPago, new SelectList(new[] {
+                                                "Transferencia Bancaria",
+                                                "Depósito Bancario",
+                                                "PayPal",
+                                                "Tarjeta de Crédito/Débito",
+                                                "Efectivo (En refugio)"
+                                            }), "👉 Selecciona método...", new { @class = "form-select", id = "MetodoPagoMonetaria" })
+                                            @Html.ValidationMessageFor(m => m.MetodoPago, "", new { @class = "text-danger" })
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group mt-3">
+                                    <label class="form-label">
+                                        <i class="fas fa-sync-alt"></i> Frecuencia de Donación
+                                    </label>
+                                    @Html.DropDownListFor(m => m.Frecuencia, new SelectList(new[] {
+                                        "💫 Donación Única",
+                                        "📅 Mensual",
+                                        "📆 Trimestral",
+                                        "📊 Anual"
+                                    }), "👉 Selecciona frecuencia...", new { @class = "form-select" })
+                                </div>
+
+                                <div class="alert-banco mt-4">
+                                    <div class="d-flex">
+                                        <i class="fas fa-university fa-lg"></i>
+                                        <div class="ms-3">
+                                            <strong class="d-block mb-2">📋 Datos Bancarios para Transferencia/Depósito:</strong>
+                                            <div class="row mt-2">
+                                                <div class="col-md-6">
+                                                    <strong>🏦 Banco:</strong> Banco Pichincha
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <strong>💳 Tipo de Cuenta:</strong> Corriente
+                                                </div>
+                                                <div class="col-md-6 mt-2">
+                                                    <strong>🔢 Número de Cuenta:</strong> 1234567890
+                                                </div>
+                                                <div class="col-md-6 mt-2">
+                                                    <strong>👤 Beneficiario:</strong> Refugio de Animales Quito
+                                                </div>
+                                                <div class="col-12 mt-2">
+                                                    <strong>📝 RUC:</strong> 1234567890001
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Sección de Donación en Especie -->
+                            <div id="donacion-especie" class="tipo-seccion">
+                                <div class="form-group">
+                                    <label class="form-label">
+                                        <i class="fas fa-box"></i> ¿Qué vas a donar? *
+                                    </label>
+                                    @Html.TextAreaFor(m => m.DescripcionArticulo, new
+                                    {
+                                        @class = "form-control",
+                                        rows = "4",
+                                        placeholder = "Describe detalladamente los artículos que deseas donar:\n• Alimento (tipo, marca, cantidad)\n• Medicamentos (nombre, fecha vencimiento)\n• Juguetes, camas, cobijas\n• Otros insumos...",
+                                        id = "DescripcionEspecie"
+                                    })
+                                    @Html.ValidationMessageFor(m => m.DescripcionArticulo, "", new { @class = "text-danger" })
+                                </div>
+
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="form-label">
+                                                <i class="fas fa-calculator"></i> Cantidad Aproximada
+                                            </label>
+                                            @Html.TextBoxFor(m => m.Cantidad, new
+                                            {
+                                                @class = "form-control",
+                                                type = "number",
+                                                min = "1",
+                                                placeholder = "Ej: 10, 5, 1"
+                                            })
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="form-label">
+                                                <i class="fas fa-weight"></i> Unidad de Medida
+                                            </label>
+                                            <select class="form-select">
+                                                <option>Kilogramos (kg)</option>
+                                                <option>Litros (L)</option>
+                                                <option>Unidades</option>
+                                                <option>Cajas</option>
+                                                <option>Paquetes</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="alert-coordinacion mt-4">
+                                    <div class="d-flex">
+                                        <i class="fas fa-info-circle"></i>
+                                        <div class="ms-3">
+                                            <strong class="d-block mb-2">📞 Coordinación de Entrega:</strong>
+                                            Después de registrar tu donación, nuestro equipo se pondrá en contacto contigo dentro de las próximas 24-48 horas para coordinar la entrega de los artículos.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Sección de Apadrinamiento -->
+                            <div id="donacion-apadrinamiento" class="tipo-seccion">
+                                <div class="form-group">
+                                    <label class="form-label">
+                                        <i class="fas fa-dog"></i> Elige una Mascota para Apadrinar *
+                                    </label>
+                                    @Html.DropDownListFor(m => m.MascotaId, (SelectList)ViewBag.Mascotas, "👉 Selecciona una mascota...", new
+                                    {
+                                        @class = "form-select mascota-selector",
+                                        id = "MascotaId",
+                                        required = "required"
+                                    })
+                                    @Html.ValidationMessageFor(m => m.MascotaId, "", new { @class = "text-danger" })
+                                </div>
+
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="form-label">
+                                                <i class="fas fa-dollar-sign"></i> Monto Mensual *
+                                            </label>
+                                            <div class="input-group">
+                                                <span class="input-group-text" style="background-color: rgba(242, 198, 109, 0.1); border-color: rgba(242, 198, 109, 0.3); color: var(--brown); font-weight: 600;">$</span>
+                                                @Html.TextBoxFor(m => m.Monto, new
+                                                {
+                                                    @class = "form-control",
+                                                    type = "number",
+                                                    step = "0.01",
+                                                    min = "10",
+                                                    placeholder = "0.00",
+                                                    id = "MontoApadrinamiento"
+                                                })
+                                            </div>
+                                            <small class="text-muted mt-1 d-block">Monto mínimo: $10.00 mensuales</small>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="form-label">
+                                                <i class="fas fa-credit-card"></i> Método de Pago *
+                                            </label>
+                                            @Html.DropDownListFor(m => m.MetodoPago, new SelectList(new[] {
+                                                "Transferencia Bancaria",
+                                                "Depósito Bancario",
+                                                "PayPal",
+                                                "Tarjeta de Crédito (Cargo mensual)"
+                                            }), "👉 Selecciona método...", new { @class = "form-select", id = "MetodoPagoApadrinamiento" })
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group mt-3">
+                                    <label class="form-label">
+                                        <i class="fas fa-calendar-alt"></i> Duración del Apadrinamiento (meses)
+                                    </label>
+                                    @Html.TextBoxFor(m => m.DuracionMeses, new
+                                    {
+                                        @class = "form-control",
+                                        type = "number",
+                                        min = "1",
+                                        max = "36",
+                                        placeholder = "12 (recomendado)",
+                                        style = "max-width: 200px;"
+                                    })
+                                    <small class="text-muted mt-1 d-block">Puedes cancelar en cualquier momento</small>
+                                </div>
+
+                                <div class="alert-apadrinamiento mt-4">
+                                    <div class="d-flex">
+                                        <i class="fas fa-heart"></i>
+                                        <div class="ms-3">
+                                            <strong class="d-block mb-2">🐕 Beneficios del Apadrinamiento:</strong>
+                                            • 🎯 Contribuyes mensualmente con el cuidado específico de una mascota<br>
+                                            • 📸 Recibirás actualizaciones periódicas con fotos de tu ahijado<br>
+                                            • 🏥 Tu donación cubre alimentación, salud y bienestar<br>
+                                            • 💝 Podrás visitar a tu mascota ahijada en el refugio
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Sección 2: Información del Donante -->
+                            <div class="section-title mt-5">
+                                <i class="fas fa-user"></i>
+                                <span>Información del Donante</span>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">
+                                    <i class="fas fa-signature"></i> Nombre Completo *
+                                </label>
+                                @Html.TextBoxFor(m => m.NombreDonante, new
+                                {
+                                    @class = "form-control",
+                                    required = "required",
+                                    placeholder = "Ingresa tu nombre y apellido completo"
+                                })
+                                @Html.ValidationMessageFor(m => m.NombreDonante, "", new { @class = "text-danger" })
+                            </div>
+
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-label">
+                                            <i class="fas fa-envelope"></i> Email *
+                                        </label>
+                                        @Html.TextBoxFor(m => m.EmailDonante, new
+                                        {
+                                            @class = "form-control",
+                                            type = "email",
+                                            required = "required",
+                                            placeholder = "ejemplo@correo.com"
+                                        })
+                                        @Html.ValidationMessageFor(m => m.EmailDonante, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-label">
+                                            <i class="fas fa-phone"></i> Teléfono / WhatsApp *
+                                        </label>
+                                        @Html.TextBoxFor(m => m.TelefonoDonante, new
+                                        {
+                                            @class = "form-control",
+                                            required = "required",
+                                            placeholder = "0999 999 999"
+                                        })
+                                        @Html.ValidationMessageFor(m => m.TelefonoDonante, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group mt-3">
+                                <label class="form-label">
+                                    <i class="fas fa-comment-dots"></i> Mensaje (Opcional)
+                                </label>
+                                @Html.TextAreaFor(m => m.Mensaje, new
+                                {
+                                    @class = "form-control",
+                                    rows = "3",
+                                    placeholder = "¿Tienes un mensaje especial? ¿Alguna dedicación? ¿Preguntas? Comparte lo que desees..."
+                                })
+                            </div>
+
+                            <div class="form-group mt-3">
+                                <label class="form-label">
+                                    <i class="fas fa-receipt"></i> Número de Transacción/Comprobante (Opcional)
+                                </label>
+                                @Html.TextBoxFor(m => m.NumeroTransaccion, new
+                                {
+                                    @class = "form-control",
+                                    placeholder = "Número de transferencia, depósito, comprobante, etc."
+                                })
+                            </div>
+
+                            <!-- Sección 3: Preferencias -->
+                            <div class="section-title mt-5">
+                                <i class="fas fa-cog"></i>
+                                <span>Preferencias</span>
+                            </div>
+
+                            <div class="form-check mt-3">
+                                @Html.CheckBoxFor(m => m.Anonima, new { @class = "form-check-input", id = "Anonima" })
+                                <label class="form-check-label" for="Anonima">
+                                    🤫 Prefiero mantener mi donación anónima
+                                </label>
+                                <small class="text-muted d-block mt-1">
+                                    Tu nombre no aparecerá en los registros públicos de donaciones
+                                </small>
+                            </div>
+
+                            <!-- Botones de Acción -->
+                            <div class="row g-3 mt-5">
+                                <div class="col-md-6">
+                                    <button type="submit" class="btn-submit pulse-once" id="btnSubmit">
+                                        <i class="fas fa-heart"></i>
+                                        <span>Realizar Donación</span>
+                                    </button>
+                                </div>
+                                <div class="col-md-6">
+                                    <a href="@Url.Action("Index", "Donaciones")" class="btn-cancel">
+                                        <i class="fas fa-times"></i>
+                                        <span>Cancelar</span>
+                                    </a>
+                                </div>
+                            </div>
+                        }
+                    </div>
                 </div>
-
-                @using (Html.BeginForm("Donar", "Donaciones", FormMethod.Post))
-                {
-                    @Html.AntiForgeryToken()
-                    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
-
-                    <h5 class="border-bottom pb-2 mb-3">Tipo de Donación</h5>
-
-                    <div class="form-group">
-                        <label><i class="fas fa-gift"></i> Tipo *</label>
-                        @Html.DropDownListFor(m => m.TipoDonacion, new SelectList(new[] {
-                            new SelectListItem { Text = "Monetaria", Value = "Monetaria" },
-                            new SelectListItem { Text = "Especie", Value = "Especie" },
-                            new SelectListItem { Text = "Apadrinamiento", Value = "Apadrinamiento" }
-                        }, "Value", "Text"), "Seleccionar...", new { @class = "form-control", id = "TipoDonacion", required = "required" })
-                        @Html.ValidationMessageFor(m => m.TipoDonacion, "", new { @class = "text-danger" })
-                    </div>
-
-                    <div id="donacion-monetaria" style="display: none;">
-                        <div class="form-group">
-                            <label><i class="fas fa-dollar-sign"></i> Monto *</label>
-                            @Html.TextBoxFor(m => m.Monto, new { @class = "form-control", type = "number", step = "0.01", min = "1", placeholder = "0.00", id = "MontoMonetaria" })
-                            @Html.ValidationMessageFor(m => m.Monto, "", new { @class = "text-danger" })
-                        </div>
-
-                        <div class="form-group">
-                            <label><i class="fas fa-credit-card"></i> Método de Pago *</label>
-                            @Html.DropDownListFor(m => m.MetodoPago, new SelectList(new[] {
-                                "Transferencia Bancaria",
-                                "Depósito",
-                                "PayPal",
-                                "Tarjeta de Crédito",
-                                "Efectivo"
-                            }), "Seleccionar...", new { @class = "form-control", id = "MetodoPagoMonetaria" })
-                            @Html.ValidationMessageFor(m => m.MetodoPago, "", new { @class = "text-danger" })
-                        </div>
-
-                        <div class="form-group">
-                            <label><i class="fas fa-sync-alt"></i> Frecuencia</label>
-                            @Html.DropDownListFor(m => m.Frecuencia, new SelectList(new[] {
-                                "Única",
-                                "Mensual",
-                                "Trimestral",
-                                "Anual"
-                            }), "Seleccionar...", new { @class = "form-control" })
-                        </div>
-
-                        <div class="alert alert-warning">
-                            <strong><i class="fas fa-university"></i> Datos Bancarios:</strong><br />
-                            <strong>Banco:</strong> Banco Pichincha<br />
-                            <strong>Cuenta Corriente:</strong> 1234567890<br />
-                            <strong>Beneficiario:</strong> Refugio de Animales Quito<br />
-                            <strong>RUC:</strong> 1234567890001
-                        </div>
-                    </div>
-
-                    <div id="donacion-especie" style="display: none;">
-                        <div class="form-group">
-                            <label><i class="fas fa-box"></i> Descripción del Artículo *</label>
-                            @Html.TextAreaFor(m => m.DescripcionArticulo, new { @class = "form-control", rows = "4", placeholder = "Describe qué vas a donar (alimento, medicamentos, juguetes, etc.)", id = "DescripcionEspecie" })
-                            @Html.ValidationMessageFor(m => m.DescripcionArticulo, "", new { @class = "text-danger" })
-                        </div>
-
-                        <div class="form-group">
-                            <label><i class="fas fa-calculator"></i> Cantidad</label>
-                            @Html.TextBoxFor(m => m.Cantidad, new { @class = "form-control", type = "number", min = "1", placeholder = "1" })
-                        </div>
-
-                        <div class="alert alert-info">
-                            <i class="fas fa-info-circle"></i> Después de registrar tu donación, nos pondremos en contacto contigo para coordinar la entrega.
-                        </div>
-                    </div>
-
-                    <div id="donacion-apadrinamiento" style="display: none;">
-                        <div class="form-group">
-                            <label><i class="fas fa-dog"></i> Mascota a Apadrinar *</label>
-                            @Html.DropDownListFor(m => m.MascotaId, (SelectList)ViewBag.Mascotas, "Seleccionar mascota...", new { @class = "form-control", id = "MascotaId", required = "required" })
-                            @Html.ValidationMessageFor(m => m.MascotaId, "", new { @class = "text-danger" })
-                        </div>
-
-                        <div class="form-group">
-                            <label><i class="fas fa-dollar-sign"></i> Monto Mensual *</label>
-                            @Html.TextBoxFor(m => m.Monto, new { @class = "form-control", type = "number", step = "0.01", min = "10", placeholder = "0.00", id = "MontoApadrinamiento" })
-                        </div>
-
-                        <div class="form-group">
-                            <label><i class="fas fa-credit-card"></i> Método de Pago *</label>
-                            @Html.DropDownListFor(m => m.MetodoPago, new SelectList(new[] {
-                                "Transferencia Bancaria",
-                                "Depósito",
-                                "PayPal",
-                                "Tarjeta de Crédito"
-                            }), "Seleccionar...", new { @class = "form-control", id = "MetodoPagoApadrinamiento" })
-                        </div>
-
-                        <div class="form-group">
-                            <label><i class="fas fa-calendar-alt"></i> Duración (meses)</label>
-                            @Html.TextBoxFor(m => m.DuracionMeses, new { @class = "form-control", type = "number", min = "1", max = "36", placeholder = "12" })
-                        </div>
-
-                        <div class="alert alert-success">
-                            <i class="fas fa-heart"></i> Al apadrinar una mascota, estás contribuyendo mensualmente con su cuidado, alimentación y salud.
-                        </div>
-                    </div>
-
-                    <h5 class="border-bottom pb-2 mb-3 mt-4">Información del Donante</h5>
-
-                    <div class="form-group">
-                        <label><i class="fas fa-user"></i> Nombre Completo *</label>
-                        @Html.TextBoxFor(m => m.NombreDonante, new { @class = "form-control", required = "required", placeholder = "Ingresa tu nombre completo" })
-                        @Html.ValidationMessageFor(m => m.NombreDonante, "", new { @class = "text-danger" })
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label><i class="fas fa-envelope"></i> Email *</label>
-                                @Html.TextBoxFor(m => m.EmailDonante, new { @class = "form-control", type = "email", required = "required", placeholder = "ejemplo@correo.com" })
-                                @Html.ValidationMessageFor(m => m.EmailDonante, "", new { @class = "text-danger" })
-                            </div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label><i class="fas fa-phone"></i> Teléfono *</label>
-                                @Html.TextBoxFor(m => m.TelefonoDonante, new { @class = "form-control", required = "required", placeholder = "0999999999" })
-                                @Html.ValidationMessageFor(m => m.TelefonoDonante, "", new { @class = "text-danger" })
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label><i class="fas fa-comment"></i> Mensaje (Opcional)</label>
-                        @Html.TextAreaFor(m => m.Mensaje, new { @class = "form-control", rows = "3", placeholder = "Déjanos un mensaje o dedicación..." })
-                    </div>
-
-                    <div class="form-group">
-                        <label><i class="fas fa-receipt"></i> Número de Transacción (Opcional)</label>
-                        @Html.TextBoxFor(m => m.NumeroTransaccion, new { @class = "form-control", placeholder = "Número de transferencia, depósito, etc." })
-                    </div>
-
-                    <h5 class="border-bottom pb-2 mb-3 mt-4">Preferencias</h5>
-
-                    <div class="form-check mb-3">
-                        @Html.CheckBoxFor(m => m.Anonima, new { @class = "form-check-input" })
-                        <label class="form-check-label">
-                            Prefiero mantener mi donación anónima
-                        </label>
-                    </div>
-
-                    <div class="form-group mt-4">
-                        <button type="submit" class="btn btn-success btn-lg btn-block">
-                            <i class="fas fa-heart"></i> Realizar Donación
-                        </button>
-                        <a href="@Url.Action("Index", "Donaciones")" class="btn btn-secondary btn-lg btn-block">
-                            <i class="fas fa-times"></i> Cancelar
-                        </a>
-                    </div>
-                }
             </div>
         </div>
     </div>
@@ -182,16 +802,15 @@
     @Scripts.Render("~/bundles/jqueryval")
     <script>
         $(document).ready(function () {
-            // Mostrar/ocultar campos según tipo de donación
+            // Mostrar/ocultar campos según tipo de donación con efectos
             function mostrarCamposSegunTipo() {
                 var tipo = $('#TipoDonacion').val();
 
-                // Ocultar todos los paneles primero
-                $('#donacion-monetaria').slideUp();
-                $('#donacion-especie').slideUp();
-                $('#donacion-apadrinamiento').slideUp();
+                // Efecto de desvanecimiento para ocultar
+                $('.tipo-seccion').slideUp(300);
 
-                // Resetear campos obligatorios
+                // Resetear campos obligatorios y clases
+                $('.form-control, .form-select').removeClass('input-error input-success');
                 $('#MontoMonetaria').removeAttr('required');
                 $('#MetodoPagoMonetaria').removeAttr('required');
                 $('#DescripcionEspecie').removeAttr('required');
@@ -199,74 +818,191 @@
                 $('#MontoApadrinamiento').removeAttr('required');
                 $('#MetodoPagoApadrinamiento').removeAttr('required');
 
-                // Mostrar el panel correspondiente y establecer requeridos
-                if (tipo === 'Monetaria') {
-                    $('#donacion-monetaria').slideDown();
-                    $('#MontoMonetaria').attr('required', 'required');
-                    $('#MetodoPagoMonetaria').attr('required', 'required');
-                } else if (tipo === 'Especie') {
-                    $('#donacion-especie').slideDown();
-                    $('#DescripcionEspecie').attr('required', 'required');
-                } else if (tipo === 'Apadrinamiento') {
-                    $('#donacion-apadrinamiento').slideDown();
-                    $('#MascotaId').attr('required', 'required');
-                    $('#MontoApadrinamiento').attr('required', 'required');
-                    $('#MetodoPagoApadrinamiento').attr('required', 'required');
-                }
+                // Mostrar el panel correspondiente con efectos
+                setTimeout(function () {
+                    if (tipo === 'Monetaria') {
+                        $('#donacion-monetaria').slideDown(400);
+                        $('#MontoMonetaria').attr('required', 'required');
+                        $('#MetodoPagoMonetaria').attr('required', 'required');
+                    } else if (tipo === 'Especie') {
+                        $('#donacion-especie').slideDown(400);
+                        $('#DescripcionEspecie').attr('required', 'required');
+                    } else if (tipo === 'Apadrinamiento') {
+                        $('#donacion-apadrinamiento').slideDown(400);
+                        $('#MascotaId').attr('required', 'required');
+                        $('#MontoApadrinamiento').attr('required', 'required');
+                        $('#MetodoPagoApadrinamiento').attr('required', 'required');
+                    }
+                }, 300);
             }
 
             $('#TipoDonacion').change(mostrarCamposSegunTipo);
 
             // Mostrar campos iniciales si ya hay un valor seleccionado
-            mostrarCamposSegunTipo();
+            if ($('#TipoDonacion').val()) {
+                mostrarCamposSegunTipo();
+            }
 
-            // Validación antes de enviar
-            $('form').submit(function (e) {
+            // Validación en tiempo real
+            function validarCampo(campo, condicion) {
+                if (condicion) {
+                    campo.removeClass('input-error').addClass('input-success');
+                    return true;
+                } else {
+                    campo.removeClass('input-success').addClass('input-error');
+                    return false;
+                }
+            }
+
+            // Validación de monto monetario
+            $('#MontoMonetaria').on('blur', function () {
+                var monto = parseFloat($(this).val()) || 0;
+                validarCampo($(this), monto >= 1);
+            });
+
+            // Validación de descripción especie
+            $('#DescripcionEspecie').on('blur', function () {
+                var texto = $(this).val().trim();
+                validarCampo($(this), texto.length >= 10);
+            });
+
+            // Validación de apadrinamiento
+            $('#MontoApadrinamiento').on('blur', function () {
+                var monto = parseFloat($(this).val()) || 0;
+                validarCampo($(this), monto >= 10);
+            });
+
+            // Validación antes de enviar con SweetAlert
+            $('#formDonacion').submit(function (e) {
                 var tipo = $('#TipoDonacion').val();
-                var isValid = true;
+                var errores = [];
+
+                if (!tipo) {
+                    errores.push('Debe seleccionar un tipo de donación');
+                }
 
                 if (tipo === 'Monetaria') {
-                    var monto = $('#MontoMonetaria').val();
+                    var monto = parseFloat($('#MontoMonetaria').val()) || 0;
                     var metodo = $('#MetodoPagoMonetaria').val();
 
-                    if (!monto || parseFloat(monto) <= 0) {
-                        alert('Debe ingresar un monto válido para donación monetaria');
-                        isValid = false;
+                    if (monto < 1) {
+                        errores.push('El monto mínimo para donación monetaria es $1.00');
                     }
                     if (!metodo) {
-                        alert('Debe seleccionar un método de pago');
-                        isValid = false;
+                        errores.push('Debe seleccionar un método de pago');
                     }
                 }
                 else if (tipo === 'Especie') {
-                    var descripcion = $('#DescripcionEspecie').val();
-                    if (!descripcion || descripcion.trim() === '') {
-                        alert('Debe ingresar una descripción del artículo');
-                        isValid = false;
+                    var descripcion = $('#DescripcionEspecie').val().trim();
+                    if (!descripcion || descripcion.length < 10) {
+                        errores.push('Debe ingresar una descripción detallada de los artículos a donar (mínimo 10 caracteres)');
                     }
                 }
                 else if (tipo === 'Apadrinamiento') {
                     var mascotaId = $('#MascotaId').val();
-                    var monto = $('#MontoApadrinamiento').val();
+                    var monto = parseFloat($('#MontoApadrinamiento').val()) || 0;
                     var metodo = $('#MetodoPagoApadrinamiento').val();
 
                     if (!mascotaId) {
-                        alert('Debe seleccionar una mascota para apadrinar');
-                        isValid = false;
+                        errores.push('Debe seleccionar una mascota para apadrinar');
                     }
-                    if (!monto || parseFloat(monto) < 10) {
-                        alert('El monto mínimo de apadrinamiento es $10/mes');
-                        isValid = false;
+                    if (monto < 10) {
+                        errores.push('El monto mínimo de apadrinamiento es $10.00 mensuales');
                     }
                     if (!metodo) {
-                        alert('Debe seleccionar un método de pago');
-                        isValid = false;
+                        errores.push('Debe seleccionar un método de pago');
                     }
                 }
 
-                if (!isValid) {
-                    e.preventDefault();
+                // Validación de campos obligatorios generales
+                if (!$('#NombreDonante').val().trim()) {
+                    errores.push('El nombre completo es obligatorio');
                 }
+                if (!$('#EmailDonante').val().trim()) {
+                    errores.push('El email es obligatorio');
+                }
+                if (!$('#TelefonoDonante').val().trim()) {
+                    errores.push('El teléfono es obligatorio');
+                }
+
+                if (errores.length > 0) {
+                    e.preventDefault();
+
+                    let mensajeErrores = '';
+                    errores.forEach(function (error, index) {
+                        mensajeErrores += (index + 1) + '. ' + error + '\n';
+                    });
+
+                    Swal.fire({
+                        icon: 'warning',
+                        title: '¡Atención!',
+                        html: '<strong>Por favor, corrige los siguientes errores:</strong><br><br>' +
+                            mensajeErrores.replace(/\n/g, '<br>'),
+                        confirmButtonColor: '#97C78B',
+                        confirmButtonText: 'Entendido'
+                    });
+
+                    // Hacer scroll al primer error
+                    $('.input-error').first().focus();
+                    $('html, body').animate({
+                        scrollTop: $('.input-error').first().offset().top - 100
+                    }, 500);
+                } else {
+                    // Confirmación antes de enviar
+                    e.preventDefault();
+
+                    let confirmMessage = '';
+                    let icon = 'info';
+
+                    if (tipo === 'Monetaria') {
+                        confirmMessage = '¿Estás seguro de realizar una donación monetaria de $' +
+                            parseFloat($('#MontoMonetaria').val()).toFixed(2) + '?';
+                        icon = 'success';
+                    } else if (tipo === 'Especie') {
+                        confirmMessage = '¿Confirmas el registro de tu donación en especie? Nos pondremos en contacto contigo para coordinar la entrega.';
+                        icon = 'question';
+                    } else if (tipo === 'Apadrinamiento') {
+                        confirmMessage = '¿Confirmas apadrinar a esta mascota con $' +
+                            parseFloat($('#MontoApadrinamiento').val()).toFixed(2) + ' mensuales?';
+                        icon = 'heart';
+                    }
+
+                    Swal.fire({
+                        title: '¡Un último paso!',
+                        text: confirmMessage,
+                        icon: icon,
+                        showCancelButton: true,
+                        confirmButtonColor: '#97C78B',
+                        cancelButtonColor: '#95A5A6',
+                        confirmButtonText: 'Sí, confirmar',
+                        cancelButtonText: 'Revisar datos',
+                        reverseButtons: true
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            // Deshabilitar botón para evitar doble envío
+                            $('#btnSubmit').prop('disabled', true)
+                                .html('<i class="fas fa-spinner fa-spin"></i> Procesando donación...');
+
+                            // Enviar formulario
+                            $('#formDonacion').off('submit').submit();
+                        }
+                    });
+                }
+            });
+
+            // Efectos en los campos al hacer focus
+            $('.form-control, .form-select').focus(function () {
+                $(this).parent().addClass('pulse-once');
+                setTimeout(() => {
+                    $(this).parent().removeClass('pulse-once');
+                }, 500);
+            });
+
+            // Mostrar información de la mascota seleccionada (apadrinamiento)
+            $('#MascotaId').change(function () {
+                var mascotaId = $(this).val();
+                // Aquí podrías hacer una llamada AJAX para obtener información de la mascota
+                // y mostrarla en un contenedor
             });
         });
     </script>

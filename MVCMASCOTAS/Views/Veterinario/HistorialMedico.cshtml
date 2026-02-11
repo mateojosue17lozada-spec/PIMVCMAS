@@ -1,5 +1,9 @@
 ﻿@{
     ViewBag.Title = $"Historial Médico - {ViewBag.Mascota.Nombre}";
+    var mascota = ViewBag.Mascota as MVCMASCOTAS.Models.Mascotas;
+    var historial = ViewBag.Historial as List<MVCMASCOTAS.Models.HistorialMedico>;
+    var vacunas = ViewBag.Vacunas as List<MVCMASCOTAS.Models.MascotaVacunas>;
+    var tratamientos = ViewBag.Tratamientos as List<MVCMASCOTAS.Models.Tratamientos>;
 }
 
 <div class="row mb-4">
@@ -10,14 +14,35 @@
                     <div class="col-md-2">
                         @if (ViewBag.ImagenBase64 != null)
                         {
-                            <img src="@ViewBag.ImagenBase64" class="img-fluid rounded" alt="@ViewBag.Mascota.Nombre">
+                            <img src="@ViewBag.ImagenBase64" class="img-fluid rounded" alt="@mascota.Nombre">
+                        }
+                        else
+                        {
+                            <div class="bg-light rounded d-flex align-items-center justify-content-center" style="height: 150px;">
+                                <i class="fas fa-paw fa-3x text-muted"></i>
+                            </div>
                         }
                     </div>
                     <div class="col-md-10">
-                        <h2><i class="fas fa-paw"></i> @ViewBag.Mascota.Nombre</h2>
-                        <p class="mb-1"><strong>Especie:</strong> @ViewBag.Mascota.Especie | <strong>Raza:</strong> @ViewBag.Mascota.Raza | <strong>Sexo:</strong> @ViewBag.Mascota.Sexo</p>
-                        <p class="mb-1"><strong>Edad:</strong> @ViewBag.Mascota.EdadAproximada | <strong>Estado:</strong> <span class="badge badge-warning">@ViewBag.Mascota.Estado</span></p>
-                        <p class="mb-0"><strong>Fecha de Ingreso:</strong> @ViewBag.Mascota.FechaIngreso.ToString("dd/MM/yyyy")</p>
+                        <h2><i class="fas fa-paw"></i> @mascota.Nombre</h2>
+                        <p class="mb-1">
+                            <strong>Especie:</strong> @mascota.Especie |
+                            <strong>Raza:</strong> @(mascota.Raza ?? "Mestizo") |
+                            <strong>Sexo:</strong> @mascota.Sexo
+                        </p>
+                        <p class="mb-1">
+                            <strong>Edad:</strong> @mascota.EdadAproximada |
+                            <strong>Estado:</strong>
+                            <span class="badge @(mascota.Estado == "En tratamiento" ? "badge-warning" :
+                                               mascota.Estado == "Disponible para adopción" ? "badge-success" :
+                                               mascota.Estado == "Rescatada" ? "badge-info" : "badge-secondary")">
+                                @mascota.Estado
+                            </span>
+                        </p>
+                        <p class="mb-0">
+                            <strong>Fecha de Ingreso:</strong>
+                            @(mascota.FechaIngreso?.ToString("dd/MM/yyyy") ?? "No especificada")
+                        </p>
                     </div>
                 </div>
             </div>
@@ -57,21 +82,27 @@
                 </div>
             </div>
             <div class="card-body">
-                @if (ViewBag.Historial != null && ViewBag.Historial.Count > 0)
+                @if (historial != null && historial.Any())
                 {
                     <div class="timeline">
-                        @foreach (var registro in ViewBag.Historial)
+                        @foreach (var registro in historial.OrderByDescending(h => h.FechaConsulta))
                         {
                             <div class="card mb-3 shadow-sm">
                                 <div class="card-body">
                                     <div class="d-flex justify-content-between">
-                                        <h6><i class="fas fa-calendar"></i> @registro.FechaRegistro.ToString("dd/MM/yyyy HH:mm")</h6>
-                                        <span class="badge badge-info">@registro.TipoRegistro</span>
+                                        <h6>
+                                            <i class="fas fa-calendar"></i>
+                                            @(registro.FechaConsulta?.ToString("dd/MM/yyyy HH:mm") ?? "Fecha no especificada")
+                                        </h6>
+                                        <span class="badge badge-info">@registro.TipoConsulta</span>
                                     </div>
-                                    <p class="mb-1"><strong>Diagnóstico:</strong> @registro.Diagnostico</p>
-                                    @if (!string.IsNullOrEmpty(registro.TratamientoRecetado))
+                                    @if (!string.IsNullOrEmpty(registro.Diagnostico))
                                     {
-                                        <p class="mb-1"><strong>Tratamiento:</strong> @registro.TratamientoRecetado</p>
+                                        <p class="mb-1"><strong>Diagnóstico:</strong> @registro.Diagnostico</p>
+                                    }
+                                    @if (!string.IsNullOrEmpty(registro.Tratamiento))
+                                    {
+                                        <p class="mb-1"><strong>Tratamiento:</strong> @registro.Tratamiento</p>
                                     }
                                     @if (registro.Peso.HasValue)
                                     {
@@ -81,11 +112,24 @@
                                     {
                                         <p class="mb-1"><strong>Temperatura:</strong> @registro.Temperatura.Value °C</p>
                                     }
+                                    @if (!string.IsNullOrEmpty(registro.EstadoGeneral))
+                                    {
+                                        <p class="mb-1"><strong>Estado General:</strong> @registro.EstadoGeneral</p>
+                                    }
                                     @if (!string.IsNullOrEmpty(registro.Observaciones))
                                     {
                                         <p class="mb-0"><strong>Observaciones:</strong> @registro.Observaciones</p>
                                     }
-                                    <small class="text-muted">Veterinario: @(registro.Usuarios?.NombreCompleto ?? "No especificado")</small>
+                                    @if (registro.ProximaConsulta.HasValue)
+                                    {
+                                        <p class="mb-0">
+                                            <strong>Próxima consulta:</strong>
+                                            @registro.ProximaConsulta.Value.ToString("dd/MM/yyyy")
+                                        </p>
+                                    }
+                                    <small class="text-muted d-block mt-2">
+                                        Veterinario: @(registro.Usuarios?.NombreCompleto ?? "No especificado")
+                                    </small>
                                 </div>
                             </div>
                         }
@@ -111,34 +155,36 @@
                 </div>
             </div>
             <div class="card-body">
-                @if (ViewBag.Vacunas != null && ViewBag.Vacunas.Count > 0)
+                @if (vacunas != null && vacunas.Any())
                 {
                     <div class="table-responsive">
-                        <table class="table">
+                        <table class="table table-hover">
                             <thead>
                                 <tr>
                                     <th>Vacuna</th>
                                     <th>Fecha Aplicación</th>
                                     <th>Próxima Dosis</th>
+                                    <th>Lote</th>
                                     <th>Veterinario</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach (var vacuna in ViewBag.Vacunas)
+                                @foreach (var vacuna in vacunas.OrderByDescending(v => v.FechaAplicacion))
                                 {
                                     <tr>
-                                        <td><strong>@vacuna.Vacunas.NombreVacuna</strong></td>
-                                        <td>@vacuna.FechaAplicacion.ToString("dd/MM/yyyy")</td>
+                                        <td><strong>@vacuna.Vacunas?.NombreVacuna</strong></td>
+                                        <td>@vacuna.FechaAplicacion?.ToString("dd/MM/yyyy")</td>
                                         <td>
-                                            @if (vacuna.FechaProximaDosis.HasValue)
+                                            @if (vacuna.ProximaDosis.HasValue)
                                             {
-                                                @vacuna.FechaProximaDosis.Value.ToString("dd/MM/yyyy")
+                                                @vacuna.ProximaDosis.Value.ToString("dd/MM/yyyy")
                                             }
                                             else
                                             {
                                                 <span class="text-muted">N/A</span>
                                             }
                                         </td>
+                                        <td>@(vacuna.Lote ?? "N/A")</td>
                                         <td>@(vacuna.Usuarios?.NombreCompleto ?? "No especificado")</td>
                                     </tr>
                                 }
@@ -160,49 +206,68 @@
             <div class="card-header">
                 <div class="d-flex justify-content-between align-items-center">
                     <h5><i class="fas fa-pills"></i> Tratamientos</h5>
-                    <a href="@Url.Action("IniciarTratamiento", "Veterinario", new { mascotaId = ViewBag.Mascota.MascotaId })" class="btn btn-warning">
+                    <a href="@Url.Action("IniciarTratamiento", "Veterinario", new { mascotaId = mascota.MascotaId })"
+                       class="btn btn-warning">
                         <i class="fas fa-plus"></i> Iniciar Tratamiento
                     </a>
                 </div>
             </div>
             <div class="card-body">
-                @if (ViewBag.Tratamientos != null && ViewBag.Tratamientos.Count > 0)
+                @if (tratamientos != null && tratamientos.Any())
                 {
-                    foreach (var tratamiento in ViewBag.Tratamientos)
+                    foreach (var tratamiento in tratamientos.OrderByDescending(t => t.FechaInicio))
                     {
-                        <div class="card mb-3 @(tratamiento.Estado == "En curso" ? "border-warning" : "")">
+                        <div class="card mb-3 @(tratamiento.Estado == "En curso" ? "border-warning" : "border-success")">
                             <div class="card-body">
                                 <div class="d-flex justify-content-between">
-                                    <h5>@tratamiento.TipoTratamiento</h5>
+                                    <h5>@tratamiento.NombreTratamiento</h5>
                                     <span class="badge badge-pill @(tratamiento.Estado == "En curso" ? "badge-warning" : "badge-success")">
                                         @tratamiento.Estado
                                     </span>
                                 </div>
-                                <p class="mb-1"><strong>Descripción:</strong> @tratamiento.Descripcion</p>
+
+                                @if (!string.IsNullOrEmpty(tratamiento.Descripcion))
+                                {
+                                    <p class="mb-1"><strong>Descripción:</strong> @tratamiento.Descripcion</p>
+                                }
+
                                 @if (!string.IsNullOrEmpty(tratamiento.Medicamentos))
                                 {
                                     <p class="mb-1"><strong>Medicamentos:</strong> @tratamiento.Medicamentos</p>
                                 }
-                                <p class="mb-1"><strong>Inicio:</strong> @tratamiento.FechaInicio.ToString("dd/MM/yyyy")</p>
+
+                                <p class="mb-1">
+                                    <strong>Inicio:</strong>
+                                    @tratamiento.FechaInicio?.ToString("dd/MM/yyyy")
+                                </p>
+
                                 @if (tratamiento.FechaFin.HasValue)
                                 {
-                                    <p class="mb-1"><strong>Fin:</strong> @tratamiento.FechaFin.Value.ToString("dd/MM/yyyy")</p>
+                                    <p class="mb-1">
+                                        <strong>Fin:</strong>
+                                        @tratamiento.FechaFin.Value.ToString("dd/MM/yyyy")
+                                    </p>
                                 }
-                                else
+
+                                @if (tratamiento.Costo.HasValue)
                                 {
-                                    <p class="mb-1"><strong>Duración Estimada:</strong> @tratamiento.DuracionEstimadaDias días</p>
+                                    <p class="mb-1">
+                                        <strong>Costo:</strong>
+                                        $@tratamiento.Costo.Value.ToString("N2")
+                                    </p>
                                 }
-                                @if (tratamiento.CostoEstimado.HasValue)
+
+                                @if (!string.IsNullOrEmpty(tratamiento.Observaciones))
                                 {
-                                    <p class="mb-1"><strong>Costo:</strong> $@tratamiento.CostoEstimado.Value.ToString("N2")</p>
+                                    <p class="mb-0"><strong>Observaciones:</strong> @tratamiento.Observaciones</p>
                                 }
-                                @if (!string.IsNullOrEmpty(tratamiento.Resultados))
-                                {
-                                    <p class="mb-0"><strong>Resultados:</strong> @tratamiento.Resultados</p>
-                                }
+
                                 @if (tratamiento.Estado == "En curso")
                                 {
-                                    <button type="button" class="btn btn-sm btn-success mt-2" data-toggle="modal" data-target="#modalFinalizarTratamiento" data-tratamiento-id="@tratamiento.TratamientoId">
+                                    <button type="button" class="btn btn-sm btn-success mt-2"
+                                            data-toggle="modal"
+                                            data-target="#modalFinalizarTratamiento"
+                                            data-tratamiento-id="@tratamiento.TratamientoId">
                                         <i class="fas fa-check"></i> Finalizar Tratamiento
                                     </button>
                                 }
@@ -232,36 +297,54 @@
             @using (Html.BeginForm("RegistrarConsulta", "Veterinario", FormMethod.Post))
             {
                 @Html.AntiForgeryToken()
-                <input type="hidden" name="mascotaId" value="@ViewBag.Mascota.MascotaId" />
+                <input type="hidden" name="mascotaId" value="@mascota.MascotaId" />
                 <div class="modal-body">
                     <div class="form-group">
                         <label>Diagnóstico *</label>
-                        <textarea name="diagnostico" class="form-control" rows="3" required></textarea>
+                        <textarea name="diagnostico" class="form-control" rows="3" required
+                                  placeholder="Ingrese el diagnóstico de la consulta..."></textarea>
                     </div>
 
                     <div class="form-group">
                         <label>Tratamiento Recetado</label>
-                        <textarea name="tratamientoRecetado" class="form-control" rows="2"></textarea>
+                        <textarea name="tratamientoRecetado" class="form-control" rows="2"
+                                  placeholder="Ingrese el tratamiento recetado..."></textarea>
                     </div>
 
                     <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <div class="form-group">
                                 <label>Peso (kg)</label>
-                                <input type="number" name="peso" class="form-control" step="0.1" />
+                                <input type="number" name="peso" class="form-control" step="0.1"
+                                       placeholder="Ej: 5.2" />
                             </div>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <div class="form-group">
                                 <label>Temperatura (°C)</label>
-                                <input type="number" name="temperatura" class="form-control" step="0.1" />
+                                <input type="number" name="temperatura" class="form-control" step="0.1"
+                                       placeholder="Ej: 38.5" />
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Estado General</label>
+                                <select name="estadoGeneral" class="form-control">
+                                    <option value="">Seleccionar...</option>
+                                    <option value="Excelente">Excelente</option>
+                                    <option value="Bueno">Bueno</option>
+                                    <option value="Regular">Regular</option>
+                                    <option value="Malo">Malo</option>
+                                    <option value="Crítico">Crítico</option>
+                                </select>
                             </div>
                         </div>
                     </div>
 
                     <div class="form-group">
                         <label>Observaciones</label>
-                        <textarea name="observaciones" class="form-control" rows="2"></textarea>
+                        <textarea name="observaciones" class="form-control" rows="2"
+                                  placeholder="Observaciones adicionales..."></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -288,19 +371,30 @@
             @using (Html.BeginForm("RegistrarVacuna", "Veterinario", FormMethod.Post))
             {
                 @Html.AntiForgeryToken()
-                <input type="hidden" name="mascotaId" value="@ViewBag.Mascota.MascotaId" />
+                <input type="hidden" name="mascotaId" value="@mascota.MascotaId" />
                 <div class="modal-body">
                     <div class="form-group">
                         <label>Vacuna *</label>
                         <select name="vacunaId" class="form-control" required>
-                            <option value="">Seleccionar...</option>
-                            <!-- Las opciones se llenarán desde el backend -->
+                            <option value="">Seleccionar vacuna...</option>
+                            <!-- Se cargarán desde el controlador -->
+                            @{
+                                var vacunasDisponibles = ViewBag.VacunasDisponibles as List<MVCMASCOTAS.Models.Vacunas>;
+                                if (vacunasDisponibles != null)
+                                {
+                                    foreach (var vacuna in vacunasDisponibles)
+                                    {
+                                        <option value="@vacuna.VacunaId">@vacuna.NombreVacuna</option>
+                                    }
+                                }
+                            }
                         </select>
                     </div>
 
                     <div class="form-group">
                         <label>Fecha de Próxima Dosis</label>
-                        <input type="date" name="fechaProximaDosis" class="form-control" />
+                        <input type="date" name="proximaConsulta" class="form-control"
+                               min="@DateTime.Now.ToString("yyyy-MM-dd")" />
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -330,14 +424,15 @@
                 <input type="hidden" name="tratamientoId" id="tratamientoIdInput" />
                 <div class="modal-body">
                     <div class="form-group">
-                        <label>Resultados del Tratamiento *</label>
-                        <textarea name="resultados" class="form-control" rows="4" required></textarea>
+                        <label>Observaciones / Resultados *</label>
+                        <textarea name="observaciones" class="form-control" rows="4" required
+                                  placeholder="Describa los resultados del tratamiento..."></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
                     <button type="submit" class="btn btn-success">
-                        <i class="fas fa-check"></i> Finalizar
+                        <i class="fas fa-check"></i> Finalizar Tratamiento
                     </button>
                 </div>
             }
@@ -347,11 +442,68 @@
 
 @section Scripts {
     <script>
-        $('#modalFinalizarTratamiento').on('show.bs.modal', function (event) {
-            var button = $(event.relatedTarget);
-            var tratamientoId = button.data('tratamiento-id');
-            var modal = $(this);
-            modal.find('#tratamientoIdInput').val(tratamientoId);
+        $(document).ready(function () {
+            // Configurar modal de finalizar tratamiento
+            $('#modalFinalizarTratamiento').on('show.bs.modal', function (event) {
+                var button = $(event.relatedTarget);
+                var tratamientoId = button.data('tratamiento-id');
+                var modal = $(this);
+                modal.find('#tratamientoIdInput').val(tratamientoId);
+            });
+
+            // Inicializar tabs
+            $('#historialTab a').on('click', function (e) {
+                e.preventDefault();
+                $(this).tab('show');
+            });
+
+            // Validar formularios
+            $('form').submit(function () {
+                var submitBtn = $(this).find('button[type="submit"]');
+                submitBtn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Procesando...');
+            });
         });
     </script>
+
+    <style>
+        .shadow-custom {
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        }
+
+        .nav-tabs .nav-link {
+            border: none;
+            border-bottom: 3px solid transparent;
+            color: #6c757d;
+            font-weight: 500;
+            padding: 0.75rem 1.5rem;
+        }
+
+            .nav-tabs .nav-link:hover {
+                border-bottom: 3px solid #dee2e6;
+                color: #495057;
+            }
+
+            .nav-tabs .nav-link.active {
+                color: #0d6efd;
+                border-bottom: 3px solid #0d6efd;
+                background-color: transparent;
+            }
+
+        .badge {
+            font-size: 0.85em;
+            padding: 0.35em 0.65em;
+        }
+
+        .border-warning {
+            border-left: 4px solid #ffc107 !important;
+        }
+
+        .border-success {
+            border-left: 4px solid #198754 !important;
+        }
+
+        .timeline .card {
+            border-left: 3px solid #0d6efd;
+        }
+    </style>
 }

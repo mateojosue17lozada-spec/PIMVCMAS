@@ -1,187 +1,38 @@
-﻿@{
-    ViewBag.Title = "Inicio";
+﻿@model System.Web.Mvc.HandleErrorInfo
+@{
+    ViewBag.Title = "Error";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<!-- Hero Section -->
-<div class="jumbotron jumbotron-fluid bg-primary text-white text-center" style="background: linear-gradient(135deg, #3498db, #2c3e50); padding: 100px 0;">
-    <div class="container">
-        <h1 class="display-3"><i class="fas fa-heart"></i> Refugio de Animales Quito</h1>
-        <p class="lead">Salvando vidas, un animal a la vez</p>
-        <hr class="my-4 bg-white">
-        <p>Adopta, dona, apadrina o hazte voluntario. ¡Tu ayuda marca la diferencia!</p>
-        <div class="mt-4">
-            <a class="btn btn-light btn-lg mr-3" href="@Url.Action("Index", "Mascotas")" role="button">
-                <i class="fas fa-dog"></i> Adoptar una Mascota
-            </a>
-            <a class="btn btn-outline-light btn-lg" href="@Url.Action("Index", "Donaciones")" role="button">
-                <i class="fas fa-hand-holding-heart"></i> Hacer una Donación
-            </a>
-        </div>
-    </div>
-</div>
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-lg">
+                <div class="card-body text-center py-5">
+                    <i class="fas fa-exclamation-triangle fa-5x text-danger mb-4"></i>
+                    <h1 class="display-4 text-danger">¡Oops!</h1>
+                    <h3>Ha ocurrido un error inesperado</h3>
+                    <p class="text-muted mt-3">
+                        Lo sentimos, algo salió mal. Por favor, intente nuevamente o contacte al soporte técnico.
+                    </p>
 
-<!-- Estadísticas -->
-<div class="container my-5">
-    <div class="row text-center">
-        <div class="col-md-3">
-            <div class="stat-box bg-success">
-                <div class="stat-value">@ViewBag.TotalMascotas</div>
-                <div class="stat-label">Mascotas Rescatadas</div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="stat-box bg-info">
-                <div class="stat-value">@ViewBag.MascotasDisponibles</div>
-                <div class="stat-label">Disponibles para Adopción</div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="stat-box bg-warning">
-                <div class="stat-value">@ViewBag.TotalAdopciones</div>
-                <div class="stat-label">Adopciones Exitosas</div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="stat-box bg-danger">
-                <div class="stat-value">@ViewBag.TotalVoluntarios</div>
-                <div class="stat-label">Voluntarios Activos</div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Mascotas Destacadas -->
-<div class="container my-5">
-    <h2 class="text-center mb-4">
-        <i class="fas fa-star"></i> Mascotas Buscando Hogar
-    </h2>
-    <div class="row">
-        @if (ViewBag.MascotasDestacadas != null)
-        {
-            foreach (var mascota in ViewBag.MascotasDestacadas)
-            {
-                <div class="col-md-4 mb-4">
-                    <div class="card mascota-card">
-                        @if (mascota.ImagenPrincipal != null)
-                        {
-                            <img src="@MVCMASCOTAS.Helpers.ImageHelper.GetImageDataUri(mascota.ImagenPrincipal)" class="card-img-top" alt="@mascota.Nombre">
-                        }
-                        else
-                        {
-                            <img src="~/Content/images/no-image.png" class="card-img-top" alt="Sin imagen">
-                        }
-                        <div class="card-body">
-                            <h5 class="card-title">@mascota.Nombre</h5>
-                            <p class="card-text">
-                                <i class="fas fa-paw"></i> @mascota.Especie<br />
-                                <i class="fas fa-venus-mars"></i> @mascota.Sexo<br />
-                                <i class="fas fa-ruler"></i> @mascota.Tamanio
-                            </p>
-                            <a href="@Url.Action("Detalle", "Mascotas", new { id = mascota.MascotaId })" class="btn btn-primary btn-block">
-                                <i class="fas fa-info-circle"></i> Ver Detalles
-                            </a>
+                    @if (Model != null && (Request.IsLocal || User.IsInRole("Administrador")))
+                    {
+                        <div class="alert alert-warning mt-4 text-left">
+                            <h5>Información técnica:</h5>
+                            <p><strong>Controller:</strong> @Model.ControllerName</p>
+                            <p><strong>Action:</strong> @Model.ActionName</p>
+                            <p><strong>Error:</strong> @Model.Exception?.Message</p>
                         </div>
-                    </div>
-                </div>
-            }
-        }
-    </div>
-    <div class="text-center mt-4">
-        <a href="@Url.Action("Index", "Mascotas")" class="btn btn-primary btn-lg">
-            Ver Todas las Mascotas <i class="fas fa-arrow-right"></i>
-        </a>
-    </div>
-</div>
+                    }
 
-<!-- Cómo Ayudar -->
-<div class="bg-light py-5">
-    <div class="container">
-        <h2 class="text-center mb-5">
-            <i class="fas fa-hands-helping"></i> ¿Cómo Puedes Ayudar?
-        </h2>
-        <div class="row">
-            <div class="col-md-3 text-center mb-4">
-                <div class="card h-100 shadow-custom">
-                    <div class="card-body">
-                        <i class="fas fa-home fa-3x text-primary mb-3"></i>
-                        <h5 class="card-title">Adoptar</h5>
-                        <p class="card-text">Dale un hogar permanente a un animal necesitado.</p>
-                        <a href="@Url.Action("Index", "Mascotas")" class="btn btn-primary">Adoptar</a>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3 text-center mb-4">
-                <div class="card h-100 shadow-custom">
-                    <div class="card-body">
-                        <i class="fas fa-dollar-sign fa-3x text-success mb-3"></i>
-                        <h5 class="card-title">Donar</h5>
-                        <p class="card-text">Tu donación nos ayuda a seguir rescatando vidas.</p>
-                        <a href="@Url.Action("Index", "Donaciones")" class="btn btn-success">Donar</a>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3 text-center mb-4">
-                <div class="card h-100 shadow-custom">
-                    <div class="card-body">
-                        <i class="fas fa-heart fa-3x text-danger mb-3"></i>
-                        <h5 class="card-title">Apadrinar</h5>
-                        <p class="card-text">Apadrina una mascota con una contribución mensual.</p>
-                        <a href="@Url.Action("Apadrinar", "Donaciones")" class="btn btn-danger">Apadrinar</a>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3 text-center mb-4">
-                <div class="card h-100 shadow-custom">
-                    <div class="card-body">
-                        <i class="fas fa-hands fa-3x text-warning mb-3"></i>
-                        <h5 class="card-title">Voluntariado</h5>
-                        <p class="card-text">Dona tu tiempo y únete a nuestro equipo.</p>
-                        <a href="@Url.Action("Index", "Voluntariado")" class="btn btn-warning">Ser Voluntario</a>
+                    <div class="mt-4">
+                        <a href="@Url.Action("Index", "Home")" class="btn btn-primary btn-lg">
+                            <i class="fas fa-home"></i> Volver al Inicio
+                        </a>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
-
-<!-- Testimonios -->
-<div class="container my-5">
-    <h2 class="text-center mb-5">
-        <i class="fas fa-comments"></i> Historias de Éxito
-    </h2>
-    <div class="row">
-        <div class="col-md-4 mb-4">
-            <div class="card shadow-custom">
-                <div class="card-body">
-                    <p class="card-text">"Adoptar a Luna fue la mejor decisión. ¡Es parte de nuestra familia!"</p>
-                    <footer class="blockquote-footer">María G. - <cite title="Source Title">Adoptante</cite></footer>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4 mb-4">
-            <div class="card shadow-custom">
-                <div class="card-body">
-                    <p class="card-text">"Ser voluntario aquí me ha dado un propósito. ¡Es increíble!"</p>
-                    <footer class="blockquote-footer">Carlos R. - <cite title="Source Title">Voluntario</cite></footer>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4 mb-4">
-            <div class="card shadow-custom">
-                <div class="card-body">
-                    <p class="card-text">"Apadrino a Max desde hace 6 meses. Recibo fotos y me hace muy feliz."</p>
-                    <footer class="blockquote-footer">Ana L. - <cite title="Source Title">Madrina</cite></footer>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-@section scripts {
-    <script>
-        $(document).ready(function () {
-            // Animaciones al cargar
-            $('.stat-box').addClass('fade-in');
-        });
-    </script>
-}

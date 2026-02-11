@@ -1,0 +1,567 @@
+﻿@model MVCMASCOTAS.Models.ViewModels.MisApadrinamientosViewModel
+
+@{
+    ViewBag.Title = "Mis Apadrinamientos";
+}
+
+<style>
+    .apadrinamientos-section {
+        min-height: 100vh;
+        padding: 30px 0;
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    }
+
+    .resumen-card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        transition: all 0.3s ease;
+        background: white;
+        margin-bottom: 25px;
+    }
+
+        .resumen-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.12);
+        }
+
+    .resumen-icon {
+        font-size: 2.5rem;
+        margin-bottom: 15px;
+        opacity: 0.8;
+    }
+
+    .resumen-valor {
+        font-size: 2.8rem;
+        font-weight: 800;
+        margin: 15px 0;
+        color: #333;
+    }
+
+    .resumen-label {
+        font-size: 1.1rem;
+        color: #6c757d;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .card-header-custom {
+        background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+        color: white;
+        border-radius: 15px 15px 0 0 !important;
+        padding: 20px 25px;
+        font-weight: 700;
+        font-size: 1.3rem;
+    }
+
+    .mascota-card {
+        border: none;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+        margin-bottom: 25px;
+        background: white;
+    }
+
+        .mascota-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+        }
+
+    .mascota-imagen {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+        border-bottom: 3px solid #ff6b6b;
+    }
+
+    .mascota-nombre {
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 5px;
+    }
+
+    .mascota-especie {
+        color: #6c757d;
+        font-size: 0.9rem;
+        margin-bottom: 10px;
+    }
+
+    .mascota-info {
+        padding: 20px;
+    }
+
+    .estado-badge {
+        font-size: 0.8rem;
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-weight: 600;
+    }
+
+    .badge-activo {
+        background-color: #d4edda;
+        color: #155724;
+    }
+
+    .badge-pausado {
+        background-color: #fff3cd;
+        color: #856404;
+    }
+
+    .badge-cancelado {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
+
+    .badge-completado {
+        background-color: #d1ecf1;
+        color: #0c5460;
+    }
+
+    .detalle-item {
+        margin-bottom: 10px;
+        font-size: 0.9rem;
+    }
+
+        .detalle-item strong {
+            color: #333;
+            min-width: 120px;
+            display: inline-block;
+        }
+
+    .btn-accion {
+        border-radius: 25px;
+        font-weight: 600;
+        padding: 10px 25px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-detalle {
+        background: linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%);
+        color: white;
+        border: none;
+    }
+
+        .btn-detalle:hover {
+            background: linear-gradient(135deg, #44a08d 0%, #4ecdc4 100%);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(68, 160, 141, 0.4);
+        }
+
+    .btn-pausar {
+        background: linear-gradient(135deg, #ffd93d 0%, #ffb347 100%);
+        color: #333;
+        border: none;
+    }
+
+        .btn-pausar:hover {
+            background: linear-gradient(135deg, #ffb347 0%, #ffd93d 100%);
+            color: #333;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 179, 71, 0.4);
+        }
+
+    .btn-reactivar {
+        background: linear-gradient(135deg, #6bce76 0%, #4caf50 100%);
+        color: white;
+        border: none;
+    }
+
+        .btn-reactivar:hover {
+            background: linear-gradient(135deg, #4caf50 0%, #6bce76 100%);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.4);
+        }
+
+    .btn-cancelar {
+        background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+        color: white;
+        border: none;
+    }
+
+        .btn-cancelar:hover {
+            background: linear-gradient(135deg, #ee5a52 0%, #ff6b6b 100%);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(238, 90, 82, 0.4);
+        }
+
+    .empty-state {
+        padding: 60px 20px;
+        text-align: center;
+        background-color: white;
+        border-radius: 15px;
+        border: 2px dashed #dee2e6;
+        margin: 30px 0;
+    }
+
+        .empty-state i {
+            font-size: 5rem;
+            color: #ff6b6b;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .empty-state h4 {
+            color: #333;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .empty-state p {
+            color: #6c757d;
+            max-width: 600px;
+            margin: 0 auto 30px;
+            font-size: 1.1rem;
+        }
+
+    .tab-content {
+        background: white;
+        border-radius: 0 0 15px 15px;
+        padding: 30px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    }
+
+    .nav-tabs-custom .nav-link {
+        border: none;
+        color: #6c757d;
+        font-weight: 600;
+        padding: 15px 25px;
+        border-radius: 10px 10px 0 0;
+        margin-right: 5px;
+        transition: all 0.3s ease;
+    }
+
+        .nav-tabs-custom .nav-link:hover {
+            color: #333;
+            background-color: rgba(255, 107, 107, 0.1);
+        }
+
+        .nav-tabs-custom .nav-link.active {
+            background-color: #ff6b6b;
+            color: white;
+            border: none;
+        }
+
+    .historial-card {
+        border-left: 4px solid #6c757d;
+        padding: 15px;
+        margin-bottom: 15px;
+        background-color: #f8f9fa;
+        border-radius: 8px;
+    }
+
+    .proximo-pago {
+        background: linear-gradient(135deg, #36d1dc 0%, #5b86e5 100%);
+        color: white;
+        padding: 15px;
+        border-radius: 10px;
+        margin-top: 20px;
+    }
+</style>
+
+<div class="apadrinamientos-section">
+    <div class="container">
+        <div class="page-header mb-4">
+            <h1 class="display-5">
+                <i class="fas fa-heart text-danger"></i> Mis Apadrinamientos
+            </h1>
+            <p class="lead text-muted">Aquí puedes ver y gestionar todos tus apadrinamientos activos</p>
+        </div>
+
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="fas fa-exclamation-triangle me-2"></i> @TempData["ErrorMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="fas fa-check-circle me-2"></i> @TempData["SuccessMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+
+        <!-- Resumen Financiero -->
+        @if (Model.Resumen != null)
+        {
+            <div class="row mb-4">
+                <div class="col-lg-3 col-md-6">
+                    <div class="resumen-card text-center p-4">
+                        <div class="resumen-icon text-danger">
+                            <i class="fas fa-paw"></i>
+                        </div>
+                        <div class="resumen-valor">@Model.Resumen.MascotasApadrinadas</div>
+                        <div class="resumen-label">Mascotas Apadrinadas</div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <div class="resumen-card text-center p-4">
+                        <div class="resumen-icon text-success">
+                            <i class="fas fa-hand-holding-usd"></i>
+                        </div>
+                        <div class="resumen-valor">$@Model.Resumen.TotalMensual.ToString("N2")</div>
+                        <div class="resumen-label">Total Mensual</div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <div class="resumen-card text-center p-4">
+                        <div class="resumen-icon text-primary">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <div class="resumen-valor">$@Model.Resumen.TotalHistorico.ToString("N2")</div>
+                        <div class="resumen-label">Total Contribuido</div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <div class="resumen-card text-center p-4">
+                        <div class="resumen-icon text-warning">
+                            <i class="fas fa-history"></i>
+                        </div>
+                        <div class="resumen-valor">@Model.Resumen.PagosRealizados</div>
+                        <div class="resumen-label">Pagos Realizados</div>
+                    </div>
+                </div>
+            </div>
+        }
+
+        <!-- Pestañas -->
+        <ul class="nav nav-tabs nav-tabs-custom mb-3" id="myTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="activos-tab" data-bs-toggle="tab" data-bs-target="#activos" type="button" role="tab">
+                    <i class="fas fa-heart me-2"></i> Activos (@Model.ApadrinamientosActivos.Count)
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="historial-tab" data-bs-toggle="tab" data-bs-target="#historial" type="button" role="tab">
+                    <i class="fas fa-history me-2"></i> Historial (@Model.ApadrinamientosHistorial.Count)
+                </button>
+            </li>
+        </ul>
+
+        <div class="tab-content" id="myTabContent">
+            <!-- Apadrinamientos Activos -->
+            <div class="tab-pane fade show active" id="activos" role="tabpanel">
+                @if (Model.ApadrinamientosActivos.Any())
+                {
+                    <div class="row">
+                        @foreach (var apadrinamiento in Model.ApadrinamientosActivos)
+                        {
+                            <div class="col-lg-6 mb-4">
+                                <div class="mascota-card">
+                                    <!-- Imagen de la mascota -->
+                                    @if (apadrinamiento.MascotaImagen != null && apadrinamiento.MascotaImagen.Length > 0)
+                                    {
+                                        <img src="data:image/jpeg;base64,@Convert.ToBase64String(apadrinamiento.MascotaImagen)"
+                                             class="mascota-imagen"
+                                             alt="@apadrinamiento.MascotaNombre">
+                                    }
+                                    else
+                                    {
+                                        <img src="~/Content/images/no-image.png"
+                                             class="mascota-imagen"
+                                             alt="Sin imagen">
+                                    }
+
+                                    <div class="mascota-info">
+                                        <!-- Nombre y especie -->
+                                        <h5 class="mascota-nombre">@apadrinamiento.MascotaNombre</h5>
+                                        <p class="mascota-especie">@apadrinamiento.MascotaEspecie</p>
+
+                                        <!-- Estado -->
+                                        <div class="mb-3">
+                                            <span class="estado-badge @(apadrinamiento.Estado == "Activo" ? "badge-activo" : "badge-pausado")">
+                                                @apadrinamiento.Estado
+                                            </span>
+                                        </div>
+
+                                        <!-- Detalles -->
+                                        <div class="detalle-item">
+                                            <strong>Monto mensual:</strong> $@apadrinamiento.MontoMensual.ToString("N2")
+                                        </div>
+                                        <div class="detalle-item">
+                                            <strong>Total contribuido:</strong> $@apadrinamiento.TotalContribuido.ToString("N2")
+                                        </div>
+                                        <div class="detalle-item">
+                                            <strong>Desde:</strong> @apadrinamiento.FechaInicio.ToString("dd/MM/yyyy")
+                                        </div>
+                                        <div class="detalle-item">
+                                            <strong>Meses activo:</strong> @apadrinamiento.MesesActivo
+                                        </div>
+
+                                        @if (apadrinamiento.ProximoPago.HasValue)
+                                        {
+                                            <div class="proximo-pago mt-3">
+                                                <i class="fas fa-calendar-check me-2"></i>
+                                                <strong>Próximo pago:</strong> @apadrinamiento.ProximoPago.Value.ToString("dd/MM/yyyy")
+                                            </div>
+                                        }
+
+                                        <!-- Botones de acción -->
+                                        <div class="d-flex flex-wrap gap-2 mt-4">
+                                            <a href="@Url.Action("Detalle", "Apadrinar", new { id = apadrinamiento.ApadrinamientoId })"
+                                               class="btn btn-detalle btn-accion">
+                                                <i class="fas fa-info-circle me-2"></i> Ver Detalle
+                                            </a>
+
+                                            @if (apadrinamiento.Estado == "Activo")
+                                            {
+                                                using (Html.BeginForm("Pausar", "Apadrinar", new { id = apadrinamiento.ApadrinamientoId }, FormMethod.Post, new { @class = "d-inline" }))
+                                                {
+                                                    @Html.AntiForgeryToken()
+                                                    <button type="submit" class="btn btn-pausar btn-accion">
+                                                        <i class="fas fa-pause me-2"></i> Pausar
+                                                    </button>
+                                                }
+                                            }
+                                            else if (apadrinamiento.Estado == "Pausado")
+                                            {
+                                                using (Html.BeginForm("Reactivar", "Apadrinar", new { id = apadrinamiento.ApadrinamientoId }, FormMethod.Post, new { @class = "d-inline" }))
+                                                {
+                                                    @Html.AntiForgeryToken()
+                                                    <button type="submit" class="btn btn-reactivar btn-accion">
+                                                        <i class="fas fa-play me-2"></i> Reactivar
+                                                    </button>
+                                                }
+                                            }
+
+                                            <button type="button" class="btn btn-cancelar btn-accion"
+                                                    onclick="confirmarCancelacion(@apadrinamiento.ApadrinamientoId, '@apadrinamiento.MascotaNombre')">
+                                                <i class="fas fa-times-circle me-2"></i> Cancelar
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="empty-state">
+                        <i class="fas fa-heart"></i>
+                        <h4>No tienes apadrinamientos activos</h4>
+                        <p>¡Es un excelente momento para apadrinar a una mascota que necesita tu ayuda!</p>
+                        <a href="@Url.Action("Index", "Apadrinar")" class="btn btn-danger btn-lg">
+                            <i class="fas fa-paw me-2"></i> Apadrinar una Mascota
+                        </a>
+                    </div>
+                }
+            </div>
+
+            <!-- Historial -->
+            <div class="tab-pane fade" id="historial" role="tabpanel">
+                @if (Model.ApadrinamientosHistorial.Any())
+                {
+                    <div class="row">
+                        @foreach (var apadrinamiento in Model.ApadrinamientosHistorial)
+                        {
+                            <div class="col-lg-4 col-md-6 mb-4">
+                                <div class="historial-card">
+                                    <h6 class="text-primary mb-2">@apadrinamiento.MascotaNombre</h6>
+                                    <div class="mb-2">
+                                        <span class="estado-badge @(apadrinamiento.Estado == "Completado" ? "badge-completado" : "badge-cancelado")">
+                                            @apadrinamiento.Estado
+                                        </span>
+                                    </div>
+                                    <div class="detalle-item small">
+                                        <strong>Especie:</strong> @apadrinamiento.MascotaEspecie
+                                    </div>
+                                    <div class="detalle-item small">
+                                        <strong>Monto:</strong> $@apadrinamiento.MontoMensual.ToString("N2")/mes
+                                    </div>
+                                    <div class="detalle-item small">
+                                        <strong>Total:</strong> $@apadrinamiento.TotalContribuido.ToString("N2")
+                                    </div>
+                                    <div class="detalle-item small">
+                                        <strong>Duración:</strong> @apadrinamiento.MesesActivo meses
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="empty-state">
+                        <i class="fas fa-history"></i>
+                        <h4>No hay historial de apadrinamientos</h4>
+                        <p>Aquí aparecerán tus apadrinamientos completados o cancelados.</p>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // Confirmación para cancelar apadrinamiento
+            window.confirmarCancelacion = function (id, mascotaNombre) {
+                Swal.fire({
+                    title: '¿Cancelar apadrinamiento?',
+                    html: `<div class="text-center">
+                              <i class="fas fa-exclamation-triangle fa-3x text-warning mb-3"></i>
+                              <h4>¿Estás seguro de cancelar el apadrinamiento de <strong>${mascotaNombre}</strong>?</h4>
+                              <p class="text-muted">Esta acción no se puede deshacer.</p>
+                           </div>`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#ff6b6b',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: '<i class="fas fa-times-circle me-2"></i> Sí, cancelar',
+                    cancelButtonText: '<i class="fas fa-times me-2"></i> No, mantener',
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Crear formulario dinámico para enviar la cancelación
+                        const form = document.createElement('form');
+                        form.method = 'POST';
+                        form.action = '@Url.Action("Cancelar", "Apadrinar")' + '/' + id;
+
+                        const token = document.createElement('input');
+                        token.type = 'hidden';
+                        token.name = '__RequestVerificationToken';
+                        token.value = $('input[name="__RequestVerificationToken"]').val();
+
+                        form.appendChild(token);
+                        document.body.appendChild(form);
+                        form.submit();
+                    }
+                });
+            };
+
+            // Efecto hover para tarjetas
+            $('.mascota-card').hover(
+                function () {
+                    $(this).css('transform', 'translateY(-8px)');
+                    $(this).css('box-shadow', '0 15px 35px rgba(0,0,0,0.15)');
+                },
+                function () {
+                    $(this).css('transform', 'translateY(0)');
+                    $(this).css('box-shadow', '0 5px 20px rgba(0,0,0,0.1)');
+                }
+            );
+
+            // Auto-ocultar alertas después de 5 segundos
+            setTimeout(function () {
+                $('.alert-dismissible').alert('close');
+            }, 5000);
+
+            // Validar que las pestañas funcionen en móviles
+            $('.nav-link').on('click', function () {
+                $('.nav-link').removeClass('active');
+                $(this).addClass('active');
+            });
+        });
+    </script>
+}

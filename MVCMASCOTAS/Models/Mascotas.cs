@@ -23,6 +23,7 @@ namespace MVCMASCOTAS.Models
             this.ReportesRescate = new HashSet<ReportesRescate>();
             this.SolicitudAdopcion = new HashSet<SolicitudAdopcion>();
             this.Tratamientos = new HashSet<Tratamientos>();
+            this.HistorialEstadosMascota = new HashSet<HistorialEstadosMascota>();
         }
     
         public int MascotaId { get; set; }
@@ -63,5 +64,7 @@ namespace MVCMASCOTAS.Models
         public virtual ICollection<SolicitudAdopcion> SolicitudAdopcion { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Tratamientos> Tratamientos { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<HistorialEstadosMascota> HistorialEstadosMascota { get; set; }
     }
 }

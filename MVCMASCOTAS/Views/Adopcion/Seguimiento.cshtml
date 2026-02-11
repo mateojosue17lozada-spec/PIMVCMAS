@@ -2,6 +2,7 @@
 
 @{
     ViewBag.Title = "Seguimiento de Adopción";
+    ViewData["Title"] = "Seguimiento de Adopción";
 
     // Calcular días desde la evaluación/aprobación
     var fechaReferencia = Model.FechaEvaluacion ?? Model.FechaSolicitud;
@@ -12,512 +13,515 @@
     }
 }
 
-<div class="page-header mb-4">
-    <h2><i class="fas fa-clipboard-list"></i> Seguimiento de Adopción</h2>
-    <p class="text-muted">Seguimiento de la adopción de @Model.Mascotas?.Nombre</p>
-</div>
+<!-- Contenido principal -->
+<div class="container body-content mt-4">
+    <div class="page-header mb-4">
+        <h2 class="text-brown font-weight-bold"><i class="fa fa-clipboard-list text-green"></i> Seguimiento de Adopción</h2>
+        <p class="text-secondary">Seguimiento de la adopción de @Model.Mascotas?.Nombre</p>
+    </div>
 
-<div class="row">
-    <!-- Información Principal -->
-    <div class="col-md-8">
-        <!-- Información de la Adopción -->
-        <div class="card shadow-custom mb-4">
-            <div class="card-header bg-primary text-white">
-                <h5 class="mb-0"><i class="fas fa-info-circle"></i> Información de la Adopción</h5>
-            </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-6">
-                        <p><strong><i class="fas fa-user"></i> Adoptante:</strong> @(Model.Usuarios?.NombreCompleto ?? "No disponible")</p>
-                        <p><strong><i class="fas fa-paw"></i> Mascota:</strong> @(Model.Mascotas?.Nombre ?? "No disponible")</p>
-                        <p><strong><i class="fas fa-dna"></i> Especie:</strong> @(Model.Mascotas?.Especie ?? "N/A")</p>
-                        <p><strong><i class="fas fa-dog"></i> Raza:</strong> @(Model.Mascotas?.Raza ?? "Mestizo")</p>
-                    </div>
-                    <div class="col-md-6">
-                        <p>
-                            <strong><i class="fas fa-clipboard-check"></i> Estado:</strong>
-                            <span class="badge @(Model.Estado == "Aprobada" ? "badge-success" :
-                                                 Model.Estado == "En evaluación" ? "badge-warning" :
-                                                 Model.Estado == "Rechazada" ? "badge-danger" :
-                                                 "badge-secondary")">
-                                @Model.Estado
-                            </span>
-                        </p>
-
-                        @if (Model.FechaSolicitud.HasValue)
-                        {
-                            <p>
-                                <strong><i class="fas fa-calendar-plus"></i> Fecha Solicitud:</strong>
-                                @Model.FechaSolicitud.Value.ToString("dd/MM/yyyy")
-                            </p>
-                        }
-
-                        @if (Model.FechaEvaluacion.HasValue)
-                        {
-                            <p>
-                                <strong><i class="fas fa-calendar-check"></i> Fecha Evaluación:</strong>
-                                @Model.FechaEvaluacion.Value.ToString("dd/MM/yyyy")
-                            </p>
-                        }
-
-                        <p>
-                            <strong><i class="fas fa-calendar-day"></i> Días desde evaluación:</strong>
-                            <span class="badge @(diasDesdeReferencia > 90 ? "badge-success" :
-                                                 diasDesdeReferencia > 60 ? "badge-info" :
-                                                 "badge-warning")">
-                                @diasDesdeReferencia días
-                            </span>
-                        </p>
-                    </div>
+    <div class="row">
+        <!-- Información Principal -->
+        <div class="col-md-8">
+            <!-- Información de la Adopción -->
+            <div class="card shadow-hover mb-4 border-green">
+                <div class="card-header bg-green text-white">
+                    <h5 class="mb-0"><i class="fa fa-info-circle"></i> Información de la Adopción</h5>
                 </div>
-
-                <!-- Información adicional si está aprobada -->
-                @if (Model.Estado == "Aprobada")
-                {
-                    <hr />
-                    <div class="alert alert-success">
-                        <h6><i class="fas fa-check-circle"></i> Información de Adopción Aprobada</h6>
-                        <div class="row">
-                            <div class="col-md-6">
-                                @if (Model.FechaEvaluacion.HasValue)
-                                {
-                                    <p><strong>Fecha de aprobación:</strong> @Model.FechaEvaluacion.Value.ToString("dd/MM/yyyy")</p>
-                                }
-
-                                @if (Model.PuntajeEvaluacion.HasValue)
-                                {
-                                    <p><strong>Puntaje de evaluación:</strong> @Model.PuntajeEvaluacion.Value / 100</p>
-                                }
-                            </div>
-                            <div class="col-md-6">
-                                @if (!string.IsNullOrEmpty(Model.ResultadoEvaluacion))
-                                {
-                                    <p><strong>Resultado:</strong> @Model.ResultadoEvaluacion</p>
-                                }
-
-                                @if (Model.FechaRespuesta.HasValue)
-                                {
-                                    <p><strong>Fecha de respuesta:</strong> @Model.FechaRespuesta.Value.ToString("dd/MM/yyyy")</p>
-                                }
-                            </div>
-                        </div>
-                    </div>
-                }
-            </div>
-        </div>
-
-        <!-- Contrato de Adopción si existe -->
-        @if (Model.ContratoAdopcion != null && Model.ContratoAdopcion.Any())
-        {
-            var contrato = Model.ContratoAdopcion.FirstOrDefault();
-            <div class="card shadow-custom mb-4">
-                <div class="card-header bg-success text-white">
-                    <h5 class="mb-0"><i class="fas fa-file-contract"></i> Información del Contrato</h5>
-                </div>
-                <div class="card-body">
+                <div class="card-body bg-light-mint">
                     <div class="row">
                         <div class="col-md-6">
-                            <p><strong>Número de contrato:</strong> @contrato.NumeroContrato</p>
-                            <p><strong>Fecha de contrato:</strong> @contrato.FechaContrato?.ToString("dd/MM/yyyy")</p>
-                            <p><strong>Estado del contrato:</strong> <span class="badge badge-info">@contrato.Estado</span></p>
+                            <p><strong><i class="fa fa-user text-green"></i> Adoptante:</strong> @(Model.Usuarios?.NombreCompleto ?? "No disponible")</p>
+                            <p><strong><i class="fa fa-paw text-green"></i> Mascota:</strong> @(Model.Mascotas?.Nombre ?? "No disponible")</p>
+                            <p><strong><i class="fa fa-dna text-green"></i> Especie:</strong> @(Model.Mascotas?.Especie ?? "N/A")</p>
+                            <p><strong><i class="fa fa-dog text-green"></i> Raza:</strong> @(Model.Mascotas?.Raza ?? "Mestizo")</p>
                         </div>
                         <div class="col-md-6">
-                            <p><strong>Representante del refugio:</strong> @contrato.RepresentanteRefugioNombre</p>
-                            <p><strong>Cédula representante:</strong> @contrato.RepresentanteRefugioCedula</p>
+                            <p>
+                                <strong><i class="fa fa-clipboard-check text-green"></i> Estado:</strong>
+                                <span class="badge @(Model.Estado == "Aprobada" ? "bg-green" :
+                                                     Model.Estado == "En evaluación" ? "bg-yellow" :
+                                                     Model.Estado == "Rechazada" ? "bg-danger" :
+                                                     "bg-secondary")">
+                                    @Model.Estado
+                                </span>
+                            </p>
 
-                            @if (!string.IsNullOrEmpty(contrato.DocumentoPDF))
+                            @if (Model.FechaSolicitud.HasValue)
                             {
-                                <a href="@contrato.DocumentoPDF" target="_blank" class="btn btn-sm btn-info">
-                                    <i class="fas fa-file-pdf"></i> Ver Contrato PDF
-                                </a>
+                                <p>
+                                    <strong><i class="fa fa-calendar-plus text-green"></i> Fecha Solicitud:</strong>
+                                    @Model.FechaSolicitud.Value.ToString("dd/MM/yyyy")
+                                </p>
                             }
+
+                            @if (Model.FechaEvaluacion.HasValue)
+                            {
+                                <p>
+                                    <strong><i class="fa fa-calendar-check text-green"></i> Fecha Evaluación:</strong>
+                                    @Model.FechaEvaluacion.Value.ToString("dd/MM/yyyy")
+                                </p>
+                            }
+
+                            <p>
+                                <strong><i class="fa fa-calendar-day text-green"></i> Días desde evaluación:</strong>
+                                <span class="badge @(diasDesdeReferencia > 90 ? "bg-green" :
+                                                     diasDesdeReferencia > 60 ? "bg-info" :
+                                                     "bg-yellow")">
+                                    @diasDesdeReferencia días
+                                </span>
+                            </p>
                         </div>
                     </div>
-                </div>
-            </div>
-        }
 
-        <!-- Registrar Seguimiento (solo si está aprobada) -->
-        @if (Model.Estado == "Aprobada")
-        {
-            <div class="card shadow-custom mb-4">
-                <div class="card-header bg-success text-white">
-                    <h5 class="mb-0"><i class="fas fa-clipboard-check"></i> Registrar Seguimiento de Adopción</h5>
-                </div>
-                <div class="card-body">
-                    <p class="text-muted mb-4">
-                        <i class="fas fa-info-circle"></i> Use este formulario para registrar visitas de seguimiento post-adopción.
-                    </p>
-
-                    @using (Html.BeginForm("RegistrarSeguimiento", "Adopcion", FormMethod.Post, new { enctype = "multipart/form-data" }))
+                    <!-- Información adicional si está aprobada -->
+                    @if (Model.Estado == "Aprobada")
                     {
-                        @Html.AntiForgeryToken()
-                        <input type="hidden" name="SolicitudId" value="@Model.SolicitudId" />
+                        <hr class="border-green" />
+                        <div class="alert-green p-3 rounded">
+                            <h6 class="text-brown"><i class="fa fa-check-circle text-green"></i> Información de Adopción Aprobada</h6>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    @if (Model.FechaEvaluacion.HasValue)
+                                    {
+                                        <p><strong>Fecha de aprobación:</strong> @Model.FechaEvaluacion.Value.ToString("dd/MM/yyyy")</p>
+                                    }
 
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label class="font-weight-bold">
-                                        <i class="fas fa-calendar"></i> Fecha de Visita *
-                                    </label>
-                                    <input type="date" name="FechaVisita" class="form-control"
-                                           value="@DateTime.Now.ToString("yyyy-MM-dd")" required />
+                                    @if (Model.PuntajeEvaluacion.HasValue)
+                                    {
+                                        <p><strong>Puntaje de evaluación:</strong> @Model.PuntajeEvaluacion.Value / 100</p>
+                                    }
                                 </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label class="font-weight-bold">
-                                        <i class="fas fa-user-md"></i> Responsable *
-                                    </label>
-                                    <input type="text" name="Responsable" class="form-control"
-                                           placeholder="Nombre del responsable" required />
-                                </div>
-                            </div>
-                        </div>
+                                <div class="col-md-6">
+                                    @if (!string.IsNullOrEmpty(Model.ResultadoEvaluacion))
+                                    {
+                                        <p><strong>Resultado:</strong> @Model.ResultadoEvaluacion</p>
+                                    }
 
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label class="font-weight-bold">
-                                        <i class="fas fa-home"></i> Condiciones del Hogar *
-                                    </label>
-                                    <select name="CondicionesHogar" class="form-control" required>
-                                        <option value="">Seleccione...</option>
-                                        <option value="Excelente">Excelente</option>
-                                        <option value="Bueno">Bueno</option>
-                                        <option value="Regular">Regular</option>
-                                        <option value="Malo">Malo</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label class="font-weight-bold">
-                                        <i class="fas fa-heart"></i> Estado de la Mascota *
-                                    </label>
-                                    <select name="EstadoMascota" class="form-control" required>
-                                        <option value="">Seleccione...</option>
-                                        <option value="Excelente">Excelente</option>
-                                        <option value="Bueno">Bueno</option>
-                                        <option value="Regular">Regular</option>
-                                        <option value="Requiere atención">Requiere atención</option>
-                                    </select>
+                                    @if (Model.FechaRespuesta.HasValue)
+                                    {
+                                        <p><strong>Fecha de respuesta:</strong> @Model.FechaRespuesta.Value.ToString("dd/MM/yyyy")</p>
+                                    }
                                 </div>
                             </div>
                         </div>
-
-                        <div class="form-group">
-                            <label class="font-weight-bold">
-                                <i class="fas fa-comment-alt"></i> Observaciones *
-                            </label>
-                            <textarea name="Observaciones" class="form-control" rows="4"
-                                      placeholder="Ingrese observaciones detalladas de la visita..." required></textarea>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="font-weight-bold">
-                                <i class="fas fa-camera"></i> Fotografías (opcional)
-                            </label>
-                            <div class="custom-file">
-                                <input type="file" name="Fotos" class="custom-file-input"
-                                       id="FotosSeguimiento" accept="image/*" multiple />
-                                <label class="custom-file-label" for="FotosSeguimiento">
-                                    <i class="fas fa-cloud-upload-alt"></i> Seleccionar imágenes...
-                                </label>
-                            </div>
-                            <small class="form-text text-muted">
-                                Puede seleccionar múltiples imágenes (JPG, PNG, GIF)
-                            </small>
-                        </div>
-
-                        <!-- Vista previa de imágenes -->
-                        <div id="previewContainer" class="row mt-3" style="display: none;"></div>
-
-                        <div class="form-group mt-4">
-                            <label class="font-weight-bold">
-                                <i class="fas fa-calendar-alt"></i> Próxima Visita Sugerida (opcional)
-                            </label>
-                            <input type="date" name="ProximaVisita" class="form-control"
-                                   min="@DateTime.Now.ToString("yyyy-MM-dd")" />
-                        </div>
-
-                        <button type="submit" class="btn btn-success btn-lg btn-block mt-4">
-                            <i class="fas fa-save"></i> Registrar Seguimiento
-                        </button>
                     }
                 </div>
             </div>
-        }
-        else
-        {
-            <div class="card shadow-custom mb-4">
-                <div class="card-header bg-warning text-white">
-                    <h5 class="mb-0"><i class="fas fa-exclamation-triangle"></i> Información</h5>
-                </div>
-                <div class="card-body">
-                    <div class="alert alert-warning">
-                        <i class="fas fa-info-circle"></i>
-                        El seguimiento de adopción solo está disponible para solicitudes aprobadas.
-                        Esta solicitud está en estado: <strong>@Model.Estado</strong>
-                    </div>
-                </div>
-            </div>
-        }
-    </div>
 
-    <!-- Panel Lateral -->
-    <div class="col-md-4">
-        <!-- Historial de Seguimientos -->
-        @if (Model.ContratoAdopcion != null && Model.ContratoAdopcion.Any())
-        {
-            var contrato = Model.ContratoAdopcion.FirstOrDefault();
-            var seguimientos = contrato.SeguimientoAdopcion?.OrderByDescending(s => s.FechaSeguimiento).ToList();
-
-            if (seguimientos != null && seguimientos.Any())
+            <!-- Contrato de Adopción si existe -->
+            @if (Model.ContratoAdopcion != null && Model.ContratoAdopcion.Any())
             {
-                <div class="card shadow-custom mb-4">
-                    <div class="card-header bg-info text-white">
-                        <h5 class="mb-0"><i class="fas fa-history"></i> Historial de Seguimientos</h5>
+                var contrato = Model.ContratoAdopcion.FirstOrDefault();
+                <div class="card shadow-hover mb-4 border-green">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0"><i class="fa fa-file-contract"></i> Información del Contrato</h5>
                     </div>
-                    <div class="card-body">
-                        <div class="timeline">
-                            @foreach (var seguimiento in seguimientos)
-                            {
-                                <div class="timeline-item mb-4 pb-3 border-bottom">
-                                    <div class="timeline-marker bg-success"></div>
-                                    <div class="timeline-content">
-                                        <small class="text-muted d-block">
-                                            <i class="fas fa-calendar-alt"></i>
-                                            @seguimiento.FechaSeguimiento?.ToString("dd/MM/yyyy HH:mm")
-                                        </small>
-                                        <h6 class="mb-2">@seguimiento.TipoSeguimiento</h6>
+                    <div class="card-body bg-light-mint">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><strong><i class="fa fa-hashtag text-green"></i> Número de contrato:</strong> @contrato.NumeroContrato</p>
+                                <p><strong><i class="fa fa-calendar text-green"></i> Fecha de contrato:</strong> @contrato.FechaContrato?.ToString("dd/MM/yyyy")</p>
+                                <p><strong><i class="fa fa-check-circle text-green"></i> Estado del contrato:</strong> <span class="badge bg-info">@contrato.Estado</span></p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong><i class="fa fa-user-tie text-green"></i> Representante del refugio:</strong> @contrato.RepresentanteRefugioNombre</p>
+                                <p><strong><i class="fa fa-id-card text-green"></i> Cédula representante:</strong> @contrato.RepresentanteRefugioCedula</p>
 
-                                        <div class="row">
-                                            <div class="col-6">
-                                                <small>
-                                                    <strong>Hogar:</strong>
-                                                    <span class="badge @(seguimiento.CondicionesVivienda == "Excelente" ? "badge-success" :
-                                                                         seguimiento.CondicionesVivienda == "Bueno" ? "badge-primary" :
-                                                                         "badge-warning")">
-                                                        @seguimiento.CondicionesVivienda
-                                                    </span>
-                                                </small>
-                                            </div>
-                                            <div class="col-6">
-                                                <small>
-                                                    <strong>Mascota:</strong>
-                                                    <span class="badge @(seguimiento.EstadoMascota == "Excelente" ? "badge-success" :
-                                                                         seguimiento.EstadoMascota == "Bueno" ? "badge-primary" :
-                                                                         "badge-warning")">
-                                                        @seguimiento.EstadoMascota
-                                                    </span>
-                                                </small>
-                                            </div>
-                                        </div>
+                                @if (!string.IsNullOrEmpty(contrato.DocumentoPDF))
+                                {
+                                    <a href="@contrato.DocumentoPDF" target="_blank" class="btn btn-green btn-sm">
+                                        <i class="fa fa-file-pdf"></i> Ver Contrato PDF
+                                    </a>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
 
-                                        @if (!string.IsNullOrEmpty(seguimiento.Observaciones))
-                                        {
-                                            <div class="mt-2 small">
-                                                <strong>Observaciones:</strong>
-                                                <p class="mb-1">@seguimiento.Observaciones</p>
-                                            </div>
-                                        }
+            <!-- Registrar Seguimiento (solo si está aprobada) -->
+            @if (Model.Estado == "Aprobada")
+            {
+                <div class="card shadow-hover mb-4 border-green">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0"><i class="fa fa-clipboard-check"></i> Registrar Seguimiento de Adopción</h5>
+                    </div>
+                    <div class="card-body bg-light-mint">
+                        <p class="text-secondary mb-4">
+                            <i class="fa fa-info-circle text-green"></i> Use este formulario para registrar visitas de seguimiento post-adopción.
+                        </p>
 
-                                        @if (!string.IsNullOrEmpty(seguimiento.FotosEvidencia))
-                                        {
-                                            <div class="mt-2">
-                                                <button type="button" class="btn btn-sm btn-outline-info"
-                                                        data-toggle="modal" data-target="#fotosModal"
-                                                        data-fotos="@seguimiento.FotosEvidencia">
-                                                    <i class="fas fa-images"></i> Ver Evidencias
-                                                </button>
-                                            </div>
-                                        }
+                        @using (Html.BeginForm("RegistrarSeguimiento", "Adopcion", FormMethod.Post, new { enctype = "multipart/form-data" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="SolicitudId" value="@Model.SolicitudId" />
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="font-weight-bold text-brown">
+                                            <i class="fa fa-calendar text-green"></i> Fecha de Visita *
+                                        </label>
+                                        <input type="date" name="FechaVisita" class="form-control border-green"
+                                               value="@DateTime.Now.ToString("yyyy-MM-dd")" required />
                                     </div>
                                 </div>
-                            }
-                        </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="font-weight-bold text-brown">
+                                            <i class="fa fa-user-md text-green"></i> Responsable *
+                                        </label>
+                                        <input type="text" name="Responsable" class="form-control border-green"
+                                               placeholder="Nombre del responsable" required />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="font-weight-bold text-brown">
+                                            <i class="fa fa-home text-green"></i> Condiciones del Hogar *
+                                        </label>
+                                        <select name="CondicionesHogar" class="form-control border-green" required>
+                                            <option value="">Seleccione...</option>
+                                            <option value="Excelente">Excelente</option>
+                                            <option value="Bueno">Bueno</option>
+                                            <option value="Regular">Regular</option>
+                                            <option value="Malo">Malo</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="font-weight-bold text-brown">
+                                            <i class="fa fa-heart text-green"></i> Estado de la Mascota *
+                                        </label>
+                                        <select name="EstadoMascota" class="form-control border-green" required>
+                                            <option value="">Seleccione...</option>
+                                            <option value="Excelente">Excelente</option>
+                                            <option value="Bueno">Bueno</option>
+                                            <option value="Regular">Regular</option>
+                                            <option value="Requiere atención">Requiere atención</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="font-weight-bold text-brown">
+                                    <i class="fa fa-comment-alt text-green"></i> Observaciones *
+                                </label>
+                                <textarea name="Observaciones" class="form-control border-green" rows="4"
+                                          placeholder="Ingrese observaciones detalladas de la visita..." required></textarea>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="font-weight-bold text-brown">
+                                    <i class="fa fa-camera text-green"></i> Fotografías (opcional)
+                                </label>
+                                <div class="custom-file">
+                                    <input type="file" name="Fotos" class="custom-file-input"
+                                           id="FotosSeguimiento" accept="image/*" multiple />
+                                    <label class="custom-file-label text-secondary" for="FotosSeguimiento">
+                                        <i class="fa fa-cloud-upload-alt"></i> Seleccionar imágenes...
+                                    </label>
+                                </div>
+                                <small class="form-text text-secondary">
+                                    Puede seleccionar múltiples imágenes (JPG, PNG, GIF)
+                                </small>
+                            </div>
+
+                            <!-- Vista previa de imágenes -->
+                            <div id="previewContainer" class="row mt-3" style="display: none;"></div>
+
+                            <div class="form-group mt-4">
+                                <label class="font-weight-bold text-brown">
+                                    <i class="fa fa-calendar-alt text-green"></i> Próxima Visita Sugerida (opcional)
+                                </label>
+                                <input type="date" name="ProximaVisita" class="form-control border-green"
+                                       min="@DateTime.Now.ToString("yyyy-MM-dd")" />
+                            </div>
+
+                            <button type="submit" class="btn btn-success btn-lg btn-block mt-4">
+                                <i class="fa fa-save"></i> Registrar Seguimiento
+                            </button>
+                        }
                     </div>
                 </div>
             }
             else
             {
-                <div class="card shadow-custom mb-4">
-                    <div class="card-header bg-info text-white">
-                        <h5 class="mb-0"><i class="fas fa-history"></i> Historial de Seguimientos</h5>
+                <div class="card shadow-hover mb-4 border-green">
+                    <div class="card-header bg-yellow text-white">
+                        <h5 class="mb-0"><i class="fa fa-exclamation-triangle"></i> Información</h5>
                     </div>
-                    <div class="card-body text-center py-4">
-                        <i class="fas fa-clipboard-list fa-3x text-muted mb-3"></i>
-                        <p class="text-muted">No hay seguimientos registrados para esta adopción.</p>
+                    <div class="card-body bg-light-mint">
+                        <div class="alert alert-warning">
+                            <i class="fa fa-info-circle"></i>
+                            El seguimiento de adopción solo está disponible para solicitudes aprobadas.
+                            Esta solicitud está en estado: <strong class="text-brown">@Model.Estado</strong>
+                        </div>
                     </div>
                 </div>
             }
-        }
+        </div>
 
-        <!-- Evaluación de Adopción -->
-        @if (Model.EvaluacionAdopcion != null && Model.EvaluacionAdopcion.Any())
-        {
-            var evaluacion = Model.EvaluacionAdopcion.FirstOrDefault();
-            <div class="card shadow-custom mb-4">
-                <div class="card-header bg-warning text-white">
-                    <h5 class="mb-0"><i class="fas fa-chart-bar"></i> Evaluación de Adopción</h5>
+        <!-- Panel Lateral -->
+        <div class="col-md-4">
+            <!-- Historial de Seguimientos -->
+            @if (Model.ContratoAdopcion != null && Model.ContratoAdopcion.Any())
+            {
+                var contrato = Model.ContratoAdopcion.FirstOrDefault();
+                var seguimientos = contrato.SeguimientoAdopcion?.OrderByDescending(s => s.FechaSeguimiento).ToList();
+
+                if (seguimientos != null && seguimientos.Any())
+                {
+                    <div class="card shadow-hover mb-4 border-green">
+                        <div class="card-header bg-info text-white">
+                            <h5 class="mb-0"><i class="fa fa-history"></i> Historial de Seguimientos</h5>
+                        </div>
+                        <div class="card-body bg-light-mint">
+                            <div class="timeline">
+                                @foreach (var seguimiento in seguimientos)
+                                {
+                                    <div class="timeline-item mb-4 pb-3 border-bottom border-green">
+                                        <div class="timeline-marker bg-green"></div>
+                                        <div class="timeline-content">
+                                            <small class="text-secondary d-block">
+                                                <i class="fa fa-calendar-alt text-green"></i>
+                                                @seguimiento.FechaSeguimiento?.ToString("dd/MM/yyyy HH:mm")
+                                            </small>
+                                            <h6 class="mb-2 text-brown">@seguimiento.TipoSeguimiento</h6>
+
+                                            <div class="row">
+                                                <div class="col-6">
+                                                    <small>
+                                                        <strong class="text-brown">Hogar:</strong>
+                                                        <span class="badge @(seguimiento.CondicionesVivienda == "Excelente" ? "bg-green" :
+                                                                             seguimiento.CondicionesVivienda == "Bueno" ? "bg-primary" :
+                                                                             "bg-yellow")">
+                                                            @seguimiento.CondicionesVivienda
+                                                        </span>
+                                                    </small>
+                                                </div>
+                                                <div class="col-6">
+                                                    <small>
+                                                        <strong class="text-brown">Mascota:</strong>
+                                                        <span class="badge @(seguimiento.EstadoMascota == "Excelente" ? "bg-green" :
+                                                                             seguimiento.EstadoMascota == "Bueno" ? "bg-primary" :
+                                                                             "bg-yellow")">
+                                                            @seguimiento.EstadoMascota
+                                                        </span>
+                                                    </small>
+                                                </div>
+                                            </div>
+
+                                            @if (!string.IsNullOrEmpty(seguimiento.Observaciones))
+                                            {
+                                                <div class="mt-2 small">
+                                                    <strong class="text-brown">Observaciones:</strong>
+                                                    <p class="mb-1 text-secondary">@seguimiento.Observaciones</p>
+                                                </div>
+                                            }
+
+                                            @if (!string.IsNullOrEmpty(seguimiento.FotosEvidencia))
+                                            {
+                                                <div class="mt-2">
+                                                    <button type="button" class="btn btn-outline-green btn-sm"
+                                                            data-toggle="modal" data-target="#fotosModal"
+                                                            data-fotos="@seguimiento.FotosEvidencia">
+                                                        <i class="fa fa-images"></i> Ver Evidencias
+                                                    </button>
+                                                </div>
+                                            }
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="card shadow-hover mb-4 border-green">
+                        <div class="card-header bg-info text-white">
+                            <h5 class="mb-0"><i class="fa fa-history"></i> Historial de Seguimientos</h5>
+                        </div>
+                        <div class="card-body bg-light-mint text-center py-4">
+                            <i class="fa fa-clipboard-list fa-3x text-secondary mb-3"></i>
+                            <p class="text-secondary">No hay seguimientos registrados para esta adopción.</p>
+                        </div>
+                    </div>
+                }
+            }
+
+            <!-- Evaluación de Adopción -->
+            @if (Model.EvaluacionAdopcion != null && Model.EvaluacionAdopcion.Any())
+            {
+                var evaluacion = Model.EvaluacionAdopcion.FirstOrDefault();
+                <div class="card shadow-hover mb-4 border-green">
+                    <div class="card-header bg-yellow text-white">
+                        <h5 class="mb-0"><i class="fa fa-chart-bar"></i> Evaluación de Adopción</h5>
+                    </div>
+                    <div class="card-body bg-light-mint">
+                        <div class="text-center mb-3">
+                            <div class="display-4 text-green font-weight-bold">@(evaluacion.PuntajeTotal ?? 0)</div>
+                            <small class="text-secondary">Puntaje total / 100</small>
+                        </div>
+
+                        <div class="small">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span class="text-brown">Vivienda:</span>
+                                <span class="text-green">@(evaluacion.PuntajeVivienda ?? 0)</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-1">
+                                <span class="text-brown">Experiencia:</span>
+                                <span class="text-green">@(evaluacion.PuntajeExperiencia ?? 0)</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-1">
+                                <span class="text-brown">Disponibilidad:</span>
+                                <span class="text-green">@(evaluacion.PuntajeDisponibilidad ?? 0)</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-1">
+                                <span class="text-brown">Referencias:</span>
+                                <span class="text-green">@(evaluacion.PuntajeReferencias ?? 0)</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-3">
+                                <span class="text-brown">Compromiso:</span>
+                                <span class="text-green">@(evaluacion.PuntajeCompromiso ?? 0)</span>
+                            </div>
+                        </div>
+
+                        <div class="alert @(evaluacion.Resultado == "Apto" ? "alert-green" : "alert-danger") small">
+                            <i class="fa @(evaluacion.Resultado == "Apto" ? "fa-check-circle text-green" : "fa-times-circle text-danger")"></i>
+                            <strong class="text-brown">Resultado:</strong> <span class="text-brown">@evaluacion.Resultado</span>
+                        </div>
+                    </div>
                 </div>
-                <div class="card-body">
-                    <div class="text-center mb-3">
-                        <div class="display-4 text-success font-weight-bold">@(evaluacion.PuntajeTotal ?? 0)</div>
-                        <small class="text-muted">Puntaje total / 100</small>
-                    </div>
+            }
 
-                    <div class="small">
-                        <div class="d-flex justify-content-between mb-1">
-                            <span>Vivienda:</span>
-                            <span>@(evaluacion.PuntajeVivienda ?? 0)</span>
-                        </div>
-                        <div class="d-flex justify-content-between mb-1">
-                            <span>Experiencia:</span>
-                            <span>@(evaluacion.PuntajeExperiencia ?? 0)</span>
-                        </div>
-                        <div class="d-flex justify-content-between mb-1">
-                            <span>Disponibilidad:</span>
-                            <span>@(evaluacion.PuntajeDisponibilidad ?? 0)</span>
-                        </div>
-                        <div class="d-flex justify-content-between mb-1">
-                            <span>Referencias:</span>
-                            <span>@(evaluacion.PuntajeReferencias ?? 0)</span>
-                        </div>
-                        <div class="d-flex justify-content-between mb-3">
-                            <span>Compromiso:</span>
-                            <span>@(evaluacion.PuntajeCompromiso ?? 0)</span>
-                        </div>
-                    </div>
-
-                    <div class="alert @(evaluacion.Resultado == "Apto" ? "alert-success" : "alert-danger") small">
-                        <i class="fas @(evaluacion.Resultado == "Apto" ? "fa-check-circle" : "fa-times-circle")"></i>
-                        <strong>Resultado:</strong> @evaluacion.Resultado
-                    </div>
+            <!-- Alertas y Recordatorios -->
+            <div class="card shadow-hover border-green">
+                <div class="card-header bg-pink text-white">
+                    <h5 class="mb-0"><i class="fa fa-bell"></i> Recordatorios y Alertas</h5>
                 </div>
-            </div>
-        }
-
-        <!-- Alertas y Recordatorios -->
-        <div class="card shadow-custom">
-            <div class="card-header bg-danger text-white">
-                <h5 class="mb-0"><i class="fas fa-bell"></i> Recordatorios y Alertas</h5>
-            </div>
-            <div class="card-body">
-                <div class="alert-list">
-                    <!-- Alerta si no hay contrato -->
-                    @if (Model.Estado == "Aprobada" && (Model.ContratoAdopcion == null || !Model.ContratoAdopcion.Any()))
-                    {
-                        <div class="alert alert-warning">
-                            <i class="fas fa-exclamation-triangle"></i>
-                            <strong>Contrato pendiente:</strong> Se requiere generar contrato de adopción.
-                        </div>
-                    }
-
-                    <!-- Alerta si no hay seguimientos -->
-                    @if (Model.Estado == "Aprobada" && Model.ContratoAdopcion != null && Model.ContratoAdopcion.Any())
-                    {
-                        var contrato = Model.ContratoAdopcion.FirstOrDefault();
-                        var ultimoSeguimiento = contrato.SeguimientoAdopcion?.OrderByDescending(s => s.FechaSeguimiento).FirstOrDefault();
-
-                        if (ultimoSeguimiento == null)
+                <div class="card-body bg-light-mint">
+                    <div class="alert-list">
+                        <!-- Alerta si no hay contrato -->
+                        @if (Model.Estado == "Aprobada" && (Model.ContratoAdopcion == null || !Model.ContratoAdopcion.Any()))
                         {
-                            <div class="alert alert-info">
-                                <i class="fas fa-calendar-plus"></i>
-                                <strong>Primer seguimiento:</strong> Programar primera visita post-adopción.
+                            <div class="alert alert-warning">
+                                <i class="fa fa-exclamation-triangle text-yellow"></i>
+                                <strong class="text-brown">Contrato pendiente:</strong> Se requiere generar contrato de adopción.
                             </div>
                         }
-                        else if (ultimoSeguimiento.ProximoSeguimiento.HasValue && ultimoSeguimiento.ProximoSeguimiento.Value < DateTime.Now)
+
+                        <!-- Alerta si no hay seguimientos -->
+                        @if (Model.Estado == "Aprobada" && Model.ContratoAdopcion != null && Model.ContratoAdopcion.Any())
                         {
-                            <div class="alert alert-danger">
-                                <i class="fas fa-exclamation-circle"></i>
-                                <strong>Seguimiento vencido:</strong> Próxima visita programada para @ultimoSeguimiento.ProximoSeguimiento.Value.ToString("dd/MM/yyyy")
+                            var contrato = Model.ContratoAdopcion.FirstOrDefault();
+                            var ultimoSeguimiento = contrato.SeguimientoAdopcion?.OrderByDescending(s => s.FechaSeguimiento).FirstOrDefault();
+
+                            if (ultimoSeguimiento == null)
+                            {
+                                <div class="alert alert-info">
+                                    <i class="fa fa-calendar-plus text-info"></i>
+                                    <strong class="text-brown">Primer seguimiento:</strong> Programar primera visita post-adopción.
+                                </div>
+                            }
+                            else if (ultimoSeguimiento.ProximoSeguimiento.HasValue && ultimoSeguimiento.ProximoSeguimiento.Value < DateTime.Now)
+                            {
+                                <div class="alert alert-danger">
+                                    <i class="fa fa-exclamation-circle text-danger"></i>
+                                    <strong class="text-brown">Seguimiento vencido:</strong> Próxima visita programada para @ultimoSeguimiento.ProximoSeguimiento.Value.ToString("dd/MM/yyyy")
+                                </div>
+                            }
+                        }
+
+                        <!-- Alerta si requiere intervención -->
+                        @if (Model.ContratoAdopcion != null && Model.ContratoAdopcion.Any())
+                        {
+                            var contrato = Model.ContratoAdopcion.FirstOrDefault();
+                            var requiereIntervencion = contrato.SeguimientoAdopcion?.Any(s => s.RequiereIntervencion == true);
+
+                            if (requiereIntervencion == true)
+                            {
+                                <div class="alert alert-danger">
+                                    <i class="fa fa-exclamation-triangle text-danger"></i>
+                                    <strong class="text-brown">Intervención requerida:</strong> Revisar seguimientos anteriores.
+                                </div>
+                            }
+                        }
+
+                        <!-- Si no hay alertas -->
+                        @if (!(Model.Estado == "Aprobada" && (Model.ContratoAdopcion == null || !Model.ContratoAdopcion.Any())) &&
+                            !(Model.Estado == "Aprobada" && Model.ContratoAdopcion != null && Model.ContratoAdopcion.Any() &&
+                              Model.ContratoAdopcion.FirstOrDefault()?.SeguimientoAdopcion?.OrderByDescending(s => s.FechaSeguimiento).FirstOrDefault() == null))
+                        {
+                            <div class="text-center text-green py-2">
+                                <i class="fa fa-check-circle fa-2x mb-2"></i>
+                                <p class="mb-0 text-brown">Sin alertas pendientes</p>
                             </div>
                         }
-                    }
-
-                    <!-- Alerta si requiere intervención -->
-                    @if (Model.ContratoAdopcion != null && Model.ContratoAdopcion.Any())
-                    {
-                        var contrato = Model.ContratoAdopcion.FirstOrDefault();
-                        var requiereIntervencion = contrato.SeguimientoAdopcion?.Any(s => s.RequiereIntervencion == true);
-
-                        if (requiereIntervencion == true)
-                        {
-                            <div class="alert alert-danger">
-                                <i class="fas fa-exclamation-triangle"></i>
-                                <strong>Intervención requerida:</strong> Revisar seguimientos anteriores.
-                            </div>
-                        }
-                    }
-
-                    <!-- Si no hay alertas -->
-                    @if (!(Model.Estado == "Aprobada" && (Model.ContratoAdopcion == null || !Model.ContratoAdopcion.Any())) &&
-                        !(Model.Estado == "Aprobada" && Model.ContratoAdopcion != null && Model.ContratoAdopcion.Any() &&
-                          Model.ContratoAdopcion.FirstOrDefault()?.SeguimientoAdopcion?.OrderByDescending(s => s.FechaSeguimiento).FirstOrDefault() == null))
-                    {
-                        <div class="text-center text-success py-2">
-                            <i class="fas fa-check-circle fa-2x mb-2"></i>
-                            <p class="mb-0">Sin alertas pendientes</p>
-                        </div>
-                    }
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
-<!-- Botones de Navegación -->
-<div class="mt-4 d-flex justify-content-between">
-    <a href="@Url.Action("SolicitudesAdopcion", "Admin")" class="btn btn-outline-secondary">
-        <i class="fas fa-arrow-left"></i> Volver a Solicitudes
-    </a>
+    <!-- Botones de Navegación -->
+    <div class="mt-4 d-flex justify-content-between">
+        <a href="@Url.Action("SolicitudesAdopcion", "Admin")" class="btn btn-outline-green">
+            <i class="fa fa-arrow-left"></i> Volver a Solicitudes
+        </a>
 
-    @if (Model.Estado == "Aprobada")
-    {
-        <div>
-            @if (Model.ContratoAdopcion == null || !Model.ContratoAdopcion.Any())
-            {
-                <a href="@Url.Action("GenerarContrato", "Adopcion", new { solicitudId = Model.SolicitudId })"
-                   class="btn btn-primary">
-                    <i class="fas fa-file-contract"></i> Generar Contrato
+        @if (Model.Estado == "Aprobada")
+        {
+            <div>
+                @if (Model.ContratoAdopcion == null || !Model.ContratoAdopcion.Any())
+                {
+                    <a href="@Url.Action("GenerarContrato", "Adopcion", new { solicitudId = Model.SolicitudId })"
+                       class="btn btn-green">
+                        <i class="fa fa-file-contract"></i> Generar Contrato
+                    </a>
+                }
+
+                <a href="@Url.Action("DetallesSolicitud", "Admin", new { id = Model.SolicitudId })"
+                   class="btn btn-outline-green ml-2">
+                    <i class="fa fa-eye"></i> Ver Detalles Completos
                 </a>
-            }
-
-            <a href="@Url.Action("DetallesSolicitud", "Admin", new { id = Model.SolicitudId })"
-               class="btn btn-info ml-2">
-                <i class="fas fa-eye"></i> Ver Detalles Completos
-            </a>
-        </div>
-    }
-</div>
-
-<!-- Modal para ver fotos -->
-<div class="modal fade" id="fotosModal" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
-            <div class="modal-header bg-primary text-white">
-                <h5 class="modal-title">
-                    <i class="fas fa-images"></i> Evidencias Fotográficas
-                </h5>
-                <button type="button" class="close text-white" data-dismiss="modal">
-                    <span aria-hidden="true">&times;</span>
-                </button>
             </div>
-            <div class="modal-body text-center">
-                <div id="carouselFotos" class="carousel slide" data-ride="carousel">
-                    <div class="carousel-inner" id="carouselInner">
-                        <!-- Las imágenes se cargarán aquí dinámicamente -->
+        }
+    </div>
+
+    <!-- Modal para ver fotos -->
+    <div class="modal fade" id="fotosModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-green text-white">
+                    <h5 class="modal-title">
+                        <i class="fa fa-images"></i> Evidencias Fotográficas
+                    </h5>
+                    <button type="button" class="close text-white" data-dismiss="modal">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body text-center">
+                    <div id="carouselFotos" class="carousel slide" data-ride="carousel">
+                        <div class="carousel-inner" id="carouselInner">
+                            <!-- Las imágenes se cargarán aquí dinámicamente -->
+                        </div>
+                        <a class="carousel-control-prev" href="#carouselFotos" role="button" data-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="sr-only">Anterior</span>
+                        </a>
+                        <a class="carousel-control-next" href="#carouselFotos" role="button" data-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="sr-only">Siguiente</span>
+                        </a>
                     </div>
-                    <a class="carousel-control-prev" href="#carouselFotos" role="button" data-slide="prev">
-                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                        <span class="sr-only">Anterior</span>
-                    </a>
-                    <a class="carousel-control-next" href="#carouselFotos" role="button" data-slide="next">
-                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                        <span class="sr-only">Siguiente</span>
-                    </a>
                 </div>
             </div>
         </div>
@@ -526,12 +530,7 @@
 
 @section Styles {
     <style>
-        .shadow-custom {
-            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-            border: none;
-            border-radius: 10px;
-        }
-
+        /* Eliminé las clases duplicadas ya que están en el layout */
         .timeline {
             position: relative;
             padding-left: 20px;
@@ -544,7 +543,7 @@
                 top: 0;
                 bottom: 0;
                 width: 2px;
-                background-color: #dee2e6;
+                background-color: var(--green);
             }
 
         .timeline-item {
@@ -563,6 +562,7 @@
 
         .alert-list .alert {
             margin-bottom: 10px;
+            border-radius: 8px;
         }
 
         .carousel-item img {
@@ -570,14 +570,45 @@
             object-fit: contain;
             margin: 0 auto;
         }
+
+        .card-header {
+            border-bottom: 2px solid var(--green);
+        }
+
+        .form-control.border-green:focus {
+            border-color: var(--green);
+            box-shadow: 0 0 0 0.2rem rgba(151, 199, 139, 0.25);
+        }
+
+        .badge.bg-danger {
+            background-color: #dc3545 !important;
+            color: white !important;
+        }
+
+        .badge.bg-info {
+            background-color: #17a2b8 !important;
+            color: white !important;
+        }
+
+        .badge.bg-secondary {
+            background-color: #6c757d !important;
+            color: white !important;
+        }
+
+        .badge.bg-primary {
+            background-color: #007bff !important;
+            color: white !important;
+        }
     </style>
 }
 
 @section Scripts {
     <script>
         $(document).ready(function () {
+            console.log('Seguimiento de adopción cargado');
+
             // Preview de imágenes seleccionadas
-            $('#FotosSeguimiento').on('change', function() {
+            $('#FotosSeguimiento').on('change', function () {
                 var previewContainer = $('#previewContainer');
                 previewContainer.empty();
                 previewContainer.hide();
@@ -586,11 +617,11 @@
                 if (files.length > 0) {
                     previewContainer.show();
 
-                    for (var i = 0; i < Math.min(files.length, 4); i++) { // Mostrar máximo 4 previews
+                    for (var i = 0; i < Math.min(files.length, 4); i++) {
                         var file = files[i];
                         var reader = new FileReader();
 
-                        reader.onload = function(e) {
+                        reader.onload = function (e) {
                             var col = $('<div class="col-6 col-md-3 mb-2"></div>');
                             var img = $('<img class="img-thumbnail" style="height: 100px; object-fit: cover;" />');
                             img.attr('src', e.target.result);
@@ -610,15 +641,15 @@
                 var carouselInner = $('#carouselInner');
                 carouselInner.empty();
 
-                // Parsear URLs de fotos (asumiendo que están separadas por comas)
-                var fotos = fotosData.split(',').map(function(url) {
+                // Parsear URLs de fotos
+                var fotos = fotosData.split(',').map(function (url) {
                     return url.trim();
-                }).filter(function(url) {
+                }).filter(function (url) {
                     return url.length > 0;
                 });
 
                 if (fotos.length > 0) {
-                    fotos.forEach(function(fotoUrl, index) {
+                    fotos.forEach(function (fotoUrl, index) {
                         var item = $('<div class="carousel-item"></div>');
                         if (index === 0) {
                             item.addClass('active');
@@ -632,14 +663,14 @@
                         carouselInner.append(item);
                     });
                 } else {
-                    carouselInner.html('<div class="text-center py-5"><p class="text-muted">No hay imágenes disponibles</p></div>');
+                    carouselInner.html('<div class="text-center py-5"><p class="text-secondary">No hay imágenes disponibles</p></div>');
                 }
             });
 
             // Bootstrap file input label
-            $('.custom-file-input').on('change', function() {
+            $('.custom-file-input').on('change', function () {
                 var fileName = $(this).val().split('\\').pop();
-                $(this).next('.custom-file-label').html('<i class="fas fa-image"></i> ' + fileName);
+                $(this).next('.custom-file-label').html('<i class="fa fa-image"></i> ' + fileName);
             });
         });
     </script>

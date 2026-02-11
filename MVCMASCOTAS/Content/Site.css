@@ -1,20 +1,390 @@
-﻿/* Set padding to keep content from hitting the edges */
-.body-content {
-    margin-top: 15px;
-    padding-left: 15px;
-    padding-right: 15px;
+﻿/* ==========================================================
+   VARIABLES CSS
+   ========================================================== */
+:root {
+    --green: #97C78B;
+    --pink: #FBCDC0;
+    --yellow: #F2C66D;
+    --bg-light: #F2E9D8;
+    --brown: #5C4B43;
+    --text-main: #2F2F2F;
+    --text-secondary: #555555;
+    --fondo-claro: #F2E9D8;
+    --verde-principal: #97C78B;
+    --rosa-suave: #FBCDC0;
+    --amarillo-acento: #F2C66D;
+    --marron-texto: #5C4B43;
+    --texto-oscuro: #2F2F2F;
 }
 
-/* Override the default bootstrap behavior where horizontal description lists 
-   will truncate terms that are too long to fit in the left column 
-*/
-.dl-horizontal dt {
-    white-space: normal;
+/* ==========================================================
+   ESTILOS GENERALES
+   ========================================================== */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: var(--text-main);
+    background-color: #fff;
 }
 
-/* Set width on the form input elements since they're 100% wide by default */
-input,
-select,
-textarea {
-    max-width: 280px;
+/* ==========================================================
+   CARDS DE MASCOTAS
+   ========================================================== */
+.mascota-card {
+    border: 2px solid var(--green);
+    border-radius: 15px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    background: white;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+    .mascota-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 12px 30px rgba(151, 199, 139, 0.3);
+    }
+
+.mascota-imagen {
+    position: relative;
+    width: 100%;
+    height: 280px;
+    overflow: hidden;
+}
+
+    .mascota-imagen img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.5s ease;
+    }
+
+.mascota-card:hover .mascota-imagen img {
+    transform: scale(1.1);
+}
+
+.mascota-badge {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    padding: 8px 15px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.badge-especial {
+    background-color: var(--yellow);
+    color: var(--brown);
+}
+
+.badge-esterilizado {
+    position: absolute;
+    bottom: 15px;
+    left: 15px;
+    background-color: rgba(255, 255, 255, 0.95);
+    color: var(--green);
+    padding: 6px 12px;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.mascota-info {
+    padding: 20px;
+    flex-grow: 1;
+}
+
+.mascota-nombre {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--brown);
+    margin-bottom: 15px;
+}
+
+.mascota-detalle {
+    margin-bottom: 15px;
+}
+
+    .mascota-detalle p {
+        margin-bottom: 10px;
+        font-size: 0.95rem;
+        color: var(--text-secondary);
+    }
+
+    .mascota-detalle i {
+        margin-right: 8px;
+        width: 20px;
+    }
+
+.icon-especie {
+    color: var(--green);
+}
+
+.icon-sexo-macho {
+    color: #4A90E2;
+}
+
+.icon-sexo-hembra {
+    color: #E91E63;
+}
+
+.icon-tamanio {
+    color: var(--yellow);
+}
+
+.icon-edad {
+    color: var(--pink);
+}
+
+.mascota-descripcion {
+    padding-top: 15px;
+    border-top: 1px solid #eee;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+}
+
+.mascota-footer {
+    padding: 0 20px 20px;
+}
+
+.btn-detalle {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    background-color: var(--green);
+    color: white;
+    text-align: center;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    text-decoration: none;
+}
+
+    .btn-detalle:hover {
+        background-color: #86b57a;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(151, 199, 139, 0.4);
+        color: white;
+        text-decoration: none;
+    }
+
+/* ==========================================================
+   FILTROS
+   ========================================================== */
+.filtros-card {
+    background: white;
+    border: 2px solid var(--green);
+    border-radius: 15px;
+    padding: 25px;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+.filtros-body {
+    padding: 0;
+}
+
+/* ==========================================================
+   SECCIÓN DE ADOPCIÓN
+   ========================================================== */
+.adopcion-section {
+    padding: 40px 0;
+}
+
+.page-header {
+    margin-bottom: 40px;
+}
+
+.header-icon {
+    color: var(--green);
+    margin-right: 15px;
+}
+
+/* ==========================================================
+   EMPTY STATE
+   ========================================================== */
+.empty-state {
+    padding: 80px 20px;
+    text-align: center;
+    background: var(--bg-light);
+    border-radius: 15px;
+    margin: 40px 0;
+}
+
+/* ==========================================================
+   PAGINACIÓN
+   ========================================================== */
+.pagination-custom {
+    margin-top: 40px;
+}
+
+    .pagination-custom .page-link-custom {
+        border: 2px solid var(--green);
+        color: var(--brown);
+        margin: 0 5px;
+        border-radius: 8px;
+        padding: 10px 18px;
+        transition: all 0.3s ease;
+    }
+
+        .pagination-custom .page-link-custom:hover {
+            background-color: var(--green);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+    .pagination-custom .page-item.active .page-link-custom {
+        background-color: var(--green);
+        border-color: var(--green);
+        color: white;
+    }
+
+/* ==========================================================
+   GESTIÓN ADMINISTRATIVA
+   ========================================================== */
+.shadow-custom {
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+}
+
+.table-hover tbody tr:hover {
+    background-color: rgba(151, 199, 139, 0.1);
+}
+
+/* ==========================================================
+   BADGES
+   ========================================================== */
+.badge.bg-info {
+    background-color: #17a2b8 !important;
+}
+
+.badge.bg-pink {
+    background-color: var(--pink) !important;
+    color: var(--brown) !important;
+}
+
+.badge.bg-success {
+    background-color: #28a745 !important;
+}
+
+.badge.bg-warning {
+    background-color: #ffc107 !important;
+}
+
+.badge.bg-secondary {
+    background-color: #6c757d !important;
+}
+
+/* ==========================================================
+   ANIMACIONES
+   ========================================================== */
+.fade-in {
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.stagger-fade {
+    animation: fadeIn 0.6s ease-out;
+}
+
+/* ==========================================================
+   RESPONSIVE
+   ========================================================== */
+@media (max-width: 768px) {
+    .mascota-imagen {
+        height: 220px;
+    }
+
+    .mascota-nombre {
+        font-size: 1.3rem;
+    }
+
+    .filtros-card {
+        padding: 20px 15px;
+    }
+
+    .adopcion-section {
+        padding: 20px 0;
+    }
+}
+
+/* ==========================================================
+   NAVBAR
+   ========================================================== */
+.navbar {
+    background-color: var(--verde-principal) !important;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+}
+
+.navbar-brand {
+    color: var(--texto-oscuro) !important;
+    font-weight: 700;
+}
+
+.navbar-nav .nav-link {
+    color: var(--texto-oscuro) !important;
+    font-weight: 500;
+}
+
+    .navbar-nav .nav-link:hover,
+    .navbar-nav .nav-link:focus {
+        color: var(--marron-texto) !important;
+    }
+
+.dropdown-menu {
+    border-color: var(--verde-principal);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.dropdown-item:hover,
+.dropdown-item:focus {
+    background-color: var(--rosa-suave);
+    color: var(--texto-oscuro);
+}
+
+.btn-outline-secondary {
+    border-color: var(--texto-secundario);
+    color: var(--texto-secundario);
+}
+
+    .btn-outline-secondary:hover {
+        background-color: var(--texto-secundario);
+        color: white;
+    }
+
+.btn-warning {
+    background-color: var(--amarillo-acento);
+    border-color: var(--amarillo-acento);
+    color: var(--texto-oscuro);
+}
+
+    .btn-warning:hover {
+        background-color: #e0b55c;
+        border-color: #e0b55c;
+    }
+
+/* ==========================================================
+   FOOTER
+   ========================================================== */
+footer {
+    color: var(--texto-secundario);
+    font-size: 0.9rem;
+}
+
+a:hover {
+    color: var(--marron-texto) !important;
+    text-decoration: none;
 }

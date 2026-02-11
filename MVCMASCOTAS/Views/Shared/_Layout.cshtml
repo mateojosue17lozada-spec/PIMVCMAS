@@ -3,34 +3,394 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@ViewBag.Title - Mi Aplicación MVC</title>
+    <title>@ViewData["Title"] - Refugio de Mascotas</title>
 
-    <!-- Bootstrap 4.6.2 CSS Local (YA instalado) -->
+    <!-- Bootstrap 4.6.2 CSS Local -->
     <link href="~/Content/bootstrap.min.css" rel="stylesheet" />
-
-    <!-- Font Awesome 4.7.0 Local (YA instalado) -->
+    <!-- Font Awesome 4.7.0 Local -->
     <link href="~/Content/font-awesome.min.css" rel="stylesheet" />
-
-    <!-- Tu CSS personalizado del proyecto -->
+    <!-- Tu CSS personalizado (con las variables :root) -->
     <link href="~/Content/site.css" rel="stylesheet" />
 
-    <!-- CSS específico de la vista (opcional) -->
-    @RenderSection("styles", required: false)
+    <!-- SweetAlert2 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+
+    <!-- ✅ ESTILOS GLOBALES INLINE -->
+    <style>
+        /* PALETA DE COLORES BASADA EN SITE.CSS */
+        :root {
+            --green: #97C78B;
+            --pink: #FBCDC0;
+            --yellow: #F2C66D;
+            --bg-light: #F2E9D8;
+            --brown: #5C4B43;
+            --text-main: #2F2F2F;
+            --text-secondary: #555555;
+            --fondo-claro: #F2E9D8;
+        }
+
+        /* CLASES DE COLORES */
+        .bg-green {
+            background-color: var(--green) !important;
+        }
+
+        .bg-pink {
+            background-color: var(--pink) !important;
+        }
+
+        .bg-yellow {
+            background-color: var(--yellow) !important;
+        }
+
+        .bg-light-mint {
+            background-color: var(--bg-light) !important;
+        }
+
+        .text-green {
+            color: var(--green) !important;
+        }
+
+        .text-brown {
+            color: var(--brown) !important;
+        }
+
+        .text-secondary {
+            color: var(--text-secondary) !important;
+        }
+
+        /* BOTONES */
+        .btn-green {
+            background-color: var(--green) !important;
+            border-color: var(--green) !important;
+            color: white !important;
+        }
+
+            .btn-green:hover {
+                background-color: #86b57a !important;
+                border-color: #86b57a !important;
+            }
+
+        .btn-pink {
+            background-color: var(--pink) !important;
+            border-color: var(--pink) !important;
+            color: var(--brown) !important;
+        }
+
+            .btn-pink:hover {
+                background-color: #f9c2b0 !important;
+                border-color: #f9c2b0 !important;
+            }
+
+        .btn-yellow {
+            background-color: var(--yellow) !important;
+            border-color: var(--yellow) !important;
+            color: var(--brown) !important;
+        }
+
+            .btn-yellow:hover {
+                background-color: #e6b85c !important;
+                border-color: #e6b85c !important;
+            }
+
+        .btn-outline-green {
+            color: var(--green) !important;
+            border-color: var(--green) !important;
+        }
+
+            .btn-outline-green:hover {
+                background-color: var(--green) !important;
+                color: white !important;
+            }
+
+        /* BORDES */
+        .border-green {
+            border-color: var(--green) !important;
+        }
+
+        /* ALERTAS */
+        .alert-green {
+            background-color: rgba(151, 199, 139, 0.1) !important;
+            border: 1px solid var(--green) !important;
+            color: var(--brown) !important;
+        }
+
+        /* HERO SECTION */
+        .hero-section {
+            background: linear-gradient(135deg, var(--bg-light) 0%, white 100%);
+        }
+
+        .hero-img {
+            border: 5px solid var(--green);
+            max-height: 400px;
+            object-fit: cover;
+            width: 100%;
+        }
+
+        /* CARDS */
+        .shadow-hover {
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+            .shadow-hover:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 10px 25px rgba(151, 199, 139, 0.2) !important;
+                border-color: var(--green);
+            }
+
+        /* STAT BOXES */
+        .stat-box {
+            padding: 25px;
+            border-radius: 12px;
+            background: white;
+            border: 2px solid var(--green);
+            transition: all 0.3s ease;
+        }
+
+            .stat-box:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 8px 20px rgba(151, 199, 139, 0.1);
+            }
+
+        /* CAMPAIGN CARDS */
+        .campaign-img {
+            height: 200px;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+        }
+
+            .campaign-img .badge {
+                position: absolute;
+                top: 15px;
+                right: 15px;
+                font-size: 0.8rem;
+                padding: 5px 10px;
+            }
+
+        /* BADGES */
+        .badge.bg-green {
+            background-color: var(--green) !important;
+            color: white !important;
+        }
+
+        .badge.bg-pink {
+            background-color: var(--pink) !important;
+            color: var(--brown) !important;
+        }
+
+        .badge.bg-yellow {
+            background-color: var(--yellow) !important;
+            color: var(--brown) !important;
+        }
+
+        /* TIPOGRAFÍA */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-weight: 700;
+        }
+
+        .display-4 {
+            font-weight: 800;
+        }
+
+        /* FORZAR DROPDOWN FUNCTIONALITY */
+        .dropdown-menu {
+            animation: fadeIn 0.3s ease;
+        }
+
+        @@keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* RESPONSIVE - ✅ CON DOBLE @@ */
+        @@media (max-width: 768px) {
+            .display-4 {
+                font-size: 2.5rem;
+            }
+
+            .hero-img {
+                max-height: 300px;
+            }
+
+            .stat-box {
+                padding: 15px;
+            }
+
+            .campaign-img {
+                height: 180px;
+            }
+
+            .btn-lg {
+                padding: 0.5rem 1rem;
+                font-size: 1rem;
+            }
+        }
+
+        /* ANIMACIONES - ✅ CON DOBLE @@ */
+        @@keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in-up {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        /* IMÁGENES */
+        .card-img-top {
+            overflow: hidden;
+        }
+
+            .card-img-top img {
+                transition: transform 0.5s ease;
+                width: 100%;
+                height: 250px;
+                object-fit: cover;
+            }
+
+            .card-img-top:hover img {
+                transform: scale(1.05);
+            }
+
+        .text-muted {
+            color: #6c757d !important;
+        }
+    </style>
+
+    <!-- ✅ CSS específico de cada vista - SOLO UNA VEZ -->
+    @{
+        // Para manejar RenderSection sin usar el helper
+        var stylesSection = RenderSection("Styles", required: false);
+    }
+    @if (stylesSection != null)
+    {
+        @stylesSection
+    }
 </head>
 <body>
     <!-- Barra de navegación -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <nav class="navbar navbar-expand-lg navbar-light" style="background-color: #F2E9D8;">
         <div class="container">
-            @Html.ActionLink("Mi App", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
+            <a class="navbar-brand text-brown font-weight-bold" href="/Home/Index">
+                <i class="fa fa-paw text-green"></i> Refugio Mascotas
+            </a>
+
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
                     aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
+
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav mr-auto">
-                    <li class="nav-item">@Html.ActionLink("Inicio", "Index", "Home", null, new { @class = "nav-link" })</li>
-                    <li class="nav-item">@Html.ActionLink("Acerca de", "About", "Home", null, new { @class = "nav-link" })</li>
-                    <li class="nav-item">@Html.ActionLink("Contacto", "Contact", "Home", null, new { @class = "nav-link" })</li>
+                    <li class="nav-item">
+                        <a class="nav-link text-brown" href="/Home/Index">
+                            <i class="fa fa-home"></i> Inicio
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-brown" href="/Mascotas/Index">
+                            <i class="fa fa-paw"></i> Mascotas
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-brown" href="/Rescate/MascotasPerdidas">
+                            <i class="fa fa-search"></i> Mascotas Perdidas
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-brown" href="/Rescate/Index">
+                            <i class="fa fa-ambulance"></i> Rescates
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-brown" href="/Donaciones/Index">
+                            <i class="fa fa-donate"></i> Donaciones
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-brown" href="/Home/About">
+                            <i class="fa fa-info-circle"></i> Acerca de
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-brown" href="/Home/Contact">
+                            <i class="fa fa-envelope"></i> Contacto
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-brown" href="/Home/Terminos">
+                            <i class="fa fa-file-alt"></i> Términos
+                        </a>
+                    </li>
+                </ul>
+
+                <!-- Menú de usuario -->
+                <ul class="navbar-nav ml-auto">
+                    <!-- Verificar autenticación usando User.Identity en lugar de ViewData -->
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle text-brown" href="#" id="navbarDropdown" role="button"
+                               data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="fa fa-user"></i> @User.Identity.Name
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+                                <!-- PARA TODOS LOS USUARIOS -->
+                                <a class="dropdown-item text-brown" href="/Account/MiPerfil">
+                                    <i class="fa fa-user-circle"></i> Mi Perfil
+                                </a>
+
+                                <!-- SOLO PARA ADMINISTRADOR -->
+                                @if (User.IsInRole("Administrador"))
+                                {
+                                    <div class="dropdown-divider"></div>
+                                    <h6 class="dropdown-header text-brown">Administración</h6>
+                                    <a class="dropdown-item text-brown" href="/Admin/Dashboard">
+                                        <i class="fa fa-tachometer-alt"></i> Panel Administrador
+                                    </a>
+                                    <a class="dropdown-item text-brown" href="/Admin/Usuarios">
+                                        <i class="fa fa-users"></i> Gestionar Usuarios
+                                    </a>
+                                    <a class="dropdown-item text-brown" href="/Admin/Roles">
+                                        <i class="fa fa-user-shield"></i> Gestionar Roles
+                                    </a>
+                                }
+
+                                <div class="dropdown-divider"></div>
+                                <!-- ✅ CORREGIDO: Botón de logout simple para GET -->
+                                <a class="dropdown-item text-brown" href="javascript:void(0);" onclick="confirmarLogout()">
+                                    <i class="fa fa-sign-out"></i> Cerrar Sesión
+                                </a>
+                            </div>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="nav-item">
+                            <a class="btn btn-outline-secondary btn-sm mr-2" href="/Account/Login">
+                                <i class="fa fa-sign-in"></i> Iniciar Sesión
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="btn btn-warning btn-sm" href="/Account/Register">
+                                <i class="fa fa-user-plus"></i> Registrarse
+                            </a>
+                        </li>
+                    }
                 </ul>
             </div>
         </div>
@@ -38,42 +398,220 @@
 
     <!-- Contenido principal -->
     <div class="container body-content mt-4">
-        @RenderBody()
+        <!-- Mostrar mensajes de éxito/error -->
+        @if (ViewData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-green border-green alert-dismissible fade show" role="alert">
+                <i class="fa fa-check-circle text-green"></i>
+                <strong class="text-brown">@ViewData["SuccessMessage"]</strong>
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        }
+
+        @if (ViewData["ErrorMessage"] != null)
+        {
+            <div class="alert alert-green border-green alert-dismissible fade show" role="alert">
+                <i class="fa fa-exclamation-circle text-green"></i>
+                <strong class="text-brown">@ViewData["ErrorMessage"]</strong>
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        }
+
+        <!-- Contenido de la vista -->
+        @{
+            var body = RenderBody();
+        }
+        @if (body != null)
+        {
+            @body
+        }
 
         <hr class="mt-5" />
 
         <!-- Footer -->
-        <footer class="mt-4 mb-4">
-            <p>&copy; @DateTime.Now.Year - Mi Aplicación MVC</p>
+        <footer class="mt-4 mb-4 text-center">
+            <p class="text-secondary">&copy; @DateTime.Now.Year - Refugio de Mascotas - Todos los derechos reservados</p>
         </footer>
     </div>
 
-    <!-- Scripts - EN ESTE ORDEN EXACTO -->
-    <!-- jQuery 3.6.0 (la versión que YA tienes) -->
+    <!-- Scripts - ORDEN CORRECTO ES IMPORTANTE -->
     <script src="~/Scripts/jquery-3.6.0.min.js"></script>
-
-    <!-- Bootstrap 4.6.2 JS Bundle (YA instalado) -->
+    <!-- VERIFICACIÓN DE JQUERY -->
+    <script>
+        console.log('jQuery cargado desde Layout, versión:', typeof jQuery !== 'undefined' ? $.fn.jquery : 'NO DEFINIDO');
+    </script>
     <script src="~/Scripts/bootstrap.bundle.min.js"></script>
 
-    <!-- jQuery Validation 1.21.0 (YA instalado) -->
+    <!-- ✅ AGREGADO: Chart.js para gráficos del Dashboard -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+
     <script src="~/Scripts/jquery.validate.min.js"></script>
     <script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>
-
-    <!-- Tu JS personalizado -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.inputmask/5.0.8/jquery.inputmask.min.js"></script>
+    <!-- SweetAlert2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="~/Scripts/site.js"></script>
 
-    <!-- Scripts específicos de la vista -->
-    @RenderSection("scripts", required: false)
+    <!-- ✅ Scripts específicos de cada vista - SOLO UNA VEZ -->
+    @{
+        var scriptsSection = RenderSection("Scripts", required: false);
+    }
+    @if (scriptsSection != null)
+    {
+        @scriptsSection
+    }
 
-    <!-- Inicializaciones generales -->
+    <!-- ✅ SCRIPT MEJORADO PARA LOGOUT (GET) Y FUNCIONALIDAD GENERAL -->
     <script>
-        $(document).ready(function () {
-            // Inicializa tooltips de Bootstrap
-            $('[data-toggle="tooltip"]').tooltip();
+        // VERIFICAR SI TODAS LAS LIBRERÍAS ESTÁN CARGADAS
+        document.addEventListener('DOMContentLoaded', function () {
+            console.log('DOM completamente cargado');
 
-            // Inicializa popovers de Bootstrap
-            $('[data-toggle="popover"]').popover();
+            // Verificar librerías cargadas
+            console.log('jQuery:', typeof jQuery !== 'undefined' ? 'OK v' + $.fn.jquery : 'NO CARGADO');
+            console.log('Bootstrap:', typeof bootstrap !== 'undefined' ? 'OK' : 'NO CARGADO');
+            console.log('SweetAlert2:', typeof Swal !== 'undefined' ? 'OK' : 'NO CARGADO');
+            console.log('Chart.js:', typeof Chart !== 'undefined' ? 'OK v' + Chart.version : 'NO CARGADO');
         });
+
+        $(document).ready(function () {
+            console.log('Layout loaded - jQuery ready');
+
+            // Inicializar dropdowns inmediatamente
+            $('.dropdown-toggle').dropdown();
+
+            // Inicializar tooltips y popovers
+            $('[data-toggle="tooltip"]').tooltip();
+            $('[data-toggle="popover"]').popover();
+
+            // Forzar que dropdowns funcionen con hover en desktop
+            if (window.innerWidth > 768) {
+                $('.dropdown').hover(
+                    function () {
+                        $(this).addClass('show');
+                        $(this).find('.dropdown-menu').addClass('show');
+                    },
+                    function () {
+                        $(this).removeClass('show');
+                        $(this).find('.dropdown-menu').removeClass('show');
+                    }
+                );
+            }
+
+            // Auto cerrar alertas después de 5 segundos
+            setTimeout(function () {
+                $('.alert').alert('close');
+            }, 5000);
+
+            // Inicializar máscaras de entrada
+            function inicializarMascaras() {
+                $('[data-mask]').each(function () {
+                    var mask = $(this).data('mask');
+                    $(this).inputmask(mask);
+                });
+            }
+            inicializarMascaras();
+
+            // Contador animado para números (si existen elementos con clase 'counter')
+            $('.counter').each(function () {
+                var $this = $(this);
+                var target = parseInt($this.text());
+                if (!isNaN(target)) {
+                    $({ countNum: 0 }).animate({
+                        countNum: target
+                    }, {
+                        duration: 2000,
+                        easing: 'swing',
+                        step: function () {
+                            $this.text(Math.floor(this.countNum));
+                        },
+                        complete: function () {
+                            $this.text(this.countNum);
+                        }
+                    });
+                }
+            });
+
+            // Efecto hover para cards con clase shadow-hover
+            $('.shadow-hover').hover(
+                function () {
+                    $(this).addClass('shadow-lg');
+                },
+                function () {
+                    $(this).removeClass('shadow-lg');
+                }
+            );
+        });
+
+        // ✅ FUNCIÓN PARA CONFIRMAR Y EJECUTAR LOGOUT (GET SIMPLE) CON FALLBACK
+        function confirmarLogout() {
+            // Verificar si SweetAlert2 está cargado
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    title: '¿Cerrar sesión?',
+                    text: "¿Estás seguro de que deseas salir del sistema?",
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#97C78B',
+                    cancelButtonColor: '#FBCDC0',
+                    confirmButtonText: 'Sí, cerrar sesión',
+                    cancelButtonText: 'Cancelar',
+                    reverseButtons: true,
+                    customClass: {
+                        confirmButton: 'btn btn-green',
+                        cancelButton: 'btn btn-pink'
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Mostrar mensaje de procesamiento
+                        Swal.fire({
+                            title: 'Cerrando sesión...',
+                            text: 'Redirigiendo al inicio',
+                            allowOutsideClick: false,
+                            allowEscapeKey: false,
+                            didOpen: () => {
+                                Swal.showLoading();
+                            }
+                        });
+
+                        // Redirigir directamente a la acción Logout (GET)
+                        setTimeout(function () {
+                            window.location.href = '/Account/Logout';
+                        }, 1000);
+                    }
+                });
+            } else {
+                // Fallback si SweetAlert2 no está cargado
+                if (confirm('¿Estás seguro de que deseas cerrar sesión?')) {
+                    // Mostrar mensaje simple
+                    var message = document.createElement('div');
+                    message.style.cssText = 'position:fixed;top:0;left:0;width:100%;background:#97C78B;color:white;padding:10px;text-align:center;z-index:9999;';
+                    message.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Cerrando sesión...';
+                    document.body.appendChild(message);
+
+                    // Redirigir después de 1 segundo
+                    setTimeout(function () {
+                        window.location.href = '/Account/Logout';
+                    }, 1000);
+                }
+            }
+        }
+
+        // FUNCIÓN DE EMERGENCIA PARA DROPDOWNS (si Bootstrap no funciona)
+        function forzarDropdown(id) {
+            var dropdown = document.getElementById(id);
+            if (dropdown) {
+                var menu = dropdown.querySelector('.dropdown-menu');
+                if (menu) {
+                    menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+                }
+            }
+            return false;
+        }
     </script>
 </body>
 </html>

@@ -12,6 +12,8 @@ namespace MVCMASCOTAS.Models
     using System;
     using System.Data.Entity;
     using System.Data.Entity.Infrastructure;
+    using System.Data.Entity.Core.Objects;
+    using System.Linq;
     
     public partial class RefugioMascotasDBEntities : DbContext
     {
@@ -58,5 +60,47 @@ namespace MVCMASCOTAS.Models
         public virtual DbSet<vw_BalanceContable> vw_BalanceContable { get; set; }
         public virtual DbSet<vw_MascotasDisponibles> vw_MascotasDisponibles { get; set; }
         public virtual DbSet<vw_ResumenAdopciones> vw_ResumenAdopciones { get; set; }
+        public virtual DbSet<CampaniaAdopcion> CampaniaAdopcion { get; set; }
+        public virtual DbSet<RefugioAdopcion> RefugioAdopcion { get; set; }
+        public virtual DbSet<RolPermisos> RolPermisos { get; set; }
+        public virtual DbSet<HistorialEstadosMascota> HistorialEstadosMascota { get; set; }
+    
+        public virtual int sp_ArchivarMascota(Nullable<int> mascotaId, Nullable<int> usuarioId, string motivo, ObjectParameter resultado)
+        {
+            var mascotaIdParameter = mascotaId.HasValue ?
+                new ObjectParameter("MascotaId", mascotaId) :
+                new ObjectParameter("MascotaId", typeof(int));
+    
+            var usuarioIdParameter = usuarioId.HasValue ?
+                new ObjectParameter("UsuarioId", usuarioId) :
+                new ObjectParameter("UsuarioId", typeof(int));
+    
+            var motivoParameter = motivo != null ?
+                new ObjectParameter("Motivo", motivo) :
+                new ObjectParameter("Motivo", typeof(string));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("sp_ArchivarMascota", mascotaIdParameter, usuarioIdParameter, motivoParameter, resultado);
+        }
+    
+        public virtual int sp_RestaurarMascota(Nullable<int> mascotaId, Nullable<int> usuarioId, string nuevoEstado, string motivo, ObjectParameter resultado)
+        {
+            var mascotaIdParameter = mascotaId.HasValue ?
+                new ObjectParameter("MascotaId", mascotaId) :
+                new ObjectParameter("MascotaId", typeof(int));
+    
+            var usuarioIdParameter = usuarioId.HasValue ?
+                new ObjectParameter("UsuarioId", usuarioId) :
+                new ObjectParameter("UsuarioId", typeof(int));
+    
+            var nuevoEstadoParameter = nuevoEstado != null ?
+                new ObjectParameter("NuevoEstado", nuevoEstado) :
+                new ObjectParameter("NuevoEstado", typeof(string));
+    
+            var motivoParameter = motivo != null ?
+                new ObjectParameter("Motivo", motivo) :
+                new ObjectParameter("Motivo", typeof(string));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("sp_RestaurarMascota", mascotaIdParameter, usuarioIdParameter, nuevoEstadoParameter, motivoParameter, resultado);
+        }
     }
 }

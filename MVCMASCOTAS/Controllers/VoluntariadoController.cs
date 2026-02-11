@@ -120,7 +120,7 @@ namespace MVCMASCOTAS.Controllers
                 <p>Saludos,<br/>Equipo del Refugio</p>
             ";
 
-            _ = EmailHelper.SendEmailAsync(usuario.Email, subject, body);
+            _ = EmailHelper.SendNotificationAsync(usuario.Email, subject, body);
 
             TempData["SuccessMessage"] = "¡Bienvenido al equipo de voluntarios!";
             return RedirectToAction("MisActividades");
@@ -267,7 +267,7 @@ namespace MVCMASCOTAS.Controllers
                 <p>Saludos,<br/>Equipo del Refugio</p>
             ";
 
-            _ = EmailHelper.SendEmailAsync(usuario.Email, subject, body);
+            _ = EmailHelper.SendNotificationAsync(usuario.Email, subject, body);
 
             return Json(new { success = true, message = "Inscripción exitosa" });
         }

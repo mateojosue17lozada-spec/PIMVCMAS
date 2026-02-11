@@ -1,314 +1,311 @@
 ﻿@model IEnumerable<MVCMASCOTAS.Models.AuditoriaAcciones>
-
 @{
     ViewBag.Title = "Auditoría del Sistema";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="container-fluid">
-    <!-- Encabezado -->
-    <div class="page-header mb-4">
-        <h2><i class="fas fa-history me-2"></i> Auditoría del Sistema</h2>
-        <p class="text-muted">Registro de todas las acciones realizadas en el sistema</p>
-    </div>
-
-    <!-- Botones de acción -->
-    <div class="mb-4">
-        <a href="@Url.Action("Dashboard", "Admin")" class="btn btn-outline-secondary">
-            <i class="fas fa-arrow-left me-1"></i> Volver al Dashboard
-        </a>
-        <a href="@Url.Action("ExportarAuditoria", "Admin")" class="btn btn-success">
-            <i class="fas fa-file-excel me-1"></i> Exportar a Excel
-        </a>
-        <button type="button" class="btn btn-danger" onclick="limpiarAuditoria()">
-            <i class="fas fa-trash-alt me-1"></i> Limpiar Registros Antiguos
-        </button>
-    </div>
-
-    <!-- Filtros -->
-    <div class="card shadow-custom mb-4">
-        <div class="card-header bg-primary text-white">
-            <h5 class="mb-0"><i class="fas fa-filter me-2"></i> Filtros</h5>
-        </div>
-        <div class="card-body">
-            @using (Html.BeginForm("Auditoria", "Admin", FormMethod.Get, new { @class = "row g-3" }))
-            {
-                <div class="col-md-3">
-                    <label class="form-label">Módulo:</label>
-                    <input type="text" name="modulo" value="@ViewBag.FiltroModulo"
-                           class="form-control" placeholder="Nombre del módulo" />
-                </div>
-                <div class="col-md-3">
-                    <label class="form-label">Acción:</label>
-                    <input type="text" name="accion" value="@ViewBag.FiltroAccion"
-                           class="form-control" placeholder="Nombre de la acción" />
-                </div>
-                <div class="col-md-2">
-                    <label class="form-label">Fecha Desde:</label>
-                    <input type="date" name="fechaDesde" value="@ViewBag.FechaDesde"
-                           class="form-control" />
-                </div>
-                <div class="col-md-2">
-                    <label class="form-label">Fecha Hasta:</label>
-                    <input type="date" name="fechaHasta" value="@ViewBag.FechaHasta"
-                           class="form-control" />
-                </div>
-                <div class="col-md-2 d-flex align-items-end">
-                    <button type="submit" class="btn btn-primary w-100">
-                        <i class="fas fa-search me-1"></i> Buscar
-                    </button>
-                </div>
-            }
+<!-- Hero Section -->
+<section class="py-4">
+    <div class="container">
+        <div class="text-center">
+            <h1 class="display-5 fw-bold mb-2 text-brown">
+                <i class="fa fa-history text-green"></i> Auditoría del Sistema
+            </h1>
+            <p class="lead mb-3 text-secondary">Registro de todas las acciones realizadas en el sistema</p>
         </div>
     </div>
+</section>
 
-    <!-- Estadísticas -->
-    <div class="row mb-4">
-        <div class="col-md-3">
-            <div class="card bg-primary text-white">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <h6 class="card-title">Total Registros</h6>
-                            <h2 class="mb-0">@ViewBag.TotalRegistros</h2>
-                        </div>
-                        <div class="align-self-center">
-                            <i class="fas fa-database fa-2x"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
+<!-- Main Content -->
+<section class="py-5">
+    <div class="container-fluid">
+        <!-- Botones de acción -->
+        <div class="mb-4">
+            <a href="@Url.Action("Dashboard", "Admin")" class="btn btn-outline-green mb-2">
+                <i class="fa fa-arrow-left me-1"></i> Volver al Dashboard
+            </a>
+            <a href="@Url.Action("ExportarAuditoria", "Admin")" class="btn btn-green text-white mb-2">
+                <i class="fa fa-file-excel me-1"></i> Exportar a Excel
+            </a>
+            <button type="button" class="btn btn-pink mb-2" onclick="limpiarAuditoria()">
+                <i class="fa fa-trash-alt me-1"></i> Limpiar Registros Antiguos
+            </button>
         </div>
-        <div class="col-md-3">
-            <div class="card bg-success text-white">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <h6 class="card-title">Acciones Hoy</h6>
-                            <h2 class="mb-0">@ViewBag.AccionesHoy</h2>
-                        </div>
-                        <div class="align-self-center">
-                            <i class="fas fa-calendar-day fa-2x"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card bg-info text-white">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <h6 class="card-title">Usuarios Activos</h6>
-                            <h2 class="mb-0">@ViewBag.UsuariosActivos</h2>
-                        </div>
-                        <div class="align-self-center">
-                            <i class="fas fa-users fa-2x"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card bg-warning text-white">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <h6 class="card-title">Última Acción</h6>
-                            <p class="mb-0 small">@(ViewBag.UltimaAccion != null ? ViewBag.UltimaAccion.ToString("dd/MM/yyyy HH:mm") : "N/A")</p>
-                        </div>
-                        <div class="align-self-center">
-                            <i class="fas fa-clock fa-2x"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
 
-    <!-- Tabla de auditoría -->
-    <div class="card shadow-custom">
-        <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
-            <h5 class="mb-0"><i class="fas fa-table me-2"></i> Registro de Actividades</h5>
-            <div>
-                <span class="badge bg-light text-dark">
-                    Mostrando @(Model != null ? Model.Count() : 0) registros
-                </span>
+        <!-- Filtros -->
+        <div class="card border-green shadow-hover mb-4">
+            <div class="card-header bg-green text-white">
+                <h5 class="mb-0"><i class="fa fa-filter me-2"></i> Filtros</h5>
+            </div>
+            <div class="card-body">
+                @using (Html.BeginForm("Auditoria", "Admin", FormMethod.Get, new { @class = "row g-3" }))
+                {
+                    <div class="col-md-3">
+                        <label class="form-label text-brown fw-medium">Módulo:</label>
+                        <input type="text" name="modulo" value="@ViewBag.FiltroModulo"
+                               class="form-control border-green" placeholder="Nombre del módulo" />
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label text-brown fw-medium">Acción:</label>
+                        <input type="text" name="accion" value="@ViewBag.FiltroAccion"
+                               class="form-control border-green" placeholder="Nombre de la acción" />
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label text-brown fw-medium">Fecha Desde:</label>
+                        <input type="date" name="fechaDesde" value="@ViewBag.FechaDesde"
+                               class="form-control border-green" />
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label text-brown fw-medium">Fecha Hasta:</label>
+                        <input type="date" name="fechaHasta" value="@ViewBag.FechaHasta"
+                               class="form-control border-green" />
+                    </div>
+                    <div class="col-md-2 d-flex align-items-end">
+                        <button type="submit" class="btn btn-green text-white w-100">
+                            <i class="fa fa-search me-1"></i> Buscar
+                        </button>
+                    </div>
+                }
             </div>
         </div>
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-hover table-striped table-sm">
-                    <thead class="table-dark">
-                        <tr>
-                            <th width="80">ID</th>
-                            <th width="150">Fecha/Hora</th>
-                            <th width="150">Usuario</th>
-                            <th width="120">Módulo</th>
-                            <th width="120">Acción</th>
-                            <th>Descripción</th>
-                            <th width="120">IP</th>
-                            <th width="80" class="text-center">Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @if (Model != null && Model.Any())
-                        {
-                            foreach (var registro in Model)
+
+        <!-- Estadísticas -->
+        <div class="row mb-4">
+            <div class="col-md-3 col-6 mb-3">
+                <div class="stat-box border-green bg-green text-white">
+                    <div class="text-center mb-2">
+                        <i class="fa fa-database fa-2x"></i>
+                    </div>
+                    <div class="h3 text-center mb-1 counter">@ViewBag.TotalRegistros</div>
+                    <div class="text-center">Total Registros</div>
+                </div>
+            </div>
+            <div class="col-md-3 col-6 mb-3">
+                <div class="stat-box border-green bg-yellow">
+                    <div class="text-center mb-2">
+                        <i class="fa fa-calendar-day fa-2x text-brown"></i>
+                    </div>
+                    <div class="h3 text-center text-brown mb-1 counter">@ViewBag.AccionesHoy</div>
+                    <div class="text-center text-brown">Acciones Hoy</div>
+                </div>
+            </div>
+            <div class="col-md-3 col-6 mb-3">
+                <div class="stat-box border-green bg-pink">
+                    <div class="text-center mb-2">
+                        <i class="fa fa-users fa-2x text-brown"></i>
+                    </div>
+                    <div class="h3 text-center text-brown mb-1 counter">@ViewBag.UsuariosActivos</div>
+                    <div class="text-center text-brown">Usuarios Activos</div>
+                </div>
+            </div>
+            <div class="col-md-3 col-6 mb-3">
+                <div class="stat-box border-green bg-light-mint">
+                    <div class="text-center mb-2">
+                        <i class="fa fa-clock fa-2x text-green"></i>
+                    </div>
+                    <div class="h4 text-center text-brown mb-1">
+                        @(ViewBag.UltimaAccion != null ? ViewBag.UltimaAccion.ToString("dd/MM/yyyy HH:mm") : "N/A")
+                    </div>
+                    <div class="text-center text-brown">Última Acción</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabla de auditoría -->
+        <div class="card border-green shadow-hover">
+            <div class="card-header bg-green text-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fa fa-table me-2"></i> Registro de Actividades</h5>
+                <div>
+                    <span class="badge bg-yellow text-brown">
+                        Mostrando @(Model != null ? Model.Count() : 0) registros
+                    </span>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr class="bg-light-mint">
+                                <th width="80" class="text-brown">ID</th>
+                                <th width="150" class="text-brown">Fecha/Hora</th>
+                                <th width="150" class="text-brown">Usuario</th>
+                                <th width="120" class="text-brown">Módulo</th>
+                                <th width="120" class="text-brown">Acción</th>
+                                <th class="text-brown">Descripción</th>
+                                <th width="120" class="text-brown">IP</th>
+                                <th width="80" class="text-center text-brown">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model != null && Model.Any())
+                            {
+                                foreach (var registro in Model)
+                                {
+                                    <tr>
+                                        <td><span class="badge bg-light-mint text-brown">#@registro.AuditoriaId</span></td>
+                                        <td>
+                                            @if (registro.FechaAccion.HasValue)
+                                            {
+                                                <span class="text-nowrap text-brown">
+                                                    @registro.FechaAccion.Value.ToString("dd/MM/yyyy")<br>
+                                                    <small class="text-secondary">@registro.FechaAccion.Value.ToString("HH:mm:ss")</small>
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-secondary">N/A</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            @if (registro.UsuarioId.HasValue && registro.Usuarios != null)
+                                            {
+                                                <div>
+                                                    <span class="badge bg-green text-white">@registro.Usuarios.NombreCompleto</span>
+                                                    <br>
+                                                    <small class="text-secondary">@registro.Usuarios.Email</small>
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-light-mint text-brown">Sistema</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-green text-white">
+                                                @(!string.IsNullOrEmpty(registro.Modulo) ? registro.Modulo : "General")
+                                            </span>
+                                        </td>
+                                        <td>
+                                            @{
+                                                var badgeClass = "bg-green text-white";
+                                                var badgeText = registro.Accion;
+
+                                                if (registro.Accion.Contains("Error") || registro.Accion.Contains("Fallido"))
+                                                {
+                                                    badgeClass = "bg-pink text-brown";
+                                                }
+                                                else if (registro.Accion.Contains("Advertencia") || registro.Accion.Contains("Warning"))
+                                                {
+                                                    badgeClass = "bg-yellow text-brown";
+                                                }
+                                            }
+                                            <span class="badge @badgeClass">@badgeText</span>
+                                        </td>
+                                        <td>
+                                            <div class="text-truncate" style="max-width: 300px;"
+                                                 title="@registro.Descripcion">
+                                                <span class="text-secondary">
+                                                    @(!string.IsNullOrEmpty(registro.Descripcion) ? registro.Descripcion : "-")
+                                                </span>
+                                            </div>
+                                            @if (!string.IsNullOrEmpty(registro.Detalles))
+                                            {
+                                                <button type="button" class="btn btn-sm btn-link p-0 text-green"
+                                                        onclick="mostrarDetalles(@registro.AuditoriaId, '@registro.Detalles')">
+                                                    <small><i class="fa fa-eye"></i> Ver detalles</small>
+                                                </button>
+                                            }
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-light-mint text-brown">
+                                                @(!string.IsNullOrEmpty(registro.DireccionIP) ? registro.DireccionIP : "N/A")
+                                            </span>
+                                        </td>
+                                        <td class="text-center">
+                                            <button type="button" class="btn btn-sm btn-outline-green"
+                                                    onclick="mostrarDetalleCompleto(@registro.AuditoriaId)"
+                                                    title="Ver detalle completo">
+                                                <i class="fa fa-search"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            else
                             {
                                 <tr>
-                                    <td><span class="badge bg-secondary">#@registro.AuditoriaId</span></td>
-                                    <td>
-                                        @if (registro.FechaAccion.HasValue)
-                                        {
-                                            <span class="text-nowrap">
-                                                @registro.FechaAccion.Value.ToString("dd/MM/yyyy")<br>
-                                                <small class="text-muted">@registro.FechaAccion.Value.ToString("HH:mm:ss")</small>
-                                            </span>
-                                        }
-                                        else
-                                        {
-                                            <span class="text-muted">N/A</span>
-                                        }
-                                    </td>
-                                    <td>
-                                        @if (registro.UsuarioId.HasValue && registro.Usuarios != null)
-                                        {
-                                            <div>
-                                                <span class="badge bg-info">@registro.Usuarios.NombreCompleto</span>
-                                                <br>
-                                                <small class="text-muted">@registro.Usuarios.Email</small>
-                                            </div>
-                                        }
-                                        else
-                                        {
-                                            <span class="badge bg-secondary">Sistema</span>
-                                        }
-                                    </td>
-                                    <td>
-                                        <span class="badge bg-primary">
-                                            @(!string.IsNullOrEmpty(registro.Modulo) ? registro.Modulo : "General")
-                                        </span>
-                                    </td>
-                                    <td>
-                                        @{
-                                            var badgeClass = "bg-success";
-                                            if (registro.Accion.Contains("Error") || registro.Accion.Contains("Fallido"))
-                                            {
-                                                badgeClass = "bg-danger";
-                                            }
-                                            else if (registro.Accion.Contains("Advertencia") || registro.Accion.Contains("Warning"))
-                                            {
-                                                badgeClass = "bg-warning";
-                                            }
-                                        }
-                                        <span class="badge @badgeClass">@registro.Accion</span>
-                                    </td>
-                                    <td>
-                                        <div class="text-truncate" style="max-width: 300px;"
-                                             title="@registro.Descripcion">
-                                            @(!string.IsNullOrEmpty(registro.Descripcion) ? registro.Descripcion : "-")
+                                    <td colspan="8" class="text-center py-5">
+                                        <div class="alert alert-green text-center border-green">
+                                            <i class="fa fa-info-circle fa-2x mb-3 text-green"></i>
+                                            <h5 class="text-brown">No se encontraron registros de auditoría</h5>
+                                            <p class="text-secondary mb-0">No hay actividades registradas con los filtros seleccionados.</p>
                                         </div>
-                                        @if (!string.IsNullOrEmpty(registro.Detalles))
-                                        {
-                                            <button type="button" class="btn btn-sm btn-link p-0"
-                                                    onclick="mostrarDetalles(@registro.AuditoriaId, '@registro.Detalles')">
-                                                <small><i class="fas fa-eye"></i> Ver detalles</small>
-                                            </button>
-                                        }
-                                    </td>
-                                    <td>
-                                        <span class="badge bg-dark">
-                                            @(!string.IsNullOrEmpty(registro.DireccionIP) ? registro.DireccionIP : "N/A")
-                                        </span>
-                                    </td>
-                                    <td class="text-center">
-                                        <button type="button" class="btn btn-sm btn-outline-info"
-                                                onclick="mostrarDetalleCompleto(@registro.AuditoriaId)"
-                                                title="Ver detalle completo">
-                                            <i class="fas fa-search"></i>
-                                        </button>
                                     </td>
                                 </tr>
                             }
-                        }
-                        else
-                        {
-                            <tr>
-                                <td colspan="8" class="text-center py-5">
-                                    <div class="alert alert-info mb-0">
-                                        <i class="fas fa-info-circle fa-2x mb-3"></i>
-                                        <h5>No se encontraron registros de auditoría</h5>
-                                        <p class="mb-0">No hay actividades registradas con los filtros seleccionados.</p>
-                                    </div>
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
+
+        <!-- Paginación -->
+        @if (ViewBag.TotalPages != null && ViewBag.TotalPages > 1)
+        {
+            <nav aria-label="Paginación" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    @if (ViewBag.CurrentPage > 1)
+                    {
+                        <li class="page-item">
+                            <a class="page-link text-brown" href="@Url.Action("Auditoria", "Admin", new {
+                                page = ViewBag.CurrentPage - 1,
+                                modulo = ViewBag.FiltroModulo,
+                                accion = ViewBag.FiltroAccion,
+                                fechaDesde = ViewBag.FechaDesde,
+                                fechaHasta = ViewBag.FechaHasta
+                            })">
+                                <i class="fa fa-chevron-left"></i> Anterior
+                            </a>
+                        </li>
+                    }
+
+                    @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                    {
+                        <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                            @if (i == ViewBag.CurrentPage)
+                            {
+                                <span class="page-link bg-green text-white">@i</span>
+                            }
+                            else
+                            {
+                                <a class="page-link text-brown" href="@Url.Action("Auditoria", "Admin", new {
+                                    page = i,
+                                    modulo = ViewBag.FiltroModulo,
+                                    accion = ViewBag.FiltroAccion,
+                                    fechaDesde = ViewBag.FechaDesde,
+                                    fechaHasta = ViewBag.FechaHasta
+                                })">@i</a>
+                            }
+                        </li>
+                    }
+
+                    @if (ViewBag.CurrentPage < ViewBag.TotalPages)
+                    {
+                        <li class="page-item">
+                            <a class="page-link text-brown" href="@Url.Action("Auditoria", "Admin", new {
+                                page = ViewBag.CurrentPage + 1,
+                                modulo = ViewBag.FiltroModulo,
+                                accion = ViewBag.FiltroAccion,
+                                fechaDesde = ViewBag.FechaDesde,
+                                fechaHasta = ViewBag.FechaHasta
+                            })">
+                                Siguiente <i class="fa fa-chevron-right"></i>
+                            </a>
+                        </li>
+                    }
+                </ul>
+            </nav>
+        }
     </div>
-
-    <!-- Paginación -->
-    @if (ViewBag.TotalPages != null && ViewBag.TotalPages > 1)
-    {
-        <nav aria-label="Paginación" class="mt-4">
-            <ul class="pagination justify-content-center">
-                @if (ViewBag.CurrentPage > 1)
-                {
-                    <li class="page-item">
-                        <a class="page-link" href="@Url.Action("Auditoria", "Admin", new {
-                            page = ViewBag.CurrentPage - 1,
-                            modulo = ViewBag.FiltroModulo,
-                            accion = ViewBag.FiltroAccion,
-                            fechaDesde = ViewBag.FechaDesde,
-                            fechaHasta = ViewBag.FechaHasta
-                        })">
-                            <i class="fas fa-chevron-left"></i> Anterior
-                        </a>
-                    </li>
-                }
-
-                @for (int i = 1; i <= ViewBag.TotalPages; i++)
-                {
-                    <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
-                        <a class="page-link" href="@Url.Action("Auditoria", "Admin", new {
-                            page = i,
-                            modulo = ViewBag.FiltroModulo,
-                            accion = ViewBag.FiltroAccion,
-                            fechaDesde = ViewBag.FechaDesde,
-                            fechaHasta = ViewBag.FechaHasta
-                        })">@i</a>
-                    </li>
-                }
-
-                @if (ViewBag.CurrentPage < ViewBag.TotalPages)
-                {
-                    <li class="page-item">
-                        <a class="page-link" href="@Url.Action("Auditoria", "Admin", new {
-                            page = ViewBag.CurrentPage + 1,
-                            modulo = ViewBag.FiltroModulo,
-                            accion = ViewBag.FiltroAccion,
-                            fechaDesde = ViewBag.FechaDesde,
-                            fechaHasta = ViewBag.FechaHasta
-                        })">
-                            Siguiente <i class="fas fa-chevron-right"></i>
-                        </a>
-                    </li>
-                }
-            </ul>
-        </nav>
-    }
-</div>
+</section>
 
 <!-- Modal para detalles -->
 <div class="modal fade" id="detallesModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header bg-dark text-white">
+        <div class="modal-content border-green">
+            <div class="modal-header bg-green text-white">
                 <h5 class="modal-title">
-                    <i class="fas fa-info-circle me-2"></i>Detalles de Auditoría
+                    <i class="fa fa-info-circle me-2"></i>Detalles de Auditoría
                 </h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
@@ -316,164 +313,40 @@
                 <div id="detallesContenido"></div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-green text-white" data-bs-dismiss="modal">Cerrar</button>
             </div>
         </div>
     </div>
 </div>
 
-@section Scripts {
-    <script>
-        function mostrarDetalles(id, detalles) {
-            $('#detallesContenido').html(`
-                <div class="mb-3">
-                    <h6><i class="fas fa-id-badge me-2"></i>ID de Registro: <span class="badge bg-primary">#${id}</span></h6>
-                </div>
-                <div class="mb-3">
-                    <h6><i class="fas fa-align-left me-2"></i>Detalles:</h6>
-                    <div class="border p-3 bg-light rounded" style="max-height: 300px; overflow-y: auto;">
-                        <pre class="mb-0">${detalles}</pre>
-                    </div>
-                </div>
-            `);
-            var modal = new bootstrap.Modal(document.getElementById('detallesModal'));
-            modal.show();
-        }
-
-        function mostrarDetalleCompleto(id) {
-            $.ajax({
-                url: '@Url.Action("ObtenerDetalleAuditoria", "Admin")',
-                type: 'GET',
-                data: { id: id },
-                success: function (data) {
-                    if (data.success) {
-                        $('#detallesContenido').html(`
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <h6><i class="fas fa-id-badge me-2"></i>ID</h6>
-                                        <p class="mb-0"><span class="badge bg-primary">#${data.registro.AuditoriaId}</span></p>
-                                    </div>
-                                    <div class="mb-3">
-                                        <h6><i class="fas fa-calendar me-2"></i>Fecha y Hora</h6>
-                                        <p class="mb-0">${data.registro.FechaAccion}</p>
-                                    </div>
-                                    <div class="mb-3">
-                                        <h6><i class="fas fa-user me-2"></i>Usuario</h6>
-                                        <p class="mb-0">
-                                            ${data.registro.UsuarioNombre ?
-                                                `<span class="badge bg-info">${data.registro.UsuarioNombre}</span>` :
-                                                `<span class="badge bg-secondary">Sistema</span>`}
-                                        </p>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <h6><i class="fas fa-cube me-2"></i>Módulo</h6>
-                                        <p class="mb-0"><span class="badge bg-primary">${data.registro.Modulo || 'General'}</span></p>
-                                    </div>
-                                    <div class="mb-3">
-                                        <h6><i class="fas fa-play me-2"></i>Acción</h6>
-                                        <p class="mb-0"><span class="badge bg-success">${data.registro.Accion}</span></p>
-                                    </div>
-                                    <div class="mb-3">
-                                        <h6><i class="fas fa-desktop me-2"></i>Dirección IP</h6>
-                                        <p class="mb-0"><span class="badge bg-dark">${data.registro.DireccionIP || 'N/A'}</span></p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="mb-3">
-                                <h6><i class="fas fa-align-left me-2"></i>Descripción</h6>
-                                <p class="mb-0">${data.registro.Descripcion || 'Sin descripción'}</p>
-                            </div>
-                            ${data.registro.Detalles ? `
-                            <div class="mb-3">
-                                <h6><i class="fas fa-info-circle me-2"></i>Detalles Adicionales</h6>
-                                <div class="border p-3 bg-light rounded" style="max-height: 200px; overflow-y: auto;">
-                                    <pre class="mb-0">${data.registro.Detalles}</pre>
-                                </div>
-                            </div>` : ''}
-                        `);
-                        var modal = new bootstrap.Modal(document.getElementById('detallesModal'));
-                        modal.show();
-                    } else {
-                        mostrarAlerta('Error', 'No se pudo obtener el detalle del registro.', 'error');
-                    }
-                },
-                error: function () {
-                    mostrarAlerta('Error', 'Error al cargar los detalles.', 'error');
-                }
-            });
-        }
-
-        function limpiarAuditoria() {
-            if (confirm('¿Está seguro de que desea eliminar los registros de auditoría con más de 30 días?\nEsta acción no se puede deshacer.')) {
-                $.ajax({
-                    url: '@Url.Action("LimpiarAuditoria", "Admin")',
-                    type: 'POST',
-                    data: { dias: 30 },
-                    success: function (data) {
-                        if (data.success) {
-                            mostrarAlerta('Éxito', `Se eliminaron ${data.registrosEliminados} registros.`, 'success');
-                            setTimeout(function () {
-                                location.reload();
-                            }, 2000);
-                        } else {
-                            mostrarAlerta('Error', 'No se pudieron eliminar los registros.', 'error');
-                        }
-                    },
-                    error: function () {
-                        mostrarAlerta('Error', 'Error al procesar la solicitud.', 'error');
-                    }
-                });
-            }
-        }
-
-        function mostrarAlerta(titulo, mensaje, tipo) {
-            Swal.fire({
-                title: titulo,
-                text: mensaje,
-                icon: tipo,
-                confirmButtonText: 'Aceptar'
-            });
-        }
-
-        // Función para exportar a Excel
-        function exportarExcel() {
-            window.location.href = '@Url.Action("ExportarAuditoria", "Admin")' +
-                '?modulo=' + encodeURIComponent('@ViewBag.FiltroModulo') +
-                '&accion=' + encodeURIComponent('@ViewBag.FiltroAccion') +
-                '&fechaDesde=' + encodeURIComponent('@ViewBag.FechaDesde') +
-                '&fechaHasta=' + encodeURIComponent('@ViewBag.FechaHasta');
-        }
-
-        // Configurar tooltips
-        $(document).ready(function () {
-            $('[title]').tooltip();
-        });
-    </script>
-
+@section Styles {
     <style>
-        .shadow-custom {
-            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-            border: 1px solid rgba(0, 0, 0, 0.125);
+        /* Estilos específicos para Auditoría */
+        .stat-box {
+            padding: 20px;
+            border-radius: 10px;
+            height: 100%;
+            transition: all 0.3s ease;
+        }
+
+            .stat-box:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 5px 15px rgba(151, 199, 139, 0.2);
+            }
+
+        .table th {
+            border-top: 2px solid var(--green);
+            border-bottom: 2px solid var(--green);
         }
 
         .table-hover tbody tr:hover {
-            background-color: rgba(0, 123, 255, 0.05);
-            cursor: pointer;
+            background-color: rgba(151, 199, 139, 0.1);
         }
 
         .badge {
             font-size: 0.85em;
             font-weight: 500;
-        }
-
-        pre {
-            white-space: pre-wrap;
-            word-wrap: break-word;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            font-size: 0.9em;
+            padding: 0.35em 0.65em;
         }
 
         .text-truncate {
@@ -481,5 +354,218 @@
             text-overflow: ellipsis;
             white-space: nowrap;
         }
+
+        .pagination .page-link {
+            color: var(--brown);
+            border: 1px solid var(--green);
+            margin: 0 2px;
+        }
+
+            .pagination .page-link:hover {
+                background-color: var(--green);
+                color: white;
+                border-color: var(--green);
+            }
+
+        .pagination .active .page-link {
+            background-color: var(--green);
+            border-color: var(--green);
+            color: white;
+        }
+
+        @@media (max-width: 768px) {
+            .stat-box {
+                padding: 15px;
+            }
+
+            .table-responsive {
+                font-size: 0.9em;
+            }
+
+            .modal-dialog {
+                margin: 0.5rem;
+            }
+        }
     </style>
+}
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            console.log('Auditoría page loaded');
+
+            // Contador animado
+            $('.counter').each(function () {
+                var $this = $(this);
+                var currentValue = parseInt($this.text());
+
+                if (!isNaN(currentValue) && currentValue > 0) {
+                    $({ countNum: 0 }).animate({
+                        countNum: currentValue
+                    }, {
+                        duration: 1500,
+                        easing: 'swing',
+                        step: function () {
+                            $this.text(Math.floor(this.countNum));
+                        },
+                        complete: function () {
+                            $this.text(this.countNum);
+                        }
+                    });
+                }
+            });
+
+            // Configurar tooltips
+            $('[title]').tooltip();
+
+            // Efecto hover para stat boxes
+            $('.stat-box').hover(
+                function() {
+                    $(this).css('transform', 'translateY(-5px)');
+                },
+                function() {
+                    $(this).css('transform', 'translateY(0)');
+                }
+            );
+        });
+
+        function limpiarAuditoria() {
+            Swal.fire({
+                title: '¿Limpiar registros antiguos?',
+                text: 'Esta acción eliminará registros de auditoría con más de 90 días.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#97C78B',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Sí, limpiar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: '@Url.Action("LimpiarAuditoria", "Admin")',
+                        type: 'POST',
+                        data: { __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val() },
+                        success: function (response) {
+                            if (response.success) {
+                                Swal.fire({
+                                    title: '¡Éxito!',
+                                    text: response.message,
+                                    icon: 'success',
+                                    confirmButtonColor: '#97C78B'
+                                }).then(() => {
+                                    location.reload();
+                                });
+                            } else {
+                                Swal.fire({
+                                    title: 'Error',
+                                    text: response.message,
+                                    icon: 'error',
+                                    confirmButtonColor: '#97C78B'
+                                });
+                            }
+                        },
+                        error: function () {
+                            Swal.fire({
+                                title: 'Error',
+                                text: 'Ocurrió un error al procesar la solicitud.',
+                                icon: 'error',
+                                confirmButtonColor: '#97C78B'
+                            });
+                        }
+                    });
+                }
+            });
+        }
+
+        function mostrarDetalles(id, detalles) {
+            try {
+                var detallesParseados = JSON.parse(detalles);
+                var html = '<div class="card border-green">';
+                html += '<div class="card-header bg-light-mint"><strong>Detalles JSON:</strong></div>';
+                html += '<div class="card-body"><pre class="mb-0">' + JSON.stringify(detallesParseados, null, 2) + '</pre></div>';
+                html += '</div>';
+
+                $('#detallesContenido').html(html);
+            } catch (e) {
+                $('#detallesContenido').html('<p class="text-secondary">' + detalles + '</p>');
+            }
+
+            var modal = new bootstrap.Modal(document.getElementById('detallesModal'));
+            modal.show();
+        }
+
+        function mostrarDetalleCompleto(id) {
+            $.ajax({
+                url: '@Url.Action("DetalleAuditoria", "Admin")',
+                type: 'GET',
+                data: { id: id },
+                success: function (response) {
+                    var html = '<div class="row">';
+
+                    if (response) {
+                        html += '<div class="col-md-6">';
+                        html += '<h6 class="text-brown"><i class="fa fa-id-card text-green me-2"></i>Información General</h6>';
+                        html += '<table class="table table-sm">';
+                        html += '<tr><th class="text-brown">ID:</th><td class="text-secondary">#' + response.AuditoriaId + '</td></tr>';
+                        html += '<tr><th class="text-brown">Fecha:</th><td class="text-secondary">' + (response.FechaAccion ? new Date(response.FechaAccion).toLocaleString() : 'N/A') + '</td></tr>';
+                        html += '<tr><th class="text-brown">Módulo:</th><td class="text-secondary">' + (response.Modulo || 'General') + '</td></tr>';
+                        html += '<tr><th class="text-brown">Acción:</th><td><span class="badge bg-green text-white">' + response.Accion + '</span></td></tr>';
+                        html += '</table>';
+                        html += '</div>';
+
+                        html += '<div class="col-md-6">';
+                        html += '<h6 class="text-brown"><i class="fa fa-user text-green me-2"></i>Información de Usuario</h6>';
+                        html += '<table class="table table-sm">';
+                        if (response.UsuarioId && response.Usuarios) {
+                            html += '<tr><th class="text-brown">Usuario:</th><td class="text-secondary">' + response.Usuarios.NombreCompleto + '</td></tr>';
+                            html += '<tr><th class="text-brown">Email:</th><td class="text-secondary">' + response.Usuarios.Email + '</td></tr>';
+                        } else {
+                            html += '<tr><th class="text-brown">Usuario:</th><td><span class="badge bg-light-mint text-brown">Sistema</span></td></tr>';
+                        }
+                        html += '<tr><th class="text-brown">IP:</th><td class="text-secondary">' + (response.DireccionIP || 'N/A') + '</td></tr>';
+                        html += '</table>';
+                        html += '</div>';
+
+                        html += '<div class="col-12 mt-3">';
+                        html += '<h6 class="text-brown"><i class="fa fa-file-alt text-green me-2"></i>Descripción</h6>';
+                        html += '<div class="alert alert-green border-green">';
+                        html += '<p class="mb-0 text-secondary">' + (response.Descripcion || 'Sin descripción') + '</p>';
+                        html += '</div>';
+
+                        if (response.Detalles) {
+                            html += '<h6 class="text-brown mt-3"><i class="fa fa-code text-green me-2"></i>Detalles Adicionales</h6>';
+                            html += '<div class="bg-light-mint p-3 rounded">';
+                            try {
+                                var detalles = JSON.parse(response.Detalles);
+                                html += '<pre class="mb-0">' + JSON.stringify(detalles, null, 2) + '</pre>';
+                            } catch (e) {
+                                html += '<p class="mb-0 text-secondary">' + response.Detalles + '</p>';
+                            }
+                            html += '</div>';
+                        }
+                        html += '</div>';
+                    } else {
+                        html += '<div class="col-12 text-center py-4">';
+                        html += '<i class="fa fa-exclamation-triangle fa-2x text-secondary mb-3"></i>';
+                        html += '<p class="text-brown">No se encontraron detalles para este registro.</p>';
+                        html += '</div>';
+                    }
+
+                    html += '</div>';
+                    $('#detallesContenido').html(html);
+
+                    var modal = new bootstrap.Modal(document.getElementById('detallesModal'));
+                    modal.show();
+                },
+                error: function () {
+                    Swal.fire({
+                        title: 'Error',
+                        text: 'No se pudieron cargar los detalles del registro.',
+                        icon: 'error',
+                        confirmButtonColor: '#97C78B'
+                    });
+                }
+            });
+        }
+    </script>
 }

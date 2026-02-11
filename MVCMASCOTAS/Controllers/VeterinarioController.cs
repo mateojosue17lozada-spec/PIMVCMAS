@@ -25,14 +25,12 @@ namespace MVCMASCOTAS.Controllers
             ViewBag.MascotasEnTratamiento = db.Mascotas.Count(m => m.Estado == "En tratamiento" && m.Activo == true);
             ViewBag.TratamientosActivos = db.Tratamientos.Count(t => t.Estado == "En curso");
 
-            // CORRECTO: HistorialMedico no tiene FechaRegistro, usa FechaConsulta
             ViewBag.CitasHoy = db.HistorialMedico
                 .Count(h => h.FechaConsulta.HasValue &&
                            h.FechaConsulta.Value.Year == DateTime.Now.Year &&
                            h.FechaConsulta.Value.Month == DateTime.Now.Month &&
                            h.FechaConsulta.Value.Day == DateTime.Now.Day);
 
-            // Mascotas que requieren atención
             var mascotasAtencion = db.Mascotas
                 .Where(m => m.Estado == "En tratamiento" && m.Activo == true)
                 .OrderByDescending(m => m.FechaIngreso)
@@ -41,7 +39,6 @@ namespace MVCMASCOTAS.Controllers
 
             ViewBag.MascotasAtencion = mascotasAtencion;
 
-            // Tratamientos pendientes
             var tratamientosPendientes = db.Tratamientos
                 .Where(t => t.Estado == "En curso" && t.Mascotas.VeterinarioAsignado == usuario.UsuarioId)
                 .OrderBy(t => t.FechaInicio)
@@ -107,7 +104,6 @@ namespace MVCMASCOTAS.Controllers
                 ? ImageHelper.GetImageDataUri(mascota.ImagenPrincipal)
                 : null;
 
-            // Historial médico
             var historial = db.HistorialMedico
                 .Where(h => h.MascotaId == mascotaId)
                 .OrderByDescending(h => h.FechaConsulta)
@@ -115,17 +111,15 @@ namespace MVCMASCOTAS.Controllers
 
             ViewBag.Historial = historial;
 
-            // Vacunas
             var vacunas = db.MascotaVacunas
                 .Where(v => v.MascotaId == mascotaId)
                 .Include(v => v.Vacunas)
-                .Include(v => v.Usuarios) // Veterinario
+                .Include(v => v.Usuarios)
                 .OrderByDescending(v => v.FechaAplicacion)
                 .ToList();
 
             ViewBag.Vacunas = vacunas;
 
-            // Tratamientos
             var tratamientos = db.Tratamientos
                 .Where(t => t.MascotaId == mascotaId)
                 .OrderByDescending(t => t.FechaInicio)
@@ -134,6 +128,56 @@ namespace MVCMASCOTAS.Controllers
             ViewBag.Tratamientos = tratamientos;
 
             return View();
+        }
+
+        // GET: Veterinario/RegistrarConsulta/5 (NUEVO MÉTODO AGREGADO)
+        public ActionResult RegistrarConsulta(int? id)
+        {
+            try
+            {
+                var usuario = db.Usuarios.FirstOrDefault(u =>
+                    u.Email == User.Identity.Name &&
+                    (u.Activo == null || u.Activo == true));
+
+                if (usuario == null)
+                {
+                    return RedirectToAction("Logout", "Account");
+                }
+
+                // Obtener mascotas asignadas a este veterinario
+                var mascotasAsignadas = db.Mascotas
+                    .Where(m => m.VeterinarioAsignado == usuario.UsuarioId &&
+                               (m.Activo == null || m.Activo == true))
+                    .OrderBy(m => m.Nombre)
+                    .ToList();
+
+                ViewBag.Mascotas = mascotasAsignadas;
+
+                // Si se proporciona un ID, cargar los datos de esa mascota específica
+                if (id.HasValue)
+                {
+                    var mascota = db.Mascotas.Find(id.Value);
+
+                    if (mascota != null && mascota.VeterinarioAsignado == usuario.UsuarioId)
+                    {
+                        ViewBag.Mascota = mascota;
+                        ViewBag.MascotaId = id.Value;
+
+                        if (mascota.ImagenPrincipal != null)
+                        {
+                            ViewBag.ImagenBase64 = ImageHelper.GetImageDataUri(mascota.ImagenPrincipal);
+                        }
+                    }
+                }
+
+                return View();
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error en RegistrarConsulta GET: {ex.Message}");
+                TempData["ErrorMessage"] = "Error al cargar el formulario de consulta";
+                return RedirectToAction("Dashboard");
+            }
         }
 
         // POST: Veterinario/RegistrarConsulta
@@ -158,21 +202,20 @@ namespace MVCMASCOTAS.Controllers
             {
                 MascotaId = mascotaId,
                 VeterinarioId = usuario.UsuarioId,
-                TipoConsulta = "Consulta General", // CORRECTO: es TipoConsulta, no TipoRegistro
+                TipoConsulta = "Consulta General",
                 Diagnostico = diagnostico,
-                Tratamiento = tratamientoRecetado, // CORRECTO: es Tratamiento, no TratamientoRecetado
+                Tratamiento = tratamientoRecetado,
                 Peso = peso,
                 Temperatura = temperatura,
                 EstadoGeneral = estadoGeneral,
                 Observaciones = observaciones,
-                FechaConsulta = DateTime.Now, // CORRECTO: es FechaConsulta, no FechaRegistro
+                FechaConsulta = DateTime.Now,
                 ProximaConsulta = DateTime.Now.AddDays(30)
             };
 
             db.HistorialMedico.Add(historial);
             db.SaveChanges();
 
-            // Auditoría
             AuditoriaHelper.RegistrarAccion("Registrar Consulta", "Veterinario",
                 $"Mascota ID: {mascotaId}, Diagnóstico: {diagnostico}", usuario.UsuarioId);
 
@@ -197,20 +240,19 @@ namespace MVCMASCOTAS.Controllers
                 VacunaId = vacunaId,
                 FechaAplicacion = DateTime.Now,
                 VeterinarioId = usuario.UsuarioId,
-                ProximaDosis = proximaConsulta, // CORRECTO: es ProximaDosis, no FechaProximaDosis
+                ProximaDosis = proximaConsulta,
                 Lote = "LOTE-" + DateTime.Now.ToString("yyyyMMdd")
             };
 
             db.MascotaVacunas.Add(mascotaVacuna);
             db.SaveChanges();
 
-            // Registrar en historial médico
             var vacuna = db.Vacunas.Find(vacunaId);
             var historial = new HistorialMedico
             {
                 MascotaId = mascotaId,
                 VeterinarioId = usuario.UsuarioId,
-                TipoConsulta = "Vacunación", // CORRECTO: es TipoConsulta
+                TipoConsulta = "Vacunación",
                 Diagnostico = $"Vacuna aplicada: {vacuna.NombreVacuna}",
                 FechaConsulta = DateTime.Now,
                 ProximaConsulta = proximaConsulta
@@ -219,7 +261,6 @@ namespace MVCMASCOTAS.Controllers
             db.HistorialMedico.Add(historial);
             db.SaveChanges();
 
-            // Auditoría
             AuditoriaHelper.RegistrarAccion("Registrar Vacuna", "Veterinario",
                 $"Mascota ID: {mascotaId}, Vacuna: {vacuna.NombreVacuna}", usuario.UsuarioId);
 
@@ -270,23 +311,21 @@ namespace MVCMASCOTAS.Controllers
             var tratamiento = new Tratamientos
             {
                 MascotaId = mascotaId,
-                VeterinarioId = usuario.UsuarioId, // CORRECTO: es VeterinarioId, no VeterinarioResponsableId
-                NombreTratamiento = nombreTratamiento, // CORRECTO: es NombreTratamiento, no TipoTratamiento
+                VeterinarioId = usuario.UsuarioId,
+                NombreTratamiento = nombreTratamiento,
                 Descripcion = descripcion,
                 Medicamentos = medicamentos,
                 FechaInicio = DateTime.Now,
                 FechaFin = fechaFin,
-                Costo = costo, // CORRECTO: es Costo, no CostoEstimado
+                Costo = costo,
                 Estado = "En curso"
             };
 
             db.Tratamientos.Add(tratamiento);
 
-            // Actualizar estado de la mascota
             var mascota = db.Mascotas.Find(mascotaId);
             mascota.Estado = "En tratamiento";
 
-            // Registrar en historial
             var historial = new HistorialMedico
             {
                 MascotaId = mascotaId,
@@ -300,7 +339,6 @@ namespace MVCMASCOTAS.Controllers
             db.HistorialMedico.Add(historial);
             db.SaveChanges();
 
-            // Auditoría
             AuditoriaHelper.RegistrarAccion("Iniciar Tratamiento", "Veterinario",
                 $"Mascota ID: {mascotaId}, Tratamiento: {nombreTratamiento}", usuario.UsuarioId);
 
@@ -330,9 +368,8 @@ namespace MVCMASCOTAS.Controllers
 
             tratamiento.FechaFin = DateTime.Now;
             tratamiento.Estado = "Completado";
-            tratamiento.Observaciones = observaciones; // CORRECTO: es Observaciones, no Resultados
+            tratamiento.Observaciones = observaciones;
 
-            // Verificar si hay más tratamientos activos para esta mascota
             var otrosTratamientos = db.Tratamientos
                 .Any(t => t.MascotaId == tratamiento.MascotaId &&
                          t.Estado == "En curso" &&
@@ -340,12 +377,10 @@ namespace MVCMASCOTAS.Controllers
 
             if (!otrosTratamientos)
             {
-                // Si no hay más tratamientos, cambiar estado de mascota
                 var mascota = db.Mascotas.Find(tratamiento.MascotaId);
                 mascota.Estado = "Disponible para adopción";
             }
 
-            // Registrar en historial
             var historial = new HistorialMedico
             {
                 MascotaId = tratamiento.MascotaId,
@@ -359,7 +394,6 @@ namespace MVCMASCOTAS.Controllers
             db.HistorialMedico.Add(historial);
             db.SaveChanges();
 
-            // Auditoría
             AuditoriaHelper.RegistrarAccion("Finalizar Tratamiento", "Veterinario",
                 $"Tratamiento ID: {tratamientoId}", usuario.UsuarioId);
 
@@ -411,7 +445,6 @@ namespace MVCMASCOTAS.Controllers
             db.Vacunas.Add(vacuna);
             db.SaveChanges();
 
-            // Auditoría
             AuditoriaHelper.RegistrarAccion("Agregar Vacuna", "Veterinario",
                 $"Vacuna: {nombreVacuna}", usuario.UsuarioId);
 
@@ -440,7 +473,6 @@ namespace MVCMASCOTAS.Controllers
             string estadoAnterior = mascota.Estado;
             mascota.Estado = nuevoEstado;
 
-            // Registrar en historial
             var historial = new HistorialMedico
             {
                 MascotaId = mascotaId,
@@ -454,7 +486,6 @@ namespace MVCMASCOTAS.Controllers
             db.HistorialMedico.Add(historial);
             db.SaveChanges();
 
-            // Auditoría
             AuditoriaHelper.RegistrarAccion("Cambiar Estado Mascota", "Veterinario",
                 $"Mascota ID: {mascotaId}, Nuevo estado: {nuevoEstado}", usuario.UsuarioId);
 
@@ -484,6 +515,7 @@ namespace MVCMASCOTAS.Controllers
             return View(mascotas);
         }
 
+        // GET: Veterinario/Vacunas
         public ActionResult Vacunas()
         {
             var usuario = db.Usuarios.FirstOrDefault(u =>
@@ -495,16 +527,14 @@ namespace MVCMASCOTAS.Controllers
                 return RedirectToAction("Logout", "Account");
             }
 
-            // Obtener todas las vacunas aplicadas por este veterinario
             var vacunasAplicadas = db.MascotaVacunas
-                .Include(v => v.Mascotas)        // Incluir datos de la mascota
-                .Include(v => v.Vacunas)         // Incluir datos del tipo de vacuna
-                .Include(v => v.Usuarios)        // Incluir datos del veterinario
+                .Include(v => v.Mascotas)
+                .Include(v => v.Vacunas)
+                .Include(v => v.Usuarios)
                 .Where(v => v.VeterinarioId == usuario.UsuarioId)
                 .OrderByDescending(v => v.FechaAplicacion)
                 .ToList();
 
-            // Obtener mascotas asignadas para el dropdown
             var mascotasAsignadas = db.Mascotas
                 .Where(m => m.VeterinarioAsignado == usuario.UsuarioId &&
                            m.Activo == true)
@@ -513,7 +543,6 @@ namespace MVCMASCOTAS.Controllers
 
             ViewBag.Mascotas = mascotasAsignadas;
 
-            // Obtener tipos de vacuna para el dropdown
             var tiposVacuna = db.Vacunas
                 .Where(v => v.Activo == true)
                 .OrderBy(v => v.NombreVacuna)
@@ -540,7 +569,6 @@ namespace MVCMASCOTAS.Controllers
                 return RedirectToAction("Logout", "Account");
             }
 
-            // Verificar que la mascota esté asignada a este veterinario
             var mascota = db.Mascotas.Find(MascotaId);
             if (mascota == null || mascota.VeterinarioAsignado != usuario.UsuarioId)
             {
@@ -548,7 +576,6 @@ namespace MVCMASCOTAS.Controllers
                 return RedirectToAction("Vacunas");
             }
 
-            // Crear registro de vacuna
             var mascotaVacuna = new MascotaVacunas
             {
                 MascotaId = MascotaId,
@@ -564,7 +591,6 @@ namespace MVCMASCOTAS.Controllers
             db.MascotaVacunas.Add(mascotaVacuna);
             db.SaveChanges();
 
-            // Registrar en historial médico
             var vacuna = db.Vacunas.Find(VacunaId);
             var historial = new HistorialMedico
             {
@@ -580,7 +606,6 @@ namespace MVCMASCOTAS.Controllers
             db.HistorialMedico.Add(historial);
             db.SaveChanges();
 
-            // Auditoría
             AuditoriaHelper.RegistrarAccion("Registrar Vacuna Completa", "Veterinario",
                 $"Mascota: {mascota.Nombre}, Vacuna: {vacuna?.NombreVacuna}", usuario.UsuarioId);
 
@@ -600,7 +625,6 @@ namespace MVCMASCOTAS.Controllers
                 return RedirectToAction("Logout", "Account");
             }
 
-            // Obtener tratamientos donde este veterinario es responsable
             var tratamientos = db.Tratamientos
                 .Include(t => t.Mascotas)
                 .Include(t => t.Usuarios)
@@ -608,7 +632,6 @@ namespace MVCMASCOTAS.Controllers
                 .OrderByDescending(t => t.FechaInicio)
                 .ToList();
 
-            // Obtener mascotas asignadas para el dropdown
             var mascotasAsignadas = db.Mascotas
                 .Where(m => m.VeterinarioAsignado == usuario.UsuarioId &&
                            m.Activo == true)
@@ -646,7 +669,6 @@ namespace MVCMASCOTAS.Controllers
             return PartialView("_DetalleTratamiento", tratamiento);
         }
 
-
         // GET: Veterinario/ReporteMensual
         public ActionResult ReporteMensual(int? year, int? month)
         {
@@ -662,21 +684,18 @@ namespace MVCMASCOTAS.Controllers
             DateTime inicioMes = new DateTime(year.Value, month.Value, 1);
             DateTime finMes = inicioMes.AddMonths(1).AddDays(-1);
 
-            // Consultas del mes
             var consultas = db.HistorialMedico
                 .Where(h => h.VeterinarioId == usuario.UsuarioId &&
                            h.FechaConsulta >= inicioMes &&
                            h.FechaConsulta <= finMes)
                 .ToList();
 
-            // Tratamientos iniciados
             var tratamientosIniciados = db.Tratamientos
                 .Where(t => t.VeterinarioId == usuario.UsuarioId &&
                            t.FechaInicio >= inicioMes &&
                            t.FechaInicio <= finMes)
                 .ToList();
 
-            // Vacunas aplicadas
             var vacunasAplicadas = db.MascotaVacunas
                 .Where(v => v.VeterinarioId == usuario.UsuarioId &&
                            v.FechaAplicacion >= inicioMes &&

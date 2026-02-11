@@ -2,334 +2,460 @@
 
 @{
     ViewBag.Title = "Gestión de Usuarios";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="page-header mb-4">
-    <h2><i class="fas fa-users"></i> Gestión de Usuarios</h2>
-    <p class="text-muted">Administración completa de usuarios del sistema</p>
-</div>
-
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <div>
-        <a href="@Url.Action("CrearUsuario", "Admin")" class="btn btn-success">
-            <i class="fas fa-user-plus"></i> Crear Nuevo Usuario
-        </a>
-        <a href="@Url.Action("Dashboard", "Admin")" class="btn btn-outline-secondary">
-            <i class="fas fa-arrow-left"></i> Volver al Dashboard
-        </a>
-    </div>
-</div>
-
-<!-- Filtros -->
-<div class="card shadow-custom mb-4">
-    <div class="card-header bg-primary text-white">
-        <h5 class="mb-0"><i class="fas fa-filter"></i> Filtros de Búsqueda</h5>
-    </div>
-    <div class="card-body">
-        <form method="get" action="@Url.Action("Usuarios", "Admin")" class="row">
-            <div class="col-md-3 mb-2">
-                <label>Rol:</label>
-                <select name="rol" class="form-control">
-                    <option value="Todos" @(ViewBag.FiltroRol == "Todos" || string.IsNullOrEmpty(ViewBag.FiltroRol) ? "selected" : "")>Todos</option>
-                    <option value="Administrador" @(ViewBag.FiltroRol == "Administrador" ? "selected" : "")>Administrador</option>
-                    <option value="Veterinario" @(ViewBag.FiltroRol == "Veterinario" ? "selected" : "")>Veterinario</option>
-                    <option value="Voluntario" @(ViewBag.FiltroRol == "Voluntario" ? "selected" : "")>Voluntario</option>
-                    <option value="Usuario" @(ViewBag.FiltroRol == "Usuario" ? "selected" : "")>Usuario</option>
-                </select>
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="page-header mb-4 fade-in-up">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1 class="h3 mb-0 text-brown">
+                    <i class="fa fa-users text-green"></i> Gestión de Usuarios
+                </h1>
+                <p class="text-secondary mb-0">Administración completa de usuarios del sistema</p>
             </div>
-
-            <div class="col-md-3 mb-2">
-                <label>Estado:</label>
-                <select name="activo" class="form-control">
-                    <option value="Todos" @(ViewBag.FiltroActivo == "Todos" || string.IsNullOrEmpty(ViewBag.FiltroActivo) ? "selected" : "")>Todos</option>
-                    <option value="true" @(ViewBag.FiltroActivo == "true" ? "selected" : "")>Activos</option>
-                    <option value="false" @(ViewBag.FiltroActivo == "false" ? "selected" : "")>Inactivos</option>
-                </select>
-            </div>
-
-            <div class="col-md-4 mb-2">
-                <label>Buscar:</label>
-                <input type="text" name="buscar" class="form-control" placeholder="Nombre, email o cédula" value="@ViewBag.FiltroBuscar" />
-            </div>
-
-            <div class="col-md-2 mb-2 d-flex align-items-end">
-                <button type="submit" class="btn btn-primary btn-block">
-                    <i class="fas fa-search"></i> Buscar
-                </button>
-            </div>
-        </form>
-    </div>
-</div>
-
-<!-- Estadísticas -->
-<div class="row mb-4">
-    <div class="col-md-3">
-        <div class="card text-white bg-primary shadow-custom">
-            <div class="card-body text-center">
-                <i class="fas fa-users fa-2x mb-2"></i>
-                <h4>@ViewBag.TotalUsuarios</h4>
-                <p class="mb-0">Total Usuarios</p>
+            <div>
+                <a href="@Url.Action("CrearUsuario", "Admin")" class="btn btn-green btn-sm">
+                    <i class="fa fa-user-plus"></i> Nuevo Usuario
+                </a>
+                <a href="@Url.Action("Dashboard", "Admin")" class="btn btn-outline-green btn-sm">
+                    <i class="fa fa-arrow-left"></i> Dashboard
+                </a>
             </div>
         </div>
     </div>
-    <div class="col-md-3">
-        <div class="card text-white bg-success shadow-custom">
-            <div class="card-body text-center">
-                <i class="fas fa-user-check fa-2x mb-2"></i>
-                <h4>@ViewBag.UsuariosActivos</h4>
-                <p class="mb-0">Activos</p>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card text-white bg-warning shadow-custom">
-            <div class="card-body text-center">
-                <i class="fas fa-user-shield fa-2x mb-2"></i>
-                <h4>@ViewBag.TotalAdministradores</h4>
-                <p class="mb-0">Administradores</p>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card text-white bg-info shadow-custom">
-            <div class="card-body text-center">
-                <i class="fas fa-user-md fa-2x mb-2"></i>
-                <h4>@ViewBag.TotalVeterinarios</h4>
-                <p class="mb-0">Veterinarios</p>
-            </div>
-        </div>
-    </div>
-</div>
 
-<!-- Tabla de usuarios -->
-<div class="card shadow-custom">
-    <div class="card-header bg-dark text-white">
-        <h5 class="mb-0"><i class="fas fa-table"></i> Listado de Usuarios</h5>
-    </div>
-    <div class="card-body">
-        <div class="table-responsive">
-            <table class="table table-hover table-striped">
-                <thead class="thead-dark">
-                    <tr>
-                        <th>ID</th>
-                        <th>Foto</th>
-                        <th>Nombre</th>
-                        <th>Email</th>
-                        <th>Cédula</th>
-                        <th>Teléfono</th>
-                        <th>Rol</th>
-                        <th>Estado</th>
-                        <th>Fecha Registro</th>
-                        <th class="text-center">Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @if (Model != null && Model.Any())
-                    {
-                        foreach (var usuario in Model)
-                        {
-                            // Obtener el rol principal del usuario
-                            var rolPrincipal = "Sin rol";
-                            var usuarioRoles = usuario.UsuariosRoles?.ToList();
-                            if (usuarioRoles != null && usuarioRoles.Any())
-                            {
-                                rolPrincipal = usuarioRoles.FirstOrDefault()?.Roles?.NombreRol ?? "Sin rol";
-                            }
-
-                            <tr>
-                                <td><strong>#@usuario.UsuarioId</strong></td>
-                                <td>
-                                    @if (usuario.ImagenPerfil != null)
-                                    {
-                                        <img src="@MVCMASCOTAS.Helpers.ImageHelper.GetImageDataUri(usuario.ImagenPerfil)"
-                                             alt="@usuario.NombreCompleto"
-                                             class="rounded-circle img-thumbnail"
-                                             style="width: 40px; height: 40px; object-fit: cover;" />
-                                    }
-                                    else
-                                    {
-                                        <div class="rounded-circle bg-secondary d-inline-flex align-items-center justify-content-center"
-                                             style="width: 40px; height: 40px;">
-                                            <i class="fas fa-user text-white"></i>
-                                        </div>
-                                    }
-                                </td>
-                                <td><strong>@usuario.NombreCompleto</strong></td>
-                                <td>@usuario.Email</td>
-                                <td>@usuario.Cedula</td>
-                                <td>@usuario.Telefono</td>
-                                <td>
-                                    @switch (rolPrincipal)
-                                    {
-                                        case "Administrador":
-                                            <span class="badge badge-danger"><i class="fas fa-user-shield"></i> @rolPrincipal</span>
-                                            break;
-                                        case "Veterinario":
-                                            <span class="badge badge-success"><i class="fas fa-user-md"></i> @rolPrincipal</span>
-                                            break;
-                                        case "Voluntario":
-                                            <span class="badge badge-info"><i class="fas fa-hands-helping"></i> @rolPrincipal</span>
-                                            break;
-                                        default:
-                                            <span class="badge badge-secondary"><i class="fas fa-user"></i> @rolPrincipal</span>
-                                            break;
-                                    }
-                                </td>
-                                <td>
-                                    @if (usuario.Activo == true)
-                                    {
-                                        <span class="badge badge-success"><i class="fas fa-check-circle"></i> Activo</span>
-                                    }
-                                    else
-                                    {
-                                        <span class="badge badge-danger"><i class="fas fa-times-circle"></i> Inactivo</span>
-                                    }
-                                </td>
-                                <td>@(usuario.FechaRegistro?.ToString("dd/MM/yyyy") ?? "N/A")</td>
-                                <td class="text-center">
-                                    <div class="btn-group" role="group">
-                                        <a href="@Url.Action("VerUsuario", "Admin", new { id = usuario.UsuarioId })"
-                                           class="btn btn-sm btn-info"
-                                           title="Ver Detalles"
-                                           data-toggle="tooltip">
-                                            <i class="fas fa-eye"></i>
-                                        </a>
-                                        <a href="@Url.Action("EditarUsuario", "Admin", new { id = usuario.UsuarioId })"
-                                           class="btn btn-sm btn-warning"
-                                           title="Editar"
-                                           data-toggle="tooltip">
-                                            <i class="fas fa-edit"></i>
-                                        </a>
-                                        @if (usuario.Activo == true)
+    <!-- Filtros -->
+    <div class="card shadow-hover border-green mb-4">
+        <div class="card-header py-3 d-flex justify-content-between align-items-center bg-green text-white">
+            <h6 class="m-0 font-weight-bold">
+                <i class="fa fa-filter"></i> Filtros de Búsqueda
+            </h6>
+        </div>
+        <div class="card-body bg-light-mint">
+            @using (Html.BeginForm("Usuarios", "Admin", FormMethod.Get, new { @class = "form-inline" }))
+            {
+                <div class="form-group mr-2 mb-2">
+                    <label class="mr-2 text-brown">Rol:</label>
+                    @{
+                        var roles = new List<SelectListItem>
                                         {
-                                            <button type="button"
-                                                    class="btn btn-sm btn-danger"
-                                                    title="Desactivar"
-                                                    data-toggle="modal"
-                                                    data-target="#toggleModal"
-                                                    data-id="@usuario.UsuarioId"
-                                                    data-nombre="@usuario.NombreCompleto"
-                                                    data-accion="Desactivar">
-                                                <i class="fas fa-ban"></i>
-                                            </button>
+                            new SelectListItem { Text = "Todos", Value = "Todos", Selected = (ViewBag.FiltroRol == null || ViewBag.FiltroRol == "Todos") },
+                            new SelectListItem { Text = "Administrador", Value = "Administrador", Selected = (ViewBag.FiltroRol == "Administrador") },
+                            new SelectListItem { Text = "Veterinario", Value = "Veterinario", Selected = (ViewBag.FiltroRol == "Veterinario") },
+                            new SelectListItem { Text = "Voluntario", Value = "Voluntario", Selected = (ViewBag.FiltroRol == "Voluntario") },
+                            new SelectListItem { Text = "Usuario", Value = "Usuario", Selected = (ViewBag.FiltroRol == "Usuario") }
+                        };
+                    }
+                    @Html.DropDownList("rol", roles, new { @class = "form-control border-green" })
+                </div>
+
+                <div class="form-group mr-2 mb-2">
+                    <label class="mr-2 text-brown">Estado:</label>
+                    @{
+                        var estados = new List<SelectListItem>
+                                        {
+                            new SelectListItem { Text = "Todos", Value = "Todos", Selected = (ViewBag.FiltroActivo == null || ViewBag.FiltroActivo == "Todos") },
+                            new SelectListItem { Text = "Activos", Value = "true", Selected = (ViewBag.FiltroActivo == "true") },
+                            new SelectListItem { Text = "Inactivos", Value = "false", Selected = (ViewBag.FiltroActivo == "false") }
+                        };
+                    }
+                    @Html.DropDownList("activo", estados, new { @class = "form-control border-green" })
+                </div>
+
+                <div class="form-group mr-2 mb-2">
+                    <label class="mr-2 text-brown">Buscar:</label>
+                    <input type="text" name="buscar" class="form-control border-green"
+                           placeholder="Nombre, email o cédula"
+                           value="@ViewBag.FiltroBuscar" />
+                </div>
+
+                <button type="submit" class="btn btn-green mb-2">
+                    <i class="fa fa-search"></i> Buscar
+                </button>
+                <a href="@Url.Action("Usuarios", "Admin")" class="btn btn-outline-green mb-2 ml-2">
+                    <i class="fa fa-redo"></i> Limpiar
+                </a>
+            }
+        </div>
+    </div>
+
+    <!-- Estadísticas -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card stat-box border-green">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-green text-uppercase mb-1">
+                                Total Usuarios
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-brown">@ViewBag.TotalUsuarios</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fa fa-users fa-2x text-green"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card stat-box border-green">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-green text-uppercase mb-1">
+                                Usuarios Activos
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-brown">@ViewBag.UsuariosActivos</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fa fa-user-check fa-2x text-green"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card stat-box border-green">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-green text-uppercase mb-1">
+                                Administradores
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-brown">@ViewBag.TotalAdministradores</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fa fa-user-shield fa-2x text-pink"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card stat-box border-green">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-green text-uppercase mb-1">
+                                Veterinarios
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-brown">@ViewBag.TotalVeterinarios</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fa fa-user-md fa-2x text-yellow"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabla de usuarios -->
+    <div class="card shadow-hover border-green mb-4">
+        <div class="card-header py-3 d-flex justify-content-between align-items-center bg-green text-white">
+            <h6 class="m-0 font-weight-bold">
+                <i class="fa fa-table"></i> Listado de Usuarios (@ViewBag.TotalItems encontrados)
+            </h6>
+            <div>
+                <span class="badge bg-light-mint text-brown">Página @ViewBag.CurrentPage de @ViewBag.TotalPages</span>
+            </div>
+        </div>
+        <div class="card-body">
+            @if (Model != null && Model.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover" id="dataTable" width="100%" cellspacing="0">
+                        <thead>
+                            <tr class="bg-green text-white">
+                                <th>ID</th>
+                                <th>Foto</th>
+                                <th>Nombre Completo</th>
+                                <th>Email</th>
+                                <th>Cédula</th>
+                                <th>Teléfono</th>
+                                <th>Roles</th>
+                                <th>Estado</th>
+                                <th>Registro</th>
+                                <th class="text-center">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var usuario in Model)
+                            {
+                                <tr class="bg-light-mint">
+                                    <td class="font-weight-bold text-brown">#@usuario.UsuarioId</td>
+                                    <td>
+                                        @if (usuario.ImagenPerfil != null && usuario.ImagenPerfil.Length > 0)
+                                        {
+                                            <img src="data:image/jpeg;base64,@Convert.ToBase64String(usuario.ImagenPerfil)"
+                                                 alt="@usuario.NombreCompleto"
+                                                 class="rounded-circle border-green"
+                                                 style="width: 40px; height: 40px; object-fit: cover;" />
                                         }
                                         else
                                         {
-                                            <button type="button"
-                                                    class="btn btn-sm btn-success"
-                                                    title="Activar"
-                                                    data-toggle="modal"
-                                                    data-target="#toggleModal"
-                                                    data-id="@usuario.UsuarioId"
-                                                    data-nombre="@usuario.NombreCompleto"
-                                                    data-accion="Activar">
-                                                <i class="fas fa-check"></i>
-                                            </button>
+                                            <div class="rounded-circle bg-light-mint d-flex align-items-center justify-content-center border-green"
+                                                 style="width: 40px; height: 40px;">
+                                                <i class="fa fa-user text-secondary"></i>
+                                            </div>
                                         }
-                                    </div>
-                                </td>
-                            </tr>
-                        }
-                    }
-                    else
-                    {
-                        <tr>
-                            <td colspan="10" class="text-center">
-                                <div class="alert alert-info mb-0">
-                                    <i class="fas fa-info-circle"></i> No se encontraron usuarios con los filtros seleccionados.
-                                </div>
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        </div>
+                                    </td>
+                                    <td>
+                                        <strong class="text-brown">@usuario.NombreCompleto</strong>
+                                        @if (usuario.EmailConfirmado == true)
+                                        {
+                                            <i class="fa fa-check-circle text-green ml-1" title="Email confirmado"></i>
+                                        }
+                                    </td>
+                                    <td class="text-brown">@usuario.Email</td>
+                                    <td class="text-brown">@(usuario.Cedula ?? "No registrada")</td>
+                                    <td>
+                                        @if (!string.IsNullOrEmpty(usuario.Telefono))
+                                        {
+                                            <span class="text-brown">@usuario.Telefono</span>
+                                            if (usuario.TelefonoConfirmado == true)
+                                            {
+                                                <i class="fa fa-check-circle text-green ml-1" title="Teléfono confirmado"></i>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <span class="text-secondary">No registrado</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        @{
+                                            // SOLUCIÓN: Obtener roles directamente desde ViewBag
+                                            var rolesUsuario = new List<string>();
 
-        @if (Model != null && Model.Any())
-        {
-            <div class="mt-3">
-                <p class="text-muted">
-                    <i class="fas fa-info-circle"></i>
-                    Mostrando @Model.Count() usuarios de un total de @ViewBag.TotalItems
-                </p>
-            </div>
-        }
+                                            if (ViewBag.UsuariosRoles != null && ViewBag.UsuariosRoles.ContainsKey(usuario.UsuarioId))
+                                            {
+                                                rolesUsuario = ViewBag.UsuariosRoles[usuario.UsuarioId] as List<string>;
+                                            }
+                                        }
+
+                                        @if (rolesUsuario != null && rolesUsuario.Any())
+                                        {
+                                            foreach (var roleName in rolesUsuario)
+                                            {
+                                                <span class="badge mr-1 mb-1
+                                                    @(roleName == "Administrador" ? "bg-pink" :
+                                                      roleName == "Veterinario" ? "bg-green" :
+                                                      roleName == "Voluntario" ? "bg-yellow" :
+                                                      roleName == "Rescatista" ? "bg-orange" :
+                                                      roleName == "Usuario" ? "bg-blue" :
+                                                      roleName == "Contabilidad" ? "bg-purple" :
+                                                      "bg-secondary")">
+                                                    @roleName
+                                                </span>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-light-mint border-green text-brown">Sin roles asignados</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (usuario.Activo == true)
+                                        {
+                                            <span class="badge bg-green">Activo</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-pink">Inactivo</span>
+                                        }
+                                    </td>
+                                    <td class="text-brown">@(usuario.FechaRegistro?.ToString("dd/MM/yyyy HH:mm") ?? "N/A")</td>
+                                    <td class="text-center">
+                                        <div class="btn-group" role="group" aria-label="Acciones">
+                                            <a href="@Url.Action("VerUsuario", "Admin", new { id = usuario.UsuarioId })"
+                                               class="btn btn-outline-green btn-sm"
+                                               title="Ver detalles"
+                                               data-toggle="tooltip">
+                                                <i class="fa fa-eye"></i>
+                                            </a>
+                                            <a href="@Url.Action("EditarUsuario", "Admin", new { id = usuario.UsuarioId })"
+                                               class="btn btn-yellow btn-sm"
+                                               title="Editar"
+                                               data-toggle="tooltip">
+                                                <i class="fa fa-edit"></i>
+                                            </a>
+
+                                            <!-- Botón Activar/Desactivar -->
+                                            @if (usuario.Activo == true)
+                                            {
+                                                <button type="button"
+                                                        class="btn btn-pink btn-sm btn-toggle"
+                                                        title="Desactivar usuario"
+                                                        data-toggle="modal"
+                                                        data-target="#toggleModal"
+                                                        data-id="@usuario.UsuarioId"
+                                                        data-nombre="@usuario.NombreCompleto"
+                                                        data-accion="Desactivar"
+                                                        data-actual="true">
+                                                    <i class="fa fa-ban"></i>
+                                                </button>
+                                            }
+                                            else
+                                            {
+                                                <button type="button"
+                                                        class="btn btn-green btn-sm btn-toggle"
+                                                        title="Activar usuario"
+                                                        data-toggle="modal"
+                                                        data-target="#toggleModal"
+                                                        data-id="@usuario.UsuarioId"
+                                                        data-nombre="@usuario.NombreCompleto"
+                                                        data-accion="Activar"
+                                                        data-actual="false">
+                                                    <i class="fa fa-check"></i>
+                                                </button>
+                                            }
+
+                                            <!-- Botón Eliminar (solo para usuarios inactivos) -->
+                                            @if (usuario.Activo == false)
+                                            {
+                                                <button type="button"
+                                                        class="btn btn-pink btn-sm btn-eliminar"
+                                                        title="Eliminar permanentemente"
+                                                        data-id="@usuario.UsuarioId"
+                                                        data-nombre="@usuario.NombreCompleto">
+                                                    <i class="fa fa-trash"></i>
+                                                </button>
+                                            }
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-green border-green">
+                    <i class="fa fa-info-circle text-green"></i> <span class="text-brown">No se encontraron usuarios con los filtros seleccionados.</span>
+                </div>
+            }
+        </div>
     </div>
+
+    <!-- Paginación -->
+    @if (ViewBag.TotalPages != null && ViewBag.TotalPages > 1)
+    {
+        <div class="d-flex justify-content-center fade-in-up">
+            <nav aria-label="Paginación de usuarios">
+                <ul class="pagination">
+                    <!-- Primera página -->
+                    @if (ViewBag.CurrentPage > 1)
+                    {
+                        <li class="page-item">
+                            <a class="page-link text-green" href="@Url.Action("Usuarios", new {
+                                page = 1,
+                                rol = ViewBag.FiltroRol,
+                                activo = ViewBag.FiltroActivo,
+                                buscar = ViewBag.FiltroBuscar
+                            })" aria-label="Primera">
+                                <i class="fa fa-angle-double-left"></i>
+                            </a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link text-green" href="@Url.Action("Usuarios", new {
+                                page = ViewBag.CurrentPage - 1,
+                                rol = ViewBag.FiltroRol,
+                                activo = ViewBag.FiltroActivo,
+                                buscar = ViewBag.FiltroBuscar
+                            })" aria-label="Anterior">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+                        </li>
+                    }
+
+                    <!-- Números de página -->
+                    @{
+                        int startPage = Math.Max(1, ViewBag.CurrentPage - 2);
+                        int endPage = Math.Min(ViewBag.TotalPages, ViewBag.CurrentPage + 2);
+                    }
+
+                    @for (int i = startPage; i <= endPage; i++)
+                    {
+                        <li class="page-item @(i == ViewBag.CurrentPage ? "active bg-green" : "")">
+                            <a class="page-link @(i == ViewBag.CurrentPage ? "text-white" : "text-green")" href="@Url.Action("Usuarios", new {
+                                page = i,
+                                rol = ViewBag.FiltroRol,
+                                activo = ViewBag.FiltroActivo,
+                                buscar = ViewBag.FiltroBuscar
+                            })">@i</a>
+                        </li>
+                    }
+
+                    <!-- Última página -->
+                    @if (ViewBag.CurrentPage < ViewBag.TotalPages)
+                    {
+                        <li class="page-item">
+                            <a class="page-link text-green" href="@Url.Action("Usuarios", new {
+                                page = ViewBag.CurrentPage + 1,
+                                rol = ViewBag.FiltroRol,
+                                activo = ViewBag.FiltroActivo,
+                                buscar = ViewBag.FiltroBuscar
+                            })" aria-label="Siguiente">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link text-green" href="@Url.Action("Usuarios", new {
+                                page = ViewBag.TotalPages,
+                                rol = ViewBag.FiltroRol,
+                                activo = ViewBag.FiltroActivo,
+                                buscar = ViewBag.FiltroBuscar
+                            })" aria-label="Última">
+                                <i class="fa fa-angle-double-right"></i>
+                            </a>
+                        </li>
+                    }
+                </ul>
+            </nav>
+        </div>
+    }
 </div>
 
-<!-- Paginación -->
-@if (ViewBag.TotalPages != null && ViewBag.TotalPages > 1)
-{
-    <nav aria-label="Paginación de usuarios" class="mt-4">
-        <ul class="pagination justify-content-center">
-            @if (ViewBag.CurrentPage > 1)
-            {
-                <li class="page-item">
-                    <a class="page-link" href="@Url.Action("Usuarios", "Admin", new {
-                        page = ViewBag.CurrentPage - 1,
-                        rol = ViewBag.FiltroRol,
-                        activo = ViewBag.FiltroActivo,
-                        buscar = ViewBag.FiltroBuscar
-                    })">
-                        <i class="fas fa-chevron-left"></i> Anterior
-                    </a>
-                </li>
-            }
-
-            @for (int i = 1; i <= ViewBag.TotalPages; i++)
-            {
-                <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
-                    <a class="page-link" href="@Url.Action("Usuarios", "Admin", new {
-                        page = i,
-                        rol = ViewBag.FiltroRol,
-                        activo = ViewBag.FiltroActivo,
-                        buscar = ViewBag.FiltroBuscar
-                    })">@i</a>
-                </li>
-            }
-
-            @if (ViewBag.CurrentPage < ViewBag.TotalPages)
-            {
-                <li class="page-item">
-                    <a class="page-link" href="@Url.Action("Usuarios", "Admin", new {
-                        page = ViewBag.CurrentPage + 1,
-                        rol = ViewBag.FiltroRol,
-                        activo = ViewBag.FiltroActivo,
-                        buscar = ViewBag.FiltroBuscar
-                    })">
-                        Siguiente <i class="fas fa-chevron-right"></i>
-                    </a>
-                </li>
-            }
-        </ul>
-    </nav>
-}
-
-<!-- Modal de confirmación -->
+<!-- Modal de confirmación para activar/desactivar -->
 <div class="modal fade" id="toggleModal" tabindex="-1" role="dialog" aria-labelledby="toggleModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header bg-warning text-white">
-                <h5 class="modal-title" id="toggleModalLabel">
-                    <i class="fas fa-exclamation-triangle"></i> Confirmar Acción
+        <div class="modal-content border-green">
+            <div class="modal-header bg-yellow">
+                <h5 class="modal-title text-brown" id="toggleModalLabel">
+                    <i class="fa fa-exclamation-triangle"></i> Confirmar Cambio de Estado
                 </h5>
-                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <div class="modal-body">
-                <p>¿Está seguro que desea <span id="accionTexto"></span> al usuario <strong id="usuarioNombre"></strong>?</p>
+            <div class="modal-body bg-light-mint">
+                <p class="text-brown">¿Está seguro que desea <span id="accionTexto" class="font-weight-bold text-brown"></span> al usuario?</p>
+                <p><strong id="usuarioNombre" class="text-brown"></strong></p>
+                <div class="alert alert-green border-green mt-2">
+                    <small>
+                        <i class="fa fa-info-circle text-green"></i>
+                        <span id="infoAccion" class="text-brown"></span>
+                    </small>
+                </div>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">
-                    <i class="fas fa-times"></i> Cancelar
+            <div class="modal-footer bg-light-mint">
+                <button type="button" class="btn btn-outline-green" data-dismiss="modal">
+                    <i class="fa fa-times"></i> Cancelar
                 </button>
                 @using (Html.BeginForm("ToggleUsuario", "Admin", FormMethod.Post, new { id = "toggleForm" }))
                 {
                     @Html.AntiForgeryToken()
-                    <input type="hidden" id="usuarioIdInput" name="id" />
-                    <button type="submit" class="btn btn-warning">
-                        <i class="fas fa-check"></i> Confirmar
+                    <input type="hidden" name="id" id="usuarioIdInput" />
+                    <button type="submit" class="btn btn-yellow">
+                        <i class="fa fa-check"></i> Confirmar
                     </button>
                 }
             </div>
@@ -337,48 +463,324 @@
     </div>
 </div>
 
+@section Styles {
+    <style>
+        .page-header {
+            border-bottom: 2px solid var(--green);
+            padding-bottom: 1rem;
+        }
+
+        .stat-box {
+            transition: all 0.3s ease;
+            border: 2px solid var(--green);
+            border-radius: 12px;
+        }
+
+            .stat-box:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 10px 25px rgba(151, 199, 139, 0.2) !important;
+            }
+
+        .table thead {
+            background-color: var(--green) !important;
+            color: white !important;
+        }
+
+        .table-bordered {
+            border: 2px solid var(--green) !important;
+        }
+
+            .table-bordered th,
+            .table-bordered td {
+                border: 1px solid var(--green) !important;
+            }
+
+        .table-hover tbody tr:hover {
+            background-color: rgba(151, 199, 139, 0.1) !important;
+        }
+
+        .badge.bg-green {
+            background-color: var(--green) !important;
+            color: white !important;
+        }
+
+        .badge.bg-yellow {
+            background-color: var(--yellow) !important;
+            color: var(--brown) !important;
+        }
+
+        .badge.bg-pink {
+            background-color: var(--pink) !important;
+            color: var(--brown) !important;
+        }
+
+        .badge.bg-secondary {
+            background-color: #6c757d !important;
+            color: white !important;
+        }
+
+        .badge.bg-light-mint {
+            background-color: var(--bg-light) !important;
+            color: var(--brown) !important;
+            border: 1px solid var(--green) !important;
+        }
+
+        .badge.bg-blue {
+            background-color: #4a86e8 !important;
+            color: white !important;
+        }
+
+        .badge.bg-orange {
+            background-color: #ff9900 !important;
+            color: white !important;
+        }
+
+        .badge.bg-purple {
+            background-color: #8e7cc3 !important;
+            color: white !important;
+        }
+
+        .pagination .page-link {
+            border-color: var(--green) !important;
+        }
+
+            .pagination .page-link:hover {
+                background-color: var(--green) !important;
+                color: white !important;
+            }
+
+        .pagination .active .page-link {
+            background-color: var(--green) !important;
+            border-color: var(--green) !important;
+        }
+
+        .btn-group .btn {
+            margin: 0 2px !important;
+        }
+
+        /* Imágenes circulares */
+        .rounded-circle.border-green {
+            border: 2px solid var(--green) !important;
+        }
+
+        /* Responsive */
+        @@media (max-width: 768px) {
+            .form-inline .form-group {
+                margin-right: 0.5rem !important;
+                margin-bottom: 0.5rem !important;
+            }
+
+            .btn-group {
+                display: flex !important;
+                flex-wrap: wrap !important;
+                justify-content: center !important;
+            }
+
+                .btn-group .btn {
+                    margin: 2px !important;
+                    flex: 1 !important;
+                    min-width: 40px !important;
+                }
+
+            .table-responsive {
+                font-size: 0.85rem !important;
+            }
+
+            .stat-box {
+                padding: 15px !important;
+            }
+
+            .display-4 {
+                font-size: 2rem !important;
+            }
+        }
+
+        /* Animaciones */
+        .fade-in-up {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        /* Estilo para filas alternas */
+        tbody tr:nth-child(even) {
+            background-color: rgba(242, 233, 216, 0.3) !important;
+        }
+
+        /* Estilos para badges de roles */
+        .badge {
+            font-size: 0.75rem !important;
+            padding: 0.25rem 0.5rem !important;
+        }
+
+        /* Scroll suave para tabla */
+        .table-responsive {
+            max-height: 600px;
+            overflow-y: auto;
+        }
+    </style>
+}
+
 @section Scripts {
     <script>
         $(document).ready(function () {
+            console.log('Vista Gestión de Usuarios cargada');
+
             // Inicializar tooltips
-            $('[data-toggle="tooltip"]').tooltip();
-
-            // Modal de toggle (activar/desactivar)
-            $('#toggleModal').on('show.bs.modal', function (event) {
-                var button = $(event.relatedTarget);
-                var usuarioId = button.data('id');
-                var usuarioNombre = button.data('nombre');
-                var accion = button.data('accion');
-                var modal = $(this);
-
-                modal.find('#usuarioNombre').text(usuarioNombre);
-                modal.find('#accionTexto').text(accion.toLowerCase());
-                modal.find('#usuarioIdInput').val(usuarioId);
-                modal.find('#toggleForm').attr('action', '@Url.Action("ToggleUsuario", "Admin")/' + usuarioId);
+            $('[data-toggle="tooltip"]').tooltip({
+                trigger: 'hover'
             });
 
-            // Confirmación para eliminar usuario
+            // Efecto hover en tarjetas
+            $('.shadow-hover').hover(
+                function () {
+                    $(this).addClass('shadow-lg');
+                },
+                function () {
+                    $(this).removeClass('shadow-lg');
+                }
+            );
+
+            // Efecto hover en estadísticas
+            $('.stat-box').hover(
+                function () {
+                    $(this).css('transform', 'translateY(-5px)');
+                },
+                function () {
+                    $(this).css('transform', 'translateY(0)');
+                }
+            );
+
+            // Modal para activar/desactivar con SweetAlert2
+            $('.btn-toggle').click(function (e) {
+                e.preventDefault();
+
+                var usuarioId = $(this).data('id');
+                var usuarioNombre = $(this).data('nombre');
+                var accion = $(this).data('accion');
+                var actual = $(this).data('actual');
+
+                var actionText = accion.toLowerCase();
+                var actionColor = accion === 'Activar' ? '#97C78B' : '#F2C66D';
+                var actionIcon = accion === 'Activar' ? 'fa-check' : 'fa-ban';
+                var infoText = actual ?
+                    'El usuario perderá acceso al sistema pero sus datos se mantendrán.' :
+                    'El usuario recuperará acceso al sistema con sus roles asignados.';
+
+                Swal.fire({
+                    title: `¿${accion} usuario?`,
+                    html: `<p class="text-brown">¿Está seguro de ${actionText} al usuario <strong>${usuarioNombre}</strong>?</p>
+                          <div class="alert alert-green border-green mt-2">
+                              <small><i class="fa fa-info-circle text-green"></i> ${infoText}</small>
+                          </div>`,
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: actionColor,
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: `<i class="fa ${actionIcon}"></i> Sí, ${actionText}`,
+                    cancelButtonText: '<i class="fa fa-times"></i> Cancelar',
+                    showClass: {
+                        popup: 'animate__animated animate__fadeInDown'
+                    },
+                    hideClass: {
+                        popup: 'animate__animated animate__fadeOutUp'
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Crear formulario dinámico para enviar
+                        var form = document.createElement('form');
+                        form.method = 'POST';
+                        form.action = '@Url.Action("ToggleUsuario", "Admin")';
+
+                        var token = document.createElement('input');
+                        token.type = 'hidden';
+                        token.name = '__RequestVerificationToken';
+                        token.value = $('input[name="__RequestVerificationToken"]').val();
+
+                        var idInput = document.createElement('input');
+                        idInput.type = 'hidden';
+                        idInput.name = 'id';
+                        idInput.value = usuarioId;
+
+                        form.appendChild(token);
+                        form.appendChild(idInput);
+                        document.body.appendChild(form);
+                        form.submit();
+                    }
+                });
+            });
+
+            // Modal para eliminar con SweetAlert2
             $('.btn-eliminar').click(function (e) {
                 e.preventDefault();
-                var usuarioNombre = $(this).data('nombre');
                 var usuarioId = $(this).data('id');
+                var usuarioNombre = $(this).data('nombre');
 
-                if (confirm('¿Está seguro que desea eliminar permanentemente al usuario "' + usuarioNombre + '"? Esta acción no se puede deshacer.')) {
-                    var form = $('<form>', {
-                        'method': 'POST',
-                        'action': '@Url.Action("EliminarUsuario", "Admin")/' + usuarioId
-                    });
+                Swal.fire({
+                    title: '¿Eliminar usuario?',
+                    html: `<p class="text-brown">¿Está seguro de eliminar permanentemente al usuario <strong>${usuarioNombre}</strong>?</p>
+                          <div class="alert alert-green border-green mt-2">
+                              <small><i class="fa fa-exclamation-circle text-green"></i> Esta acción NO se puede deshacer. Se eliminarán todos los datos asociados al usuario.</small>
+                          </div>`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#FBCDC0',
+                    cancelButtonColor: '#97C78B',
+                    confirmButtonText: '<i class="fa fa-trash"></i> Sí, eliminar',
+                    cancelButtonText: '<i class="fa fa-times"></i> Cancelar',
+                    showClass: {
+                        popup: 'animate__animated animate__fadeInDown'
+                    },
+                    hideClass: {
+                        popup: 'animate__animated animate__fadeOutUp'
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Crear formulario dinámico para enviar
+                        var form = document.createElement('form');
+                        form.method = 'POST';
+                        form.action = '@Url.Action("EliminarUsuario", "Admin")/' + usuarioId;
 
-                    var token = $('input[name="__RequestVerificationToken"]').val();
-                    form.append($('<input>', {
-                        'type': 'hidden',
-                        'name': '__RequestVerificationToken',
-                        'value': token
-                    }));
+                        var token = document.createElement('input');
+                        token.type = 'hidden';
+                        token.name = '__RequestVerificationToken';
+                        token.value = $('input[name="__RequestVerificationToken"]').val();
 
-                    form.appendTo('body').submit();
-                }
+                        form.appendChild(token);
+                        document.body.appendChild(form);
+                        form.submit();
+                    }
+                });
             });
+
+            // Notificaciones de TempData con SweetAlert2
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <text>
+                Swal.fire({
+                    icon: 'success',
+                    title: '¡Éxito!',
+                    text: '@Html.Raw(TempData["SuccessMessage"])',
+                    confirmButtonColor: '#97C78B',
+                    timer: 3000
+                });
+                </text>
+            }
+
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <text>
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: '@Html.Raw(TempData["ErrorMessage"])',
+                    confirmButtonColor: '#FBCDC0'
+                });
+                </text>
+            }
+
+            // Auto cerrar alertas
+            setTimeout(function () {
+                $('.alert').alert('close');
+            }, 5000);
         });
     </script>
 }

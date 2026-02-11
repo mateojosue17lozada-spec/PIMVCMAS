@@ -1,38 +1,225 @@
 ﻿@{
-    ViewBag.Title = "Reportes";
     ViewBag.Title = "Reportes Contables";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>Reportes</h2>
-<div class="page-header mb-4">
-    <h2><i class="fas fa-chart-line"></i> Reportes Contables</h2>
+<div class="container-fluid">
+    <div class="page-header mb-4">
+        <h2><i class="fas fa-chart-line"></i> Reportes Contables</h2>
+        <p class="text-muted">Análisis y estadísticas financieras</p>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-custom">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-file-alt"></i> Reporte Mensual</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="chartMensual" height="200"></canvas>
+                    <a href="@Url.Action("DescargarReporte", "Contabilidad", new { tipo = "mensual" })" class="btn btn-primary btn-block mt-3">
+                        <i class="fas fa-download"></i> Descargar Reporte Mensual
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-custom">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="fas fa-chart-pie"></i> Por Categorías</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="chartCategorias" height="200"></canvas>
+                    <a href="@Url.Action("DescargarReporte", "Contabilidad", new { tipo = "categorias" })" class="btn btn-success btn-block mt-3">
+                        <i class="fas fa-download"></i> Descargar Reporte por Categorías
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-custom">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="fas fa-chart-bar"></i> Comparativa Anual</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="chartAnual" height="200"></canvas>
+                    <a href="@Url.Action("DescargarReporte", "Contabilidad", new { tipo = "anual" })" class="btn btn-info btn-block mt-3">
+                        <i class="fas fa-download"></i> Descargar Reporte Anual
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-custom">
+                <div class="card-header bg-warning text-white">
+                    <h5 class="mb-0"><i class="fas fa-chart-line"></i> Tendencia Mensual</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="chartTendencia" height="200"></canvas>
+                    <a href="@Url.Action("DescargarReporte", "Contabilidad", new { tipo = "tendencia" })" class="btn btn-warning btn-block mt-3">
+                        <i class="fas fa-download"></i> Descargar Reporte de Tendencia
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-custom">
+        <div class="card-header bg-secondary text-white">
+            <h5 class="mb-0"><i class="fas fa-cogs"></i> Generar Reporte Personalizado</h5>
+        </div>
+        <div class="card-body">
+            <form method="post" action="@Url.Action("GenerarReportePersonalizado", "Contabilidad")">
+                @Html.AntiForgeryToken()
+                
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <label class="form-label">Fecha Inicio</label>
+                        <input type="date" name="fechaInicio" class="form-control" required />
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Fecha Fin</label>
+                        <input type="date" name="fechaFin" class="form-control" required />
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Formato</label>
+                        <select name="formato" class="form-control" required>
+                            <option value="pdf">PDF</option>
+                            <option value="excel">Excel</option>
+                            <option value="csv">CSV</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="incluirIngresos" checked />
+                            <label class="form-check-label">Incluir Ingresos</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="incluirEgresos" checked />
+                            <label class="form-check-label">Incluir Egresos</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="incluirGraficos" checked />
+                            <label class="form-check-label">Incluir Gráficos</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="incluirTotales" checked />
+                            <label class="form-check-label">Incluir Totales</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-end">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-file-download"></i> Generar Reporte
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
 
-<div class="row">
-    <div class="col-md-6 mb-4">
-        <div class="card shadow-custom">
-            <div class="card-header bg-primary text-white">
-                <h5><i class="fas fa-file-alt"></i> Reporte Mensual</h5>
-            </div>
-            <div class="card-body">
-                <canvas id="chartMensual" height="200"></canvas>
-                <a href="@Url.Action("DescargarReporte", "Contabilidad", new { tipo = "mensual" })" class="btn btn-primary btn-block mt-3">
-                    <i class="fas fa-download"></i> Descargar Reporte Mensual
-                </a>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-6 mb-4">
-        <div class="card shadow-custom">
-            <div class="card-header bg-success text-white">
-                <h5><i class="fas fa-chart-pie"></i> Por Categorías</h5>
-            </div>
-            <div class="card-body">
-                <canvas id="chartCategorias" height="200"></canvas>
-                <a href="@Url.Action("DescargarReporte", "Contabilidad", new { tipo = "categorias" })" class="btn btn-success btn-block mt-3">
-                    <i class="fas fa-download"></i> Descargar Reporte por Categorías
-                </a>
-            </div>
-        </div>
-    </div>
-</div>
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Datos de ejemplo para los gráficos
+            var dataMensual = {
+                labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul'],
+                datasets: [{
+                    label: 'Ingresos',
+                    backgroundColor: 'rgba(40, 167, 69, 0.5)',
+                    borderColor: 'rgb(40, 167, 69)',
+                    borderWidth: 1,
+                    data: [5000, 6000, 5500, 7000, 6500, 8000, 7500]
+                }, {
+                    label: 'Egresos',
+                    backgroundColor: 'rgba(220, 53, 69, 0.5)',
+                    borderColor: 'rgb(220, 53, 69)',
+                    borderWidth: 1,
+                    data: [3500, 4000, 3800, 4200, 4500, 4800, 4600]
+                }]
+            };
+
+            var dataCategorias = {
+                labels: ['Alimentos', 'Medicamentos', 'Veterinaria', 'Servicios', 'Mantenimiento'],
+                datasets: [{
+                    data: [30, 25, 20, 15, 10],
+                    backgroundColor: [
+                        '#FF6384',
+                        '#36A2EB',
+                        '#FFCE56',
+                        '#4BC0C0',
+                        '#9966FF'
+                    ]
+                }]
+            };
+
+            // Inicializar gráficos
+            var ctxMensual = document.getElementById('chartMensual').getContext('2d');
+            var chartMensual = new Chart(ctxMensual, {
+                type: 'bar',
+                data: dataMensual,
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+            var ctxCategorias = document.getElementById('chartCategorias').getContext('2d');
+            var chartCategorias = new Chart(ctxCategorias, {
+                type: 'pie',
+                data: dataCategorias,
+                options: {
+                    responsive: true
+                }
+            });
+
+            // Configurar fecha por defecto en formularios
+            var hoy = new Date();
+            var primerDiaMes = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+            var ultimoDiaMes = new Date(hoy.getFullYear(), hoy.getMonth() + 1, 0);
+            
+            $('input[name="fechaInicio"]').val(primerDiaMes.toISOString().split('T')[0]);
+            $('input[name="fechaFin"]').val(ultimoDiaMes.toISOString().split('T')[0]);
+        });
+    </script>
+}
+
+<style>
+    .shadow-custom {
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        border: 1px solid rgba(0, 0, 0, 0.125);
+    }
+
+    .card {
+        border-radius: 8px;
+    }
+
+    .page-header h2 {
+        color: #2c3e50;
+        font-weight: 600;
+    }
+
+    .btn-block {
+        width: 100%;
+    }
+
+    .form-check {
+        margin-bottom: 0.5rem;
+    }
+</style>

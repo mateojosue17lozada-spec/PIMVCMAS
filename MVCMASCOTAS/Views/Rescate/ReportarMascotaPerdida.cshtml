@@ -1,0 +1,497 @@
+﻿@model MVCMASCOTAS.Models.ViewModels.ReporteMascotaPerdidaViewModel
+
+@{
+    ViewBag.Title = "Reportar Mascota Perdida";
+}
+
+<div class="container my-5">
+    <!-- Header con información importante -->
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card shadow-custom border-0">
+                <div class="card-header bg-danger text-white py-4">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-exclamation-triangle fa-3x mr-4"></i>
+                        <div>
+                            <h1 class="h2 mb-2">Reportar Mascota Perdida</h1>
+                            <p class="mb-0 opacity-75">Llena este formulario para reportar una mascota extraviada y aumentar las posibilidades de encontrarla</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-body p-4 p-md-5">
+                    <!-- Alerta de emergencia -->
+                    <div class="alert alert-warning border-warning">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-lightbulb fa-2x mr-3 text-warning"></i>
+                            <div>
+                                <h5 class="alert-heading mb-2">Consejos antes de reportar</h5>
+                                <ul class="mb-0 pl-3">
+                                    <li>Busca en los alrededores inmediatos de donde se perdió</li>
+                                    <li>Pregunta a vecinos y comercios cercanos</li>
+                                    <li>Revisa refugios y veterinarias de la zona</li>
+                                    <li>Ten a mano fotos recientes de tu mascota</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    @using (Html.BeginForm("ReportarMascotaPerdida", "Rescate", FormMethod.Post, new { enctype = "multipart/form-data", @class = "needs-validation", novalidate = "novalidate" }))
+                    {
+                        @Html.AntiForgeryToken()
+
+                        <!-- Información de la Mascota -->
+                        <fieldset class="mb-5">
+                            <legend class="h4 text-primary border-bottom pb-2 mb-4">
+                                <i class="fas fa-paw mr-2"></i> Información de la Mascota
+                            </legend>
+
+                            <!-- Nombre y Especie -->
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        @Html.LabelFor(model => model.NombreMascota, new { @class = "font-weight-bold" })
+                                        @Html.TextBoxFor(model => model.NombreMascota, new { @class = "form-control", placeholder = "Ej: Toby, Luna, etc.", required = "required" })
+                                        @Html.ValidationMessageFor(model => model.NombreMascota, "", new { @class = "text-danger small" })
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        @Html.LabelFor(model => model.Especie, new { @class = "font-weight-bold" })
+                                        @Html.DropDownListFor(model => model.Especie,
+                                            new List<SelectListItem>
+                                            {
+                                                new SelectListItem { Text = "Seleccionar especie", Value = "" },
+                                                new SelectListItem { Text = "Perro", Value = "Perro" },
+                                                new SelectListItem { Text = "Gato", Value = "Gato" },
+                                                new SelectListItem { Text = "Ave", Value = "Ave" },
+                                                new SelectListItem { Text = "Conejo", Value = "Conejo" },
+                                                new SelectListItem { Text = "Otro", Value = "Otro" }
+                                            },
+                                            new { @class = "form-control", required = "required" })
+                                        @Html.ValidationMessageFor(model => model.Especie, "", new { @class = "text-danger small" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Raza y Sexo -->
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        @Html.LabelFor(model => model.Raza, new { @class = "font-weight-bold" })
+                                        @Html.TextBoxFor(model => model.Raza, new { @class = "form-control", placeholder = "Ej: Labrador, Siames, etc." })
+                                        <small class="form-text text-muted">Si es mestizo, indica 'Mestizo'</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        @Html.LabelFor(model => model.Sexo, new { @class = "font-weight-bold" })
+                                        <div class="btn-group btn-group-toggle w-100" data-toggle="buttons">
+                                            <label class="btn btn-outline-primary @(Model.Sexo == "M" ? "active" : "")">
+                                                <input type="radio" name="Sexo" value="M" @(Model.Sexo == "M" ? "checked" : "")> Macho
+                                            </label>
+                                            <label class="btn btn-outline-primary @(Model.Sexo == "F" ? "active" : "")">
+                                                <input type="radio" name="Sexo" value="F" @(Model.Sexo == "F" ? "checked" : "")> Hembra
+                                            </label>
+                                            <label class="btn btn-outline-primary @(Model.Sexo == "D" ? "active" : "")">
+                                                <input type="radio" name="Sexo" value="D" @(Model.Sexo == "D" ? "checked" : "")> Desconocido
+                                            </label>
+                                        </div>
+                                        @Html.ValidationMessageFor(model => model.Sexo, "", new { @class = "text-danger small" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Edad y Color -->
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        @Html.LabelFor(model => model.Edad, new { @class = "font-weight-bold" })
+                                        @Html.TextBoxFor(model => model.Edad, new { @class = "form-control", placeholder = "Ej: 3 años, 6 meses, etc." })
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        @Html.LabelFor(model => model.Color, new { @class = "font-weight-bold" })
+                                        @Html.TextBoxFor(model => model.Color, new { @class = "form-control", placeholder = "Ej: Blanco con manchas marrones" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Características Distintivas -->
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.CaracteristicasDistintivas, new { @class = "font-weight-bold" })
+                                @Html.TextAreaFor(model => model.CaracteristicasDistintivas, new { @class = "form-control", rows = "3", placeholder = "Describe características que la hagan única: cicatrices, marcas especiales, collar, etc.", required = "required" })
+                                <small class="form-text text-muted">Ej: Tiene una mancha en forma de corazón en la oreja izquierda, usa collar azul con placa plateada</small>
+                                @Html.ValidationMessageFor(model => model.CaracteristicasDistintivas, "", new { @class = "text-danger small" })
+                            </div>
+
+                            <!-- Imagen de la Mascota -->
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.ImagenMascota, new { @class = "font-weight-bold" })
+                                <div class="custom-file">
+                                    @Html.TextBoxFor(model => model.ImagenMascota, new { type = "file", @class = "custom-file-input", accept = "image/*", id = "imagenMascota" })
+                                    <label class="custom-file-label" for="imagenMascota">Seleccionar imagen...</label>
+                                </div>
+                                <small class="form-text text-muted">Formatos aceptados: JPG, PNG, GIF. Tamaño máximo: 10MB</small>
+                                @Html.ValidationMessageFor(model => model.ImagenMascota, "", new { @class = "text-danger small" })
+
+                                <!-- Vista previa de imagen -->
+                                <div class="mt-3 text-center">
+                                    <img id="previewImagen" src="#" alt="Vista previa de la imagen" class="img-fluid rounded d-none" style="max-height: 250px;">
+                                </div>
+                            </div>
+                        </fieldset>
+
+                        <!-- Información de la Pérdida -->
+                        <fieldset class="mb-5">
+                            <legend class="h4 text-primary border-bottom pb-2 mb-4">
+                                <i class="fas fa-map-marker-alt mr-2"></i> Información de la Pérdida
+                            </legend>
+
+                            <!-- Fecha de Pérdida -->
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.FechaPerdida, new { @class = "font-weight-bold" })
+                                <div class="input-group">
+                                    @Html.TextBoxFor(model => model.FechaPerdida, "{0:dd/MM/yyyy HH:mm}", new { @class = "form-control datetimepicker", type = "text", placeholder = "DD/MM/AAAA HH:MM", required = "required" })
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">
+                                            <i class="fas fa-calendar-alt"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                                <small class="form-text text-muted">Fecha y hora aproximada en que se perdió la mascota</small>
+                                @Html.ValidationMessageFor(model => model.FechaPerdida, "", new { @class = "text-danger small" })
+                            </div>
+
+                            <!-- Ubicación de Pérdida -->
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.UbicacionPerdida, new { @class = "font-weight-bold" })
+                                @Html.TextAreaFor(model => model.UbicacionPerdida, new { @class = "form-control", rows = "2", placeholder = "Dirección exacta, barrio, referencias cercanas", required = "required" })
+                                <small class="form-text text-muted">Sé lo más específico posible: calles, parques, edificios cercanos</small>
+                                @Html.ValidationMessageFor(model => model.UbicacionPerdida, "", new { @class = "text-danger small" })
+                            </div>
+
+                            <!-- Coordenadas GPS (Opcional) -->
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.CoordenadasGPS, new { @class = "font-weight-bold" })
+                                <div class="input-group">
+                                    @Html.TextBoxFor(model => model.CoordenadasGPS, new { @class = "form-control", placeholder = "Ej: -0.180653, -78.467834" })
+                                    <div class="input-group-append">
+                                        <button type="button" class="btn btn-outline-secondary" id="btnObtenerUbicacion">
+                                            <i class="fas fa-location-arrow"></i> Usar mi ubicación
+                                        </button>
+                                    </div>
+                                </div>
+                                <small class="form-text text-muted">Coordenadas GPS (opcional). Puedes obtenerlas desde Google Maps</small>
+                            </div>
+
+                            <!-- Observaciones -->
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.Observaciones, new { @class = "font-weight-bold" })
+                                @Html.TextAreaFor(model => model.Observaciones, new { @class = "form-control", rows = "3", placeholder = "Circunstancias de la pérdida, estado emocional de la mascota, etc." })
+                            </div>
+
+                            <!-- Recompensa -->
+                            <div class="form-group">
+                                <div class="custom-control custom-checkbox mb-3">
+                                    @Html.CheckBoxFor(model => model.OfrecerRecompensa, new { @class = "custom-control-input", id = "ofrecerRecompensa" })
+                                    <label class="custom-control-label font-weight-bold" for="ofrecerRecompensa">
+                                        Ofrecer recompensa por información
+                                    </label>
+                                </div>
+
+                                <div id="recompensaContainer" class="pl-4" style="display: none;">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                @Html.LabelFor(model => model.Recompensa, new { @class = "font-weight-bold" })
+                                                <div class="input-group">
+                                                    <div class="input-group-prepend">
+                                                        <span class="input-group-text">$</span>
+                                                    </div>
+                                                    @Html.TextBoxFor(model => model.Recompensa, new { @class = "form-control", placeholder = "0.00", type = "number", step = "0.01", min = "0" })
+                                                </div>
+                                                <small class="form-text text-muted">Monto de la recompensa (USD)</small>
+                                                @Html.ValidationMessageFor(model => model.Recompensa, "", new { @class = "text-danger small" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </fieldset>
+
+                        <!-- Información de Contacto -->
+                        <fieldset class="mb-5">
+                            <legend class="h4 text-primary border-bottom pb-2 mb-4">
+                                <i class="fas fa-address-card mr-2"></i> Información de Contacto
+                            </legend>
+
+                            <!-- Nombre de Contacto -->
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.ContactoNombre, new { @class = "font-weight-bold" })
+                                @Html.TextBoxFor(model => model.ContactoNombre, new { @class = "form-control", placeholder = "Tu nombre completo", required = "required" })
+                                @Html.ValidationMessageFor(model => model.ContactoNombre, "", new { @class = "text-danger small" })
+                            </div>
+
+                            <!-- Teléfono y Email -->
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        @Html.LabelFor(model => model.ContactoTelefono, new { @class = "font-weight-bold" })
+                                        <div class="input-group">
+                                            @Html.TextBoxFor(model => model.ContactoTelefono, new { @class = "form-control", placeholder = "Ej: 0987654321", required = "required" })
+                                            <div class="input-group-append">
+                                                <span class="input-group-text">
+                                                    <i class="fas fa-phone"></i>
+                                                </span>
+                                            </div>
+                                        </div>
+                                        @Html.ValidationMessageFor(model => model.ContactoTelefono, "", new { @class = "text-danger small" })
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        @Html.LabelFor(model => model.ContactoEmail, new { @class = "font-weight-bold" })
+                                        <div class="input-group">
+                                            @Html.TextBoxFor(model => model.ContactoEmail, new { @class = "form-control", placeholder = "tu@email.com", type = "email" })
+                                            <div class="input-group-append">
+                                                <span class="input-group-text">
+                                                    <i class="fas fa-envelope"></i>
+                                                </span>
+                                            </div>
+                                        </div>
+                                        @Html.ValidationMessageFor(model => model.ContactoEmail, "", new { @class = "text-danger small" })
+                                    </div>
+                                </div>
+                            </div>
+                        </fieldset>
+
+                        <!-- Términos y Condiciones -->
+                        <div class="card border-primary mb-5">
+                            <div class="card-header bg-light">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-file-contract text-primary mr-2"></i> Términos y Condiciones
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="alert alert-info">
+                                    <h6 class="alert-heading">Importante:</h6>
+                                    <ul class="mb-0 pl-3">
+                                        <li>La información proporcionada será pública para ayudar en la búsqueda</li>
+                                        <li>Nos comprometemos a mantener tus datos de contacto seguros</li>
+                                        <li>Te notificaremos si alguien reporta un avistamiento</li>
+                                        <li>Puedes actualizar o cerrar el reporte cuando encuentres a tu mascota</li>
+                                    </ul>
+                                </div>
+
+                                <div class="custom-control custom-checkbox">
+                                    @Html.CheckBoxFor(model => model.AceptaTerminos, new { @class = "custom-control-input", id = "aceptaTerminos", required = "required" })
+                                    <label class="custom-control-label font-weight-bold" for="aceptaTerminos">
+                                        He leído y acepto los
+                                        <a href="@Url.Action("Terminos", "Home")" target="_blank" class="text-primary">términos y condiciones</a>
+                                    </label>
+                                    @Html.ValidationMessageFor(model => model.AceptaTerminos, "", new { @class = "text-danger small d-block" })
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Botones de acción -->
+                        <div class="text-center py-4">
+                            <button type="submit" class="btn btn-danger btn-lg px-5 mr-3">
+                                <i class="fas fa-paper-plane mr-2"></i> Reportar Mascota Perdida
+                            </button>
+                            <a href="@Url.Action("MascotasPerdidas", "Rescate")" class="btn btn-outline-secondary btn-lg">
+                                <i class="fas fa-times mr-2"></i> Cancelar
+                            </a>
+                        </div>
+                    }
+                </div>
+
+                <!-- Información de ayuda -->
+                <div class="card-footer bg-light">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6><i class="fas fa-question-circle text-primary mr-2"></i> ¿Qué pasa después?</h6>
+                            <p class="small mb-0">Tu reporte será publicado en nuestra sección de mascotas perdidas y nuestro equipo te contactará para seguimiento.</p>
+                        </div>
+                        <div class="col-md-6 text-md-right">
+                            <h6><i class="fas fa-headset text-success mr-2"></i> ¿Necesitas ayuda?</h6>
+                            <p class="small mb-0">Llama al <strong>(02) 123-4567</strong> o escribe a <strong>rescate@refugiomascotas.org</strong></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        .shadow-custom {
+            box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.1);
+            border-radius: 15px;
+            border: 1px solid rgba(0,0,0,0.1);
+        }
+
+        fieldset {
+            border: 1px solid #dee2e6;
+            border-radius: 10px;
+            padding: 25px;
+            background: #fff;
+        }
+
+        legend {
+            width: auto;
+            padding: 0 15px;
+            margin-left: -15px;
+        }
+
+        .btn-group .btn {
+            flex: 1;
+        }
+
+        .custom-file-label::after {
+            content: "Examinar";
+        }
+
+        .datetimepicker {
+            background: #fff;
+        }
+
+        /* Estilos para validación */
+        .was-validated .form-control:valid,
+        .form-control.is-valid {
+            border-color: #28a745;
+            padding-right: calc(1.5em + .75rem);
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' viewBox='0 0 8 8'%3e%3cpath fill='%2328a745' d='M2.3 6.73L.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right calc(.375em + .1875rem) center;
+            background-size: calc(.75em + .375rem) calc(.75em + .375rem);
+        }
+
+        .was-validated .form-control:invalid,
+        .form-control.is-invalid {
+            border-color: #dc3545;
+            padding-right: calc(1.5em + .75rem);
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' stroke='%23dc3545' viewBox='0 0 12 12'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right calc(.375em + .1875rem) center;
+            background-size: calc(.75em + .375rem) calc(.75em + .375rem);
+        }
+    </style>
+}
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // Vista previa de imagen
+            $('#imagenMascota').change(function (e) {
+                var file = e.target.files[0];
+                if (file) {
+                    var reader = new FileReader();
+                    reader.onload = function (e) {
+                        $('#previewImagen').attr('src', e.target.result).removeClass('d-none');
+                    }
+                    reader.readAsDataURL(file);
+                    $('.custom-file-label').text(file.name);
+                } else {
+                    $('#previewImagen').addClass('d-none');
+                    $('.custom-file-label').text('Seleccionar imagen...');
+                }
+            });
+
+            // Mostrar/ocultar campo de recompensa
+            $('#ofrecerRecompensa').change(function () {
+                if (this.checked) {
+                    $('#recompensaContainer').slideDown();
+                } else {
+                    $('#recompensaContainer').slideUp();
+                    $('#Recompensa').val('');
+                }
+            });
+
+            // Inicializar estado del campo de recompensa
+            if ($('#ofrecerRecompensa').is(':checked')) {
+                $('#recompensaContainer').show();
+            }
+
+            // Obtener ubicación actual
+            $('#btnObtenerUbicacion').click(function () {
+                if (navigator.geolocation) {
+                    $(this).html('<i class="fas fa-spinner fa-spin"></i> Obteniendo...').prop('disabled', true);
+
+                    navigator.geolocation.getCurrentPosition(
+                        function (position) {
+                            var lat = position.coords.latitude.toFixed(6);
+                            var lng = position.coords.longitude.toFixed(6);
+                            $('#CoordenadasGPS').val(lat + ', ' + lng);
+
+                            $('#btnObtenerUbicacion').html('<i class="fas fa-check"></i> Ubicación obtenida').prop('disabled', false);
+                            setTimeout(function () {
+                                $('#btnObtenerUbicacion').html('<i class="fas fa-location-arrow"></i> Usar mi ubicación');
+                            }, 2000);
+                        },
+                        function (error) {
+                            alert('No se pudo obtener la ubicación. Error: ' + error.message);
+                            $('#btnObtenerUbicacion').html('<i class="fas fa-location-arrow"></i> Usar mi ubicación').prop('disabled', false);
+                        }
+                    );
+                } else {
+                    alert('Tu navegador no soporta geolocalización.');
+                }
+            });
+
+            // Validación de formulario
+            (function () {
+                'use strict';
+                window.addEventListener('load', function () {
+                    var forms = document.getElementsByClassName('needs-validation');
+                    Array.prototype.filter.call(forms, function (form) {
+                        form.addEventListener('submit', function (event) {
+                            if (form.checkValidity() === false) {
+                                event.preventDefault();
+                                event.stopPropagation();
+                            }
+                            form.classList.add('was-validated');
+                        }, false);
+                    });
+                }, false);
+            })();
+
+            // Máscara para teléfono
+            $('#ContactoTelefono').inputmask({
+                mask: '999-999-9999',
+                placeholder: '_',
+                showMaskOnHover: false
+            });
+
+            // Máscara para fecha
+            $('.datetimepicker').inputmask({
+                mask: '99/99/9999 99:99',
+                placeholder: 'DD/MM/AAAA HH:MM',
+                showMaskOnHover: false
+            });
+
+            // Auto-completar datos del usuario si está autenticado
+            @if (User.Identity.IsAuthenticated)
+            {
+                <text>
+                $.get('@Url.Action("ObtenerDatosUsuario", "Account")', function (data) {
+                    if (data.success) {
+                        if (data.nombre && !$('#ContactoNombre').val()) {
+                            $('#ContactoNombre').val(data.nombre);
+                        }
+                        if (data.telefono && !$('#ContactoTelefono').val()) {
+                            $('#ContactoTelefono').val(data.telefono);
+                        }
+                        if (data.email && !$('#ContactoEmail').val()) {
+                            $('#ContactoEmail').val(data.email);
+                        }
+                    }
+                });
+                </text>
+            }
+        });
+    </script>
+}

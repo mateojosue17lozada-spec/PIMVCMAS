@@ -42,6 +42,8 @@ namespace MVCMASCOTAS.Models
             this.Tratamientos = new HashSet<Tratamientos>();
             this.UsuariosRoles = new HashSet<UsuariosRoles>();
             this.UsuariosRoles1 = new HashSet<UsuariosRoles>();
+            this.RolPermisos = new HashSet<RolPermisos>();
+            this.HistorialEstadosMascota = new HashSet<HistorialEstadosMascota>();
         }
     
         public int UsuarioId { get; set; }
@@ -60,6 +62,12 @@ namespace MVCMASCOTAS.Models
         public Nullable<bool> Activo { get; set; }
         public Nullable<bool> EmailConfirmado { get; set; }
         public Nullable<bool> TelefonoConfirmado { get; set; }
+        public Nullable<System.DateTime> FechaUltimoCambioPassword { get; set; }
+        public Nullable<int> IntentosFallidos { get; set; }
+        public Nullable<System.DateTime> FechaBloqueoTemporal { get; set; }
+        public Nullable<System.DateTime> FechaDesbloqueo { get; set; }
+        public Nullable<bool> BloqueadoPermanentemente { get; set; }
+        public Nullable<System.DateTime> FechaUltimoIntentoFallido { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Actividades> Actividades { get; set; }
@@ -111,5 +119,9 @@ namespace MVCMASCOTAS.Models
         public virtual ICollection<UsuariosRoles> UsuariosRoles { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<UsuariosRoles> UsuariosRoles1 { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<RolPermisos> RolPermisos { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<HistorialEstadosMascota> HistorialEstadosMascota { get; set; }
     }
 }

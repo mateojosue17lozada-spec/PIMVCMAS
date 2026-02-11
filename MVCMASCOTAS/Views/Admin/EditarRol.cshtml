@@ -1,0 +1,221 @@
+﻿@model MVCMASCOTAS.Models.ViewModels.EditarRolViewModel
+@{
+    ViewBag.Title = "Editar Rol";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="page-header mb-4">
+    <h2><i class="fa fa-edit text-green"></i> Editar Rol</h2>
+    <p class="text-secondary">Modifique los datos del rol según sea necesario</p>
+</div>
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-green border-green alert-dismissible fade show" role="alert">
+        <i class="fa fa-exclamation-circle text-green"></i> <strong class="text-brown">@TempData["ErrorMessage"]</strong>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+}
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-green border-green alert-dismissible fade show" role="alert">
+        <i class="fa fa-check-circle text-green"></i> <strong class="text-brown">@TempData["SuccessMessage"]</strong>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="card shadow-hover border-green">
+            <div class="card-header bg-green text-white">
+                <h5 class="mb-0"><i class="fa fa-user-tag"></i> Información del Rol</h5>
+            </div>
+            <div class="card-body bg-light-mint">
+                @using (Html.BeginForm("EditarRol", "Admin", FormMethod.Post))
+                {
+                    @Html.AntiForgeryToken()
+                    @Html.HiddenFor(model => model.RolId)
+
+                    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.NombreRol, new { @class = "font-weight-bold text-brown" })
+                        @Html.TextBoxFor(model => model.NombreRol, new
+                        {
+                            @class = "form-control border-green",
+                            maxlength = "100",
+                            placeholder = "Ej: Administrador, Usuario, Moderador"
+                        })
+                        @Html.ValidationMessageFor(model => model.NombreRol, "", new { @class = "text-danger" })
+                        <small class="form-text text-secondary">Nombre único del rol (no puede repetirse)</small>
+                    </div>
+
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.Descripcion, new { @class = "font-weight-bold text-brown" })
+                        @Html.TextAreaFor(model => model.Descripcion, new
+                        {
+                            @class = "form-control border-green",
+                            rows = 4,
+                            maxlength = "500",
+                            placeholder = "Describa las funciones y permisos de este rol..."
+                        })
+                        @Html.ValidationMessageFor(model => model.Descripcion, "", new { @class = "text-danger" })
+                        <small class="form-text text-secondary">Máximo 500 caracteres</small>
+                    </div>
+
+                    <div class="form-group form-check">
+                        <div class="custom-control custom-switch">
+                            @Html.CheckBoxFor(model => model.Activo, new
+                            {
+                                @class = "custom-control-input",
+                                id = "chkActivo"
+                            })
+                            <label class="custom-control-label text-brown" for="chkActivo">
+                                <i class="fa fa-check-circle"></i> Activo
+                            </label>
+                        </div>
+                        <small class="form-text text-secondary">Los roles inactivos no pueden asignarse a nuevos usuarios</small>
+                    </div>
+
+                    <div class="alert alert-green border-green mt-3">
+                        <i class="fa fa-info-circle text-green"></i> <strong class="text-brown">Información del Rol:</strong>
+                        <ul class="mb-0 mt-2">
+                            <li class="text-brown"><strong>ID del Rol:</strong> <span class="badge bg-green">@Model.RolId</span></li>
+                            <li class="text-brown"><strong>Fecha de creación:</strong> @(Model.FechaCreacion?.ToString("dd/MM/yyyy HH:mm") ?? "No registrada")</li>
+                            <li class="text-brown"><strong>Última modificación:</strong> @DateTime.Now.ToString("dd/MM/yyyy HH:mm")</li>
+                        </ul>
+                    </div>
+
+                    <div class="form-group mt-4 pt-3 border-top border-green">
+                        <div class="d-flex justify-content-between">
+                            <a href="@Url.Action("Roles", "Admin")" class="btn btn-outline-green">
+                                <i class="fa fa-arrow-left"></i> Volver a la lista
+                            </a>
+                            <div>
+                                <button type="button" class="btn btn-yellow mr-2" id="btnPreview">
+                                    <i class="fa fa-eye"></i> Vista previa
+                                </button>
+                                <button type="submit" class="btn btn-green" id="btnGuardar">
+                                    <i class="fa fa-save"></i> Guardar Cambios
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Panel de vista previa -->
+        <div class="card border-green mt-4 fade-in-up" id="previewPanel" style="display: none;">
+            <div class="card-header bg-pink">
+                <h5 class="mb-0"><i class="fa fa-eye"></i> Vista Previa del Rol</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6 class="text-brown">Nombre del Rol:</h6>
+                        <p id="previewNombre" class="text-secondary">-</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="text-brown">Estado:</h6>
+                        <p id="previewEstado" class="text-secondary">-</p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <h6 class="text-brown">Descripción:</h6>
+                        <p id="previewDescripcion" class="text-secondary">-</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            console.log('Vista Editar Rol cargada');
+
+            // Auto cerrar alertas después de 5 segundos
+            setTimeout(function () {
+                $('.alert').alert('close');
+            }, 5000);
+
+            // Vista previa del rol
+            $('#btnPreview').click(function () {
+                var nombre = $('#NombreRol').val().trim();
+                var descripcion = $('#Descripcion').val().trim();
+                var activo = $('#chkActivo').is(':checked');
+
+                if (nombre === '') {
+                    nombre = '[Sin nombre]';
+                }
+
+                if (descripcion === '') {
+                    descripcion = '[Sin descripción]';
+                }
+
+                $('#previewNombre').text(nombre);
+                $('#previewDescripcion').text(descripcion);
+                $('#previewEstado').html(activo ?
+                    '<span class="badge bg-green">Activo</span>' :
+                    '<span class="badge bg-pink">Inactivo</span>');
+
+                $('#previewPanel').slideDown();
+            });
+
+            // Validación personalizada al guardar
+            $('#btnGuardar').click(function () {
+                var nombre = $('#NombreRol').val().trim();
+                if (nombre === '') {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Campo requerido',
+                        text: 'Por favor, ingrese un nombre para el rol.',
+                        confirmButtonColor: '#97C78B',
+                        confirmButtonText: 'Entendido'
+                    });
+                    $('#NombreRol').focus();
+                    return false;
+                }
+
+                // Confirmación antes de guardar
+                Swal.fire({
+                    title: '¿Guardar cambios?',
+                    text: "Se actualizará la información del rol en el sistema.",
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#97C78B',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Sí, guardar',
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Enviar formulario
+                        $('form').submit();
+                    }
+                });
+
+                return false; // Prevenir envío inmediato
+            });
+
+            // Efecto hover en la tarjeta principal
+            $('.shadow-hover').hover(
+                function () {
+                    $(this).addClass('shadow-lg');
+                },
+                function () {
+                    $(this).removeClass('shadow-lg');
+                }
+            );
+        });
+    </script>
+
+    @Scripts.Render("~/bundles/jqueryval")
+}

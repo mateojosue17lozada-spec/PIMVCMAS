@@ -1,0 +1,249 @@
+﻿@model System.Exception
+
+@{
+    ViewBag.Title = "Error";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    // Obtener código de estado si está disponible
+    var statusCode = Response.StatusCode;
+    var errorTitle = "¡Oops! Algo salió mal";
+    var errorMessage = "Ha ocurrido un error inesperado en la aplicación.";
+
+    // Personalizar mensajes según código de error
+    switch (statusCode)
+    {
+        case 404:
+            errorTitle = "Página no encontrada";
+            errorMessage = "La página que buscas no existe o ha sido movida.";
+            break;
+        case 403:
+            errorTitle = "Acceso denegado";
+            errorMessage = "No tienes permisos para acceder a esta página.";
+            break;
+        case 401:
+            errorTitle = "No autorizado";
+            errorMessage = "Debes iniciar sesión para acceder a esta página.";
+            break;
+        case 500:
+            errorTitle = "Error del servidor";
+            errorMessage = "Ocurrió un error interno en el servidor.";
+            break;
+    }
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-10 col-lg-8">
+            <div class="card border-danger shadow-lg">
+                <div class="card-header bg-danger text-white">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-exclamation-triangle fa-2x mr-3"></i>
+                        <h2 class="mb-0">@errorTitle</h2>
+                    </div>
+                </div>
+
+                <div class="card-body text-center py-4">
+                    <!-- Icono según tipo de error -->
+                    <div class="mb-4">
+                        @if (statusCode == 404)
+                        {
+                            <i class="fas fa-map-signs fa-6x text-warning"></i>
+                        }
+                        else if (statusCode == 403 || statusCode == 401)
+                        {
+                            <i class="fas fa-lock fa-6x text-warning"></i>
+                        }
+                        else
+                        {
+                            <i class="fas fa-exclamation-circle fa-6x text-danger"></i>
+                        }
+                    </div>
+
+                    <h3 class="text-danger mb-3">@errorTitle</h3>
+                    <p class="lead mb-4">@errorMessage</p>
+
+                    <!-- Información del error -->
+                    <div class="alert alert-light mb-4">
+                        <p class="mb-2">
+                            <strong>Código de error:</strong>
+                            <span class="badge badge-danger">@statusCode</span>
+                        </p>
+                        <p class="mb-2">
+                            <strong>URL solicitada:</strong>
+                            <code>@Request.Url?.PathAndQuery</code>
+                        </p>
+                        <p class="mb-0">
+                            <strong>Fecha y hora:</strong>
+                            @DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss")
+                        </p>
+                    </div>
+
+                    <!-- Detalles del error (solo si hay excepción) -->
+                    @if (Model != null)
+                    {
+                        <div class="mt-4">
+                            @if (HttpContext.Current.IsDebuggingEnabled)
+                            {
+                                <div class="card">
+                                    <div class="card-header bg-warning text-dark">
+                                        <h5 class="mb-0">
+                                            <i class="fas fa-bug"></i> Detalles Técnicos del Error
+                                        </h5>
+                                    </div>
+                                    <div class="card-body text-left">
+                                        <p><strong>Mensaje:</strong> @Model.Message</p>
+
+                                        @if (Model.InnerException != null)
+                                        {
+                                            <p><strong>Error Interno:</strong> @Model.InnerException.Message</p>
+                                        }
+
+                                        <p><strong>Tipo de Error:</strong> <code>@Model.GetType().Name</code></p>
+
+                                        <button class="btn btn-sm btn-outline-secondary mb-3"
+                                                type="button"
+                                                data-toggle="collapse"
+                                                data-target="#stackTrace">
+                                            <i class="fas fa-code"></i> Ver Stack Trace
+                                        </button>
+
+                                        <div class="collapse" id="stackTrace">
+                                            <pre class="bg-dark text-light p-3 rounded">@Model.StackTrace</pre>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+
+                    <!-- Botones de acción -->
+                    <div class="btn-group mt-4" role="group">
+                        <a href="@Url.Action("Index", "Home")" class="btn btn-primary btn-lg mr-2">
+                            <i class="fas fa-home"></i> Volver al Inicio
+                        </a>
+                        <a href="javascript:history.back()" class="btn btn-secondary btn-lg mr-2">
+                            <i class="fas fa-arrow-left"></i> Volver Atrás
+                        </a>
+
+                        <!-- Botón para reportar error -->
+                        <button class="btn btn-info btn-lg" onclick="reportError()">
+                            <i class="fas fa-flag"></i> Reportar Error
+                        </button>
+                    </div>
+
+                    <!-- Navegación según rol -->
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        <div class="mt-4">
+                            <h6>Accesos rápidos:</h6>
+                            <div class="btn-group btn-group-sm" role="group">
+                                @if (User.IsInRole("Administrador"))
+                                {
+                                    <a href="@Url.Action("Dashboard", "Admin")" class="btn btn-outline-info">
+                                        <i class="fas fa-user-shield"></i> Panel Admin
+                                    </a>
+                                }
+                                @if (User.IsInRole("Veterinario"))
+                                {
+                                    <a href="@Url.Action("Dashboard", "Veterinario")" class="btn btn-outline-info">
+                                        <i class="fas fa-stethoscope"></i> Panel Veterinario
+                                    </a>
+                                }
+                                <a href="@Url.Action("MiPerfil", "Account")" class="btn btn-outline-success">
+                                    <i class="fas fa-user"></i> Mi Perfil
+                                </a>
+                                <a href="@Url.Action("Logout", "Account")" class="btn btn-outline-warning">
+                                    <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                                </a>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <div class="card-footer text-center text-muted">
+                    <small>
+                        <i class="fas fa-info-circle"></i>
+                        Si el error persiste, contacta al administrador del sistema.
+                        <br>
+                        <i class="fas fa-copyright"></i>
+                        © @DateTime.Now.Year - Refugio de Mascotas - Todos los derechos reservados
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Función para reportar error
+        function reportError() {
+            const errorInfo = {
+                url: window.location.href,
+                statusCode: @statusCode,
+                user: '@User.Identity.Name',
+                timestamp: new Date().toISOString(),
+                userAgent: navigator.userAgent
+            };
+
+            // Aquí podrías enviar esta información a tu servidor
+            console.log('Error reportado:', errorInfo);
+
+            // Mostrar mensaje al usuario
+            alert('Error reportado al administrador. ¡Gracias por tu ayuda!');
+
+            // Opcional: Enviar por email o guardar en BD
+            // $.post('/Error/Report', errorInfo);
+        }
+
+        // Función para copiar detalles del error
+        function copyErrorDetails() {
+            const errorText = `Error: ${@Html.Raw(Json.Encode(Model?.Message))}\nURL: ${window.location.href}`;
+            navigator.clipboard.writeText(errorText)
+                .then(() => alert('Detalles copiados al portapapeles'))
+                .catch(err => console.error('Error al copiar:', err));
+        }
+    </script>
+}
+
+@section Styles {
+    <style>
+        .card {
+            border-radius: 15px;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+
+            .card:hover {
+                transform: translateY(-5px);
+            }
+
+        .card-header {
+            border-bottom: none;
+            padding: 1.5rem;
+        }
+
+        pre {
+            max-height: 300px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .btn-lg {
+            min-width: 180px;
+            margin-bottom: 10px;
+        }
+
+        @@media (max-width: 768px) {
+            .btn-group {
+                flex-direction: column;
+            }
+
+            .btn-lg {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+        }
+    </style>
+}

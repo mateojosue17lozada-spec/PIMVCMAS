@@ -23,8 +23,8 @@
         <div class="col-md-4">
             <div class="card shadow-custom text-center">
                 <div class="card-body">
-                    <h5>Donaciones Únicas</h5>
-                    <h2 class="text-success">$@Model.Where(d => d.TipoDonacion == "Única").Sum(d => (decimal?)d.Monto ?? 0).ToString("N2")</h2>
+                    <h5>Total Donado</h5>
+                    <h2 class="text-success">$@Model.Sum(d => (decimal?)d.Monto ?? 0).ToString("N2")</h2>
                 </div>
             </div>
         </div>
@@ -38,47 +38,263 @@
         </div>
     </div>
 
-    foreach (var donacion in Model)
+    // Verificar si tenemos el ViewBag con detalles procesados
+    var donacionesProcesadas = ViewBag.DonacionesProcesadas as List<dynamic>;
+
+    if (donacionesProcesadas != null && donacionesProcesadas.Count > 0)
     {
-        <div class="card mb-3 shadow-custom">
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-8">
-                        <h5>
-                            @if (donacion.TipoDonacion == "Única")
+        // USAR LOS DATOS PROCESADOS DEL CONTROLADOR
+        foreach (var item in donacionesProcesadas)
+        {
+            // Verificar si el objeto tiene las propiedades necesarias
+            MVCMASCOTAS.Models.Donaciones donacion = null;
+            string tipoEspecifico = "Donación";
+            string descripcionLimpia = "";
+
+            // Verificar si es un objeto dinámico con propiedades
+            if (item is System.Dynamic.ExpandoObject expando)
+            {
+                var dict = (IDictionary<string, object>)expando;
+                if (dict.ContainsKey("Donacion"))
+                {
+                    donacion = dict["Donacion"] as MVCMASCOTAS.Models.Donaciones;
+                }
+                if (dict.ContainsKey("TipoEspecifico"))
+                {
+                    tipoEspecifico = dict["TipoEspecifico"] as string;
+                }
+                if (dict.ContainsKey("DescripcionLimpia"))
+                {
+                    descripcionLimpia = dict["DescripcionLimpia"] as string;
+                }
+            }
+            else
+            {
+                // Intentar acceso directo si no es ExpandoObject
+                try
+                {
+                    donacion = item.Donacion as MVCMASCOTAS.Models.Donaciones;
+                    tipoEspecifico = item.TipoEspecifico as string;
+                    descripcionLimpia = item.DescripcionLimpia as string;
+                }
+                catch
+                {
+                    // Si falla, usar valores por defecto
+                    continue;
+                }
+            }
+
+            if (donacion == null) { continue; }
+
+            // Determinar icono y color según el tipo específico
+            string icono = "fas fa-hand-holding-heart";
+            string colorClase = "";
+            string tipoMostrar = tipoEspecifico ?? "Donación";
+
+            // Lógica de clasificación
+            switch (tipoMostrar)
+            {
+                case "Monetaria":
+                case "Donación Monetaria":
+                    icono = "fas fa-dollar-sign";
+                    colorClase = "text-success";
+                    tipoMostrar = "Donación Monetaria";
+                    break;
+                case "Especie":
+                case "Donación en Especie":
+                    icono = "fas fa-box";
+                    colorClase = "text-primary";
+                    tipoMostrar = "Donación en Especie";
+                    break;
+                case "Apadrinamiento":
+                    icono = "fas fa-paw";
+                    colorClase = "text-warning";
+                    tipoMostrar = "Apadrinamiento";
+                    break;
+                default:
+                    if (donacion.TipoDonacion == "Recurrente")
+                    {
+                        icono = "fas fa-sync-alt";
+                        colorClase = "text-info";
+                    }
+                    break;
+            }
+
+            <div class="card mb-3 shadow-custom">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <h5 class="@colorClase">
+                                <i class="@icono"></i>
+                                @tipoMostrar
+                                @if (donacion.TipoDonacion == "Recurrente" && tipoMostrar != "Apadrinamiento")
+                                {
+                                    <small class="text-muted">(Recurrente)</small>
+                                }
+                            </h5>
+
+                            @if (donacion.Monto > 0)
                             {
-                                <i class="fas fa-dollar-sign text-success"></i>
+                                <p class="h4 text-success">$@donacion.Monto.ToString("N2")</p>
                             }
-                            else
+
+                            @if (!string.IsNullOrEmpty(donacion.MetodoPago))
                             {
-                                <i class="fas fa-box text-info"></i>
+                                <p><strong>Método de Pago:</strong> @donacion.MetodoPago</p>
                             }
-                            Donación @donacion.TipoDonacion
-                        </h5>
 
-                        @if (donacion.TipoDonacion == "Única")
-                        {
-                            <p class="h4 text-success">$@donacion.Monto.ToString("N2")</p>
-                            <p><strong>Método de Pago:</strong> @donacion.MetodoPago</p>
-                        }
-                        else
-                        {
-                            <p><strong>Mensaje:</strong> @donacion.Mensaje</p>
-                        }
+                            @if (!string.IsNullOrEmpty(descripcionLimpia))
+                            {
+                                <p><strong>Detalles:</strong> @descripcionLimpia</p>
+                            }
+                            else if (!string.IsNullOrEmpty(donacion.Mensaje))
+                            {
+                                <p><strong>Detalles:</strong> @donacion.Mensaje</p>
+                            }
 
-                        <p class="text-muted">
-                            <i class="fas fa-calendar"></i> @donacion.FechaDonacion.Value.ToString("dd/MM/yyyy HH:mm")
-                        </p>
-                    </div>
+                            <p class="text-muted">
+                                <i class="fas fa-calendar"></i> @donacion.FechaDonacion.Value.ToString("dd/MM/yyyy HH:mm")
+                            </p>
 
-                    <div class="col-md-4 text-right">
-                        <span class="badge badge-pill @(donacion.Estado == "Completada" ? "badge-success" : donacion.Estado == "Pendiente" ? "badge-warning" : "badge-secondary") p-3">
-                            @donacion.Estado
-                        </span>
+                            @if (!string.IsNullOrEmpty(donacion.NumeroTransaccion))
+                            {
+                                <p><small><strong>Transacción:</strong> @donacion.NumeroTransaccion</small></p>
+                            }
+
+                            @if (!string.IsNullOrEmpty(donacion.Frecuencia) && donacion.Frecuencia != "Única")
+                            {
+                                <p><small><strong>Frecuencia:</strong> @donacion.Frecuencia</small></p>
+                            }
+                        </div>
+
+                        <div class="col-md-4 text-right">
+                            <span class="badge badge-pill @(donacion.Estado == "Completada" ? "badge-success" : donacion.Estado == "Pendiente" ? "badge-warning" : "badge-secondary") p-3">
+                                @donacion.Estado
+                            </span>
+
+                            @if (donacion.Anonima == true)
+                            {
+                                <div class="mt-2">
+                                    <span class="badge badge-pill badge-secondary">
+                                        <i class="fas fa-user-secret"></i> Anónima
+                                    </span>
+                                </div>
+                            }
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+        }
+    }
+    else
+    {
+        // FALLBACK: Mostrar usando el modelo directamente si no hay ViewBag
+        foreach (var donacion in Model)
+        {
+            // DETERMINAR EL TIPO ESPECÍFICO
+            string tipoEspecifico = "Donación";
+            string icono = "fas fa-hand-holding-heart";
+            string colorClase = "";
+
+            // Lógica para determinar el tipo específico
+            if (donacion.TipoDonacion == "Recurrente")
+            {
+                if (donacion.Mensaje != null && donacion.Mensaje.IndexOf("apadrinamiento", StringComparison.OrdinalIgnoreCase) >= 0)
+                {
+                    tipoEspecifico = "Apadrinamiento";
+                    icono = "fas fa-paw";
+                    colorClase = "text-warning";
+                }
+                else if (donacion.Monto > 0)
+                {
+                    tipoEspecifico = "Donación Monetaria Recurrente";
+                    icono = "fas fa-dollar-sign";
+                    colorClase = "text-success";
+                }
+                else
+                {
+                    tipoEspecifico = "Donación Recurrente";
+                    icono = "fas fa-sync-alt";
+                    colorClase = "text-info";
+                }
+            }
+            else if (donacion.TipoDonacion == "Única")
+            {
+                if (donacion.Monto == 0 && !string.IsNullOrEmpty(donacion.Mensaje))
+                {
+                    tipoEspecifico = "Donación en Especie";
+                    icono = "fas fa-box";
+                    colorClase = "text-primary";
+                }
+                else if (donacion.Monto > 0)
+                {
+                    tipoEspecifico = "Donación Monetaria Única";
+                    icono = "fas fa-money-bill-wave";
+                    colorClase = "text-success";
+                }
+            }
+
+            <div class="card mb-3 shadow-custom">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <h5 class="@colorClase">
+                                <i class="@icono"></i>
+                                @tipoEspecifico
+                                @if (donacion.TipoDonacion == "Recurrente")
+                                {
+                                    <small class="text-muted">(Recurrente)</small>
+                                }
+                            </h5>
+
+                            @if (donacion.Monto > 0)
+                            {
+                                <p class="h4 text-success">$@donacion.Monto.ToString("N2")</p>
+                            }
+
+                            @if (!string.IsNullOrEmpty(donacion.MetodoPago))
+                            {
+                                <p><strong>Método de Pago:</strong> @donacion.MetodoPago</p>
+                            }
+
+                            @if (!string.IsNullOrEmpty(donacion.Mensaje))
+                            {
+                                <p><strong>Mensaje/Detalles:</strong> @donacion.Mensaje</p>
+                            }
+
+                            <p class="text-muted">
+                                <i class="fas fa-calendar"></i> @donacion.FechaDonacion.Value.ToString("dd/MM/yyyy HH:mm")
+                            </p>
+
+                            @if (!string.IsNullOrEmpty(donacion.NumeroTransaccion))
+                            {
+                                <p><small><strong>Transacción:</strong> @donacion.NumeroTransaccion</small></p>
+                            }
+
+                            @if (!string.IsNullOrEmpty(donacion.Frecuencia) && donacion.Frecuencia != "Única")
+                            {
+                                <p><small><strong>Frecuencia:</strong> @donacion.Frecuencia</small></p>
+                            }
+                        </div>
+
+                        <div class="col-md-4 text-right">
+                            <span class="badge badge-pill @(donacion.Estado == "Completada" ? "badge-success" : donacion.Estado == "Pendiente" ? "badge-warning" : "badge-secondary") p-3">
+                                @donacion.Estado
+                            </span>
+
+                            @if (donacion.Anonima == true)
+                            {
+                                <div class="mt-2">
+                                    <span class="badge badge-pill badge-secondary">
+                                        <i class="fas fa-user-secret"></i> Anónima
+                                    </span>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
     }
 }
 else
@@ -94,3 +310,62 @@ else
         </div>
     </div>
 }
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // Agregar efectos a las tarjetas
+            $('.card').hover(
+                function () {
+                    $(this).css('transform', 'translateY(-5px)');
+                    $(this).css('box-shadow', '0 10px 20px rgba(0,0,0,0.15)');
+                },
+                function () {
+                    $(this).css('transform', 'translateY(0)');
+                    $(this).css('box-shadow', '0 2px 10px rgba(0,0,0,0.1)');
+                }
+            );
+        });
+    </script>
+}
+
+<style>
+    .shadow-custom {
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+    }
+
+        .shadow-custom:hover {
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+            transform: translateY(-5px);
+        }
+
+    .badge-success {
+        background-color: #28a745 !important;
+    }
+
+    .badge-warning {
+        background-color: #ffc107 !important;
+        color: #212529 !important;
+    }
+
+    .badge-secondary {
+        background-color: #6c757d !important;
+    }
+
+    .text-success {
+        color: #28a745 !important;
+    }
+
+    .text-primary {
+        color: #007bff !important;
+    }
+
+    .text-info {
+        color: #17a2b8 !important;
+    }
+
+    .text-warning {
+        color: #ffc107 !important;
+    }
+</style>

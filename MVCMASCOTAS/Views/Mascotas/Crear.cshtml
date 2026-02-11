@@ -2,167 +2,457 @@
 
 @{
     ViewBag.Title = "Registrar Nueva Mascota";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="row justify-content-center">
-    <div class="col-md-10">
-        <div class="card shadow-custom">
-            <div class="card-header">
-                <h3><i class="fas fa-plus-circle"></i> Registrar Nueva Mascota</h3>
-            </div>
-            <div class="card-body">
-                @using (Html.BeginForm("Crear", "Mascotas", FormMethod.Post, new { enctype = "multipart/form-data" }))
-                {
-                    @Html.AntiForgeryToken()
-                    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
-
-                    <h5 class="border-bottom pb-2 mb-3">Información Básica</h5>
-
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label><i class="fas fa-signature"></i> Nombre *</label>
-                                @Html.TextBoxFor(m => m.Nombre, new { @class = "form-control", required = "required" })
-                                @Html.ValidationMessageFor(m => m.Nombre, "", new { @class = "text-danger" })
-                            </div>
-                        </div>
-
-                        <div class="col-md-3">
-                            <div class="form-group">
-                                <label><i class="fas fa-paw"></i> Especie *</label>
-                                @Html.DropDownListFor(m => m.Especie, new SelectList(new[] { "Perro", "Gato", "Otro" }), "Seleccionar...", new { @class = "form-control", required = "required" })
-                                @Html.ValidationMessageFor(m => m.Especie, "", new { @class = "text-danger" })
-                            </div>
-                        </div>
-
-                        <div class="col-md-3">
-                            <div class="form-group">
-                                <label><i class="fas fa-venus-mars"></i> Sexo *</label>
-                                @Html.DropDownListFor(m => m.Sexo, new SelectList(new[] { "Macho", "Hembra" }), "Seleccionar...", new { @class = "form-control", required = "required" })
-                                @Html.ValidationMessageFor(m => m.Sexo, "", new { @class = "text-danger" })
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label><i class="fas fa-dog"></i> Raza</label>
-                                @Html.TextBoxFor(m => m.Raza, new { @class = "form-control", placeholder = "Mestizo si no es de raza" })
-                                @Html.ValidationMessageFor(m => m.Raza, "", new { @class = "text-danger" })
-                            </div>
-                        </div>
-
-                        <div class="col-md-3">
-                            <div class="form-group">
-                                <label><i class="fas fa-ruler"></i> Tamaño *</label>
-                                @Html.DropDownListFor(m => m.Tamanio, new SelectList(new[] { "Pequeño", "Mediano", "Grande" }), "Seleccionar...", new { @class = "form-control", required = "required" })
-                                @Html.ValidationMessageFor(m => m.Tamanio, "", new { @class = "text-danger" })
-                            </div>
-                        </div>
-
-                        <div class="col-md-3">
-                            <div class="form-group">
-                                <label><i class="fas fa-palette"></i> Color *</label>
-                                @Html.TextBoxFor(m => m.Color, new { @class = "form-control", required = "required" })
-                                @Html.ValidationMessageFor(m => m.Color, "", new { @class = "text-danger" })
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label><i class="fas fa-calendar"></i> Edad Aproximada *</label>
-                                @Html.DropDownListFor(m => m.EdadAproximada, new SelectList(new[] {
-                                    "Cachorro (0-1 año)",
-                                    "Joven (1-3 años)",
-                                    "Adulto (3-7 años)",
-                                    "Senior (7+ años)"
-                                }), "Seleccionar...", new { @class = "form-control", required = "required" })
-                                @Html.ValidationMessageFor(m => m.EdadAproximada, "", new { @class = "text-danger" })
-                            </div>
-                        </div>
-
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label><i class="fas fa-tag"></i> Categoría</label>
-                                @Html.DropDownListFor(m => m.Categoria, new SelectList(new[] { "Normal", "Especial" }), "Seleccionar...", new { @class = "form-control" })
-                                @Html.ValidationMessageFor(m => m.Categoria, "", new { @class = "text-danger" })
-                            </div>
-                        </div>
-
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label><i class="fas fa-star"></i> Tipo Especial</label>
-                                @Html.TextBoxFor(m => m.TipoEspecial, new { @class = "form-control", placeholder = "Ej: Ciego, cojo, etc." })
-                                @Html.ValidationMessageFor(m => m.TipoEspecial, "", new { @class = "text-danger" })
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-check mb-3">
-                                @Html.CheckBoxFor(m => m.Esterilizado, new { @class = "form-check-input" })
-                                <label class="form-check-label">
-                                    <i class="fas fa-check-circle"></i> Esterilizado/Castrado
-                                </label>
-                            </div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label><i class="fas fa-microchip"></i> Microchip (Número)</label>
-                                @Html.TextBoxFor(m => m.Microchip, new { @class = "form-control" })
-                                @Html.ValidationMessageFor(m => m.Microchip, "", new { @class = "text-danger" })
-                            </div>
-                        </div>
-                    </div>
-
-                    <h5 class="border-bottom pb-2 mb-3 mt-4">Descripciones</h5>
-
-                    <div class="form-group">
-                        <label><i class="fas fa-align-left"></i> Descripción General</label>
-                        @Html.TextAreaFor(m => m.DescripcionGeneral, new { @class = "form-control", rows = "3", maxlength = "500" })
-                        @Html.ValidationMessageFor(m => m.DescripcionGeneral, "", new { @class = "text-danger" })
-                    </div>
-
-                    <div class="form-group">
-                        <label><i class="fas fa-heart"></i> Características de Comportamiento</label>
-                        @Html.TextAreaFor(m => m.CaracteristicasComportamiento, new { @class = "form-control", rows = "3", maxlength = "500" })
-                        @Html.ValidationMessageFor(m => m.CaracteristicasComportamiento, "", new { @class = "text-danger" })
-                    </div>
-
-                    <div class="form-group">
-                        <label><i class="fas fa-book"></i> Historia de Rescate</label>
-                        @Html.TextAreaFor(m => m.HistoriaRescate, new { @class = "form-control", rows = "3", maxlength = "1000" })
-                        @Html.ValidationMessageFor(m => m.HistoriaRescate, "", new { @class = "text-danger" })
-                    </div>
-
-                    <h5 class="border-bottom pb-2 mb-3 mt-4">Imagen</h5>
-
-                    <div class="form-group">
-                        <label><i class="fas fa-camera"></i> Imagen Principal</label>
-                        <input type="file" name="ImagenPrincipalFile" class="form-control-file" accept="image/*" data-preview="#preview-mascota" />
-                        <small class="form-text text-muted">Tamaño máximo: 5 MB. Formatos: JPG, PNG, GIF</small>
-                        <img id="preview-mascota" src="#" alt="Preview" class="img-preview mt-2" style="display: none;" />
-                    </div>
-
-                    <div class="form-group mt-4">
-                        <button type="submit" class="btn btn-primary btn-lg">
-                            <i class="fas fa-save"></i> Registrar Mascota
-                        </button>
-                        <a href="@Url.Action("Gestionar", "Mascotas")" class="btn btn-secondary btn-lg">
-                            <i class="fas fa-times"></i> Cancelar
-                        </a>
-                    </div>
-                }
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>
+                    <i class="fas fa-plus-circle text-success"></i> Registrar Nueva Mascota
+                </h2>
+                <a href="@Url.Action("Gestionar", "Mascotas")" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Volver
+                </a>
             </div>
         </div>
     </div>
+
+    @using (Html.BeginForm("Crear", "Mascotas", FormMethod.Post, new { enctype = "multipart/form-data", id = "formCrearMascota" }))
+    {
+        @Html.AntiForgeryToken()
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+        <div class="row">
+            <!-- COLUMNA IZQUIERDA -->
+            <div class="col-lg-8">
+
+                <!-- INFORMACIÓN BÁSICA -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-info-circle me-2"></i>Información Básica
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <!-- Nombre -->
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">
+                                    <i class="fas fa-tag me-1 text-primary"></i>
+                                    Nombre <span class="text-danger">*</span>
+                                </label>
+                                @Html.TextBoxFor(m => m.Nombre, new
+                                {
+                                    @class = "form-control",
+                                    placeholder = "Ej: Max, Luna, Rocky...",
+                                    required = "required"
+                                })
+                                @Html.ValidationMessageFor(m => m.Nombre, "", new { @class = "text-danger small" })
+                            </div>
+
+                            <!-- Especie -->
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">
+                                    <i class="fas fa-paw me-1 text-primary"></i>
+                                    Especie <span class="text-danger">*</span>
+                                </label>
+                                @Html.DropDownListFor(m => m.Especie,
+                                    Model.EspeciesList ?? new SelectList(new List<string> { "Perro", "Gato" }),
+                                    "-- Seleccione --",
+                                    new { @class = "form-select", required = "required" })
+                                @Html.ValidationMessageFor(m => m.Especie, "", new { @class = "text-danger small" })
+                            </div>
+
+                            <!-- Raza -->
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">
+                                    <i class="fas fa-dna me-1 text-primary"></i>
+                                    Raza
+                                </label>
+                                @Html.TextBoxFor(m => m.Raza, new
+                                {
+                                    @class = "form-control",
+                                    placeholder = "Ej: Labrador, Mestizo..."
+                                })
+                            </div>
+
+                            <!-- Sexo -->
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">
+                                    <i class="fas fa-venus-mars me-1 text-primary"></i>
+                                    Sexo <span class="text-danger">*</span>
+                                </label>
+                                <select name="Sexo" id="Sexo" class="form-select" required>
+                                    <option value="">-- Seleccione --</option>
+                                    <option value="Macho" selected>Macho</option>
+                                    <option value="Hembra">Hembra</option>
+                                </select>
+                            </div>
+
+                            <!-- Edad -->
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">
+                                    <i class="fas fa-birthday-cake me-1 text-primary"></i>
+                                    Edad Aproximada <span class="text-danger">*</span>
+                                </label>
+                                @Html.TextBoxFor(m => m.EdadAproximada, new
+                                {
+                                    @class = "form-control",
+                                    placeholder = "Ej: 2 años",
+                                    required = "required"
+                                })
+                            </div>
+
+                            <!-- Tamaño -->
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">
+                                    <i class="fas fa-ruler-combined me-1 text-primary"></i>
+                                    Tamaño <span class="text-danger">*</span>
+                                </label>
+                                @Html.DropDownListFor(m => m.Tamanio,
+                                    Model.TamaniosList ?? new SelectList(new List<string> { "Pequeño", "Mediano", "Grande" }),
+                                    "-- Seleccione --",
+                                    new { @class = "form-select", required = "required" })
+                            </div>
+
+                            <!-- Color -->
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">
+                                    <i class="fas fa-palette me-1 text-primary"></i>
+                                    Color
+                                </label>
+                                @Html.TextBoxFor(m => m.Color, new
+                                {
+                                    @class = "form-control",
+                                    placeholder = "Ej: Negro, Blanco..."
+                                })
+                            </div>
+
+                            <!-- Esterilizado -->
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label d-block">
+                                    <i class="fas fa-check-circle me-1 text-primary"></i>
+                                    ¿Esterilizado?
+                                </label>
+                                <div class="form-check form-check-inline">
+                                    @Html.RadioButtonFor(m => m.Esterilizado, true, new { @class = "form-check-input", id = "esterilizadoSi" })
+                                    <label class="form-check-label" for="esterilizadoSi">Sí</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    @Html.RadioButtonFor(m => m.Esterilizado, false, new { @class = "form-check-input", id = "esterilizadoNo", @checked = "checked" })
+                                    <label class="form-check-label" for="esterilizadoNo">No</label>
+                                </div>
+                            </div>
+
+                            <!-- Microchip -->
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">
+                                    <i class="fas fa-microchip me-1 text-primary"></i>
+                                    Microchip
+                                </label>
+                                @Html.TextBoxFor(m => m.Microchip, new
+                                {
+                                    @class = "form-control",
+                                    placeholder = "Número de microchip"
+                                })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CATEGORÍA Y ESTADO -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-flag me-2"></i>Categoría y Estado
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <!-- Categoría -->
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">
+                                    <i class="fas fa-star me-1 text-info"></i>
+                                    Categoría
+                                </label>
+                                @Html.DropDownListFor(m => m.Categoria,
+                                    Model.CategoriasList ?? new SelectList(new List<string> { "Normal", "Especial" }),
+                                    "-- Seleccione --",
+                                    new { @class = "form-select", id = "selectCategoria" })
+                            </div>
+
+                            <!-- Tipo Especial -->
+                            <div class="col-md-8 mb-3" id="divTipoEspecial" style="display: none;">
+                                <label class="form-label">
+                                    <i class="fas fa-info-circle me-1 text-warning"></i>
+                                    Tipo de Necesidad Especial
+                                </label>
+                                @Html.TextBoxFor(m => m.TipoEspecial, new
+                                {
+                                    @class = "form-control",
+                                    placeholder = "Ej: Discapacidad motora, ceguera...",
+                                    id = "TipoEspecial"
+                                })
+                                <small class="text-muted">Especifique el tipo de necesidad especial</small>
+                            </div>
+
+                            <!-- Estado -->
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">
+                                    <i class="fas fa-heartbeat me-1 text-info"></i>
+                                    Estado <span class="text-danger">*</span>
+                                </label>
+                                @Html.DropDownListFor(m => m.Estado,
+                                    Model.EstadosList ?? new SelectList(new List<string> { "Rescatada", "En revisión veterinaria", "Disponible para adopción" }),
+                                    new { @class = "form-select", required = "required" })
+                            </div>
+
+                            <!-- Fecha Ingreso -->
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">
+                                    <i class="fas fa-calendar-alt me-1 text-info"></i>
+                                    Fecha de Ingreso <span class="text-danger">*</span>
+                                </label>
+                                @Html.TextBoxFor(m => m.FechaIngreso, "{0:yyyy-MM-dd}", new
+                                {
+                                    @class = "form-control",
+                                    type = "date",
+                                    required = "required",
+                                    max = DateTime.Now.ToString("yyyy-MM-dd")
+                                })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ASIGNACIONES -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-users me-2"></i>Asignaciones
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <!-- Veterinario -->
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">
+                                    <i class="fas fa-user-md me-1 text-success"></i>
+                                    Veterinario Asignado
+                                </label>
+                                @Html.DropDownListFor(m => m.VeterinarioAsignado,
+                                    Model.VeterinariosList ?? new SelectList(new List<object>()),
+                                    "-- Sin asignar --",
+                                    new { @class = "form-select" })
+                            </div>
+
+                            <!-- Rescatista -->
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">
+                                    <i class="fas fa-hands-helping me-1 text-success"></i>
+                                    Rescatista
+                                </label>
+                                @Html.DropDownListFor(m => m.RescatistaId,
+                                    Model.RescatistasList ?? new SelectList(new List<object>()),
+                                    "-- Sin asignar --",
+                                    new { @class = "form-select" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- DESCRIPCIONES -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-warning text-dark">
+                        <h5 class="mb-0">
+                            <i class="fas fa-align-left me-2"></i>Descripciones
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="form-label">
+                                <i class="fas fa-file-alt me-1 text-warning"></i>
+                                Descripción General
+                            </label>
+                            @Html.TextAreaFor(m => m.DescripcionGeneral, new
+                            {
+                                @class = "form-control",
+                                rows = "4",
+                                placeholder = "Describe las características físicas..."
+                            })
+                            <small class="text-muted">Visible en la página pública</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">
+                                <i class="fas fa-heart me-1 text-warning"></i>
+                                Características de Comportamiento
+                            </label>
+                            @Html.TextAreaFor(m => m.CaracteristicasComportamiento, new
+                            {
+                                @class = "form-control",
+                                rows = "4",
+                                placeholder = "Describe el comportamiento..."
+                            })
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">
+                                <i class="fas fa-book me-1 text-warning"></i>
+                                Historia de Rescate
+                            </label>
+                            @Html.TextAreaFor(m => m.HistoriaRescate, new
+                            {
+                                @class = "form-control",
+                                rows = "4",
+                                placeholder = "Cuenta la historia..."
+                            })
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- COLUMNA DERECHA: IMAGEN -->
+            <div class="col-lg-4">
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-secondary text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-image me-2"></i>Imagen Principal
+                        </h5>
+                    </div>
+                    <div class="card-body text-center">
+                        <div class="mb-3">
+                            <img id="imgPreview"
+                                 src="/Content/images/no-image.png"
+                                 class="img-fluid rounded shadow-sm"
+                                 style="max-height: 400px; width: 100%; object-fit: cover;"
+                                 alt="Vista previa">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="btn btn-primary w-100">
+                                <i class="fas fa-upload me-2"></i>Seleccionar Imagen
+                                <input type="file"
+                                       name="ImagenPrincipalFile"
+                                       id="imagenFile"
+                                       accept="image/jpeg,image/png,image/gif"
+                                       style="display: none;"
+                                       onchange="previewImage(this)">
+                            </label>
+                        </div>
+
+                        <div class="alert alert-info mb-0">
+                            <small>
+                                <i class="fas fa-info-circle me-1"></i>
+                                <strong>Formatos:</strong> JPG, PNG, GIF<br>
+                                <strong>Tamaño máximo:</strong> 5 MB
+                            </small>
+                        </div>
+
+                        <div id="imagenError" class="alert alert-danger mt-3" style="display: none;"></div>
+                    </div>
+                </div>
+
+                <!-- Botones -->
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-success btn-lg" id="btnGuardar">
+                                <i class="fas fa-save me-2"></i>Guardar Mascota
+                            </button>
+                            <a href="@Url.Action("Gestionar", "Mascotas")" class="btn btn-secondary">
+                                <i class="fas fa-times me-2"></i>Cancelar
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
 </div>
 
 @section Scripts {
-    @Scripts.Render("~/bundles/jqueryval")
+    <script src="~/Scripts/jquery.validate.min.js"></script>
+    <script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            // Toggle TipoEspecial
+            $('#selectCategoria').change(function () {
+                if ($(this).val() === 'Especial') {
+                    $('#divTipoEspecial').slideDown();
+                    $('#TipoEspecial').attr('required', 'required');
+                } else {
+                    $('#divTipoEspecial').slideUp();
+                    $('#TipoEspecial').removeAttr('required').val('');
+                }
+            });
+
+            // Validación antes de enviar
+            $('#formCrearMascota').submit(function (e) {
+                var imagenFile = $('#imagenFile')[0];
+
+                if (imagenFile.files.length > 0) {
+                    var file = imagenFile.files[0];
+                    var fileSize = file.size / 1024 / 1024;
+
+                    if (fileSize > 5) {
+                        e.preventDefault();
+                        alert('La imagen no debe superar los 5 MB');
+                        return false;
+                    }
+                }
+
+                $('#btnGuardar').html('<i class="fas fa-spinner fa-spin me-2"></i>Guardando...').prop('disabled', true);
+            });
+        });
+
+        function previewImage(input) {
+            if (input.files && input.files[0]) {
+                var file = input.files[0];
+                var fileSize = file.size / 1024 / 1024;
+
+                $('#imagenError').hide();
+
+                if (fileSize > 5) {
+                    $('#imagenError').text('La imagen no debe superar los 5 MB').show();
+                    input.value = '';
+                    return;
+                }
+
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    $('#imgPreview').attr('src', e.target.result);
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+    </script>
 }
+
+<style>
+    .form-label {
+        font-weight: 500;
+    }
+
+    .card {
+        border: none;
+        border-radius: 10px;
+    }
+
+    .card-header {
+        border-radius: 10px 10px 0 0 !important;
+        padding: 1rem 1.5rem;
+    }
+
+    #imgPreview {
+        border: 3px dashed #dee2e6;
+        transition: all 0.3s;
+    }
+
+        #imgPreview:hover {
+            border-color: #0d6efd;
+        }
+</style>

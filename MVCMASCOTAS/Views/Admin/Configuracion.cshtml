@@ -1,176 +1,339 @@
-﻿@model MVCMASCOTAS.Models.Configuracion
-
+﻿@model MVCMASCOTAS.Models.ViewModels.ConfiguracionViewModel
 @{
-    ViewBag.Title = "Configuracion";
     ViewBag.Title = "Configuración del Sistema";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>Configuracion</h2>
-<div class="page-header mb-4">
-    <h2><i class="fas fa-cog"></i> Configuración del Sistema</h2>
-    <p class="text-muted">Ajustes generales del refugio de mascotas</p>
-</div>
-
-<div class="mb-4">
-    <a href="@Url.Action("Dashboard", "Admin")" class="btn btn-outline-secondary">
-        <i class="fas fa-arrow-left"></i> Volver al Dashboard
-    </a>
-</div>
-
-<div class="row">
-    <!-- Información del refugio -->
-    <div class="col-md-6">
-        <div class="card shadow-custom mb-4">
-            <div class="card-header bg-primary text-white">
-                <h5 class="mb-0"><i class="fas fa-building"></i> Información del Refugio</h5>
-            </div>
-            <div class="card-body">
-                @using (Html.BeginForm("ActualizarConfiguracion", "Admin", FormMethod.Post))
-                {
-                    @Html.AntiForgeryToken()
-
-                    <div class="form-group">
-                        <label><i class="fas fa-tag"></i> Nombre del Refugio</label>
-                        <input type="text" name="NombreRefugio" value="@ViewBag.NombreRefugio" class="form-control" required />
-                    </div>
-
-                    <div class="form-group">
-                        <label><i class="fas fa-envelope"></i> Email de Contacto</label>
-                        <input type="email" name="EmailContacto" value="@ViewBag.EmailContacto" class="form-control" required />
-                    </div>
-
-                    <div class="form-group">
-                        <label><i class="fas fa-phone"></i> Teléfono</label>
-                        <input type="text" name="Telefono" value="@ViewBag.Telefono" class="form-control" required />
-                    </div>
-
-                    <div class="form-group">
-                        <label><i class="fas fa-map-marker-alt"></i> Dirección</label>
-                        <textarea name="Direccion" class="form-control" rows="3" required>@ViewBag.Direccion</textarea>
-                    </div>
-
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save"></i> Guardar Cambios
-                    </button>
-                }
-            </div>
-        </div>
-
-        <!-- Configuración de notificaciones -->
-        <div class="card shadow-custom mb-4">
-            <div class="card-header bg-info text-white">
-                <h5 class="mb-0"><i class="fas fa-bell"></i> Notificaciones</h5>
-            </div>
-            <div class="card-body">
-                @using (Html.BeginForm("ActualizarNotificaciones", "Admin", FormMethod.Post))
-                {
-                    @Html.AntiForgeryToken()
-
-                    <div class="form-check mb-3">
-                        <input class="form-check-input" type="checkbox" name="NotificacionesSolicitudes" id="notifSolicitudes" @(ViewBag.NotificacionesSolicitudes ? "checked" : "") />
-                        <label class="form-check-label" for="notifSolicitudes">
-                            Notificar nuevas solicitudes de adopción
-                        </label>
-                    </div>
-
-                    <div class="form-check mb-3">
-                        <input class="form-check-input" type="checkbox" name="NotificacionesDonaciones" id="notifDonaciones" @(ViewBag.NotificacionesDonaciones ? "checked" : "") />
-                        <label class="form-check-label" for="notifDonaciones">
-                            Notificar nuevas donaciones
-                        </label>
-                    </div>
-
-                    <div class="form-check mb-3">
-                        <input class="form-check-input" type="checkbox" name="NotificacionesRescates" id="notifRescates" @(ViewBag.NotificacionesRescates ? "checked" : "") />
-                        <label class="form-check-label" for="notifRescates">
-                            Notificar reportes de rescate
-                        </label>
-                    </div>
-
-                    <button type="submit" class="btn btn-info">
-                        <i class="fas fa-save"></i> Guardar Preferencias
-                    </button>
-                }
-            </div>
+<!-- Hero Section -->
+<section class="py-4">
+    <div class="container">
+        <div class="text-center">
+            <h1 class="display-5 fw-bold mb-2 text-brown">
+                <i class="fa fa-cog text-green"></i> Configuración del Sistema
+            </h1>
+            <p class="lead mb-3 text-secondary">Ajustes generales del refugio de mascotas</p>
         </div>
     </div>
+</section>
 
-    <!-- Configuración de sistema -->
-    <div class="col-md-6">
-        <div class="card shadow-custom mb-4">
-            <div class="card-header bg-success text-white">
-                <h5 class="mb-0"><i class="fas fa-sliders-h"></i> Configuración del Sistema</h5>
+<!-- Main Content -->
+<section class="py-5 bg-light-mint">
+    <div class="container">
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-green border-green alert-dismissible fade show mb-4" role="alert">
+                <i class="fa fa-check-circle text-green"></i> @TempData["SuccessMessage"]
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
             </div>
-            <div class="card-body">
-                @using (Html.BeginForm("ActualizarSistema", "Admin", FormMethod.Post))
-                {
-                    @Html.AntiForgeryToken()
+        }
 
-                    <div class="form-group">
-                        <label><i class="fas fa-list"></i> Mascotas por página</label>
-                        <input type="number" name="MascotasPorPagina" value="@ViewBag.MascotasPorPagina" class="form-control" min="6" max="50" />
-                    </div>
-
-                    <div class="form-group">
-                        <label><i class="fas fa-dollar-sign"></i> Monto mínimo de donación</label>
-                        <input type="number" name="MontoMinimoDonacion" value="@ViewBag.MontoMinimoDonacion" class="form-control" min="1" step="0.01" />
-                    </div>
-
-                    <div class="form-group">
-                        <label><i class="fas fa-clock"></i> Días de validez de solicitud</label>
-                        <input type="number" name="DiasValidezSolicitud" value="@ViewBag.DiasValidezSolicitud" class="form-control" min="1" max="365" />
-                    </div>
-
-                    <button type="submit" class="btn btn-success">
-                        <i class="fas fa-save"></i> Guardar Configuración
-                    </button>
-                }
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div class="alert alert-green border-green alert-dismissible fade show mb-4" role="alert">
+                <i class="fa fa-exclamation-circle text-brown"></i> Por favor, corrija los errores en el formulario.
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
             </div>
+        }
+
+        <div class="mb-4">
+            <a href="@Url.Action("Dashboard", "Admin")" class="btn btn-outline-green">
+                <i class="fa fa-arrow-left"></i> Volver al Dashboard
+            </a>
         </div>
 
-        <!-- Estadísticas del sistema -->
-        <div class="card shadow-custom mb-4">
-            <div class="card-header bg-dark text-white">
-                <h5 class="mb-0"><i class="fas fa-chart-bar"></i> Estadísticas del Sistema</h5>
-            </div>
-            <div class="card-body">
-                <div class="row text-center">
-                    <div class="col-6 mb-3">
-                        <h3 class="text-primary">@ViewBag.TotalRegistros</h3>
-                        <p class="text-muted">Total Registros</p>
+        @using (Html.BeginForm("ActualizarConfiguracion", "Admin", FormMethod.Post, new { id = "configForm" }))
+        {
+            @Html.AntiForgeryToken()
+
+            <div class="row">
+                <!-- Columna Izquierda -->
+                <div class="col-md-6">
+                    <!-- Información del Refugio -->
+                    <div class="card border-green shadow-hover mb-4">
+                        <div class="card-header bg-green text-white">
+                            <h5 class="mb-0"><i class="fa fa-building"></i> Información del Refugio</h5>
+                        </div>
+                        <div class="card-body">
+                            @if (!string.IsNullOrEmpty(Model.ModificadoPorUsuario))
+                            {
+                                <div class="alert alert-green small mb-3">
+                                    <i class="fa fa-history text-green"></i> Última modificación: @Model.UltimaModificacion?.ToString("dd/MM/yyyy HH:mm") por @Model.ModificadoPorUsuario
+                                </div>
+                            }
+
+                            <div class="form-group">
+                                @Html.LabelFor(m => m.NombreRefugio, new { @class = "text-brown" })
+                                @Html.TextBoxFor(m => m.NombreRefugio, new { @class = "form-control border-green", placeholder = "Nombre del refugio" })
+                                @Html.ValidationMessageFor(m => m.NombreRefugio, "", new { @class = "text-brown small" })
+                            </div>
+
+                            <div class="form-group">
+                                @Html.LabelFor(m => m.EmailContacto, new { @class = "text-brown" })
+                                @Html.TextBoxFor(m => m.EmailContacto, new { @class = "form-control border-green", placeholder = "correo@ejemplo.com", type = "email" })
+                                @Html.ValidationMessageFor(m => m.EmailContacto, "", new { @class = "text-brown small" })
+                            </div>
+
+                            <div class="form-group">
+                                @Html.LabelFor(m => m.TelefonoContacto, new { @class = "text-brown" })
+                                @Html.TextBoxFor(m => m.TelefonoContacto, new { @class = "form-control border-green", placeholder = "Número de teléfono" })
+                                @Html.ValidationMessageFor(m => m.TelefonoContacto, "", new { @class = "text-brown small" })
+                            </div>
+
+                            <div class="form-group">
+                                @Html.LabelFor(m => m.DireccionRefugio, new { @class = "text-brown" })
+                                @Html.TextAreaFor(m => m.DireccionRefugio, new { @class = "form-control border-green", rows = "3", placeholder = "Dirección completa" })
+                                @Html.ValidationMessageFor(m => m.DireccionRefugio, "", new { @class = "text-brown small" })
+                            </div>
+
+                            <div class="form-group">
+                                @Html.LabelFor(m => m.MensajeBienvenida, new { @class = "text-brown" })
+                                @Html.TextAreaFor(m => m.MensajeBienvenida, new { @class = "form-control border-green", rows = "3", placeholder = "Mensaje de bienvenida para nuevos usuarios" })
+                                @Html.ValidationMessageFor(m => m.MensajeBienvenida, "", new { @class = "text-brown small" })
+                            </div>
+                        </div>
                     </div>
-                    <div class="col-6 mb-3">
-                        <h3 class="text-success">@ViewBag.EspacioUtilizado</h3>
-                        <p class="text-muted">Espacio en DB</p>
+
+                    <!-- Configuración de Límites -->
+                    <div class="card border-green shadow-hover mb-4">
+                        <div class="card-header bg-green text-white">
+                            <h5 class="mb-0"><i class="fa fa-sliders-h"></i> Límites del Sistema</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-group">
+                                @Html.LabelFor(m => m.CapacidadMaximaMascotas, new { @class = "text-brown" })
+                                <div class="input-group">
+                                    @Html.TextBoxFor(m => m.CapacidadMaximaMascotas, new { @class = "form-control border-green", type = "number", min = "1", max = "1000" })
+                                    <div class="input-group-append">
+                                        <span class="input-group-text bg-light-mint text-brown border-green">mascotas</span>
+                                    </div>
+                                </div>
+                                @Html.ValidationMessageFor(m => m.CapacidadMaximaMascotas, "", new { @class = "text-brown small" })
+                                <small class="form-text text-secondary">Número máximo de mascotas que puede albergar el refugio</small>
+                            </div>
+
+                            <div class="form-group">
+                                @Html.LabelFor(m => m.DiasValidezSolicitud, new { @class = "text-brown" })
+                                <div class="input-group">
+                                    @Html.TextBoxFor(m => m.DiasValidezSolicitud, new { @class = "form-control border-green", type = "number", min = "1", max = "365" })
+                                    <div class="input-group-append">
+                                        <span class="input-group-text bg-light-mint text-brown border-green">días</span>
+                                    </div>
+                                </div>
+                                @Html.ValidationMessageFor(m => m.DiasValidezSolicitud, "", new { @class = "text-brown small" })
+                                <small class="form-text text-secondary">Tiempo que una solicitud de adopción permanece activa</small>
+                            </div>
+
+                            <div class="form-group">
+                                @Html.LabelFor(m => m.MascotasPorPagina, new { @class = "text-brown" })
+                                <div class="input-group">
+                                    @Html.TextBoxFor(m => m.MascotasPorPagina, new { @class = "form-control border-green", type = "number", min = "6", max = "50" })
+                                    <div class="input-group-append">
+                                        <span class="input-group-text bg-light-mint text-brown border-green">por página</span>
+                                    </div>
+                                </div>
+                                @Html.ValidationMessageFor(m => m.MascotasPorPagina, "", new { @class = "text-brown small" })
+                                <small class="form-text text-secondary">Número de mascotas mostradas en listados</small>
+                            </div>
+                        </div>
                     </div>
-                    <div class="col-6 mb-3">
-                        <h3 class="text-info">@ViewBag.UsuariosActivos</h3>
-                        <p class="text-muted">Usuarios Activos</p>
+                </div>
+
+                <!-- Columna Derecha -->
+                <div class="col-md-6">
+                    <!-- Configuración Financiera -->
+                    <div class="card border-green shadow-hover mb-4">
+                        <div class="card-header bg-green text-white">
+                            <h5 class="mb-0"><i class="fa fa-dollar-sign"></i> Configuración Financiera</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-group">
+                                @Html.LabelFor(m => m.MontoMinimoApadrinamiento, new { @class = "text-brown" })
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text bg-light-mint text-brown border-green">$</span>
+                                    </div>
+                                    @Html.TextBoxFor(m => m.MontoMinimoApadrinamiento, new
+                                    {
+                                        @class = "form-control border-green",
+                                        type = "number",
+                                        min = "1",
+                                        max = "1000",
+                                        step = "0.01",
+                                        placeholder = "10.00"
+                                    })
+                                </div>
+                                @Html.ValidationMessageFor(m => m.MontoMinimoApadrinamiento, "", new { @class = "text-brown small" })
+                                <small class="form-text text-secondary">Monto mínimo requerido para apadrinar una mascota</small>
+                            </div>
+
+                            <div class="form-group">
+                                @Html.LabelFor(m => m.MontoMinimoDonacion, new { @class = "text-brown" })
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text bg-light-mint text-brown border-green">$</span>
+                                    </div>
+                                    @Html.TextBoxFor(m => m.MontoMinimoDonacion, new
+                                    {
+                                        @class = "form-control border-green",
+                                        type = "number",
+                                        min = "1",
+                                        max = "1000",
+                                        step = "0.01",
+                                        placeholder = "5.00"
+                                    })
+                                </div>
+                                @Html.ValidationMessageFor(m => m.MontoMinimoDonacion, "", new { @class = "text-brown small" })
+                                <small class="form-text text-secondary">Monto mínimo aceptado para donaciones</small>
+                            </div>
+                        </div>
                     </div>
-                    <div class="col-6 mb-3">
-                        <h3 class="text-warning">@ViewBag.AccionesHoy</h3>
-                        <p class="text-muted">Acciones Hoy</p>
+
+                    <!-- Configuración de Notificaciones -->
+                    <div class="card border-green shadow-hover mb-4">
+                        <div class="card-header bg-green text-white">
+                            <h5 class="mb-0"><i class="fa fa-bell"></i> Notificaciones del Sistema</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-check mb-3">
+                                @Html.CheckBoxFor(m => m.NotificarSolicitudes, new { @class = "form-check-input border-green" })
+                                @Html.LabelFor(m => m.NotificarSolicitudes, new { @class = "form-check-label text-brown font-weight-normal" })
+                                <small class="form-text text-secondary d-block">Recibir notificaciones por nuevas solicitudes de adopción</small>
+                            </div>
+
+                            <div class="form-check mb-3">
+                                @Html.CheckBoxFor(m => m.NotificarDonaciones, new { @class = "form-check-input border-green" })
+                                @Html.LabelFor(m => m.NotificarDonaciones, new { @class = "form-check-label text-brown font-weight-normal" })
+                                <small class="form-text text-secondary d-block">Recibir notificaciones por nuevas donaciones</small>
+                            </div>
+
+                            <div class="form-check mb-3">
+                                @Html.CheckBoxFor(m => m.NotificarRescates, new { @class = "form-check-input border-green" })
+                                @Html.LabelFor(m => m.NotificarRescates, new { @class = "form-check-label text-brown font-weight-normal" })
+                                <small class="form-text text-secondary d-block">Recibir notificaciones por reportes de rescate</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Botones de Acción -->
+                    <div class="card border-green shadow-hover">
+                        <div class="card-header bg-green text-white">
+                            <h5 class="mb-0"><i class="fa fa-save"></i> Guardar Configuración</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="alert alert-green">
+                                <i class="fa fa-exclamation-triangle text-brown"></i>
+                                <strong class="text-brown">Advertencia:</strong> <span class="text-secondary">Los cambios se aplicarán inmediatamente a todo el sistema.</span>
+                            </div>
+
+                            <div class="d-flex justify-content-between">
+                                <button type="button" class="btn btn-outline-green" onclick="restaurarValoresPorDefecto()">
+                                    <i class="fa fa-undo"></i> Restaurar Valores
+                                </button>
+                                <button type="submit" class="btn btn-green text-white">
+                                    <i class="fa fa-save"></i> Guardar Cambios
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-
-        <!-- Mantenimiento -->
-        <div class="card shadow-custom mb-4">
-            <div class="card-header bg-warning text-white">
-                <h5 class="mb-0"><i class="fas fa-tools"></i> Mantenimiento</h5>
-            </div>
-            <div class="card-body">
-                <a href="@Url.Action("LimpiarCache", "Admin")" class="btn btn-warning btn-block mb-2">
-                    <i class="fas fa-trash-alt"></i> Limpiar Caché
-                </a>
-                <a href="@Url.Action("RespaldarDB", "Admin")" class="btn btn-info btn-block mb-2">
-                    <i class="fas fa-database"></i> Respaldar Base de Datos
-                </a>
-                <a href="@Url.Action("OptimizarDB", "Admin")" class="btn btn-primary btn-block">
-                    <i class="fas fa-cog"></i> Optimizar Base de Datos
-                </a>
-            </div>
-        </div>
+        }
     </div>
-</div>
+</section>
+
+@section Styles {
+    <style>
+        /* Solo estilos específicos si son necesarios */
+        .page-header {
+            border-bottom: 2px solid var(--green);
+            padding-bottom: 1rem;
+        }
+
+        .form-control.border-green:focus {
+            border-color: #86b57a;
+            box-shadow: 0 0 0 0.2rem rgba(151, 199, 139, 0.25);
+        }
+
+        .input-group-text {
+            background-color: var(--bg-light);
+            border-color: var(--green);
+        }
+
+        .form-check-input.border-green {
+            border: 2px solid var(--green);
+        }
+
+            .form-check-input.border-green:checked {
+                background-color: var(--green);
+                border-color: var(--green);
+            }
+
+        .alert-green {
+            background-color: rgba(151, 199, 139, 0.1);
+            border: 1px solid var(--green);
+            color: var(--brown);
+        }
+
+        /* Responsive */
+        @@media (max-width: 768px) {
+            .card-body {
+                padding: 1rem;
+            }
+
+            .d-flex {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+
+        /* Animaciones */
+        @@keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        /* Estilos para validación */
+        .field-validation-error {
+            display: block;
+            margin-top: 5px;
+        }
+
+        .input-validation-error {
+            border-color: #FBCDC0 !important;
+        }
+    </style>
+}
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    <script>
+        $(document).ready(function () {
+            // Auto-eliminar mensajes después de 5 segundos
+            setTimeout(function () {
+                $('.alert').alert('close');
+            }, 5000);
+
+            // Agregar animación a elementos
+            $('.card, .alert').addClass('fade-in');
+        });
+    </script>
+}

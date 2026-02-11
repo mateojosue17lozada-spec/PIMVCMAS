@@ -26,16 +26,50 @@ namespace MVCMASCOTAS.Controllers
                                d.FechaDonacion.Value.Month == DateTime.Now.Month &&
                                d.FechaDonacion.Value.Year == DateTime.Now.Year);
 
+                // CORRECCIÓN: Cambiar para ser consistente con HomeController
                 var ultimasDonaciones = db.Donaciones
-                    .Where(d => !d.Anonima.HasValue || d.Anonima == false)
+                    .Where(d => d.Estado == "Completada")
                     .OrderByDescending(d => d.FechaDonacion)
                     .Take(10)
-                    .Select(d => new
+                    .ToList()
+                    .Select(d =>
                     {
-                        Donante = d.Anonima == true ? "Anónimo" : d.Usuarios.NombreCompleto ?? "Donante",
-                        Tipo = d.TipoDonacion,
-                        Monto = d.Monto,
-                        Fecha = d.FechaDonacion
+                        string nombreDonante = "Anónimo";
+
+                        if (d.Anonima != true && d.UsuarioId.HasValue)
+                        {
+                            var usuario = db.Usuarios.Find(d.UsuarioId.Value);
+                            if (usuario != null)
+                            {
+                                nombreDonante = usuario.NombreCompleto;
+                            }
+                        }
+
+                        // Determinar tipo específico basado en el mensaje
+                        string tipoEspecifico = d.TipoDonacion;
+                        if (d.Mensaje != null && d.Mensaje.Contains("[Tipo Original:"))
+                        {
+                            // Extraer el tipo original del mensaje
+                            var inicio = d.Mensaje.IndexOf("[Tipo Original:") + 15;
+                            var fin = d.Mensaje.IndexOf("]", inicio);
+                            if (fin > inicio)
+                            {
+                                tipoEspecifico = d.Mensaje.Substring(inicio, fin - inicio).Trim();
+                            }
+                        }
+                        else if (d.Mensaje != null && d.Mensaje.Contains("[Apadrinamiento]"))
+                        {
+                            tipoEspecifico = "Apadrinamiento";
+                        }
+
+                        // CORRECCIÓN: Usar las mismas propiedades que el HomeController
+                        return new
+                        {
+                            Donante = nombreDonante,  // Igual que HomeController
+                            Tipo = tipoEspecifico,    // Mostrar tipo específico
+                            Monto = d.Monto,          // Igual que HomeController
+                            Fecha = d.FechaDonacion   // Igual que HomeController
+                        };
                     })
                     .ToList();
 
@@ -133,125 +167,139 @@ namespace MVCMASCOTAS.Controllers
                 usuarioId = usuario?.UsuarioId;
             }
 
-            // Crear donación
+            // Crear donación con mapeo correcto para la BD
             var donacion = new Donaciones
             {
                 UsuarioId = usuarioId,
-                TipoDonacion = model.TipoDonacion,
+                // CORREGIDO: Mapear los valores de la aplicación a los de la BD
+                // "Monetaria" y "Apadrinamiento" son "Recurrente"
+                // "Especie" es "Única"
+                TipoDonacion = (model.TipoDonacion == "Apadrinamiento" || model.TipoDonacion == "Monetaria")
+                                ? "Recurrente" : "Única",
                 Monto = model.TipoDonacion == "Especie" ? 0 : model.Monto,
                 Frecuencia = model.Frecuencia,
                 FechaDonacion = DateTime.Now,
                 MetodoPago = model.TipoDonacion == "Monetaria" || model.TipoDonacion == "Apadrinamiento" ? model.MetodoPago : null,
                 Estado = "Pendiente",
                 Anonima = model.Anonima,
-                Mensaje = model.Mensaje,
+                // Guardar el tipo original en el mensaje para poder identificarlo después
+                Mensaje = $"[Tipo Original: {model.TipoDonacion}] " + (model.Mensaje ?? ""),
                 NumeroTransaccion = model.NumeroTransaccion
             };
 
-            db.Donaciones.Add(donacion);
-            db.SaveChanges();
-
-            // Si es apadrinamiento, crear registro adicional
-            if (model.TipoDonacion == "Apadrinamiento" && model.MascotaId.HasValue)
+            try
             {
-                var apadrinamiento = new Apadrinamientos
-                {
-                    MascotaId = model.MascotaId.Value,
-                    UsuarioId = usuarioId ?? 0,
-                    MontoMensual = model.Monto,
-                    FechaInicio = DateTime.Now,
-                    Estado = "Activo",
-                    DiaCobroMensual = DateTime.Now.Day,
-                    MetodoPagoPreferido = model.MetodoPago,
-                    Observaciones = model.DescripcionArticulo ?? model.Mensaje
-                };
-
-                db.Apadrinamientos.Add(apadrinamiento);
+                db.Donaciones.Add(donacion);
                 db.SaveChanges();
 
-                // Registrar primer pago
-                var pago = new PagosApadrinamiento
-                {
-                    ApadrinamientoId = apadrinamiento.ApadrinamientoId,
-                    Monto = model.Monto,
-                    FechaPago = DateTime.Now,
-                    MesPagado = DateTime.Now.ToString("MM/yyyy"),
-                    MetodoPago = model.MetodoPago,
-                    Estado = "Completado"
-                };
-                db.PagosApadrinamiento.Add(pago);
-                db.SaveChanges();
-            }
-
-            // Registrar en contabilidad solo si es monetaria o apadrinamiento
-            if ((model.TipoDonacion == "Monetaria" || model.TipoDonacion == "Apadrinamiento") && model.Monto > 0)
-            {
-                var usuarioActual = db.Usuarios.FirstOrDefault(u => u.Email == User.Identity.Name);
-                int responsableId = usuarioActual?.UsuarioId ?? 0;
-
-                var movimiento = new MovimientosContables
-                {
-                    TipoMovimiento = "Ingreso",
-                    Categoria = model.TipoDonacion == "Apadrinamiento" ? "Apadrinamientos" : "Donaciones",
-                    Monto = model.Monto,
-                    Concepto = model.TipoDonacion == "Apadrinamiento"
-                        ? $"Apadrinamiento - Mascota ID: {model.MascotaId}"
-                        : $"Donación {(model.Anonima ? "Anónima" : $"de {model.NombreDonante}")}",
-                    FechaMovimiento = DateTime.Now,
-                    MetodoPago = model.MetodoPago,
-                    NumeroComprobante = model.NumeroTransaccion,
-                    ResponsableRegistro = responsableId,
-                    Observaciones = model.Mensaje ?? model.DescripcionArticulo
-                };
-
-                db.MovimientosContables.Add(movimiento);
-                db.SaveChanges();
-            }
-
-            // Auditoría
-            AuditoriaHelper.RegistrarAccion("Donar", "Donaciones",
-                $"Tipo: {model.TipoDonacion}, Monto: ${model.Monto}", usuarioId);
-
-            // Enviar email de agradecimiento
-            if (!string.IsNullOrEmpty(model.EmailDonante))
-            {
-                string subject = "¡Gracias por tu donación!";
-
-                string detalles = "";
+                // Si es apadrinamiento, crear registro adicional
                 if (model.TipoDonacion == "Apadrinamiento" && model.MascotaId.HasValue)
                 {
-                    var mascota = db.Mascotas.Find(model.MascotaId.Value);
-                    detalles = $"<li>Mascota apadrinada: {mascota?.Nombre ?? "No especificada"}</li>";
-                }
-                else if (model.TipoDonacion == "Monetaria")
-                {
-                    detalles = $"<li>Monto: ${model.Monto:N2}</li>";
-                }
-                else if (model.TipoDonacion == "Especie")
-                {
-                    detalles = $"<li>Artículo: {model.DescripcionArticulo}</li>";
+                    var apadrinamiento = new Apadrinamientos
+                    {
+                        MascotaId = model.MascotaId.Value,
+                        UsuarioId = usuarioId ?? 0,
+                        MontoMensual = model.Monto,
+                        FechaInicio = DateTime.Now,
+                        Estado = "Activo",
+                        DiaCobroMensual = DateTime.Now.Day,
+                        MetodoPagoPreferido = model.MetodoPago,
+                        Observaciones = model.DescripcionArticulo ?? model.Mensaje
+                    };
+
+                    db.Apadrinamientos.Add(apadrinamiento);
+                    db.SaveChanges();
+
+                    // Registrar primer pago
+                    var pago = new PagosApadrinamiento
+                    {
+                        ApadrinamientoId = apadrinamiento.ApadrinamientoId,
+                        Monto = model.Monto,
+                        FechaPago = DateTime.Now,
+                        MesPagado = DateTime.Now.ToString("MM/yyyy"),
+                        MetodoPago = model.MetodoPago,
+                        Estado = "Completado"
+                    };
+                    db.PagosApadrinamiento.Add(pago);
+                    db.SaveChanges();
                 }
 
-                string body = $@"
-                    <h2>Estimado/a {model.NombreDonante}</h2>
-                    <p>Queremos agradecerte sinceramente por tu generosa donación al Refugio de Animales Quito.</p>
-                    <p><strong>Detalles de tu donación:</strong></p>
-                    <ul>
-                        <li>Tipo: {model.TipoDonacion}</li>
-                        {detalles}
-                        <li>Fecha: {DateTime.Now:dd/MM/yyyy}</li>
-                        {(model.TipoDonacion == "Apadrinamiento" ? "<li>Recibirás actualizaciones mensuales sobre tu mascota apadrinada</li>" : "")}
-                    </ul>
-                    <p>Tu apoyo nos permite continuar rescatando y cuidando animales necesitados.</p>
-                    <br/>
-                    <p>Con gratitud,<br/>Equipo del Refugio de Animales Quito</p>
-                ";
+                // Registrar en contabilidad solo si es monetaria o apadrinamiento
+                if ((model.TipoDonacion == "Monetaria" || model.TipoDonacion == "Apadrinamiento") && model.Monto > 0)
+                {
+                    var usuarioActual = db.Usuarios.FirstOrDefault(u => u.Email == User.Identity.Name);
+                    int responsableId = usuarioActual?.UsuarioId ?? 0;
 
-                _ = EmailHelper.SendEmailAsync(model.EmailDonante, subject, body);
+                    var movimiento = new MovimientosContables
+                    {
+                        TipoMovimiento = "Ingreso",
+                        Categoria = model.TipoDonacion == "Apadrinamiento" ? "Apadrinamientos" : "Donaciones",
+                        Monto = model.Monto,
+                        Concepto = model.TipoDonacion == "Apadrinamiento"
+                            ? $"Apadrinamiento - Mascota ID: {model.MascotaId}"
+                            : $"Donación {(model.Anonima ? "Anónima" : $"de {model.NombreDonante}")}",
+                        FechaMovimiento = DateTime.Now,
+                        MetodoPago = model.MetodoPago,
+                        NumeroComprobante = model.NumeroTransaccion,
+                        ResponsableRegistro = responsableId,
+                        Observaciones = model.Mensaje ?? model.DescripcionArticulo
+                    };
+
+                    db.MovimientosContables.Add(movimiento);
+                    db.SaveChanges();
+                }
+
+                // Auditoría
+                AuditoriaHelper.RegistrarAccion("Donar", "Donaciones",
+                    $"Tipo: {model.TipoDonacion}, Monto: ${model.Monto}", usuarioId);
+
+                // Enviar email de agradecimiento
+                if (!string.IsNullOrEmpty(model.EmailDonante))
+                {
+                    string subject = "¡Gracias por tu donación!";
+
+                    string detalles = "";
+                    if (model.TipoDonacion == "Apadrinamiento" && model.MascotaId.HasValue)
+                    {
+                        var mascota = db.Mascotas.Find(model.MascotaId.Value);
+                        detalles = $"<li>Mascota apadrinada: {mascota?.Nombre ?? "No especificada"}</li>";
+                    }
+                    else if (model.TipoDonacion == "Monetaria")
+                    {
+                        detalles = $"<li>Monto: ${model.Monto:N2}</li>";
+                    }
+                    else if (model.TipoDonacion == "Especie")
+                    {
+                        detalles = $"<li>Artículo: {model.DescripcionArticulo}</li>";
+                    }
+
+                    string body = $@"
+                        <h2>Estimado/a {model.NombreDonante}</h2>
+                        <p>Queremos agradecerte sinceramente por tu generosa donación al Refugio de Animales Quito.</p>
+                        <p><strong>Detalles de tu donación:</strong></p>
+                        <ul>
+                            <li>Tipo: {model.TipoDonacion}</li>
+                            {detalles}
+                            <li>Fecha: {DateTime.Now:dd/MM/yyyy}</li>
+                            {(model.TipoDonacion == "Apadrinamiento" ? "<li>Recibirás actualizaciones mensuales sobre tu mascota apadrinada</li>" : "")}
+                        </ul>
+                        <p>Tu apoyo nos permite continuar rescatando y cuidando animales necesitados.</p>
+                        <br/>
+                        <p>Con gratitud,<br/>Equipo del Refugio de Animales Quito</p>
+                    ";
+
+                    _ = EmailHelper.SendNotificationAsync(model.EmailDonante, subject, body);
+                }
+
+                TempData["SuccessMessage"] = "¡Gracias por tu donación! Tu apoyo es muy importante para nosotros.";
+                return RedirectToAction("Index");
             }
-
-            TempData["SuccessMessage"] = "¡Gracias por tu donación! Tu apoyo es muy importante para nosotros.";
-            return RedirectToAction("Index");
+            catch (Exception ex)
+            {
+                // Capturar errores específicos de BD
+                ModelState.AddModelError("", $"Error al guardar la donación: {ex.Message}");
+                return View(model);
+            }
         }
 
         // GET: Donaciones/MisDonaciones
@@ -271,8 +319,36 @@ namespace MVCMASCOTAS.Controllers
                 .OrderByDescending(d => d.FechaDonacion)
                 .ToList();
 
+            // Agregar información de tipo específico para la vista
+            var donacionesConDetalle = donaciones.Select(d =>
+            {
+                // Determinar tipo específico
+                string tipoEspecifico = d.TipoDonacion;
+                string descripcion = d.Mensaje ?? "";
+
+                if (d.Mensaje != null && d.Mensaje.Contains("[Tipo Original:"))
+                {
+                    var inicio = d.Mensaje.IndexOf("[Tipo Original:") + 15;
+                    var fin = d.Mensaje.IndexOf("]", inicio);
+                    if (fin > inicio)
+                    {
+                        tipoEspecifico = d.Mensaje.Substring(inicio, fin - inicio).Trim();
+                        // Limpiar el mensaje (quitar la parte del tipo)
+                        descripcion = d.Mensaje.Substring(fin + 1).Trim();
+                    }
+                }
+
+                return new
+                {
+                    Donacion = d,
+                    TipoEspecifico = tipoEspecifico,
+                    DescripcionLimpia = descripcion
+                };
+            }).ToList();
+
             ViewBag.TotalDonado = donaciones.Sum(d => d.Monto);
-            ViewBag.DonacionesRecurrentes = donaciones.Count(d => d.Frecuencia == "Mensual");
+            ViewBag.DonacionesRecurrentes = donaciones.Count(d => d.TipoDonacion == "Recurrente");
+            ViewBag.DonacionesConDetalle = donacionesConDetalle;
 
             return View(donaciones);
         }
@@ -344,6 +420,23 @@ namespace MVCMASCOTAS.Controllers
             db.Apadrinamientos.Add(apadrinamiento);
             db.SaveChanges();
 
+            // AGREGAR: Crear registro de donación también para apadrinamiento
+            var donacion = new Donaciones
+            {
+                UsuarioId = usuario.UsuarioId,
+                TipoDonacion = "Recurrente", // Apadrinamiento es recurrente
+                Monto = montoMensual,
+                Frecuencia = "Mensual",
+                FechaDonacion = DateTime.Now,
+                MetodoPago = "Transferencia Bancaria",
+                Estado = "Completada",
+                Anonima = false,
+                Mensaje = $"[Apadrinamiento] {mascota.Nombre} - Monto mensual: ${montoMensual}"
+            };
+
+            db.Donaciones.Add(donacion);
+            db.SaveChanges();
+
             var pago = new PagosApadrinamiento
             {
                 ApadrinamientoId = apadrinamiento.ApadrinamientoId,
@@ -388,7 +481,7 @@ namespace MVCMASCOTAS.Controllers
                 <p>Con gratitud,<br/>Equipo del Refugio</p>
             ";
 
-            _ = EmailHelper.SendEmailAsync(usuario.Email, subject, body);
+            _ = EmailHelper.SendNotificationAsync(usuario.Email, subject, body);
 
             TempData["SuccessMessage"] = $"¡Gracias por apadrinar a {mascota.Nombre}!";
             return RedirectToAction("MisApadrinamientos");
@@ -447,6 +540,134 @@ namespace MVCMASCOTAS.Controllers
             return View(apadrinamiento);
         }
 
+        // POST: Donaciones/SuspenderApadrinamiento/5
+        [HttpPost]
+        [Authorize]
+        [ValidateAntiForgeryToken]
+        public ActionResult SuspenderApadrinamiento(int id)
+        {
+            var usuario = db.Usuarios.FirstOrDefault(u =>
+                u.Email == User.Identity.Name && u.Activo == true);
+
+            if (usuario == null)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            var apadrinamiento = db.Apadrinamientos
+                .Include(a => a.Mascotas)
+                .FirstOrDefault(a => a.ApadrinamientoId == id && a.UsuarioId == usuario.UsuarioId);
+
+            if (apadrinamiento == null)
+            {
+                return HttpNotFound();
+            }
+
+            if (apadrinamiento.Estado == "Pausado")
+            {
+                TempData["ErrorMessage"] = "Este apadrinamiento ya está pausado";
+                return RedirectToAction("MisApadrinamientos");
+            }
+
+            if (apadrinamiento.Estado == "Cancelado" || apadrinamiento.Estado == "Completado")
+            {
+                TempData["ErrorMessage"] = "No se puede pausar un apadrinamiento que está cancelado o completado";
+                return RedirectToAction("MisApadrinamientos");
+            }
+
+            // Cambiar a "Pausado" en lugar de "Cancelado"
+            apadrinamiento.Estado = "Pausado";
+            apadrinamiento.Observaciones = apadrinamiento.Observaciones + " [Pausado el " + DateTime.Now.ToString("dd/MM/yyyy") + "]";
+            db.SaveChanges();
+
+            AuditoriaHelper.RegistrarAccion("Suspender Apadrinamiento", "Donaciones",
+                $"Mascota: {apadrinamiento.Mascotas?.Nombre}", usuario.UsuarioId);
+
+            string subject = "Confirmación de Pausa de Apadrinamiento";
+            string body = $@"
+                <h2>Estimado/a {usuario.NombreCompleto}</h2>
+                <p>Confirmamos la pausa del apadrinamiento de <strong>{apadrinamiento.Mascotas?.Nombre}</strong>.</p>
+                <p><strong>Detalles:</strong></p>
+                <ul>
+                    <li>Mascota: {apadrinamiento.Mascotas?.Nombre}</li>
+                    <li>Inicio: {apadrinamiento.FechaInicio:dd/MM/yyyy}</li>
+                    <li>Pausado: {DateTime.Now:dd/MM/yyyy}</li>
+                </ul>
+                <p>Puedes reactivar este apadrinamiento en cualquier momento desde la sección de Mis Apadrinamientos.</p>
+                <br/>
+                <p>Atentamente,<br/>Equipo del Refugio</p>
+            ";
+
+            _ = EmailHelper.SendNotificationAsync(usuario.Email, subject, body);
+
+            TempData["SuccessMessage"] = $"Apadrinamiento pausado exitosamente.";
+            return RedirectToAction("MisApadrinamientos");
+        }
+
+        // POST: Donaciones/ReactivarApadrinamiento/5
+        [HttpPost]
+        [Authorize]
+        [ValidateAntiForgeryToken]
+        public ActionResult ReactivarApadrinamiento(int id)
+        {
+            var usuario = db.Usuarios.FirstOrDefault(u =>
+                u.Email == User.Identity.Name && u.Activo == true);
+
+            if (usuario == null)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            var apadrinamiento = db.Apadrinamientos
+                .Include(a => a.Mascotas)
+                .FirstOrDefault(a => a.ApadrinamientoId == id && a.UsuarioId == usuario.UsuarioId);
+
+            if (apadrinamiento == null)
+            {
+                return HttpNotFound();
+            }
+
+            if (apadrinamiento.Estado == "Activo")
+            {
+                TempData["ErrorMessage"] = "Este apadrinamiento ya está activo";
+                return RedirectToAction("MisApadrinamientos");
+            }
+
+            if (apadrinamiento.Estado == "Cancelado" || apadrinamiento.Estado == "Completado")
+            {
+                TempData["ErrorMessage"] = "No se puede reactivar un apadrinamiento que está cancelado o completado";
+                return RedirectToAction("MisApadrinamientos");
+            }
+
+            // Cambiar a "Activo"
+            apadrinamiento.Estado = "Activo";
+            apadrinamiento.Observaciones = apadrinamiento.Observaciones + " [Reactivado el " + DateTime.Now.ToString("dd/MM/yyyy") + "]";
+            db.SaveChanges();
+
+            AuditoriaHelper.RegistrarAccion("Reactivar Apadrinamiento", "Donaciones",
+                $"Mascota: {apadrinamiento.Mascotas?.Nombre}", usuario.UsuarioId);
+
+            string subject = "Confirmación de Reactivación de Apadrinamiento";
+            string body = $@"
+                <h2>Estimado/a {usuario.NombreCompleto}</h2>
+                <p>¡Buenas noticias! Hemos reactivado el apadrinamiento de <strong>{apadrinamiento.Mascotas?.Nombre}</strong>.</p>
+                <p><strong>Detalles:</strong></p>
+                <ul>
+                    <li>Mascota: {apadrinamiento.Mascotas?.Nombre}</li>
+                    <li>Inicio: {apadrinamiento.FechaInicio:dd/MM/yyyy}</li>
+                    <li>Reactivado: {DateTime.Now:dd/MM/yyyy}</li>
+                </ul>
+                <p>¡Gracias por continuar con tu apoyo!</p>
+                <br/>
+                <p>Atentamente,<br/>Equipo del Refugio</p>
+            ";
+
+            _ = EmailHelper.SendNotificationAsync(usuario.Email, subject, body);
+
+            TempData["SuccessMessage"] = $"Apadrinamiento reactivado exitosamente.";
+            return RedirectToAction("MisApadrinamientos");
+        }
+
         // POST: Donaciones/CancelarApadrinamiento/5
         [HttpPost]
         [Authorize]
@@ -498,10 +719,43 @@ namespace MVCMASCOTAS.Controllers
                 <p>Atentamente,<br/>Equipo del Refugio</p>
             ";
 
-            _ = EmailHelper.SendEmailAsync(usuario.Email, subject, body);
+            _ = EmailHelper.SendNotificationAsync(usuario.Email, subject, body);
 
             TempData["SuccessMessage"] = $"Apadrinamiento cancelado exitosamente.";
             return RedirectToAction("MisApadrinamientos");
+        }
+
+        // GET: Donaciones/HistorialPagos/5
+        [Authorize]
+        public ActionResult HistorialPagos(int id)
+        {
+            var usuario = db.Usuarios.FirstOrDefault(u =>
+                u.Email == User.Identity.Name && u.Activo == true);
+
+            if (usuario == null)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            var apadrinamiento = db.Apadrinamientos
+                .Include(a => a.Mascotas)
+                .FirstOrDefault(a => a.ApadrinamientoId == id && a.UsuarioId == usuario.UsuarioId);
+
+            if (apadrinamiento == null)
+            {
+                return HttpNotFound();
+            }
+
+            var pagos = db.PagosApadrinamiento
+                .Where(p => p.ApadrinamientoId == id)
+                .OrderByDescending(p => p.FechaPago)
+                .ToList();
+
+            ViewBag.Apadrinamiento = apadrinamiento;
+            ViewBag.TotalPagado = pagos.Sum(p => p.Monto);
+            ViewBag.PagosCompletados = pagos.Count(p => p.Estado == "Completado");
+
+            return View(pagos);
         }
 
         protected override void Dispose(bool disposing)

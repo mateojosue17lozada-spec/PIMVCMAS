@@ -2,112 +2,517 @@
 
 @{
     ViewBag.Title = "Gestión de Roles";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>Roles</h2>
-<div class="page-header mb-4">
-    <h2><i class="fas fa-user-tag"></i> Gestión de Roles y Permisos</h2>
-    <p class="text-muted">Administra los roles del sistema y sus permisos</p>
-</div>
+<div class="roles-section fade-in-up">
+    <div class="container">
+        <!-- Encabezado -->
+        <div class="page-header text-center mb-4">
+            <h2 class="display-5 text-brown">
+                <i class="fa fa-user-tag text-green mr-2"></i> Gestión de Roles y Permisos
+            </h2>
+            <p class="text-secondary mt-2">Administra los roles del sistema y sus permisos</p>
+        </div>
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <a href="@Url.Action("CrearRol", "Admin")" class="btn btn-success">
-        <i class="fas fa-plus-circle"></i> Crear Nuevo Rol
-    </a>
-    <a href="@Url.Action("Dashboard", "Admin")" class="btn btn-outline-secondary">
-        <i class="fas fa-arrow-left"></i> Volver al Dashboard
-    </a>
-</div>
+        <!-- Botones de acción -->
+        <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+            <a href="@Url.Action("CrearRol", "Admin")" class="btn btn-green btn-lg">
+                <i class="fa fa-plus-circle mr-2"></i> Crear Nuevo Rol
+            </a>
+            <a href="@Url.Action("Dashboard", "Admin")" class="btn btn-outline-green btn-lg">
+                <i class="fa fa-arrow-left mr-2"></i> Volver al Dashboard
+            </a>
+        </div>
 
-<!-- Roles del sistema -->
-<div class="row">
-    @if (Model != null && Model.Any())
-    {
-        foreach (var rol in Model)
-        {
-            <div class="col-md-6 col-lg-4 mb-4">
-                <div class="card shadow-custom h-100">
-                    <div class="card-header @(rol.NombreRol == "Administrador" ? "bg-danger" : rol.NombreRol == "Veterinario" ? "bg-success" : rol.NombreRol == "Voluntario" ? "bg-info" : "bg-secondary") text-white">
-                        <h5 class="mb-0">
-                            <i class="fas @(rol.NombreRol == "Administrador" ? "fa-user-shield" : rol.NombreRol == "Veterinario" ? "fa-user-md" : rol.NombreRol == "Voluntario" ? "fa-hands-helping" : "fa-user")"></i>
-                            @rol.NombreRol
-                        </h5>
+        <!-- Tarjetas de Roles -->
+        <div class="row">
+            @if (Model != null && Model.Any())
+            {
+                foreach (var rol in Model)
+                {
+                    <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="card shadow-hover border-green h-100">
+                            <!-- Encabezado de la tarjeta con color según rol -->
+                            <div class="card-header @(rol.NombreRol == "Administrador" ? "role-admin" :
+                                                   rol.NombreRol == "Veterinario" ? "role-veterinario" :
+                                                   rol.NombreRol == "Voluntario" ? "role-voluntario" :
+                                                   rol.NombreRol == "Usuario" ? "role-user" :
+                                                   rol.NombreRol == "Rescatista" ? "role-rescatista" : "bg-green") text-white">
+                                <h5 class="mb-0">
+                                    <i class="fa @(rol.NombreRol == "Administrador" ? "fa-user-shield" :
+                                                  rol.NombreRol == "Veterinario" ? "fa-user-md" :
+                                                  rol.NombreRol == "Voluntario" ? "fa-hands-helping" :
+                                                  rol.NombreRol == "Usuario" ? "fa-user" :
+                                                  rol.NombreRol == "Rescatista" ? "fa-first-aid" : "fa-user-tag") mr-2"></i>
+                                    @rol.NombreRol
+                                </h5>
+                            </div>
+
+                            <!-- Cuerpo de la tarjeta -->
+                            <div class="card-body bg-light-mint">
+                                <p class="card-text text-secondary mb-3">
+                                    <i class="fa fa-align-left mr-2 text-green"></i>
+                                    @(rol.Descripcion ?? "Sin descripción")
+                                </p>
+
+                                <hr class="border-green" />
+
+                                <!-- Información del rol -->
+                                <h6 class="text-brown mb-3">
+                                    <i class="fa fa-info-circle mr-2 text-green"></i>Información:
+                                </h6>
+
+                                <ul class="list-unstyled mb-0">
+                                    <li class="mb-2 text-brown">
+                                        <i class="fa fa-calendar-plus mr-2 text-green"></i>
+                                        <strong>Creado:</strong>
+                                        <span class="float-right">
+                                            @(rol.FechaCreacion?.ToString("dd/MM/yyyy") ?? "No registrado")
+                                        </span>
+                                    </li>
+
+                                    <li class="text-brown">
+                                        <i class="fa fa-check-circle mr-2 text-green"></i>
+                                        <strong>Estado:</strong>
+                                        <span class="float-right">
+                                            @if (rol.Activo == true)
+                                            {
+                                                <span class="badge bg-green">Activo</span>
+                                            }
+                                            else if (rol.Activo == false)
+                                            {
+                                                <span class="badge bg-pink">Inactivo</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-secondary">No definido</span>
+                                            }
+                                        </span>
+                                    </li>
+                                </ul>
+
+                                <hr class="border-green mt-3 mb-3" />
+
+                                <!-- Contador de usuarios -->
+                                <p class="mb-0 text-brown">
+                                    <i class="fa fa-users mr-2 text-green"></i>
+                                    <span class="text-secondary">Usuarios asignados:</span>
+                                    <span class="user-count float-right">
+                                        @if (ViewBag.UsuariosPorRol != null && ViewBag.UsuariosPorRol.ContainsKey(rol.RolId))
+                                        {
+                                            @ViewBag.UsuariosPorRol[rol.RolId]
+                                        }
+                                        else
+                                        {
+                                            <text>0</text>
+                                        }
+                                    </span>
+                                </p>
+                            </div>
+
+                            <!-- Pie de tarjeta con botones -->
+                            <div class="card-footer bg-light-mint border-top border-green">
+                                <div class="row">
+                                    <div class="col-6 pr-1">
+                                        <a href="@Url.Action("EditarRol", "Admin", new { id = rol.RolId })"
+                                           class="btn btn-yellow btn-block">
+                                            <i class="fa fa-edit mr-1"></i> Editar
+                                        </a>
+                                    </div>
+                                    <div class="col-6 pl-1">
+                                        <a href="@Url.Action("PermisosRol", "Admin", new { id = rol.RolId })"
+                                           class="btn btn-pink btn-block">
+                                            <i class="fa fa-key mr-1"></i> Permisos
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="card-body">
-                        <p class="card-text">@(rol.Descripcion ?? "Sin descripción")</p>
-                        <hr />
-                        <h6><i class="fas fa-calendar-alt"></i> Información:</h6>
-                        <ul class="list-unstyled">
-                            <li><i class="fas fa-calendar-plus"></i> Creado: @(rol.FechaCreacion?.ToString("dd/MM/yyyy") ?? "No registrado")</li>
-                            <li>
-                                <i class="fas fa-check-circle"></i> Estado:
-                                @if (rol.Activo == true)
-                                {
-                                    <span class="badge badge-success">Activo</span>
-                                }
-                                else if (rol.Activo == false)
-                                {
-                                    <span class="badge badge-danger">Inactivo</span>
-                                }
-                                else
-                                {
-                                    <span class="badge badge-secondary">No definido</span>
-                                }
-                            </li>
-                        </ul>
-                        <hr />
-                        <p class="text-muted mb-0">
-                            <i class="fas fa-users"></i>
-                            @if (ViewBag.UsuariosPorRol != null && ViewBag.UsuariosPorRol.ContainsKey(rol.RolId))
-                            {
-                                <strong>@ViewBag.UsuariosPorRol[rol.RolId]</strong>
-                            }
-                            else
-                            {
-                                <strong>0</strong>
-                            }
-                            usuarios con este rol
-                        </p>
+                }
+            }
+            else
+            {
+                <!-- Mensaje cuando no hay roles -->
+                <div class="col-12">
+                    <div class="alert alert-green border-green text-center py-4 fade-in-up">
+                        <i class="fa fa-info-circle fa-3x mb-3 text-green"></i>
+                        <h4 class="text-brown">No hay roles configurados en el sistema</h4>
+                        <p class="text-secondary mb-0">Comienza creando el primer rol del sistema</p>
+                        <div class="mt-3">
+                            <a href="@Url.Action("CrearRol", "Admin")" class="btn btn-green">
+                                <i class="fa fa-plus-circle mr-2"></i> Crear Primer Rol
+                            </a>
+                        </div>
                     </div>
-                    <div class="card-footer">
-                        <a href="@Url.Action("EditarRol", "Admin", new { id = rol.RolId })" class="btn btn-warning btn-sm">
-                            <i class="fas fa-edit"></i> Editar
-                        </a>
-                        <a href="@Url.Action("PermisosRol", "Admin", new { id = rol.RolId })" class="btn btn-info btn-sm">
-                            <i class="fas fa-key"></i> Permisos
-                        </a>
+                </div>
+            }
+        </div>
+
+        <!-- Información adicional sobre roles -->
+        <div class="card shadow-hover border-green mt-5 fade-in-up">
+            <div class="card-header bg-green text-white">
+                <h5 class="mb-0">
+                    <i class="fa fa-info-circle mr-2"></i> Información sobre Roles del Sistema
+                </h5>
+            </div>
+
+            <div class="card-body bg-light-mint">
+                <h6 class="text-brown mb-3">Descripción de roles disponibles:</h6>
+
+                <ul class="info-list">
+                    <li class="d-flex align-items-start mb-3">
+                        <span class="badge bg-pink mr-3">Admin</span>
+                        <div class="text-brown">
+                            <strong>Administrador:</strong> Control total del sistema, gestión de usuarios, mascotas y configuración general.
+                        </div>
+                    </li>
+
+                    <li class="d-flex align-items-start mb-3">
+                        <span class="badge bg-green mr-3">Vet</span>
+                        <div class="text-brown">
+                            <strong>Veterinario:</strong> Gestión de historiales médicos, vacunas, tratamientos y consultas veterinarias.
+                        </div>
+                    </li>
+
+                    <li class="d-flex align-items-start mb-3">
+                        <span class="badge bg-yellow mr-3">Vol</span>
+                        <div class="text-brown">
+                            <strong>Voluntario:</strong> Acceso a actividades de voluntariado, reportes de rescate y cuidado de animales.
+                        </div>
+                    </li>
+
+                    <li class="d-flex align-items-start mb-3">
+                        <span class="badge bg-light-mint border-green text-brown mr-3">User</span>
+                        <div class="text-brown">
+                            <strong>Usuario:</strong> Solicitudes de adopción, donaciones, apadrinamientos y seguimiento de procesos.
+                        </div>
+                    </li>
+
+                    <li class="d-flex align-items-start">
+                        <span class="badge bg-pink mr-3" style="background-color: var(--green) !important;">Resc</span>
+                        <div class="text-brown">
+                            <strong>Rescatista:</strong> Reportes de rescate, seguimiento de animales rescatados y coordinación de rescates.
+                        </div>
+                    </li>
+                </ul>
+
+                <!-- Nota informativa -->
+                <div class="alert alert-green border-green mt-4">
+                    <div class="d-flex">
+                        <i class="fa fa-lightbulb fa-2x text-green mr-3"></i>
+                        <div>
+                            <strong class="text-brown">Nota:</strong>
+                            <span class="text-secondary">
+                                Para asignar permisos específicos a cada rol, utiliza la opción "Permisos" en cada tarjeta.
+                                Los permisos definen qué acciones puede realizar cada tipo de usuario en el sistema.
+                            </span>
+                        </div>
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        /* ESTILOS ESPECÍFICOS PARA LA PÁGINA DE ROLES */
+        .roles-section {
+            background: linear-gradient(135deg, var(--bg-light) 0%, white 100%);
+            min-height: 100vh;
+            padding: 30px 0;
         }
-    }
-    else
-    {
-        <div class="col-12">
-            <div class="alert alert-info">
-                <i class="fas fa-info-circle"></i> No hay roles configurados en el sistema.
-            </div>
-        </div>
-    }
-</div>
 
-<!-- Información adicional -->
-<div class="card shadow-custom mt-4">
-    <div class="card-header bg-primary text-white">
-        <h5 class="mb-0"><i class="fas fa-info-circle"></i> Información sobre Roles</h5>
-    </div>
-    <div class="card-body">
-        <h6>Roles del sistema:</h6>
-        <ul>
-            <li><strong>Administrador:</strong> Control total del sistema, gestión de usuarios, mascotas y configuración</li>
-            <li><strong>Veterinario:</strong> Gestión de historiales médicos, vacunas, tratamientos y consultas</li>
-            <li><strong>Voluntario:</strong> Acceso a actividades de voluntariado y reportes de rescate</li>
-            <li><strong>Usuario:</strong> Solicitudes de adopción, donaciones y apadrinamientos</li>
-            <li><strong>Rescatista:</strong> Reportes de rescate y seguimiento de animales rescatados</li>
-        </ul>
+        .page-header {
+            padding: 25px 0;
+            margin-bottom: 30px;
+            border-bottom: 3px solid var(--green);
+        }
 
-        <div class="alert alert-info mt-3">
-            <i class="fas fa-lightbulb"></i> <strong>Nota:</strong> Para asignar permisos específicos a cada rol, usa la opción "Permisos" en cada tarjeta.
-        </div>
-    </div>
-</div>
+        .card {
+            border-radius: 12px !important;
+            border: 2px solid var(--green) !important;
+        }
+
+        .card-header {
+            border-radius: 10px 10px 0 0 !important;
+            padding: 15px 20px !important;
+            font-weight: 600;
+        }
+
+        .card-body {
+            padding: 1.25rem;
+        }
+
+        .user-count {
+            font-size: 1.1rem;
+            color: var(--brown);
+            font-weight: 600;
+        }
+
+        .card-footer {
+            background-color: rgba(151, 199, 139, 0.05);
+            border-top: 1px solid var(--green);
+            padding: 15px 20px;
+        }
+
+        .info-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+            .info-list li {
+                padding: 10px 0;
+                border-bottom: 1px solid rgba(151, 199, 139, 0.2);
+            }
+
+                .info-list li:last-child {
+                    border-bottom: none;
+                }
+
+        /* COLORES ESPECÍFICOS PARA ROLES usando tu paleta */
+        .role-admin {
+            background: linear-gradient(135deg, var(--pink) 0%, #f9c2b0 100%) !important;
+            color: var(--brown) !important;
+        }
+
+        .role-veterinario {
+            background: linear-gradient(135deg, var(--green) 0%, #86b57a 100%) !important;
+            color: white !important;
+        }
+
+        .role-voluntario {
+            background: linear-gradient(135deg, var(--yellow) 0%, #e6b85c 100%) !important;
+            color: var(--brown) !important;
+        }
+
+        .role-user {
+            background: linear-gradient(135deg, var(--bg-light) 0%, #e6d9c3 100%) !important;
+            color: var(--brown) !important;
+        }
+
+        .role-rescatista {
+            background: linear-gradient(135deg, var(--pink) 0%, #f9c2b0 100%) !important;
+            color: var(--brown) !important;
+        }
+
+        /* BADGES PERSONALIZADOS */
+        .badge.bg-green {
+            background-color: var(--green) !important;
+            color: white !important;
+        }
+
+        .badge.bg-pink {
+            background-color: var(--pink) !important;
+            color: var(--brown) !important;
+        }
+
+        .badge.bg-yellow {
+            background-color: var(--yellow) !important;
+            color: var(--brown) !important;
+        }
+
+        .badge.bg-secondary {
+            background-color: #6c757d !important;
+            color: white !important;
+        }
+
+        /* Botones en tarjetas */
+        .card-footer .btn {
+            padding: 0.5rem 0.75rem;
+            font-size: 0.9rem;
+        }
+
+        .gap-3 {
+            gap: 1rem;
+        }
+
+        /* Animaciones */
+        .fade-in-up {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        /* Efectos hover mejorados */
+        .shadow-hover:hover {
+            transform: translateY(-5px);
+            border-color: var(--green) !important;
+        }
+
+        /* Responsive */
+        @@media (max-width: 768px) {
+            .page-header {
+                padding: 15px 0;
+                margin-bottom: 20px;
+            }
+
+            .card-header h5 {
+                font-size: 1.1rem;
+            }
+
+            .card-footer .btn {
+                margin-bottom: 5px;
+            }
+
+            .btn-lg {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+
+            .display-5 {
+                font-size: 1.8rem;
+            }
+
+            .roles-section {
+                padding: 15px 0;
+            }
+        }
+
+        @@media (max-width: 576px) {
+            .card-footer .col-6 {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+
+            .card-footer .pr-1,
+            .card-footer .pl-1 {
+                padding-right: 0 !important;
+                padding-left: 0 !important;
+            }
+
+            .info-list li {
+                flex-direction: column;
+                align-items: flex-start !important;
+            }
+
+            .info-list .badge {
+                margin-bottom: 5px;
+                margin-right: 0 !important;
+            }
+        }
+
+        /* Efectos en badges de información */
+        .info-list .badge {
+            min-width: 45px;
+            text-align: center;
+            font-weight: bold;
+            border: 1px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+            .info-list .badge:hover {
+                transform: scale(1.05);
+                border-color: var(--green);
+            }
+
+        /* Contador de usuarios con animación */
+        .user-count {
+            transition: all 0.3s ease;
+            padding: 2px 8px;
+            border-radius: 4px;
+            background-color: rgba(151, 199, 139, 0.1);
+        }
+
+            .user-count:hover {
+                background-color: rgba(151, 199, 139, 0.2);
+                transform: scale(1.1);
+            }
+
+        /* Estilos para el estado activo/inactivo */
+        .badge.bg-green, .badge.bg-pink {
+            cursor: default;
+        }
+    </style>
+}
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            console.log('Vista Gestión de Roles cargada');
+
+            // Efecto hover en tarjetas
+            $('.shadow-hover').hover(
+                function () {
+                    $(this).addClass('shadow-lg');
+                },
+                function () {
+                    $(this).removeClass('shadow-lg');
+                }
+            );
+
+            // Animación para contadores de usuarios
+            $('.user-count').each(function () {
+                var $this = $(this);
+                var count = parseInt($this.text());
+                if (!isNaN(count)) {
+                    $this.addClass('counter');
+                }
+            });
+
+            // Tooltips para badges de estado
+            $('[data-toggle="tooltip"]').tooltip();
+
+            // Efecto en botones de tarjetas
+            $('.card-footer .btn').hover(
+                function () {
+                    $(this).css('transform', 'translateY(-2px)');
+                },
+                function () {
+                    $(this).css('transform', 'translateY(0)');
+                }
+            );
+
+            // Notificaciones de TempData
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <text>
+                Swal.fire({
+                    icon: 'success',
+                    title: '¡Éxito!',
+                    text: '@Html.Raw(TempData["SuccessMessage"])',
+                    confirmButtonColor: '#97C78B',
+                    timer: 3000
+                });
+                </text>
+            }
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <text>
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: '@Html.Raw(TempData["ErrorMessage"])',
+                    confirmButtonColor: '#FBCDC0'
+                });
+                </text>
+            }
+
+            // Confirmación para eliminar rol (si hay botones de eliminar)
+            $('.btn-eliminar-rol').click(function (e) {
+                e.preventDefault();
+                var rolId = $(this).data('id');
+                var rolNombre = $(this).data('nombre');
+
+                Swal.fire({
+                    title: '¿Eliminar rol?',
+                    html: `<p class="text-brown">¿Está seguro de eliminar el rol <strong>${rolNombre}</strong>?</p>
+                          <div class="alert alert-green border-green mt-2">
+                              <small><i class="fa fa-exclamation-circle text-green"></i> Esta acción NO se puede deshacer</small>
+                          </div>`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#FBCDC0',
+                    cancelButtonColor: '#97C78B',
+                    confirmButtonText: '<i class="fa fa-trash"></i> Sí, eliminar',
+                    cancelButtonText: '<i class="fa fa-times"></i> Cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = '@Url.Action("EliminarRol", "Admin")/' + rolId;
+                    }
+                });
+            });
+        });
+    </script>
+}

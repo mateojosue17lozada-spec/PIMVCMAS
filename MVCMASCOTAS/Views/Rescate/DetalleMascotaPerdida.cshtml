@@ -1,0 +1,730 @@
+﻿@model MVCMASCOTAS.Models.ViewModels.DetalleMascotaPerdidaViewModel
+
+@{
+    ViewBag.Title = "Detalle de Mascota Perdida";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    .detail-hero {
+        background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+        color: white;
+        padding: 40px 0;
+        margin-bottom: 30px;
+        border-radius: 15px;
+    }
+
+    .pet-image-container {
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        margin-bottom: 30px;
+        background: #f8f9fa;
+        min-height: 400px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .pet-image {
+        width: 100%;
+        max-height: 500px;
+        object-fit: contain;
+    }
+
+    .info-section {
+        background: white;
+        border-radius: 15px;
+        padding: 25px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        margin-bottom: 25px;
+        border-left: 4px solid #ff6b6b;
+    }
+
+    .section-title {
+        color: #ff6b6b;
+        border-bottom: 2px solid #ff6b6b;
+        padding-bottom: 10px;
+        margin-bottom: 20px;
+        font-size: 1.3rem;
+    }
+
+    .status-badge {
+        font-size: 1rem;
+        padding: 8px 20px;
+        border-radius: 20px;
+        font-weight: 600;
+    }
+
+    .contact-card {
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        color: white;
+        border-radius: 15px;
+        padding: 25px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    .action-buttons {
+        position: sticky;
+        top: 20px;
+        z-index: 100;
+    }
+
+    .btn-action {
+        border-radius: 25px;
+        padding: 10px 25px;
+        font-weight: 600;
+        transition: all 0.3s;
+        margin-bottom: 10px;
+        width: 100%;
+        text-align: left;
+    }
+
+        .btn-action i {
+            margin-right: 10px;
+        }
+
+    .qr-code-container {
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        text-align: center;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    .qr-code {
+        width: 200px;
+        height: 200px;
+        margin: 0 auto 15px;
+        background: #f8f9fa;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 2px dashed #dee2e6;
+    }
+
+    .map-container {
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        height: 300px;
+    }
+
+    .avistamiento-card {
+        border-left: 4px solid #28a745;
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 15px;
+    }
+
+    .emergency-alert {
+        background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+        color: white;
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+</style>
+
+<div class="detail-hero">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h1 class="display-4">
+                    <i class="fas fa-search"></i>
+                    @Model.NombreMascota
+                </h1>
+                <p class="lead mb-0">
+                    <i class="fas fa-map-marker-alt"></i>
+                    Perdida en: @Model.UbicacionPerdida
+                </p>
+                <p class="mb-0">
+                    <i class="fas fa-calendar-alt"></i>
+                    Fecha de pérdida: @Model.FechaPerdida.ToString("dd/MM/yyyy HH:mm")
+                </p>
+            </div>
+            <div class="col-md-4 text-right">
+                @if (Model.Estado == "Perdida")
+                {
+                    <span class="status-badge badge-danger">
+                        <i class="fas fa-exclamation-triangle"></i> PERDIDA
+                    </span>
+                }
+                else if (Model.Estado == "Encontrada")
+                {
+                    <span class="status-badge badge-success">
+                        <i class="fas fa-check-circle"></i> ENCONTRADA
+                    </span>
+                }
+                else
+                {
+                    <span class="status-badge badge-secondary">
+                        <i class="fas fa-times-circle"></i> CERRADO
+                    </span>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row">
+        <!-- Columna izquierda: Imagen y acciones -->
+        <div class="col-lg-4">
+            <!-- Imagen de la mascota -->
+            <div class="pet-image-container">
+                @if (!string.IsNullOrEmpty(Model.ImagenBase64))
+                {
+                    <img src="data:image/jpeg;base64,@Model.ImagenBase64"
+                         class="pet-image"
+                         alt="@Model.NombreMascota">
+                }
+                else
+                {
+                    <div class="text-center">
+                        <i class="fas fa-paw fa-6x text-muted"></i>
+                        <p class="mt-3 text-muted">Sin imagen disponible</p>
+                    </div>
+                }
+            </div>
+
+            <!-- Botones de acción -->
+            <div class="action-buttons mb-4">
+                <div class="info-section">
+                    <h5 class="section-title">
+                        <i class="fas fa-bolt"></i> Acciones
+                    </h5>
+
+                    @if (Model.Estado == "Perdida")
+                    {
+                        <!-- Reportar avistamiento -->
+                        <button type="button" class="btn btn-success btn-action"
+                                data-toggle="modal" data-target="#modalAvistamiento">
+                            <i class="fas fa-eye"></i> Reportar que la vi
+                        </button>
+
+                        <!-- Compartir en redes -->
+                        <button type="button" class="btn btn-info btn-action" id="btnCompartir">
+                            <i class="fas fa-share-alt"></i> Compartir
+                        </button>
+
+                        <!-- Imprimir reporte -->
+                        <button type="button" class="btn btn-secondary btn-action" onclick="window.print()">
+                            <i class="fas fa-print"></i> Imprimir reporte
+                        </button>
+                    }
+
+                    @if (Model.PuedeMarcarEncontrada)
+                    {
+                        <!-- Marcar como encontrada (solo dueño/admin) -->
+                        <a href="@Url.Action("MarcarEncontrada", "Rescate", new { id = Model.MascotaPerdidaId })"
+                           class="btn btn-warning btn-action"
+                           onclick="return confirm('¿Estás seguro de marcar a @Model.NombreMascota como encontrada?');">
+                            <i class="fas fa-check-circle"></i> Marcar como encontrada
+                        </a>
+                    }
+
+                    @if (Model.PuedeCerrar)
+                    {
+                        <!-- Cerrar reporte (solo dueño/admin) -->
+                        <a href="@Url.Action("CerrarReporte", "Rescate", new { id = Model.MascotaPerdidaId })"
+                           class="btn btn-danger btn-action"
+                           onclick="return confirm('¿Estás seguro de cerrar este reporte?');">
+                            <i class="fas fa-times-circle"></i> Cerrar reporte
+                        </a>
+                    }
+
+                    @if (Model.PuedeEditar)
+                    {
+                        <!-- Editar reporte (solo dueño/admin) -->
+                        <!-- CORRECCIÓN: Cambiado a acción genérica o comentado si no existe -->
+                        @*<a href="@Url.Action("EditarMascotaPerdida", "Admin", new { id = Model.MascotaPerdidaId })"
+                               class="btn btn-primary btn-action">
+                                <i class="fas fa-edit"></i> Editar información
+                            </a>*@
+                    }
+
+                    <!-- Volver a la lista -->
+                    <a href="@Url.Action("MascotasPerdidas", "Rescate")"
+                       class="btn btn-outline-secondary btn-action">
+                        <i class="fas fa-arrow-left"></i> Volver a la lista
+                    </a>
+                </div>
+            </div>
+
+            <!-- QR Code para compartir -->
+            <div class="qr-code-container mb-4">
+                <h6><i class="fas fa-qrcode"></i> Código QR</h6>
+                <p class="text-muted small mb-3">Escanea para ver este reporte</p>
+                <div class="qr-code" id="qrCode">
+                    <!-- QR se generará con JavaScript -->
+                    <i class="fas fa-qrcode fa-4x text-muted"></i>
+                </div>
+                <button class="btn btn-sm btn-outline-primary mt-2" id="btnDescargarQR">
+                    <i class="fas fa-download"></i> Descargar QR
+                </button>
+            </div>
+        </div>
+
+        <!-- Columna derecha: Información detallada -->
+        <div class="col-lg-8">
+            <!-- Alerta de emergencia -->
+            @if (Model.Estado == "Perdida" && Model.FechaPerdida < DateTime.Now.AddDays(-7))
+            {
+                <div class="emergency-alert">
+                    <h5><i class="fas fa-exclamation-triangle"></i> ¡ATENCIÓN!</h5>
+                    <p class="mb-0">
+                        Esta mascota lleva más de 7 días perdida. Tu ayuda es crucial para encontrarla.
+                        Si la has visto, repórtalo inmediatamente.
+                    </p>
+                </div>
+            }
+
+            <!-- Recompensa -->
+            @if (Model.TieneRecompensa && Model.Recompensa.HasValue)
+            {
+                <div class="info-section" style="border-left-color: #ffc107;">
+                    <div class="alert alert-warning text-center py-3">
+                        <i class="fas fa-award fa-2x mb-2"></i>
+                        <h4 class="mb-0">RECOMPENSA</h4>
+                        <h2 class="text-danger">$@Model.Recompensa.Value.ToString("N2")</h2>
+                        <p class="mb-0">Ofrecida por información que lleve al encuentro</p>
+                    </div>
+                </div>
+            }
+
+            <!-- Sección 1: Información de la mascota -->
+            <div class="info-section">
+                <h5 class="section-title">
+                    <i class="fas fa-paw"></i> Información de la Mascota
+                </h5>
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Nombre:</strong> @Model.NombreMascota</p>
+                        <p>
+                            <strong>Especie:</strong>
+                            <span class="badge badge-info">
+                                <i class="fas fa-@(Model.Especie.ToLower() == "perro" ? "dog" : "cat")"></i>
+                                @Model.Especie
+                            </span>
+                        </p>
+                        <p><strong>Raza:</strong> @(string.IsNullOrEmpty(Model.Raza) ? "No especificada" : Model.Raza)</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p>
+                            <strong>Sexo:</strong>
+                            <span class="badge badge-light">
+                                <i class="fas fa-@(Model.Sexo == "M" ? "mars" : "venus")"></i>
+                                @(Model.Sexo == "M" ? "Macho" : (Model.Sexo == "F" ? "Hembra" : "Desconocido"))
+                            </span>
+                        </p>
+                        <p><strong>Edad:</strong> @(string.IsNullOrEmpty(Model.Edad) ? "No especificada" : Model.Edad)</p>
+                        <p><strong>Color:</strong> @(string.IsNullOrEmpty(Model.Color) ? "No especificado" : Model.Color)</p>
+                    </div>
+                </div>
+
+                <!-- Características distintivas -->
+                @if (!string.IsNullOrEmpty(Model.CaracteristicasDistintivas))
+                {
+                    <div class="mt-3">
+                        <h6><i class="fas fa-star"></i> Características Distintivas:</h6>
+                        <p class="mb-0">@Model.CaracteristicasDistintivas</p>
+                    </div>
+                }
+            </div>
+
+            <!-- Sección 2: Detalles de la pérdida -->
+            <div class="info-section">
+                <h5 class="section-title">
+                    <i class="fas fa-map-marker-alt"></i> Detalles de la Pérdida
+                </h5>
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Fecha y hora:</strong> @Model.FechaPerdida.ToString("dd/MM/yyyy HH:mm")</p>
+                        <p><strong>Ubicación exacta:</strong> @Model.UbicacionPerdida</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Reportado el:</strong> @Model.FechaPublicacion.ToString("dd/MM/yyyy HH:mm")</p>
+                        <p>
+                            <strong>Estado actual:</strong>
+                            @if (Model.Estado == "Perdida")
+                            {
+                                <span class="badge badge-danger">PERDIDA</span>
+                            }
+                            else if (Model.Estado == "Encontrada")
+                            {
+                                <span class="badge badge-success">ENCONTRADA</span>
+                                <br>
+                                if (Model.FechaEncontrada.HasValue)
+                                {
+                                    <small class="text-muted">Encontrada el: @Model.FechaEncontrada.Value.ToString("dd/MM/yyyy HH:mm")</small>
+                                }
+                            }
+                            else
+                            {
+                                <span class="badge badge-secondary">CERRADO</span>
+                            }
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Mapa simplificado -->
+                @if (!string.IsNullOrEmpty(Model.UbicacionPerdida))
+                {
+                    <div class="mt-3">
+                        <h6><i class="fas fa-map"></i> Ubicación de la pérdida:</h6>
+                        <div class="map-container">
+                            <div class="d-flex align-items-center justify-content-center h-100 bg-light">
+                                <div class="text-center">
+                                    <i class="fas fa-map-marked-alt fa-3x text-muted mb-3"></i>
+                                    <p class="mb-0">@Model.UbicacionPerdida</p>
+                                    <!-- CORRECCIÓN: Removido CoordenadasGPS que no existe -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+
+                <!-- Observaciones -->
+                @if (!string.IsNullOrEmpty(Model.Observaciones))
+                {
+                    <div class="mt-3">
+                        <h6><i class="fas fa-sticky-note"></i> Observaciones adicionales:</h6>
+                        <p class="mb-0">@Model.Observaciones</p>
+                    </div>
+                }
+            </div>
+
+            <!-- Sección 3: Información de contacto -->
+            <div class="contact-card">
+                <h5 class="mb-3">
+                    <i class="fas fa-address-card"></i> Información de Contacto
+                </h5>
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Nombre:</strong> @Model.ContactoNombre</p>
+                        <p>
+                            <strong>Teléfono:</strong>
+                            <a href="tel:@Model.ContactoTelefono" class="text-white">
+                                <i class="fas fa-phone"></i> @Model.ContactoTelefono
+                            </a>
+                        </p>
+                    </div>
+                    <div class="col-md-6">
+                        @if (!string.IsNullOrEmpty(Model.ContactoEmail))
+                        {
+                            <p>
+                                <strong>Email:</strong>
+                                <a href="mailto:@Model.ContactoEmail" class="text-white">
+                                    <i class="fas fa-envelope"></i> @Model.ContactoEmail
+                                </a>
+                            </p>
+                        }
+                        @if (!string.IsNullOrEmpty(Model.PropietarioNombre))
+                        {
+                            <p><strong>Dueño:</strong> @Model.PropietarioNombre</p>
+                        }
+                    </div>
+                </div>
+                <div class="alert alert-light mt-3 mb-0">
+                    <small>
+                        <i class="fas fa-info-circle"></i>
+                        Esta información es pública. Contacta solo si tienes información relevante sobre esta mascota.
+                    </small>
+                </div>
+            </div>
+
+            <!-- Sección 4: Avistamientos reportados -->
+            <!-- CORRECCIÓN: Comentado hasta que implementes la funcionalidad -->
+            @*
+                @if (Model.Avistamientos != null && Model.Avistamientos.Any())
+                {
+                    <div class="info-section mt-4">
+                        <h5 class="section-title">
+                            <i class="fas fa-eye"></i> Avistamientos Reportados
+                            <span class="badge badge-primary">@Model.Avistamientos.Count</span>
+                        </h5>
+
+                        @foreach (var avistamiento in Model.Avistamientos)
+                        {
+                            <div class="avistamiento-card">
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <p class="mb-1">
+                                            <strong><i class="fas fa-map-marker-alt"></i> @avistamiento.Ubicacion</strong>
+                                        </p>
+                                        <p class="mb-1">
+                                            <i class="fas fa-calendar"></i>
+                                            @avistamiento.FechaAvistamiento.ToString("dd/MM/yyyy HH:mm")
+                                        </p>
+                                        <p class="mb-0">
+                                            <i class="fas fa-user"></i>
+                                            @avistamiento.ReportanteNombre - @avistamiento.ReportanteTelefono
+                                        </p>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <p class="mb-0">
+                                            <small class="text-muted">
+                                                @if (!string.IsNullOrEmpty(avistamiento.Descripcion))
+                                                {
+                                                    @avistamiento.Descripcion
+                                                }
+                                            </small>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+                else if (Model.Estado == "Perdida")
+                {
+                    <div class="alert alert-info mt-4">
+                        <i class="fas fa-info-circle"></i>
+                        <strong>Aún no hay avistamientos reportados.</strong>
+                        Si has visto a esta mascota, por favor repórtalo usando el botón "Reportar que la vi".
+                    </div>
+                }
+            *@
+
+            <!-- Sección 5: Código para compartir -->
+            <div class="info-section mt-4">
+                <h5 class="section-title">
+                    <i class="fas fa-share-alt"></i> Ayuda a Difundir
+                </h5>
+                <p class="mb-3">Comparte este reporte para aumentar las posibilidades de encontrar a @Model.NombreMascota:</p>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <button class="btn btn-facebook btn-block" onclick="compartirFacebook()">
+                            <i class="fab fa-facebook"></i> Compartir en Facebook
+                        </button>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <button class="btn btn-whatsapp btn-block" onclick="compartirWhatsApp()">
+                            <i class="fab fa-whatsapp"></i> Compartir en WhatsApp
+                        </button>
+                    </div>
+                </div>
+
+                <!-- CORRECCIÓN: Forma correcta de obtener la URL actual -->
+                @{
+                    var currentUrl = Request.Url?.AbsoluteUri ?? "";
+                }
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control" id="enlaceCompartir"
+                           value="@currentUrl" readonly>
+                    <div class="input-group-append">
+                        <button class="btn btn-outline-primary" type="button" id="btnCopiarEnlace">
+                            <i class="fas fa-copy"></i> Copiar enlace
+                        </button>
+                    </div>
+                </div>
+
+                <p class="text-muted small mb-0">
+                    <i class="fas fa-lightbulb"></i>
+                    Cada compartida aumenta las probabilidades de encontrar a una mascota perdida.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para reportar avistamiento -->
+<div class="modal fade" id="modalAvistamiento" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <!-- CORRECCIÓN: Cambiado para usar el método correcto -->
+            @using (Html.BeginForm("ReportarAvistamiento", "Rescate", FormMethod.Post))
+            {
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="mascotaPerdidaId" value="@Model.MascotaPerdidaId" />
+
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title">
+                        <i class="fas fa-eye"></i> Reportar Avistamiento
+                    </h5>
+                    <button type="button" class="close text-white" data-dismiss="modal">
+                        <span>&times;</span>
+                    </button>
+                </div>
+
+                <div class="modal-body">
+                    <p>Estás reportando un avistamiento de: <strong>@Model.NombreMascota</strong></p>
+
+                    <div class="form-group">
+                        <label for="ubicacionAvistamiento">¿Dónde la viste? *</label>
+                        <input type="text" class="form-control" id="ubicacionAvistamiento" name="ubicacionAvistamiento" required
+                               placeholder="Ej: Parque La Carolina, cerca del monumento">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="fechaAvistamiento">¿Cuándo la viste? *</label>
+                        <input type="datetime-local" class="form-control" id="fechaAvistamiento" name="fechaAvistamiento"
+                               value="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm")" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="descripcionAvistamiento">Describe cómo la viste *</label>
+                        <textarea class="form-control" id="descripcionAvistamiento" name="descripcionAvistamiento" rows="3" required
+                                  placeholder="Ej: La vi corriendo hacia el norte, llevaba collar rojo..."></textarea>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="nombreReportante">Tu nombre *</label>
+                                <input type="text" class="form-control" id="nombreReportante" name="nombreReportante" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="telefonoReportante">Tu teléfono *</label>
+                                <input type="tel" class="form-control" id="telefonoReportante" name="telefonoReportante" required>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-success">Enviar Reporte</button>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        .btn-facebook {
+            background: #3b5998;
+            color: white;
+        }
+
+        .btn-whatsapp {
+            background: #25d366;
+            color: white;
+        }
+
+        .badge-danger {
+            background: #ff6b6b;
+        }
+
+        .badge-success {
+            background: #28a745;
+        }
+
+        .badge-secondary {
+            background: #6c757d;
+        }
+
+        .badge-info {
+            background: #17a2b8;
+        }
+
+        .badge-light {
+            background: #f8f9fa;
+            color: #212529;
+        }
+
+        @@media print {
+            .action-buttons, .modal, .btn-action, .emergency-alert {
+                display: none !important;
+            }
+
+            .detail-hero {
+                background: #fff !important;
+                color: #000 !important;
+                border: 2px solid #000;
+            }
+        }
+    </style>
+}
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.0/build/qrcode.min.js"></script>
+
+    <!-- Toastr para notificaciones -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            // Generar QR Code
+            var qrCodeElement = document.getElementById('qrCode');
+            var currentUrl = window.location.href;
+
+            QRCode.toCanvas(qrCodeElement, currentUrl, function (error) {
+                if (error) {
+                    console.error(error);
+                    qrCodeElement.innerHTML = '<i class="fas fa-qrcode fa-4x text-muted"></i>';
+                }
+            });
+
+            // Copiar enlace al portapapeles
+            $('#btnCopiarEnlace').click(function () {
+                var copyText = document.getElementById("enlaceCompartir");
+                copyText.select();
+                copyText.setSelectionRange(0, 99999);
+                document.execCommand("copy");
+
+                toastr.success('Enlace copiado al portapapeles', '¡Listo!');
+            });
+
+            // Descargar QR
+            $('#btnDescargarQR').click(function () {
+                var canvas = document.querySelector('#qrCode canvas');
+                if (canvas) {
+                    var link = document.createElement('a');
+                    link.download = 'qr-@Model.NombreMascota.Replace(" ", "-").ToLower()';
+                    link.href = canvas.toDataURL();
+                    link.click();
+                }
+            });
+
+            // Compartir en Facebook
+            window.compartirFacebook = function () {
+                var url = 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(currentUrl);
+                window.open(url, '_blank', 'width=600,height=400');
+            };
+
+            // Compartir en WhatsApp
+            window.compartirWhatsApp = function () {
+                var text = encodeURIComponent('Ayuda a encontrar a ' + '@Model.NombreMascota' +
+                    ', perdida en ' + '@Model.UbicacionPerdida' + '. ' + currentUrl);
+                var url = 'https://wa.me/?text=' + text;
+                window.open(url, '_blank');
+            };
+
+            // Botón de compartir genérico
+            $('#btnCompartir').click(function () {
+                if (navigator.share) {
+                    navigator.share({
+                        title: 'Encontremos a @Model.NombreMascota',
+                        text: 'Mascota perdida en @Model.UbicacionPerdida',
+                        url: currentUrl
+                    });
+                } else {
+                    // Fallback para navegadores que no soportan Web Share API
+                    $('#enlaceCompartir').select();
+                    toastr.info('Selecciona y copia el enlace para compartir', 'Compartir');
+                }
+            });
+
+            // Cargar teléfono del usuario si está autenticado
+            @if (User.Identity.IsAuthenticated)
+            {
+                <text>
+                $.get('@Url.Action("ObtenerTelefonoUsuario", "Account")', function (data) {
+                    if (data.success && data.telefono) {
+                        $('#telefonoReportante').val(data.telefono);
+                    }
+                });
+                </text>
+            }
+        });
+    </script>
+}

@@ -1,0 +1,245 @@
+﻿@model MVCMASCOTAS.Models.ViewModels.CrearRolViewModel
+@{
+    ViewBag.Title = "Crear Nuevo Rol";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!-- Hero Section -->
+<section class="py-4">
+    <div class="container">
+        <div class="text-center">
+            <h1 class="display-5 fw-bold mb-2 text-brown">
+                <i class="fa fa-plus-circle text-green"></i> Crear Nuevo Rol
+            </h1>
+            <p class="lead mb-3 text-secondary">Complete los datos para crear un nuevo rol en el sistema</p>
+        </div>
+    </div>
+</section>
+
+<!-- Main Content -->
+<section class="py-5 bg-light-mint">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 col-md-10">
+                @{
+                    // Usando ViewData en lugar de TempData temporalmente
+                    var errorMessage = ViewData["ErrorMessage"] as string;
+                    var successMessage = ViewData["SuccessMessage"] as string;
+                }
+
+                @if (!string.IsNullOrEmpty(errorMessage))
+                {
+                    <div class="alert alert-green border-green alert-dismissible fade show mb-4" role="alert">
+                        <i class="fa fa-exclamation-circle text-green"></i>
+                        <strong class="text-brown">@errorMessage</strong>
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                }
+
+                @if (!string.IsNullOrEmpty(successMessage))
+                {
+                    <div class="alert alert-green border-green alert-dismissible fade show mb-4" role="alert">
+                        <i class="fa fa-check-circle text-green"></i>
+                        <strong class="text-brown">@successMessage</strong>
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                }
+
+                <div class="card border-green shadow-hover">
+                    <div class="card-header bg-green text-white">
+                        <h5 class="mb-0"><i class="fa fa-user-tag"></i> Información del Rol</h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <form action="@Url.Action("CrearRol", "Admin")" method="post" id="crearRolForm">
+                            @Html.AntiForgeryToken()
+
+                            <!-- Mostrar errores de validación -->
+                            @if (ViewData.ModelState.Any(x => x.Value.Errors.Count > 0))
+                            {
+                                <div class="alert alert-green border-green mb-4">
+                                    @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                                    {
+                                        <div><i class="fa fa-exclamation-circle text-green"></i> @error.ErrorMessage</div>
+                                    }
+                                </div>
+                            }
+
+                            <div class="form-group mb-4">
+                                <label class="form-label text-brown fw-medium" for="NombreRol">Nombre del Rol</label>
+                                <input type="text" class="form-control border-green"
+                                       id="NombreRol" name="NombreRol"
+                                       value="@(Model?.NombreRol)"
+                                       placeholder="Ej: Rescatista, Supervisora, etc."
+                                       maxlength="100"
+                                       required />
+                                <span class="text-danger small mt-1 field-validation-valid" data-valmsg-for="NombreRol" data-valmsg-replace="true"></span>
+                                <small class="form-text text-secondary mt-2">
+                                    <i class="fa fa-info-circle text-green"></i> Nombre único del rol (no puede repetirse)
+                                </small>
+                            </div>
+
+                            <div class="form-group mb-4">
+                                <label class="form-label text-brown fw-medium" for="Descripcion">Descripción</label>
+                                <textarea class="form-control border-green"
+                                          id="Descripcion" name="Descripcion"
+                                          rows="3"
+                                          placeholder="Describa las funciones y permisos de este rol"
+                                          maxlength="500">@(Model?.Descripcion)</textarea>
+                                <span class="text-danger small mt-1 field-validation-valid" data-valmsg-for="Descripcion" data-valmsg-replace="true"></span>
+                                <small class="form-text text-secondary mt-2">
+                                    <i class="fa fa-info-circle text-green"></i> Máximo 500 caracteres
+                                </small>
+                            </div>
+
+                            <div class="form-group form-check mb-4">
+                                <input type="checkbox" class="form-check-input border-green"
+                                       id="chkActivo" name="Activo"
+                                       @((Model?.Activo ?? true) ? "checked" : "") value="true" />
+                                <label class="form-check-label text-brown" for="chkActivo">
+                                    <i class="fa fa-check-circle text-green me-1"></i> Activo
+                                </label>
+                                <input type="hidden" name="Activo" value="false" />
+                                <small class="form-text text-secondary d-block mt-2">
+                                    <i class="fa fa-info-circle text-green"></i> Los roles inactivos no pueden asignarse a nuevos usuarios
+                                </small>
+                            </div>
+
+                            <div class="alert alert-green border-green mb-4">
+                                <i class="fa fa-info-circle text-green"></i> <strong class="text-brown">Información:</strong>
+                                <ul class="mb-0 text-secondary mt-2">
+                                    <li><i class="fa fa-calendar text-green me-2"></i> Fecha de creación: @DateTime.Now.ToString("dd/MM/yyyy HH:mm")</li>
+                                    <li><i class="fa fa-check text-green me-2"></i> Los roles se crean automáticamente como activos</li>
+                                    <li><i class="fa fa-edit text-green me-2"></i> Puede editar esta configuración después de crear el rol</li>
+                                </ul>
+                            </div>
+
+                            <div class="d-flex flex-column flex-md-row justify-content-between gap-3 mt-4">
+                                <a href="@Url.Action("Roles", "Admin")" class="btn btn-outline-green">
+                                    <i class="fa fa-arrow-left"></i> Cancelar
+                                </a>
+                                <button type="submit" class="btn btn-green text-white" id="btnCrearRol">
+                                    <i class="fa fa-save"></i> Crear Rol
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Styles {
+    <style>
+        /* Estilos específicos para Crear Rol */
+        .form-check-input.border-green {
+            border: 2px solid var(--green);
+        }
+
+            .form-check-input.border-green:checked {
+                background-color: var(--green);
+                border-color: var(--green);
+            }
+
+        .form-check-input:focus {
+            box-shadow: 0 0 0 0.25rem rgba(151, 199, 139, 0.25);
+        }
+
+        .form-control:focus {
+            border-color: var(--green) !important;
+            box-shadow: 0 0 0 0.25rem rgba(151, 199, 139, 0.25) !important;
+        }
+
+        ul {
+            padding-left: 0;
+            list-style-type: none;
+        }
+
+            ul li {
+                margin-bottom: 8px;
+            }
+
+        @@media (max-width: 768px) {
+            .gap-3 {
+                gap: 1rem !important;
+            }
+
+            .card-body {
+                padding: 1.5rem;
+            }
+        }
+
+        /* Asegurar que los botones tengan el diseño correcto */
+        .btn-outline-green {
+            color: #97C78B !important;
+            border-color: #97C78B !important;
+        }
+
+            .btn-outline-green:hover {
+                background-color: #97C78B !important;
+                color: white !important;
+            }
+
+        .btn-green {
+            background-color: #97C78B !important;
+            border-color: #97C78B !important;
+            color: white !important;
+        }
+    </style>
+}
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            console.log('Crear Rol page loaded');
+
+            // Auto cerrar alertas después de 5 segundos
+            setTimeout(function () {
+                $('.alert').fadeOut('slow');
+            }, 5000);
+
+            // Validación del formulario
+            $('#crearRolForm').submit(function (e) {
+                var nombre = $('#NombreRol').val().trim();
+
+                if (nombre === '') {
+                    e.preventDefault();
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Nombre requerido',
+                        text: 'Por favor, ingrese un nombre para el rol.',
+                        confirmButtonColor: '#97C78B'
+                    });
+                    $('#NombreRol').focus();
+                    return false;
+                }
+
+                if (nombre.length < 3) {
+                    e.preventDefault();
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Nombre muy corto',
+                        text: 'El nombre del rol debe tener al menos 3 caracteres.',
+                        confirmButtonColor: '#97C78B'
+                    });
+                    $('#NombreRol').focus();
+                    return false;
+                }
+
+                // Deshabilitar botón y mostrar spinner
+                $('#btnCrearRol').prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Creando...');
+                return true;
+            });
+
+            // Auto-focus en el campo de nombre
+            $('#NombreRol').focus();
+
+            // Inicializar tooltips
+            $('[data-toggle="tooltip"]').tooltip();
+        });
+    </script>
+}

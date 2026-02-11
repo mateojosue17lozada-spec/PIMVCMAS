@@ -1,0 +1,341 @@
+﻿@model IEnumerable<MVCMASCOTAS.Models.SeguimientoAdopcion>
+
+@{
+    ViewBag.Title = "Seguimiento de Mascota";
+    var mascota = ViewBag.Mascota as MVCMASCOTAS.Models.Mascotas;
+    var contrato = ViewBag.Contrato as MVCMASCOTAS.Models.ContratoAdopcion;
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>
+            <i class="fas fa-clipboard-list text-primary"></i>
+            Seguimiento de: @Html.Encode(mascota.Nombre)
+        </h2>
+        <div>
+            <a href="@Url.Action("SeguimientoAdopciones", "Mascotas")" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left"></i> Volver
+            </a>
+            <a href="@Url.Action("CrearSeguimientoManual", "Mascotas", new { mascotaId = mascota.MascotaId })"
+               class="btn btn-primary">
+                <i class="fas fa-plus"></i> Nuevo Seguimiento
+            </a>
+        </div>
+    </div>
+
+    <!-- Información de la mascota -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 text-center">
+                            @if (ViewBag.ImagenBase64 != null)
+                            {
+                                <img src="@ViewBag.ImagenBase64"
+                                     class="img-fluid rounded"
+                                     style="max-height: 150px;"
+                                     alt="@mascota.Nombre">
+                            }
+                            else
+                            {
+                                <div class="bg-light rounded d-flex align-items-center justify-content-center"
+                                     style="height: 150px;">
+                                    <i class="fas fa-paw fa-3x text-secondary"></i>
+                                </div>
+                            }
+                        </div>
+                        <div class="col-md-9">
+                            <h4 class="text-primary">@Html.Encode(mascota.Nombre)</h4>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p><strong>Especie:</strong> @Html.Encode(mascota.Especie)</p>
+                                    <p><strong>Raza:</strong> @Html.Encode(mascota.Raza ?? "Mestizo")</p>
+                                    <p><strong>Sexo:</strong> @Html.Encode(ViewBag.SexoTexto)</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p>
+                                        <strong>Fecha Adopción:</strong>
+                                        @(mascota.FechaAdopcion?.ToString("dd/MM/yyyy") ?? "No especificada")
+                                    </p>
+                                    <p><strong>Contrato:</strong> @Html.Encode(contrato?.NumeroContrato ?? "N/A")</p>
+                                    <p><strong>Adoptante:</strong> @Html.Encode(contrato?.AdoptanteNombre ?? "N/A")</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm border-primary">
+                <div class="card-header bg-primary text-white">
+                    <h6 class="mb-0"><i class="fas fa-chart-bar"></i> Resumen</h6>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Total seguimientos:</span>
+                        <strong class="text-primary">@ViewBag.TotalSeguimientos</strong>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Completados:</span>
+                        <strong class="text-success">@ViewBag.SeguimientosCompletados</strong>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Pendientes:</span>
+                        <strong class="text-warning">@ViewBag.SeguimientosPendientes</strong>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span>Con intervención:</span>
+                        <strong class="text-danger">@Model.Count(s => s.RequiereIntervencion)</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabla de seguimientos -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-light d-flex justify-content-between align-items-center">
+            <h5 class="mb-0"><i class="fas fa-list"></i> Historial de Seguimientos</h5>
+            <span class="badge bg-primary">@Model.Count() registros</span>
+        </div>
+        <div class="card-body">
+            @if (Model.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr class="table-primary">
+                                <th>#</th>
+                                <th>Fecha</th>
+                                <th>Tipo</th>
+                                <th>Estado Mascota</th>
+                                <th>Condiciones</th>
+                                <th>Relación</th>
+                                <th>Intervención</th>
+                                <th>Próximo</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var seguimiento in Model.OrderByDescending(s => s.FechaSeguimiento))
+                            {
+                                <tr class="@(seguimiento.RequiereIntervencion ? "table-danger" : "")">
+                                    <td><strong>@seguimiento.SeguimientoId</strong></td>
+                                    <td>
+                                        @if (seguimiento.FechaSeguimiento.HasValue)
+                                        {
+                                            @seguimiento.FechaSeguimiento.Value.ToString("dd/MM/yyyy HH:mm")
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">No realizado</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        <span class="badge @(seguimiento.TipoSeguimiento == "Inicial" ? "bg-primary" :
+                                                           seguimiento.TipoSeguimiento == "Final" ? "bg-info" :
+                                                           seguimiento.TipoSeguimiento == "Extraordinario" ? "bg-warning" : "bg-secondary")">
+                                            @seguimiento.TipoSeguimiento
+                                        </span>
+                                    </td>
+                                    <td>
+                                        @{
+                                            var estadoColor = seguimiento.EstadoMascota?.Contains("Excelente") == true ? "success" :
+                                                              seguimiento.EstadoMascota?.Contains("Bueno") == true ? "primary" :
+                                                              seguimiento.EstadoMascota?.Contains("Regular") == true ? "warning" :
+                                                              seguimiento.EstadoMascota?.Contains("Malo") == true ? "danger" : "secondary";
+                                        }
+                                        <span class="badge bg-@estadoColor">@seguimiento.EstadoMascota</span>
+                                    </td>
+                                    <td>@seguimiento.CondicionesVivienda</td>
+                                    <td>@seguimiento.RelacionConAdoptante</td>
+                                    <td class="text-center">
+                                        @if (seguimiento.RequiereIntervencion)
+                                        {
+                                            <span class="badge bg-danger">
+                                                <i class="fas fa-exclamation-triangle"></i> Sí
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-success">
+                                                <i class="fas fa-check"></i> No
+                                            </span>
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (seguimiento.ProximoSeguimiento.HasValue)
+                                        {
+                                            var hoy = DateTime.Today;
+                                            var dias = (seguimiento.ProximoSeguimiento.Value - hoy).Days;
+                                            var clase = dias <= 0 ? "text-danger" :
+                                                       dias <= 7 ? "text-warning" : "text-success";
+                                            <span class="@clase">
+                                                @seguimiento.ProximoSeguimiento.Value.ToString("dd/MM/yyyy")
+                                                @if (dias <= 0)
+                                                {
+                                                    <br /><small>(Vencido hace @(-dias) días)</small>
+                                                }
+                                                else
+                                                {
+                                                    <br /><small>(En @dias días)</small>
+                                                }
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">N/A</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm" role="group">
+                                            <button type="button" class="btn btn-info"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#modalDetalle@(seguimiento.SeguimientoId)"
+                                                    title="Ver detalles">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <a href="@Url.Action("EditarSeguimiento", "Mascotas", new { id = seguimiento.SeguimientoId })"
+                                               class="btn btn-warning" title="Editar">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            @if (User.IsInRole("Administrador") || User.IsInRole("Veterinario"))
+                                            {
+                                                <form action="@Url.Action("EliminarSeguimiento", "Mascotas")"
+                                                      method="post"
+                                                      class="d-inline"
+                                                      onsubmit="return confirm('¿Eliminar este seguimiento?');">
+                                                    @Html.AntiForgeryToken()
+                                                    <input type="hidden" name="id" value="@seguimiento.SeguimientoId" />
+                                                    <button type="submit" class="btn btn-danger" title="Eliminar">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </form>
+                                            }
+                                        </div>
+
+                                        <!-- Modal de detalles -->
+                                        <div class="modal fade" id="modalDetalle@(seguimiento.SeguimientoId)" tabindex="-1">
+                                            <div class="modal-dialog modal-lg">
+                                                <div class="modal-content">
+                                                    <div class="modal-header bg-primary text-white">
+                                                        <h5 class="modal-title">
+                                                            <i class="fas fa-clipboard-check"></i>
+                                                            Seguimiento #@seguimiento.SeguimientoId
+                                                        </h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <div class="row">
+                                                            <div class="col-md-6">
+                                                                <h6>Información General</h6>
+                                                                <p>
+                                                                    <strong>Fecha:</strong>
+                                                                    @(seguimiento.FechaSeguimiento?.ToString("dd/MM/yyyy HH:mm") ?? "No registrada")
+                                                                </p>
+                                                                <p><strong>Tipo:</strong> @seguimiento.TipoSeguimiento</p>
+                                                                <p><strong>Estado Mascota:</strong> @seguimiento.EstadoMascota</p>
+                                                                <p><strong>Condiciones Vivienda:</strong> @seguimiento.CondicionesVivienda</p>
+                                                                <p><strong>Relación con Adoptante:</strong> @seguimiento.RelacionConAdoptante</p>
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <h6>Información Adicional</h6>
+                                                                <p>
+                                                                    <strong>Próximo seguimiento:</strong>
+                                                                    @(seguimiento.ProximoSeguimiento?.ToString("dd/MM/yyyy") ?? "No programado")
+                                                                </p>
+                                                                <p>
+                                                                    <strong>Requiere intervención:</strong>
+                                                                    @(seguimiento.RequiereIntervencion ? "Sí" : "No")
+                                                                </p>
+                                                                <p>
+                                                                    <strong>Fotos de evidencia:</strong><br />
+                                                                    @(string.IsNullOrEmpty(seguimiento.FotosEvidencia) ?
+                                                                     "No hay fotos" : seguimiento.FotosEvidencia)
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                        <hr />
+                                                        <div class="row">
+                                                            <div class="col-md-6">
+                                                                <h6>Observaciones</h6>
+                                                                <div class="border rounded p-3 bg-light">
+                                                                    @if (!string.IsNullOrEmpty(seguimiento.Observaciones))
+                                                                    {
+                                                                        @Html.Raw(seguimiento.Observaciones.Replace("\n", "<br />"))
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <span class="text-muted">No hay observaciones</span>
+                                                                    }
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <h6>Recomendaciones</h6>
+                                                                <div class="border rounded p-3 bg-light">
+                                                                    @if (!string.IsNullOrEmpty(seguimiento.Recomendaciones))
+                                                                    {
+                                                                        @Html.Raw(seguimiento.Recomendaciones.Replace("\n", "<br />"))
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <span class="text-muted">No hay recomendaciones</span>
+                                                                    }
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                                            <i class="fas fa-times"></i> Cerrar
+                                                        </button>
+                                                        <a href="@Url.Action("EditarSeguimiento", "Mascotas", new { id = seguimiento.SeguimientoId })"
+                                                           class="btn btn-primary">
+                                                            <i class="fas fa-edit"></i> Editar
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="text-center py-5">
+                    <i class="fas fa-clipboard-list fa-4x text-muted mb-3"></i>
+                    <h4 class="text-muted">No hay seguimientos registrados</h4>
+                    <p class="text-muted">Comienza registrando el primer seguimiento de esta adopción.</p>
+                    <a href="@Url.Action("CrearSeguimientoManual", "Mascotas", new { mascotaId = mascota.MascotaId })"
+                       class="btn btn-primary mt-3">
+                        <i class="fas fa-plus"></i> Registrar Primer Seguimiento
+                    </a>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // Inicializar tooltips
+            $('[title]').tooltip();
+
+            // Ordenar tabla por defecto por fecha descendente
+            $('.table').DataTable({
+                order: [[1, 'desc']],
+                language: {
+                    url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json'
+                },
+                pageLength: 10
+            });
+        });
+    </script>
+}

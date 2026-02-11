@@ -1,277 +1,344 @@
-﻿@model MVCMASCOTAS.Models.ViewModels.SolicitudAdopcionViewModel
+﻿@model MVCMASCOTAS.Models.ViewModels.FormularioAdopcionViewModel
 
 @{
     ViewBag.Title = "Solicitar Adopción";
+    ViewData["Title"] = "Solicitar Adopción";
 }
 
-<div class="row justify-content-center">
-    <div class="col-md-10">
-        <div class="alert alert-info">
-            <h4><i class="fas fa-info-circle"></i> Proceso de Adopción</h4>
-            <p>Estás a punto de solicitar la adopción de <strong>@ViewBag.NombreMascota</strong>. Por favor completa el siguiente formulario con información veraz y detallada.</p>
-            <p>Nuestro equipo revisará tu solicitud y te contactaremos en un plazo de 3 a 5 días hábiles.</p>
-        </div>
-
-        <div class="card shadow-custom">
-            <div class="card-header">
-                <h3><i class="fas fa-file-alt"></i> Formulario de Adopción</h3>
+<!-- Contenido principal -->
+<div class="container body-content mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="alert alert-green border-green">
+                <h4 class="text-brown"><i class="fa fa-info-circle text-green"></i> Proceso de Adopción</h4>
+                <p class="text-secondary">Estás a punto de solicitar la adopción de <strong class="text-brown">@ViewBag.NombreMascota</strong>. Por favor completa el siguiente formulario con información veraz y detallada.</p>
+                <p class="text-secondary mb-0">Nuestro equipo revisará tu solicitud y te contactaremos en un plazo de 3 a 5 días hábiles.</p>
             </div>
-            <div class="card-body">
-                @using (Html.BeginForm("Solicitar", "Adopcion", FormMethod.Post))
-                {
-                    @Html.AntiForgeryToken()
-                    @Html.HiddenFor(m => m.MascotaId)
-                    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
 
-                    <h5 class="border-bottom pb-2 mb-3">
-                        <i class="fas fa-home"></i> Información de Vivienda
-                    </h5>
+            <div class="card shadow-hover border-green mb-4">
+                <div class="card-header bg-green text-white">
+                    <h3 class="mb-0"><i class="fa fa-file-alt"></i> Formulario de Adopción</h3>
+                </div>
+                <div class="card-body bg-light-mint">
+                    @using (Html.BeginForm("Solicitar", "Adopcion", FormMethod.Post))
+                    {
+                        @Html.AntiForgeryToken()
+                        @Html.HiddenFor(m => m.MascotaId)
+                        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
 
-                    <div class="row">
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label>Tipo de Vivienda *</label>
-                                @Html.DropDownList("TipoVivienda", new SelectList(new[] {
-                                    "Casa", "Departamento", "Finca/Quinta", "Otro"
-                                }), "Seleccionar...", new { @class = "form-control", required = "required" })
-                            </div>
-                        </div>
+                        <h5 class="border-bottom pb-2 mb-3 border-green">
+                            <i class="fa fa-home text-green"></i> <span class="text-brown">Información de Vivienda</span>
+                        </h5>
 
-                        <div class="col-md-4">
-                            <div class="form-check mt-4">
-                                @Html.CheckBox("ViviendaPropia", false, new { @class = "form-check-input" })
-                                <label class="form-check-label">Vivienda Propia</label>
-                            </div>
-                        </div>
-
-                        <div class="col-md-4">
-                            <div class="form-check mt-4">
-                                @Html.CheckBox("TieneJardin", false, new { @class = "form-check-input" })
-                                <label class="form-check-label">Tiene Jardín/Patio</label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div id="tamanio-jardin" style="display: none;">
-                        <div class="form-group">
-                            <label>Tamaño del Jardín/Patio</label>
-                            @Html.DropDownList("TamanioJardin", new SelectList(new[] {
-                                "Pequeño (< 50m²)", "Mediano (50-100m²)", "Grande (> 100m²)"
-                            }), "Seleccionar...", new { @class = "form-control" })
-                        </div>
-                    </div>
-
-                    <div class="form-check mb-3">
-                        @Html.CheckBox("PermisoMascotas", false, new { @class = "form-check-input", required = "required" })
-                        <label class="form-check-label">
-                            <strong>* Tengo permiso del propietario/condominio para tener mascotas</strong>
-                        </label>
-                    </div>
-
-                    <h5 class="border-bottom pb-2 mb-3 mt-4">
-                        <i class="fas fa-users"></i> Composición del Hogar
-                    </h5>
-
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Número de Personas en el Hogar *</label>
-                                @Html.TextBox("PersonasEnCasa", "", new { @class = "form-control", type = "number", min = "1", required = "required" })
-                            </div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <div class="form-check mt-4">
-                                @Html.CheckBox("HayNinios", false, new { @class = "form-check-input" })
-                                <label class="form-check-label">Hay niños en el hogar</label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div id="edades-ninios" style="display: none;">
-                        <div class="form-group">
-                            <label>Edades de los niños</label>
-                            @Html.TextBox("EdadesNinios", "", new { @class = "form-control", placeholder = "Ej: 5, 8 y 12 años" })
-                        </div>
-                    </div>
-
-                    <h5 class="border-bottom pb-2 mb-3 mt-4">
-                        <i class="fas fa-paw"></i> Experiencia con Mascotas
-                    </h5>
-
-                    <div class="form-check mb-3">
-                        @Html.CheckBox("ExperienciaPreviaConMascotas", false, new { @class = "form-check-input" })
-                        <label class="form-check-label">Tengo experiencia previa con mascotas</label>
-                    </div>
-
-                    <div id="detalle-experiencia" style="display: none;">
-                        <div class="form-group">
-                            <label>Describe tu experiencia previa *</label>
-                            @Html.TextArea("DetalleExperiencia", new { @class = "form-control", rows = "3", required = "required", placeholder = "Describe las mascotas que has tenido anteriormente..." })
-                        </div>
-                    </div>
-
-                    <div class="form-check mb-3">
-                        @Html.CheckBox("TieneMascotasActualmente", false, new { @class = "form-check-input" })
-                        <label class="form-check-label">Actualmente tengo otras mascotas</label>
-                    </div>
-
-                    <div id="mascotas-actuales" style="display: none;">
                         <div class="row">
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <div class="form-group">
-                                    <label>Cantidad de Perros</label>
-                                    @Html.TextBox("CantidadPerros", "0", new { @class = "form-control", type = "number", min = "0" })
+                                    <label class="text-brown">Tipo de Vivienda *</label>
+                                    @Html.DropDownListFor(m => m.TipoVivienda, new SelectList(new[] {
+                                        "Casa", "Departamento", "Finca/Quinta", "Otro"
+                                    }), "Seleccionar...", new { @class = "form-control border-green", required = "required" })
+                                    @Html.ValidationMessageFor(m => m.TipoVivienda, "", new { @class = "text-danger" })
                                 </div>
                             </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label>Cantidad de Gatos</label>
-                                    @Html.TextBox("CantidadGatos", "0", new { @class = "form-control", type = "number", min = "0" })
+
+                            <div class="col-md-4">
+                                <div class="form-check mt-4 pt-2">
+                                    @Html.CheckBoxFor(m => m.ViviendaPropia, new { @class = "form-check-input" })
+                                    <label class="form-check-label text-brown">Vivienda Propia</label>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="form-check mt-4 pt-2">
+                                    @Html.CheckBoxFor(m => m.TieneJardin, new { @class = "form-check-input" })
+                                    <label class="form-check-label text-brown">Tiene Jardín/Patio</label>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="form-group">
-                            <label>Otras mascotas</label>
-                            @Html.TextBox("OtrasMascotas", "", new { @class = "form-control", placeholder = "Ej: Conejos, pájaros, etc." })
+                        <div id="tamanio-jardin" style="display: none;">
+                            <div class="form-group">
+                                <label class="text-brown">Tamaño del Jardín/Patio</label>
+                                @Html.DropDownListFor(m => m.TamanioJardin, new SelectList(new[] {
+                                    "Pequeño (< 50m²)", "Mediano (50-100m²)", "Grande (> 100m²)"
+                                }), "Seleccionar...", new { @class = "form-control border-green" })
+                            </div>
                         </div>
 
                         <div class="form-check mb-3">
-                            @Html.CheckBox("MascotasEsterilizadas", false, new { @class = "form-check-input" })
-                            <label class="form-check-label">Mis mascotas están esterilizadas</label>
+                            @Html.CheckBoxFor(m => m.PermisoMascotas, new { @class = "form-check-input", required = "required" })
+                            <label class="form-check-label text-brown">
+                                <strong>* Tengo permiso del propietario/condominio para tener mascotas</strong>
+                            </label>
+                            @Html.ValidationMessageFor(m => m.PermisoMascotas, "", new { @class = "text-danger" })
                         </div>
-                    </div>
 
-                    <h5 class="border-bottom pb-2 mb-3 mt-4">
-                        <i class="fas fa-clock"></i> Disponibilidad y Compromiso
-                    </h5>
+                        <h5 class="border-bottom pb-2 mb-3 mt-4 border-green">
+                            <i class="fa fa-users text-green"></i> <span class="text-brown">Composición del Hogar</span>
+                        </h5>
 
-                    <div class="form-group">
-                        <label>Tiempo disponible para la mascota diariamente *</label>
-                        @Html.DropDownList("TiempoDisponibleDiario", new SelectList(new[] {
-                            "Menos de 1 hora", "1-2 horas", "2-4 horas", "4+ horas", "Todo el día"
-                        }), "Seleccionar...", new { @class = "form-control", required = "required" })
-                    </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="text-brown">Número de Personas en el Hogar *</label>
+                                    @Html.TextBoxFor(m => m.PersonasEnCasa, new { @class = "form-control border-green", type = "number", min = "1", required = "required" })
+                                    @Html.ValidationMessageFor(m => m.PersonasEnCasa, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
 
-                    <div class="form-group">
-                        <label>¿Quién cuidará de la mascota durante el día? *</label>
-                        @Html.TextArea("QuienCuidaraMascota", new { @class = "form-control", rows = "2", required = "required", placeholder = "Ej: Yo trabajo desde casa, mi esposa/o, etc." })
-                    </div>
-
-                    <h5 class="border-bottom pb-2 mb-3 mt-4">
-                        <i class="fas fa-question-circle"></i> Preguntas Importantes
-                    </h5>
-
-                    <div class="form-group">
-                        <label>¿Por qué deseas adoptar esta mascota? *</label>
-                        @Html.TextArea("MotivoAdopcion", new { @class = "form-control", rows = "3", maxlength = "500", required = "required", placeholder = "Explícanos por qué quieres adoptar a esta mascota en particular..." })
-                        <small class="form-text text-muted">Mínimo 50 caracteres</small>
-                    </div>
-
-                    <div class="form-group">
-                        <label>¿Qué harías si cambias de residencia? *</label>
-                        @Html.TextArea("QuePasaSiCambiaResidencia", new { @class = "form-control", rows = "2", required = "required", placeholder = "Describe tus planes si te mudas..." })
-                    </div>
-
-                    <div class="form-group">
-                        <label>¿Qué harías ante problemas de comportamiento? *</label>
-                        @Html.TextArea("QuePasaSiProblemasComportamiento", new { @class = "form-control", rows = "2", required = "required", placeholder = "Ej: Consultaría con un veterinario, buscaría entrenamiento..." })
-                    </div>
-
-                    <h5 class="border-bottom pb-2 mb-3 mt-4">
-                        <i class="fas fa-user-md"></i> Referencias Veterinarias
-                    </h5>
-
-                    <div class="form-group">
-                        <label>Veterinario de referencia (opcional)</label>
-                        @Html.TextBox("VeterinarioReferencia", "", new { @class = "form-control", placeholder = "Nombre del veterinario o clínica" })
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Referencia personal 1 *</label>
-                                @Html.TextBox("ReferenciaPersonal1", "", new { @class = "form-control", required = "required", placeholder = "Nombre completo" })
+                            <div class="col-md-6">
+                                <div class="form-check mt-4 pt-2">
+                                    @Html.CheckBoxFor(m => m.HayNinios, new { @class = "form-check-input" })
+                                    <label class="form-check-label text-brown">Hay niños en el hogar</label>
+                                </div>
                             </div>
                         </div>
-                        <div class="col-md-6">
+
+                        <div id="edades-ninios" style="display: none;">
                             <div class="form-group">
-                                <label>Teléfono referencia 1 *</label>
-                                @Html.TextBox("TelefonoReferencia1", "", new { @class = "form-control", required = "required", placeholder = "0999999999" })
+                                <label class="text-brown">Edades de los niños</label>
+                                @Html.TextBoxFor(m => m.EdadesNinios, new { @class = "form-control border-green", placeholder = "Ej: 5, 8 y 12 años" })
                             </div>
                         </div>
-                    </div>
 
-                    <div class="row">
-                        <div class="col-md-6">
+                        <h5 class="border-bottom pb-2 mb-3 mt-4 border-green">
+                            <i class="fa fa-paw text-green"></i> <span class="text-brown">Experiencia con Mascotas</span>
+                        </h5>
+
+                        <div class="form-check mb-3">
+                            @Html.CheckBoxFor(m => m.ExperienciaPreviaConMascotas, new { @class = "form-check-input" })
+                            <label class="form-check-label text-brown">Tengo experiencia previa con mascotas</label>
+                        </div>
+
+                        <div id="detalle-experiencia" style="display: none;">
                             <div class="form-group">
-                                <label>Referencia personal 2 (opcional)</label>
-                                @Html.TextBox("ReferenciaPersonal2", "", new { @class = "form-control", placeholder = "Nombre completo" })
+                                <label class="text-brown">Describe tu experiencia previa *</label>
+                                @Html.TextAreaFor(m => m.DetalleExperiencia, new { @class = "form-control border-green", rows = "3", required = "required", placeholder = "Describe las mascotas que has tenido anteriormente..." })
+                                @Html.ValidationMessageFor(m => m.DetalleExperiencia, "", new { @class = "text-danger" })
                             </div>
                         </div>
-                        <div class="col-md-6">
+
+                        <div class="form-check mb-3">
+                            @Html.CheckBoxFor(m => m.TieneMascotasActualmente, new { @class = "form-check-input" })
+                            <label class="form-check-label text-brown">Actualmente tengo otras mascotas</label>
+                        </div>
+
+                        <div id="mascotas-actuales" style="display: none;">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="text-brown">Cantidad de Perros</label>
+                                        @Html.TextBoxFor(m => m.CantidadPerros, "0", new { @class = "form-control border-green", type = "number", min = "0" })
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="text-brown">Cantidad de Gatos</label>
+                                        @Html.TextBoxFor(m => m.CantidadGatos, "0", new { @class = "form-control border-green", type = "number", min = "0" })
+                                    </div>
+                                </div>
+                            </div>
+
                             <div class="form-group">
-                                <label>Teléfono referencia 2 (opcional)</label>
-                                @Html.TextBox("TelefonoReferencia2", "", new { @class = "form-control", placeholder = "0999999999" })
+                                <label class="text-brown">Otras mascotas</label>
+                                @Html.TextBoxFor(m => m.OtrasMascotas, new { @class = "form-control border-green", placeholder = "Ej: Conejos, pájaros, etc." })
+                            </div>
+
+                            <div class="form-check mb-3">
+                                @Html.CheckBoxFor(m => m.MascotasEsterilizadas, new { @class = "form-check-input" })
+                                <label class="form-check-label text-brown">Mis mascotas están esterilizadas</label>
                             </div>
                         </div>
-                    </div>
 
-                    <h5 class="border-bottom pb-2 mb-3 mt-4">
-                        <i class="fas fa-gavel"></i> Compromisos Legales
-                    </h5>
+                        <h5 class="border-bottom pb-2 mb-3 mt-4 border-green">
+                            <i class="fa fa-clock text-green"></i> <span class="text-brown">Disponibilidad y Compromiso</span>
+                        </h5>
 
-                    <div class="form-check mb-3">
-                        @Html.CheckBox("AceptaEsterilizacion", false, new { @class = "form-check-input", required = "required" })
-                        <label class="form-check-label">
-                            <strong>* Acepto esterilizar a la mascota si aún no lo está</strong>
-                        </label>
-                    </div>
+                        <div class="form-group">
+                            <label class="text-brown">Tiempo disponible para la mascota diariamente *</label>
+                            @Html.DropDownListFor(m => m.TiempoDisponibleDiario, new SelectList(new[] {
+                                "Menos de 1 hora", "1-2 horas", "2-4 horas", "4+ horas", "Todo el día"
+                            }), "Seleccionar...", new { @class = "form-control border-green", required = "required" })
+                            @Html.ValidationMessageFor(m => m.TiempoDisponibleDiario, "", new { @class = "text-danger" })
+                        </div>
 
-                    <div class="form-check mb-3">
-                        @Html.CheckBox("AceptaVisitasSeguimiento", false, new { @class = "form-check-input", required = "required" })
-                        <label class="form-check-label">
-                            <strong>* Acepto visitas de seguimiento del refugio</strong>
-                        </label>
-                    </div>
+                        <div class="form-group">
+                            <label class="text-brown">¿Quién cuidará de la mascota durante el día? *</label>
+                            @Html.TextAreaFor(m => m.QuienCuidaraMascota, new { @class = "form-control border-green", rows = "2", required = "required", placeholder = "Ej: Yo trabajo desde casa, mi esposa/o, etc." })
+                            @Html.ValidationMessageFor(m => m.QuienCuidaraMascota, "", new { @class = "text-danger" })
+                        </div>
 
-                    <div class="form-check mb-3">
-                        @Html.CheckBox("AceptaCondicionesLOBA", false, new { @class = "form-check-input", required = "required" })
-                        <label class="form-check-label">
-                            <strong>* Acepto las condiciones establecidas en la Ley Orgánica de Bienestar Animal</strong>
-                        </label>
-                    </div>
+                        <h5 class="border-bottom pb-2 mb-3 mt-4 border-green">
+                            <i class="fa fa-question-circle text-green"></i> <span class="text-brown">Preguntas Importantes</span>
+                        </h5>
 
-                    <div class="form-check mb-3">
-                        @Html.CheckBox("AceptaDevolucionSiNoPuedeAtender", false, new { @class = "form-check-input", required = "required" })
-                        <label class="form-check-label">
-                            <strong>* Me comprometo a devolver la mascota al refugio si no puedo continuar atendiéndola</strong>
-                        </label>
-                    </div>
+                        <div class="form-group">
+                            <label class="text-brown">¿Por qué deseas adoptar esta mascota? *</label>
+                            @Html.TextAreaFor(m => m.MotivoAdopcion, new { @class = "form-control border-green", rows = "3", maxlength = "500", required = "required", placeholder = "Explícanos por qué quieres adoptar a esta mascota en particular..." })
+                            @Html.ValidationMessageFor(m => m.MotivoAdopcion, "", new { @class = "text-danger" })
+                            <small class="form-text text-secondary">Mínimo 50 caracteres</small>
+                        </div>
 
-                    <div class="alert alert-warning mt-4">
-                        <i class="fas fa-exclamation-triangle"></i> <strong>Importante:</strong> La información proporcionada será verificada. Proporcionar información falsa resultará en el rechazo automático de la solicitud.
-                    </div>
+                        <div class="form-group">
+                            <label class="text-brown">¿Qué harías si cambias de residencia? *</label>
+                            @Html.TextAreaFor(m => m.QuePasaSiCambiaResidencia, new { @class = "form-control border-green", rows = "2", required = "required", placeholder = "Describe tus planes si te mudas..." })
+                            @Html.ValidationMessageFor(m => m.QuePasaSiCambiaResidencia, "", new { @class = "text-danger" })
+                        </div>
 
-                    <div class="form-group mt-4">
-                        <button type="submit" class="btn btn-success btn-lg btn-block">
-                            <i class="fas fa-paper-plane"></i> Enviar Solicitud
-                        </button>
-                        <a href="@Url.Action("Detalle", "Mascotas", new { id = Model.MascotaId })" class="btn btn-secondary btn-lg btn-block">
-                            <i class="fas fa-times"></i> Cancelar
-                        </a>
-                    </div>
-                }
+                        <div class="form-group">
+                            <label class="text-brown">¿Qué harías ante problemas de comportamiento? *</label>
+                            @Html.TextAreaFor(m => m.QuePasaSiProblemasComportamiento, new { @class = "form-control border-green", rows = "2", required = "required", placeholder = "Ej: Consultaría con un veterinario, buscaría entrenamiento..." })
+                            @Html.ValidationMessageFor(m => m.QuePasaSiProblemasComportamiento, "", new { @class = "text-danger" })
+                        </div>
+
+                        <h5 class="border-bottom pb-2 mb-3 mt-4 border-green">
+                            <i class="fa fa-user-md text-green"></i> <span class="text-brown">Referencias Veterinarias</span>
+                        </h5>
+
+                        <div class="form-group">
+                            <label class="text-brown">Veterinario de referencia (opcional)</label>
+                            @Html.TextBoxFor(m => m.VeterinarioReferencia, new { @class = "form-control border-green", placeholder = "Nombre del veterinario o clínica" })
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="text-brown">Referencia personal 1 *</label>
+                                    @Html.TextBoxFor(m => m.ReferenciaPersonal1, new { @class = "form-control border-green", required = "required", placeholder = "Nombre completo" })
+                                    @Html.ValidationMessageFor(m => m.ReferenciaPersonal1, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="text-brown">Teléfono referencia 1 *</label>
+                                    @Html.TextBoxFor(m => m.TelefonoReferencia1, new { @class = "form-control border-green", required = "required", placeholder = "0999999999" })
+                                    @Html.ValidationMessageFor(m => m.TelefonoReferencia1, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="text-brown">Referencia personal 2 (opcional)</label>
+                                    @Html.TextBoxFor(m => m.ReferenciaPersonal2, new { @class = "form-control border-green", placeholder = "Nombre completo" })
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="text-brown">Teléfono referencia 2 (opcional)</label>
+                                    @Html.TextBoxFor(m => m.TelefonoReferencia2, new { @class = "form-control border-green", placeholder = "0999999999" })
+                                </div>
+                            </div>
+                        </div>
+
+                        <h5 class="border-bottom pb-2 mb-3 mt-4 border-green">
+                            <i class="fa fa-gavel text-green"></i> <span class="text-brown">Compromisos Legales</span>
+                        </h5>
+
+                        <div class="form-check mb-3">
+                            @Html.CheckBoxFor(m => m.AceptaEsterilizacion, new { @class = "form-check-input", required = "required" })
+                            <label class="form-check-label text-brown">
+                                <strong>* Acepto esterilizar a la mascota si aún no lo está</strong>
+                            </label>
+                            @Html.ValidationMessageFor(m => m.AceptaEsterilizacion, "", new { @class = "text-danger" })
+                        </div>
+
+                        <div class="form-check mb-3">
+                            @Html.CheckBoxFor(m => m.AceptaVisitasSeguimiento, new { @class = "form-check-input", required = "required" })
+                            <label class="form-check-label text-brown">
+                                <strong>* Acepto visitas de seguimiento del refugio</strong>
+                            </label>
+                            @Html.ValidationMessageFor(m => m.AceptaVisitasSeguimiento, "", new { @class = "text-danger" })
+                        </div>
+
+                        <div class="form-check mb-3">
+                            @Html.CheckBoxFor(m => m.AceptaCondicionesLOBA, new { @class = "form-check-input", required = "required" })
+                            <label class="form-check-label text-brown">
+                                <strong>* Acepto las condiciones establecidas en la Ley Orgánica de Bienestar Animal</strong>
+                            </label>
+                            @Html.ValidationMessageFor(m => m.AceptaCondicionesLOBA, "", new { @class = "text-danger" })
+                        </div>
+
+                        <div class="form-check mb-3">
+                            @Html.CheckBoxFor(m => m.AceptaDevolucionSiNoPuedeAtender, new { @class = "form-check-input", required = "required" })
+                            <label class="form-check-label text-brown">
+                                <strong>* Me comprometo a devolver la mascota al refugio si no puedo continuar atendiéndola</strong>
+                            </label>
+                            @Html.ValidationMessageFor(m => m.AceptaDevolucionSiNoPuedeAtender, "", new { @class = "text-danger" })
+                        </div>
+
+                        <div class="alert alert-warning mt-4 border border-warning">
+                            <i class="fa fa-exclamation-triangle text-warning"></i> <strong class="text-brown">Importante:</strong> <span class="text-secondary">La información proporcionada será verificada. Proporcionar información falsa resultará en el rechazo automático de la solicitud.</span>
+                        </div>
+
+                        <div class="form-group mt-4">
+                            <button type="submit" class="btn btn-green btn-lg btn-block">
+                                <i class="fa fa-paper-plane"></i> Enviar Solicitud
+                            </button>
+                            <a href="@Url.Action("Detalle", "Mascotas", new { id = Model.MascotaId })" class="btn btn-outline-green btn-lg btn-block mt-2">
+                                <i class="fa fa-times"></i> Cancelar
+                            </a>
+                        </div>
+                    }
+                </div>
             </div>
         </div>
     </div>
 </div>
 
+@section Styles {
+    <style>
+        .form-control.border-green:focus {
+            border-color: var(--green);
+            box-shadow: 0 0 0 0.2rem rgba(151, 199, 139, 0.25);
+        }
+
+        .form-check-input:checked {
+            background-color: var(--green);
+            border-color: var(--green);
+        }
+
+        .form-check-input:focus {
+            border-color: var(--green);
+            box-shadow: 0 0 0 0.2rem rgba(151, 199, 139, 0.25);
+        }
+
+        .border-green {
+            border-color: var(--green) !important;
+        }
+
+        .alert-warning {
+            background-color: rgba(255, 193, 7, 0.1);
+        }
+
+        .text-warning {
+            color: #ffc107 !important;
+        }
+
+        .border-warning {
+            border-color: #ffc107 !important;
+        }
+
+        .pt-2 {
+            padding-top: 0.5rem !important;
+        }
+
+        .form-group label {
+            font-weight: 500;
+        }
+    </style>
+}
+
 @section Scripts {
-    @Scripts.Render("~/bundles/jqueryval")
+    @* La ruta del bundle puede variar según tu configuración *@
+    <script src="~/Scripts/jquery.validate.min.js"></script>
+    <script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>
+
     <script>
         $(document).ready(function () {
+            console.log('Formulario de adopción cargado');
+
             // Mostrar/ocultar tamaño del jardín
             $('#TieneJardin').change(function () {
                 if ($(this).is(':checked')) {
@@ -330,7 +397,12 @@
                 }
 
                 if (!isValid) {
-                    alert('Por favor corrija los siguientes errores:\n\n' + mensaje);
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Por favor corrija los siguientes errores:',
+                        text: mensaje,
+                        confirmButtonColor: '#97C78B'
+                    });
                     e.preventDefault();
                 }
             });

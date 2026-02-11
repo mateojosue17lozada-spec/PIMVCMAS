@@ -1,0 +1,303 @@
+﻿@model MVCMASCOTAS.Models.SeguimientoAdopcion
+
+@{
+    ViewBag.Title = "Nuevo Seguimiento Manual";
+    var mascota = ViewBag.Mascota as MVCMASCOTAS.Models.Mascotas;
+    var contrato = ViewBag.Contrato as MVCMASCOTAS.Models.ContratoAdopcion;
+}
+
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card shadow-lg">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">
+                        <i class="fas fa-plus-circle"></i> Nuevo Seguimiento Manual
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <!-- Información de contexto -->
+                    <div class="alert alert-info mb-4">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6><i class="fas fa-dog"></i> Mascota</h6>
+                                <p class="mb-1"><strong>Nombre:</strong> @Html.Encode(mascota.Nombre)</p>
+                                <p class="mb-1"><strong>Especie:</strong> @Html.Encode(mascota.Especie)</p>
+                                <p class="mb-0"><strong>Contrato:</strong> @Html.Encode(contrato?.NumeroContrato)</p>
+                            </div>
+                            <div class="col-md-6">
+                                <h6><i class="fas fa-user"></i> Adoptante</h6>
+                                <p class="mb-1"><strong>Nombre:</strong> @Html.Encode(contrato?.AdoptanteNombre)</p>
+                                <p class="mb-1"><strong>Teléfono:</strong> @Html.Encode(contrato?.AdoptanteTelefono)</p>
+                                <p class="mb-0"><strong>Dirección:</strong> @Html.Encode(contrato?.AdoptanteDireccion)</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    @using (Html.BeginForm("CrearSeguimientoManual", "Mascotas", FormMethod.Post))
+                    {
+                        @Html.AntiForgeryToken()
+                        @Html.HiddenFor(model => model.ContratoId)
+                        @Html.HiddenFor(model => model.ResponsableSeguimiento)
+
+                        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+                        <div class="row">
+                            <!-- Sección izquierda -->
+                            <div class="col-md-6">
+                                <h5 class="border-bottom pb-2 mb-3">
+                                    <i class="fas fa-calendar-alt text-primary"></i> Información Básica
+                                </h5>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">
+                                        <i class="fas fa-calendar"></i> Fecha del Seguimiento *
+                                    </label>
+                                    @Html.TextBoxFor(model => model.FechaSeguimiento, "{0:yyyy-MM-dd}",
+                                    new
+                                         {
+                                        @class = "form-control",
+                                        type = "date",
+                                        required = "required",
+                                        max = DateTime.Now.ToString("yyyy-MM-dd")
+                                    })
+                                    @Html.ValidationMessageFor(model => model.FechaSeguimiento, "", new { @class = "text-danger" })
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">
+                                        <i class="fas fa-tag"></i> Tipo de Seguimiento *
+                                    </label>
+                                    @Html.DropDownListFor(model => model.TipoSeguimiento,
+                                        new SelectList(ViewBag.TiposSeguimiento ?? new string[] { }),
+                                        "Seleccionar...",
+                                        new { @class = "form-control", required = "required" })
+                                    @Html.ValidationMessageFor(model => model.TipoSeguimiento, "", new { @class = "text-danger" })
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">
+                                        <i class="fas fa-calendar-plus"></i> Próximo Seguimiento
+                                    </label>
+                                    @Html.TextBoxFor(model => model.ProximoSeguimiento, "{0:yyyy-MM-dd}",
+                                    new
+                                         {
+                                        @class = "form-control",
+                                        type = "date",
+                                        min = DateTime.Now.AddDays(1).ToString("yyyy-MM-dd")
+                                    })
+                                    @Html.ValidationMessageFor(model => model.ProximoSeguimiento, "", new { @class = "text-danger" })
+                                    <small class="text-muted">Programe la fecha del próximo seguimiento (opcional)</small>
+                                </div>
+                            </div>
+
+                            <!-- Sección derecha -->
+                            <div class="col-md-6">
+                                <h5 class="border-bottom pb-2 mb-3">
+                                    <i class="fas fa-clipboard-check text-primary"></i> Evaluaciones
+                                </h5>
+
+                                <div class="row">
+                                    <div class="col-md-12 mb-3">
+                                        <label class="form-label fw-bold">
+                                            <i class="fas fa-heart"></i> Estado de la Mascota *
+                                        </label>
+                                        @Html.DropDownListFor(model => model.EstadoMascota,
+                                            new SelectList(ViewBag.EstadosMascota ?? new string[] { }),
+                                            "Seleccionar...",
+                                            new { @class = "form-control", required = "required" })
+                                        @Html.ValidationMessageFor(model => model.EstadoMascota, "", new { @class = "text-danger" })
+                                    </div>
+
+                                    <div class="col-md-12 mb-3">
+                                        <label class="form-label fw-bold">
+                                            <i class="fas fa-home"></i> Condiciones de Vivienda *
+                                        </label>
+                                        @Html.DropDownListFor(model => model.CondicionesVivienda,
+                                            new SelectList(ViewBag.CondicionesVivienda ?? new string[] { }),
+                                            "Seleccionar...",
+                                            new { @class = "form-control", required = "required" })
+                                        @Html.ValidationMessageFor(model => model.CondicionesVivienda, "", new { @class = "text-danger" })
+                                    </div>
+
+                                    <div class="col-md-12 mb-3">
+                                        <label class="form-label fw-bold">
+                                            <i class="fas fa-users"></i> Relación con Adoptante *
+                                        </label>
+                                        @Html.DropDownListFor(model => model.RelacionConAdoptante,
+                                            new SelectList(ViewBag.Relaciones ?? new string[] { }),
+                                            "Seleccionar...",
+                                            new { @class = "form-control", required = "required" })
+                                        @Html.ValidationMessageFor(model => model.RelacionConAdoptante, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+
+                                <div class="form-check mb-3">
+                                    @Html.CheckBoxFor(model => model.RequiereIntervencion, new { @class = "form-check-input" })
+                                    <label class="form-check-label fw-bold">
+                                        <i class="fas fa-exclamation-triangle text-danger"></i>
+                                        Requiere intervención del refugio
+                                    </label>
+                                    <small class="text-muted d-block">
+                                        Marque si se necesita acción inmediata del refugio
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <h5 class="border-bottom pb-2 mb-3 mt-4">
+                            <i class="fas fa-align-left text-primary"></i> Observaciones y Recomendaciones
+                        </h5>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">
+                                        <i class="fas fa-comment-alt"></i> Observaciones
+                                    </label>
+                                    @Html.TextAreaFor(model => model.Observaciones,
+                                    new
+                                         {
+                                        @class = "form-control",
+                                        rows = "5",
+                                        placeholder = "Describa en detalle las observaciones del seguimiento..."
+                                    })
+                                    @Html.ValidationMessageFor(model => model.Observaciones, "", new { @class = "text-danger" })
+                                    <div class="form-text text-end">
+                                        <span id="obsCounter">0</span>/2000 caracteres
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">
+                                        <i class="fas fa-lightbulb"></i> Recomendaciones
+                                    </label>
+                                    @Html.TextAreaFor(model => model.Recomendaciones,
+                                    new
+                                         {
+                                        @class = "form-control",
+                                        rows = "5",
+                                        placeholder = "Ingrese recomendaciones para el adoptante..."
+                                    })
+                                    @Html.ValidationMessageFor(model => model.Recomendaciones, "", new { @class = "text-danger" })
+                                    <div class="form-text text-end">
+                                        <span id="recCounter">0</span>/2000 caracteres
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">
+                                        <i class="fas fa-images"></i> Fotos de Evidencia
+                                    </label>
+                                    @Html.TextBoxFor(model => model.FotosEvidencia,
+                                    new
+                                         {
+                                        @class = "form-control",
+                                        placeholder = "Ruta donde se almacenaron las fotos (opcional)"
+                                    })
+                                    <small class="text-muted">
+                                        Ingrese la ruta donde guardó las fotos del seguimiento
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between mt-4 pt-3 border-top">
+                            <a href="@Url.Action("SeguimientoMascota", "Mascotas", new { id = mascota.MascotaId })"
+                               class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left"></i> Cancelar
+                            </a>
+                            <div>
+                                <button type="reset" class="btn btn-outline-danger me-2">
+                                    <i class="fas fa-redo"></i> Limpiar
+                                </button>
+                                <button type="submit" class="btn btn-primary btn-lg">
+                                    <i class="fas fa-save"></i> Guardar Seguimiento
+                                </button>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // Establecer fecha actual por defecto
+            var hoy = new Date().toISOString().split('T')[0];
+            if (!$('#FechaSeguimiento').val()) {
+                $('#FechaSeguimiento').val(hoy);
+            }
+
+            // Establecer fecha de mañana para próximo seguimiento
+            var manana = new Date();
+            manana.setDate(manana.getDate() + 1);
+            var mananaStr = manana.toISOString().split('T')[0];
+
+            if (!$('#ProximoSeguimiento').val()) {
+                $('#ProximoSeguimiento').val(mananaStr);
+            }
+
+            // Contadores de caracteres
+            function actualizarContador(textareaId, counterId) {
+                var textarea = document.getElementById(textareaId);
+                var counter = document.getElementById(counterId);
+                if (textarea && counter) {
+                    var length = textarea.value.length;
+                    counter.textContent = length;
+
+                    if (length > 1800) {
+                        counter.className = 'text-danger';
+                    } else if (length > 1500) {
+                        counter.className = 'text-warning';
+                    } else {
+                        counter.className = '';
+                    }
+                }
+            }
+
+            $('#Observaciones').on('input', function() {
+                actualizarContador('Observaciones', 'obsCounter');
+            });
+
+            $('#Recomendaciones').on('input', function() {
+                actualizarContador('Recomendaciones', 'recCounter');
+            });
+
+            // Inicializar contadores
+            actualizarContador('Observaciones', 'obsCounter');
+            actualizarContador('Recomendaciones', 'recCounter');
+
+            // Validación de formulario
+            $('form').submit(function(e) {
+                var fechaSeguimiento = new Date($('#FechaSeguimiento').val());
+                var hoy = new Date();
+                hoy.setHours(0, 0, 0, 0);
+
+                if (fechaSeguimiento > hoy) {
+                    e.preventDefault();
+                    alert('La fecha del seguimiento no puede ser futura.');
+                    return false;
+                }
+
+                var fechaProximo = new Date($('#ProximoSeguimiento').val());
+                if ($('#ProximoSeguimiento').val() && fechaProximo <= fechaSeguimiento) {
+                    e.preventDefault();
+                    alert('La fecha del próximo seguimiento debe ser posterior a la fecha actual.');
+                    return false;
+                }
+
+                return true;
+            });
+        });
+    </script>
+}

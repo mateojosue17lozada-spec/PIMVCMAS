@@ -5,242 +5,257 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="container mt-4">
-    <div class="row">
-        <div class="col-md-8 mx-auto">
-            <div class="card">
-                <div class="card-header bg-primary text-white">
-                    <h4 class="mb-0">
-                        <i class="fas fa-user-edit me-2"></i>@ViewBag.Title
-                    </h4>
-                </div>
+<!-- Hero Section -->
+<section class="py-4">
+    <div class="container">
+        <div class="text-center">
+            <h1 class="display-5 fw-bold mb-2 text-brown">
+                <i class="fa fa-user-edit text-green"></i> Editar Perfil
+            </h1>
+            <p class="lead mb-3 text-secondary">Actualiza tu información personal y de contacto</p>
+        </div>
+    </div>
+</section>
 
-                <div class="card-body">
-                    @if (TempData["SuccessMessage"] != null)
-                    {
-                        <div class="alert alert-success alert-dismissible fade show" role="alert">
-                            <i class="fas fa-check-circle me-2"></i>
-                            @TempData["SuccessMessage"]
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                    }
+<!-- Main Content -->
+<section class="py-5 bg-light-mint">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="card border-green shadow-hover">
+                    <div class="card-header bg-green text-white">
+                        <h4 class="mb-0">
+                            <i class="fa fa-user-edit me-2"></i>@ViewBag.Title
+                        </h4>
+                    </div>
 
-                    @if (TempData["ErrorMessage"] != null)
-                    {
-                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                            <i class="fas fa-exclamation-triangle me-2"></i>
-                            @TempData["ErrorMessage"]
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                    }
-
-                    @using (Html.BeginForm("EditProfile", "Account", FormMethod.Post,
-                           new { enctype = "multipart/form-data", @class = "needs-validation", novalidate = "novalidate" }))
-                    {
-                        @Html.AntiForgeryToken()
-                        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
-
-                        <div class="row">
-                            <!-- Columna izquierda - Imagen de perfil -->
-                            <div class="col-md-4 mb-4">
-                                <div class="text-center">
-                                    @if (!string.IsNullOrEmpty(Model.ImagenPerfilBase64))
-                                    {
-                                        <img id="profileImage" src="data:image/jpeg;base64,@Model.ImagenPerfilBase64"
-                                             class="img-fluid rounded-circle border border-3 border-primary mb-3"
-                                             style="width: 200px; height: 200px; object-fit: cover;"
-                                             alt="Imagen de perfil actual" />
-                                    }
-                                    else
-                                    {
-                                        <div id="profileImage" class="rounded-circle border border-3 border-primary mb-3 d-flex align-items-center justify-content-center mx-auto"
-                                             style="width: 200px; height: 200px; background-color: #e9ecef;">
-                                            <i class="fas fa-user fa-5x text-secondary"></i>
-                                        </div>
-                                    }
-
-                                    <div class="mb-3">
-                                        <label for="NuevaImagenPerfil" class="form-label">
-                                            <i class="fas fa-camera me-1"></i>Cambiar imagen
-                                        </label>
-                                        <input type="file" class="form-control" id="NuevaImagenPerfil"
-                                               name="NuevaImagenPerfil" accept="image/*"
-                                               onchange="previewImage(this)" />
-                                        @Html.ValidationMessageFor(model => model.NuevaImagenPerfil, "", new { @class = "text-danger" })
-                                        <div class="form-text">
-                                            Formatos permitidos: JPG, PNG, GIF (máx. 5MB)
-                                        </div>
-                                    </div>
-                                </div>
+                    <div class="card-body">
+                        @if (TempData["SuccessMessage"] != null)
+                        {
+                            <div class="alert alert-green border-green alert-dismissible fade show" role="alert">
+                                <i class="fa fa-check-circle text-green me-2"></i>
+                                <strong class="text-brown">@TempData["SuccessMessage"]</strong>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                             </div>
+                        }
 
-                            <!-- Columna derecha - Formulario -->
-                            <div class="col-md-8">
-                                <h5 class="mb-4 border-bottom pb-2">
-                                    <i class="fas fa-info-circle me-2"></i>Información Personal
-                                </h5>
+                        @if (TempData["ErrorMessage"] != null)
+                        {
+                            <div class="alert alert-green border-green alert-dismissible fade show" role="alert">
+                                <i class="fa fa-exclamation-triangle text-green me-2"></i>
+                                <strong class="text-brown">@TempData["ErrorMessage"]</strong>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        }
 
-                                <!-- Nombre Completo -->
-                                <div class="mb-3">
-                                    @Html.LabelFor(model => model.NombreCompleto,
-                                        new { @class = "form-label fw-bold" })
-                                    @Html.TextBoxFor(model => model.NombreCompleto,
-                                        new { @class = "form-control", placeholder = "Ingrese su nombre completo" })
-                                    @Html.ValidationMessageFor(model => model.NombreCompleto, "",
-                                        new { @class = "text-danger small" })
-                                </div>
+                        @using (Html.BeginForm("EditProfile", "Account", FormMethod.Post,
+                               new { enctype = "multipart/form-data", @class = "needs-validation", novalidate = "novalidate", id = "editProfileForm" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            @Html.ValidationSummary(true, "", new { @class = "alert alert-green border-green" })
 
-                                <!-- Teléfono -->
-                                <div class="mb-3">
-                                    @Html.LabelFor(model => model.Telefono,
-                                        new { @class = "form-label fw-bold" })
-                                    @Html.TextBoxFor(model => model.Telefono,
-                                        new { @class = "form-control", placeholder = "Ej: 0991234567" })
-                                    @Html.ValidationMessageFor(model => model.Telefono, "",
-                                        new { @class = "text-danger small" })
-                                </div>
-
-                                <!-- Dirección -->
-                                <div class="mb-3">
-                                    @Html.LabelFor(model => model.Direccion,
-                                        new { @class = "form-label fw-bold" })
-                                    @Html.TextAreaFor(model => model.Direccion,
-                                        new
-                                             {
-                                                 @class = "form-control",
-                                                 rows = "2",
-                                              placeholder = "Ingrese su dirección completa"
-                                             })
-                                    @Html.ValidationMessageFor(model => model.Direccion, "",
-                                        new { @class = "text-danger small" })
-                                </div>
-
-                                <!-- Ciudad y Provincia -->
-                                <div class="row">
-                                    <div class="col-md-6 mb-3">
-                                        @Html.LabelFor(model => model.Ciudad,
-                                            new { @class = "form-label fw-bold" })
-                                        @Html.TextBoxFor(model => model.Ciudad,
-                                            new { @class = "form-control", placeholder = "Ciudad" })
-                                        @Html.ValidationMessageFor(model => model.Ciudad, "",
-                                            new { @class = "text-danger small" })
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        @Html.LabelFor(model => model.Provincia,
-                                            new { @class = "form-label fw-bold" })
-                                        @Html.TextBoxFor(model => model.Provincia,
-                                            new { @class = "form-control", placeholder = "Provincia" })
-                                        @Html.ValidationMessageFor(model => model.Provincia, "",
-                                            new { @class = "text-danger small" })
-                                    </div>
-                                </div>
-
-                                <!-- Información de solo lectura -->
-                                <h6 class="mt-4 mb-3 border-bottom pb-2 text-muted">
-                                    <i class="fas fa-lock me-2"></i>Información no editable
-                                </h6>
-
-                                <div class="row">
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label fw-bold text-muted">
-                                            <i class="fas fa-envelope me-1"></i>Email
-                                        </label>
-                                        @Html.TextBoxFor(model => model.Email,
-                                            new { @class = "form-control-plaintext bg-light p-2 rounded", @readonly = "readonly" })
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label fw-bold text-muted">
-                                            <i class="fas fa-id-card me-1"></i>Cédula
-                                        </label>
-                                        @Html.TextBoxFor(model => model.Cedula,
-                                            new
-                                                 {
-                                                     @class = "form-control-plaintext bg-light p-2 rounded",
-                                                     @readonly = "readonly",
-                                                  value = Model.Cedula ?? "No disponible"
-                                                 })
-                                    </div>
-                                </div>
-
-                                <!-- Información adicional de solo lectura -->
-                                <div class="row">
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label fw-bold text-muted">
-                                            <i class="fas fa-calendar-alt me-1"></i>Fecha de Registro
-                                        </label>
-                                        @if (Model.FechaRegistro.HasValue)
+                            <div class="row">
+                                <!-- Columna izquierda - Imagen de perfil -->
+                                <div class="col-md-4 mb-4">
+                                    <div class="text-center">
+                                        @if (!string.IsNullOrEmpty(Model.ImagenPerfilBase64))
                                         {
-                                            <input type="text" class="form-control-plaintext bg-light p-2 rounded"
-                                                   value="@Model.FechaRegistro.Value.ToString("dd/MM/yyyy HH:mm")" readonly />
+                                            <img id="profileImage" src="data:image/jpeg;base64,@Model.ImagenPerfilBase64"
+                                                 class="img-fluid rounded-circle border border-3 border-green mb-3"
+                                                 style="width: 200px; height: 200px; object-fit: cover;"
+                                                 alt="Imagen de perfil actual" />
                                         }
                                         else
                                         {
-                                            <input type="text" class="form-control-plaintext bg-light p-2 rounded"
-                                                   value="No disponible" readonly />
+                                            <div id="profileImage" class="rounded-circle border border-3 border-green mb-3 d-flex align-items-center justify-content-center mx-auto"
+                                                 style="width: 200px; height: 200px; background-color: var(--bg-light);">
+                                                <i class="fa fa-user fa-5x text-secondary"></i>
+                                            </div>
                                         }
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label fw-bold text-muted">
-                                            <i class="fas fa-check-circle me-1"></i>Estado de Cuenta
-                                        </label>
-                                        <div class="d-flex flex-wrap gap-2">
-                                            @if (Model.Activo == true)
-                                            {
-                                                <span class="badge bg-success">Activo</span>
-                                            }
-                                            else
-                                            {
-                                                <span class="badge bg-danger">Inactivo</span>
-                                            }
 
-                                            @if (Model.EmailConfirmado == true)
-                                            {
-                                                <span class="badge bg-info">Email Confirmado</span>
-                                            }
-
-                                            @if (Model.TelefonoConfirmado == true)
-                                            {
-                                                <span class="badge bg-info">Teléfono Confirmado</span>
-                                            }
+                                        <div class="mb-3">
+                                            <label for="NuevaImagenPerfil" class="form-label text-brown fw-medium">
+                                                <i class="fa fa-camera text-green me-1"></i>Cambiar imagen
+                                            </label>
+                                            <input type="file" class="form-control border-green" id="NuevaImagenPerfil"
+                                                   name="NuevaImagenPerfil" accept="image/*"
+                                                   onchange="previewImage(this)" />
+                                            @Html.ValidationMessageFor(model => model.NuevaImagenPerfil, "", new { @class = "text-danger small" })
+                                            <div class="form-text text-secondary">
+                                                <i class="fa fa-info-circle text-green"></i> Formatos permitidos: JPG, PNG, GIF (máx. 5MB)
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
 
-                                <!-- Botones -->
-                                <div class="d-flex justify-content-between mt-4 pt-3 border-top">
-                                    <a href="@Url.Action("MiPerfil", "Account")"
-                                       class="btn btn-outline-secondary">
-                                        <i class="fas fa-arrow-left me-1"></i>Volver al Perfil
-                                    </a>
-                                    <div>
-                                        <button type="reset" class="btn btn-outline-danger me-2" onclick="resetForm()">
-                                            <i class="fas fa-redo me-1"></i>Cancelar Cambios
-                                        </button>
-                                        <button type="submit" class="btn btn-primary">
-                                            <i class="fas fa-save me-1"></i>Guardar Cambios
-                                        </button>
+                                <!-- Columna derecha - Formulario -->
+                                <div class="col-md-8">
+                                    <h5 class="mb-4 border-bottom pb-2 text-brown">
+                                        <i class="fa fa-info-circle text-green me-2"></i>Información Personal
+                                    </h5>
+
+                                    <!-- Nombre Completo -->
+                                    <div class="mb-4">
+                                        @Html.LabelFor(model => model.NombreCompleto,
+                                            new { @class = "form-label text-brown fw-medium" })
+                                        @Html.TextBoxFor(model => model.NombreCompleto,
+                                            new { @class = "form-control border-green", placeholder = "Ingrese su nombre completo" })
+                                        @Html.ValidationMessageFor(model => model.NombreCompleto, "",
+                                            new { @class = "text-danger small mt-1" })
+                                    </div>
+
+                                    <!-- Teléfono -->
+                                    <div class="mb-4">
+                                        @Html.LabelFor(model => model.Telefono,
+                                            new { @class = "form-label text-brown fw-medium" })
+                                        @Html.TextBoxFor(model => model.Telefono,
+                                            new { @class = "form-control border-green", placeholder = "Ej: 0991234567" })
+                                        @Html.ValidationMessageFor(model => model.Telefono, "",
+                                            new { @class = "text-danger small mt-1" })
+                                    </div>
+
+                                    <!-- Dirección -->
+                                    <div class="mb-4">
+                                        @Html.LabelFor(model => model.Direccion,
+                                            new { @class = "form-label text-brown fw-medium" })
+                                        @Html.TextAreaFor(model => model.Direccion,
+                                            new
+                                                 {
+                                                     @class = "form-control border-green",
+                                                     rows = "2",
+                                                  placeholder = "Ingrese su dirección completa"
+                                                 })
+                                        @Html.ValidationMessageFor(model => model.Direccion, "",
+                                            new { @class = "text-danger small mt-1" })
+                                    </div>
+
+                                    <!-- Ciudad y Provincia -->
+                                    <div class="row">
+                                        <div class="col-md-6 mb-4">
+                                            @Html.LabelFor(model => model.Ciudad,
+                                                new { @class = "form-label text-brown fw-medium" })
+                                            @Html.TextBoxFor(model => model.Ciudad,
+                                                new { @class = "form-control border-green", placeholder = "Ciudad" })
+                                            @Html.ValidationMessageFor(model => model.Ciudad, "",
+                                                new { @class = "text-danger small mt-1" })
+                                        </div>
+                                        <div class="col-md-6 mb-4">
+                                            @Html.LabelFor(model => model.Provincia,
+                                                new { @class = "form-label text-brown fw-medium" })
+                                            @Html.TextBoxFor(model => model.Provincia,
+                                                new { @class = "form-control border-green", placeholder = "Provincia" })
+                                            @Html.ValidationMessageFor(model => model.Provincia, "",
+                                                new { @class = "text-danger small mt-1" })
+                                        </div>
+                                    </div>
+
+                                    <!-- Información de solo lectura -->
+                                    <h6 class="mt-4 mb-3 border-bottom pb-2 text-brown">
+                                        <i class="fa fa-lock text-green me-2"></i>Información no editable
+                                    </h6>
+
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label text-brown fw-medium">
+                                                <i class="fa fa-envelope text-green me-1"></i>Email
+                                            </label>
+                                            @Html.TextBoxFor(model => model.Email,
+                                                new { @class = "form-control-plaintext bg-light-mint p-2 rounded", @readonly = "readonly" })
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label text-brown fw-medium">
+                                                <i class="fa fa-id-card text-green me-1"></i>Cédula
+                                            </label>
+                                            @Html.TextBoxFor(model => model.Cedula,
+                                                new
+                                                     {
+                                                         @class = "form-control-plaintext bg-light-mint p-2 rounded",
+                                                         @readonly = "readonly",
+                                                      value = Model.Cedula ?? "No disponible"
+                                                     })
+                                        </div>
+                                    </div>
+
+                                    <!-- Información adicional de solo lectura -->
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label text-brown fw-medium">
+                                                <i class="fa fa-calendar-alt text-green me-1"></i>Fecha de Registro
+                                            </label>
+                                            @if (Model.FechaRegistro.HasValue)
+                                            {
+                                                <input type="text" class="form-control-plaintext bg-light-mint p-2 rounded"
+                                                       value="@Model.FechaRegistro.Value.ToString("dd/MM/yyyy HH:mm")" readonly />
+                                            }
+                                            else
+                                            {
+                                                <input type="text" class="form-control-plaintext bg-light-mint p-2 rounded"
+                                                       value="No disponible" readonly />
+                                            }
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label text-brown fw-medium">
+                                                <i class="fa fa-check-circle text-green me-1"></i>Estado de Cuenta
+                                            </label>
+                                            <div class="d-flex flex-wrap gap-2">
+                                                @if (Model.Activo == true)
+                                                {
+                                                    <span class="badge bg-green">Activo</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-pink">Inactivo</span>
+                                                }
+
+                                                @if (Model.EmailConfirmado == true)
+                                                {
+                                                    <span class="badge bg-green">Email Confirmado</span>
+                                                }
+
+                                                @if (Model.TelefonoConfirmado == true)
+                                                {
+                                                    <span class="badge bg-green">Teléfono Confirmado</span>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Botones -->
+                                    <div class="d-flex justify-content-between mt-4 pt-3 border-top border-green">
+                                        <a href="@Url.Action("MiPerfil", "Account")"
+                                           class="btn btn-outline-green">
+                                            <i class="fa fa-arrow-left me-1"></i>Volver al Perfil
+                                        </a>
+                                        <div>
+                                            <button type="reset" class="btn btn-outline-green me-2" onclick="resetForm()">
+                                                <i class="fa fa-redo me-1"></i>Cancelar Cambios
+                                            </button>
+                                            <button type="submit" class="btn btn-green text-white">
+                                                <i class="fa fa-save me-1"></i>Guardar Cambios
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    }
+                        }
+                    </div>
                 </div>
-            </div>
 
-            <!-- Enlace para cambiar contraseña -->
-            <div class="card mt-3">
-                <div class="card-body">
-                    <h6 class="mb-3">
-                        <i class="fas fa-key me-2"></i>Seguridad
-                    </h6>
-                    <a href="@Url.Action("ChangePassword", "Account")" class="btn btn-outline-warning">
-                        <i class="fas fa-lock me-1"></i>Cambiar Contraseña
-                    </a>
+                <!-- Enlace para cambiar contraseña -->
+                <div class="card border-green shadow-hover mt-4">
+                    <div class="card-body">
+                        <h6 class="mb-3 text-brown">
+                            <i class="fa fa-key text-green me-2"></i>Seguridad
+                        </h6>
+                        <a href="@Url.Action("ChangePassword", "Account")" class="btn btn-pink">
+                            <i class="fa fa-lock me-1"></i>Cambiar Contraseña
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
+</section>
 
 @section Scripts {
     @Scripts.Render("~/bundles/jqueryval")
@@ -256,13 +271,13 @@
                     if (imgElement.is('img')) {
                         imgElement
                             .attr('src', e.target.result)
-                            .removeClass('border-primary')
-                            .addClass('border-success');
+                            .removeClass('border-green')
+                            .addClass('border-green');
                     } else {
                         // Si es un div (icono de usuario), reemplazarlo por imagen
                         imgElement.replaceWith(
                             '<img id="profileImage" src="' + e.target.result +
-                            '" class="img-fluid rounded-circle border border-3 border-success mb-3"' +
+                            '" class="img-fluid rounded-circle border border-3 border-green mb-3"' +
                             ' style="width: 200px; height: 200px; object-fit: cover;"' +
                             ' alt="Imagen de perfil nueva" />'
                         );
@@ -283,12 +298,12 @@
                     imgElement
                         .attr('src', 'data:image/jpeg;base64,' + originalImage)
                         .removeClass('border-success')
-                        .addClass('border-primary');
+                        .addClass('border-green');
                 } else {
                     // Si es un div (icono), reemplazar por imagen
                     imgElement.replaceWith(
                         '<img id="profileImage" src="data:image/jpeg;base64,' + originalImage +
-                        '" class="img-fluid rounded-circle border border-3 border-primary mb-3"' +
+                        '" class="img-fluid rounded-circle border border-3 border-green mb-3"' +
                         ' style="width: 200px; height: 200px; object-fit: cover;"' +
                         ' alt="Imagen de perfil actual" />'
                     );
@@ -297,9 +312,9 @@
                 // Restaurar icono de usuario
                 if (imgElement.is('img')) {
                     imgElement.replaceWith(
-                        '<div id="profileImage" class="rounded-circle border border-3 border-primary mb-3 d-flex align-items-center justify-content-center mx-auto"' +
-                        ' style="width: 200px; height: 200px; background-color: #e9ecef;">' +
-                        '<i class="fas fa-user fa-5x text-secondary"></i>' +
+                        '<div id="profileImage" class="rounded-circle border border-3 border-green mb-3 d-flex align-items-center justify-content-center mx-auto"' +
+                        ' style="width: 200px; height: 200px; background-color: var(--bg-light);">' +
+                        '<i class="fa fa-user fa-5x text-secondary"></i>' +
                         '</div>'
                     );
                 }
@@ -313,9 +328,15 @@
         }
 
         function showToast(title, message, type) {
-            // Crear toast de Bootstrap 5
+            var colorClass = 'bg-green';
+            if (type === 'warning') {
+                colorClass = 'bg-yellow text-brown';
+            } else if (type === 'error') {
+                colorClass = 'bg-pink text-brown';
+            }
+
             var toastHtml = `
-                <div class="toast align-items-center text-white bg-${type} border-0" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="toast align-items-center ${colorClass} border-0" role="alert" aria-live="assertive" aria-atomic="true">
                     <div class="d-flex">
                         <div class="toast-body">
                             <strong>${title}</strong><br>${message}
@@ -373,25 +394,38 @@
             }
         });
     </script>
+}
 
+@section Styles {
     <style>
+        /* Estilos específicos para Editar Perfil */
         .form-control:focus {
-            border-color: #0d6efd;
-            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+            border-color: var(--green) !important;
+            box-shadow: 0 0 0 0.25rem rgba(151, 199, 139, 0.25) !important;
         }
 
-        .form-control-plaintext.bg-light {
-            background-color: #f8f9fa !important;
+        .form-control-plaintext.bg-light-mint {
+            background-color: var(--bg-light) !important;
             cursor: not-allowed;
         }
 
         .border-success {
-            border-color: #198754 !important;
+            border-color: var(--green) !important;
         }
 
         .badge {
             font-size: 0.75em;
             padding: 0.35em 0.65em;
         }
+
+        /* Estilo para imagen de perfil */
+        .rounded-circle {
+            transition: all 0.3s ease;
+        }
+
+            .rounded-circle:hover {
+                transform: scale(1.02);
+                box-shadow: 0 5px 15px rgba(151, 199, 139, 0.3);
+            }
     </style>
 }

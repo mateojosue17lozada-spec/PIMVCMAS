@@ -34,6 +34,7 @@ namespace MVCMASCOTAS.Models
         public string MotivoRechazo { get; set; }
         public Nullable<System.DateTime> FechaRespuesta { get; set; }
         public string Observaciones { get; set; }
+        public string EstadoAdopcion { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ContratoAdopcion> ContratoAdopcion { get; set; }

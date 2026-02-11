@@ -1,94 +1,485 @@
 ﻿@{
-    ViewBag.Title = "Sobre Nosotros";
+    ViewBag.Title = "Acerca de Nosotros";
 }
 
-<main aria-labelledby="title">
-    <h2 id="title">@ViewBag.Title.</h2>
-    <h3>@ViewBag.Message</h3>
-    <p>Use this area to provide additional information.</p>
-</main>
-
-<div class="jumbotron bg-light">
-    <h1 class="display-4"><i class="fas fa-heart"></i> Sobre Refugio de Mascotas</h1>
-    <p class="lead">Dedicados al rescate, cuidado y adopción responsable de animales.</p>
-</div>
-
-<div class="row mb-5">
-    <div class="col-md-6">
-        <h2><i class="fas fa-flag"></i> Nuestra Misión</h2>
-        <p>Somos una organización sin fines de lucro dedicada al rescate, rehabilitación y reubicación de animales en situación de abandono o maltrato. Trabajamos incansablemente para brindarles una segunda oportunidad y encontrarles un hogar lleno de amor.</p>
-
-        <h2 class="mt-4"><i class="fas fa-eye"></i> Nuestra Visión</h2>
-        <p>Aspiramos a ser el refugio de referencia en la región, reconocido por nuestro compromiso con el bienestar animal y la promoción de la tenencia responsable de mascotas.</p>
+<!-- Hero Section -->
+<section class="about-hero">
+    <div class="container">
+        <h1 class="display-3 mb-4 text-white">Acerca de Nosotros</h1>
+        <p class="lead mb-0 text-white">Desde 2015, trabajando por el bienestar animal en Ecuador</p>
     </div>
-    <div class="col-md-6">
-        <h2><i class="fas fa-star"></i> Nuestros Valores</h2>
-        <ul class="list-unstyled">
-            <li class="mb-3"><i class="fas fa-check-circle text-success"></i> <strong>Compasión:</strong> Tratamos a cada animal con amor y respeto</li>
-            <li class="mb-3"><i class="fas fa-check-circle text-success"></i> <strong>Responsabilidad:</strong> Nos comprometemos con el cuidado integral</li>
-            <li class="mb-3"><i class="fas fa-check-circle text-success"></i> <strong>Transparencia:</strong> Actuamos con honestidad en todas nuestras acciones</li>
-            <li class="mb-3"><i class="fas fa-check-circle text-success"></i> <strong>Colaboración:</strong> Trabajamos en equipo con la comunidad</li>
-        </ul>
-    </div>
-</div>
+</section>
 
-<div class="row mb-5">
-    <div class="col-12">
-        <h2 class="text-center mb-4"><i class="fas fa-history"></i> Nuestra Historia</h2>
-        <p>Fundado en 2015, el Refugio de Mascotas nació del sueño de un grupo de amantes de los animales que querían hacer la diferencia. Desde entonces, hemos rescatado y rehomado a más de 500 animales, brindándoles la atención médica, alimentación y amor que merecen.</p>
-    </div>
-</div>
-
-<div class="row mb-5 text-center">
-    <div class="col-md-3">
-        <div class="card">
-            <div class="card-body">
-                <h3 class="text-primary">@(ViewBag.TotalRescates ?? "500+")</h3>
-                <p>Animales Rescatados</p>
+<!-- Misión y Visión -->
+<section class="mission-vision">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 mb-4">
+                <div class="card h-100 border-green shadow-hover">
+                    <div class="card-body text-center p-5">
+                        <div class="stat-icon">
+                            <i class="fas fa-bullseye text-green fa-3x"></i>
+                        </div>
+                        <h3 class="card-title mb-3 text-brown">Nuestra Misión</h3>
+                        <p class="card-text text-secondary">
+                            Rescatar, rehabilitar y encontrar hogares responsables para animales en situación
+                            de abandono y maltrato en Quito y sus alrededores, promoviendo la tenencia
+                            responsable y el respeto hacia todos los seres vivos.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-4">
+                <div class="card h-100 border-green shadow-hover">
+                    <div class="card-body text-center p-5">
+                        <div class="stat-icon">
+                            <i class="fas fa-eye text-green fa-3x"></i>
+                        </div>
+                        <h3 class="card-title mb-3 text-brown">Nuestra Visión</h3>
+                        <p class="card-text text-secondary">
+                            Ser la organización líder en bienestar animal en Ecuador, creando una sociedad
+                            consciente y comprometida donde ningún animal sufra por abandono, maltrato
+                            o falta de cuidado médico.
+                        </p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-    <div class="col-md-3">
-        <div class="card">
-            <div class="card-body">
-                <h3 class="text-success">@(ViewBag.TotalAdopciones ?? "350+")</h3>
-                <p>Adopciones Exitosas</p>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card">
-            <div class="card-body">
-                <h3 class="text-warning">@(ViewBag.TotalVoluntarios ?? "50+")</h3>
-                <p>Voluntarios Activos</p>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card">
-            <div class="card-body">
-                <h3 class="text-info">@(ViewBag.TotalDonantes ?? "200+")</h3>
-                <p>Donantes Solidarios</p>
-            </div>
-        </div>
-    </div>
-</div>
+</section>
 
-<div class="row">
-    <div class="col-12 text-center">
-        <h2><i class="fas fa-hands-helping"></i> ¿Cómo Puedes Ayudar?</h2>
-        <p class="lead mb-4">Hay muchas formas de apoyar nuestra misión</p>
-        <a href="@Url.Action("Index", "Donaciones")" class="btn btn-primary btn-lg m-2">
-            <i class="fas fa-donate"></i> Hacer una Donación
-        </a>
-        <a href="@Url.Action("Index", "Mascotas")" class="btn btn-success btn-lg m-2">
-            <i class="fas fa-heart"></i> Adoptar una Mascota
-        </a>
-        <a href="@Url.Action("Index", "Voluntariado")" class="btn btn-warning btn-lg m-2">
-            <i class="fas fa-hands-helping"></i> Ser Voluntario
-        </a>
-        <a href="@Url.Action("Contact", "Home")" class="btn btn-info btn-lg m-2">
-            <i class="fas fa-envelope"></i> Contactarnos
-        </a>
+<!-- Estadísticas -->
+<section class="py-5">
+    <div class="container">
+        <h2 class="text-center mb-5 text-brown">Nuestro Impacto en Números</h2>
+        <div class="row">
+            <div class="col-md-3 col-sm-6 mb-4">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-paw text-green fa-3x"></i>
+                    </div>
+                    <h3 class="stat-number counter">@(ViewBag.TotalMascotas ?? "1,500")</h3>
+                    <p class="stat-label text-brown fw-medium">Mascotas Rescatadas</p>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6 mb-4">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-home text-green fa-3x"></i>
+                    </div>
+                    <h3 class="stat-number counter">@(ViewBag.MascotasAdoptadas ?? "1,200")</h3>
+                    <p class="stat-label text-brown fw-medium">Adopciones Exitosas</p>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6 mb-4">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-hands-helping text-green fa-3x"></i>
+                    </div>
+                    <h3 class="stat-number counter">@(ViewBag.VoluntariosActivos ?? "250")</h3>
+                    <p class="stat-label text-brown fw-medium">Voluntarios Activos</p>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6 mb-4">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-hand-holding-heart text-green fa-3x"></i>
+                    </div>
+                    <h3 class="stat-number counter">@(ViewBag.TotalDonaciones ?? "5,000")</h3>
+                    <p class="stat-label text-brown fw-medium">Donaciones Recibidas</p>
+                </div>
+            </div>
+        </div>
     </div>
-</div>
+</section>
+
+<!-- Nuestra Historia -->
+<section class="py-5 bg-light-mint">
+    <div class="container">
+        <h2 class="text-center mb-5 text-brown">Nuestra Historia</h2>
+        <div class="timeline">
+            <div class="timeline-item">
+                <h4 class="text-brown">2015 - Fundación</h4>
+                <p class="text-secondary">Un grupo de 5 amigos amantes de los animales funda el refugio con 10 mascotas rescatadas.</p>
+            </div>
+            <div class="timeline-item">
+                <h4 class="text-brown">2017 - Primer Centro Veterinario</h4>
+                <p class="text-secondary">Inauguramos nuestra primera clínica veterinaria para atender a las mascotas del refugio.</p>
+            </div>
+            <div class="timeline-item">
+                <h4 class="text-brown">2019 - Sistema Web</h4>
+                <p class="text-secondary">Implementamos el sistema web para digitalizar adopciones y donaciones.</p>
+            </div>
+            <div class="timeline-item">
+                <h4 class="text-brown">2021 - Alianzas Estratégicas</h4>
+                <p class="text-secondary">Formamos alianzas con 15 empresas ecuatorianas comprometidas con el bienestar animal.</p>
+            </div>
+            <div class="timeline-item">
+                <h4 class="text-brown">2023 - Expansión Nacional</h4>
+                <p class="text-secondary">Extendemos nuestras operaciones a Guayaquil y Cuenca con nuevos centros de rescate.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Nuestro Equipo -->
+<section class="py-5">
+    <div class="container">
+        <h2 class="text-center mb-5 text-brown">Nuestro Equipo</h2>
+        <div class="row">
+            <div class="col-md-4 team-member">
+                <div class="team-img-wrapper">
+                    <img src="/Content/images/team-1.jpg" alt="Directora" class="team-img">
+                </div>
+                <h4 class="text-brown">María González</h4>
+                <p class="text-secondary">Directora Ejecutiva</p>
+                <p class="text-secondary">Veterinaria con 15 años de experiencia en rescate animal.</p>
+            </div>
+            <div class="col-md-4 team-member">
+                <div class="team-img-wrapper">
+                    <img src="/Content/images/team-2.jpg" alt="Coordinador" class="team-img">
+                </div>
+                <h4 class="text-brown">Carlos Mendoza</h4>
+                <p class="text-secondary">Coordinador de Rescates</p>
+                <p class="text-secondary">Especialista en comportamiento animal y rescates de emergencia.</p>
+            </div>
+            <div class="col-md-4 team-member">
+                <div class="team-img-wrapper">
+                    <img src="/Content/images/team-3.jpg" alt="Veterinaria" class="team-img">
+                </div>
+                <h4 class="text-brown">Ana López</h4>
+                <p class="text-secondary">Jefa de Veterinarios</p>
+                <p class="text-secondary">Cirujana veterinaria especializada en animales de rescate.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Valores -->
+<section class="py-5 bg-light-mint">
+    <div class="container">
+        <h2 class="text-center mb-5 text-brown">Nuestros Valores</h2>
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 border-green shadow-hover">
+                    <div class="card-body text-center">
+                        <i class="fas fa-heart fa-3x text-green mb-3"></i>
+                        <h4 class="text-brown">Compasión</h4>
+                        <p class="text-secondary">Actuamos con empatía y respeto hacia todos los seres vivos.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 border-green shadow-hover">
+                    <div class="card-body text-center">
+                        <i class="fas fa-shield-alt fa-3x text-green mb-3"></i>
+                        <h4 class="text-brown">Responsabilidad</h4>
+                        <p class="text-secondary">Nos comprometemos con el cuidado integral de cada animal.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 border-green shadow-hover">
+                    <div class="card-body text-center">
+                        <i class="fas fa-users fa-3x text-green mb-3"></i>
+                        <h4 class="text-brown">Comunidad</h4>
+                        <p class="text-secondary">Trabajamos en conjunto con la sociedad para crear cambio.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Call to Action -->
+<section class="py-5 bg-green text-white">
+    <div class="container text-center">
+        <h2 class="mb-4">¿Quieres ser parte del cambio?</h2>
+        <p class="lead mb-5">Únete a nuestra misión de crear un mundo mejor para los animales.</p>
+        <div class="row justify-content-center">
+            <div class="col-md-3 mb-3">
+                <a href="@Url.Action("Register", "Account")" class="btn btn-pink btn-lg btn-block">
+                    <i class="fas fa-user-plus"></i> Ser Voluntario
+                </a>
+            </div>
+            <div class="col-md-3 mb-3">
+                <a href="@Url.Action("Donar", "Donaciones")" class="btn btn-yellow btn-lg btn-block text-brown">
+                    <i class="fas fa-donate"></i> Donar
+                </a>
+            </div>
+            <div class="col-md-3 mb-3">
+                <a href="@Url.Action("Index", "Mascotas")" class="btn btn-light btn-lg btn-block text-brown">
+                    <i class="fas fa-paw"></i> Adoptar
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Styles {
+    <style>
+        .about-hero {
+            background: linear-gradient(rgba(151, 199, 139, 0.8), rgba(242, 201, 109, 0.8)), url('/Content/images/about-hero.jpg');
+            background-size: cover;
+            background-position: center;
+            padding: 100px 0;
+            text-align: center;
+            margin-bottom: 60px;
+            border-radius: 10px;
+        }
+
+        .mission-vision {
+            padding: 60px 0;
+        }
+
+        .stat-card {
+            text-align: center;
+            padding: 30px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(151, 199, 139, 0.1);
+            margin-bottom: 30px;
+            transition: transform 0.3s;
+            border: 2px solid #97C78B;
+        }
+
+            .stat-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 10px 25px rgba(151, 199, 139, 0.2);
+                border-color: #86b57a;
+            }
+
+        .stat-icon {
+            margin-bottom: 20px;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #5C4B43;
+            margin: 15px 0;
+        }
+
+        .stat-label {
+            color: #555555;
+            font-size: 1rem;
+        }
+
+        .team-member {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .team-img-wrapper {
+            position: relative;
+            width: 150px;
+            height: 150px;
+            margin: 0 auto 20px auto;
+        }
+
+        .team-img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 5px solid #97C78B;
+            box-shadow: 0 5px 15px rgba(151, 199, 139, 0.2);
+        }
+
+            /* Placeholder para imágenes faltantes */
+            .team-img[src$=""] {
+                display: none;
+            }
+
+        .team-img-wrapper:not(:has(img[src$=""]))::after {
+            content: '\f007'; /* Icono de usuario de Font Awesome */
+            font-family: 'Font Awesome 5 Free';
+            font-weight: 900;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 3rem;
+            color: #97C78B;
+            z-index: 1;
+        }
+
+        .team-img-wrapper:not(:has(img[src$=""]))::before {
+            content: '';
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #F2E9D8;
+            border-radius: 50%;
+            border: 5px solid #97C78B;
+            z-index: 0;
+        }
+
+        .timeline {
+            position: relative;
+            padding-left: 30px;
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 30px;
+            padding-left: 30px;
+        }
+
+            .timeline-item::before {
+                content: '';
+                position: absolute;
+                left: -30px;
+                top: 10px;
+                width: 15px;
+                height: 15px;
+                background: #97C78B;
+                border-radius: 50%;
+                border: 3px solid #F2E9D8;
+            }
+
+            .timeline-item::after {
+                content: '';
+                position: absolute;
+                left: -23px;
+                top: 25px;
+                width: 2px;
+                height: calc(100% + 5px);
+                background: #97C78B;
+                opacity: 0.5;
+            }
+
+            .timeline-item:last-child::after {
+                display: none;
+            }
+
+        /* Responsive */
+        @@media (max-width: 768px) {
+            .about-hero {
+                padding: 60px 0;
+            }
+
+            .stat-number {
+                font-size: 2rem;
+            }
+
+            .team-img-wrapper {
+                width: 120px;
+                height: 120px;
+            }
+
+            .timeline {
+                padding-left: 20px;
+            }
+
+            .timeline-item::before {
+                left: -20px;
+            }
+
+            .timeline-item::after {
+                left: -16px;
+            }
+        }
+
+        /* Animaciones */
+        @@keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in-up {
+            animation: fadeInUp 0.6s ease-out;
+        }
+    </style>
+}
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // Contador animado
+            $('.counter').each(function () {
+                var $this = $(this);
+                var countTo = $this.text().replace(',', '');
+
+                if (!isNaN(countTo)) {
+                    $({ countNum: 0 }).animate({
+                        countNum: parseInt(countTo)
+                    }, {
+                        duration: 2000,
+                        easing: 'swing',
+                        step: function () {
+                            $this.text(Math.floor(this.countNum).toLocaleString());
+                        },
+                        complete: function () {
+                            $this.text(this.countNum.toLocaleString());
+                        }
+                    });
+                }
+            });
+
+            // Animación de aparición para secciones
+            function checkScroll() {
+                $('.fade-in-up').each(function () {
+                    var elementTop = $(this).offset().top;
+                    var windowHeight = $(window).height();
+                    var scrollTop = $(window).scrollTop();
+
+                    if (elementTop < scrollTop + windowHeight - 100) {
+                        $(this).addClass('visible');
+                    }
+                });
+            }
+
+            // Agregar clase a elementos para animación
+            $('.stat-card, .timeline-item, .team-member, .card').addClass('fade-in-up');
+
+            // Verificar scroll
+            checkScroll();
+            $(window).scroll(checkScroll);
+
+            // Efecto hover para timeline items
+            $('.timeline-item').hover(
+                function () {
+                    $(this).css('transform', 'translateX(10px)');
+                },
+                function () {
+                    $(this).css('transform', 'translateX(0)');
+                }
+            );
+
+            // Comprobar si las imágenes existen y mostrar placeholder si no
+            $('.team-img').each(function () {
+                var $img = $(this);
+                var imgSrc = $img.attr('src');
+
+                // Si la imagen no tiene src o el src está vacío
+                if (!imgSrc || imgSrc === '' || imgSrc === '/Content/images/team-1.jpg' ||
+                    imgSrc === '/Content/images/team-2.jpg' || imgSrc === '/Content/images/team-3.jpg') {
+
+                    // Aquí puedes agregar lógica para verificar si la imagen existe realmente
+                    // Por ahora, simplemente ocultamos la imagen si el src parece ser placeholder
+                    var img = new Image();
+                    img.onload = function () {
+                        // La imagen existe, la dejamos visible
+                    };
+                    img.onerror = function () {
+                        // La imagen no existe, ocultamos y mostramos placeholder
+                        $img.hide();
+                        $img.parent().addClass('has-placeholder');
+                    };
+                    img.src = imgSrc;
+                }
+            });
+        });
+    </script>
+}

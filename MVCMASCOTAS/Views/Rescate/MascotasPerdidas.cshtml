@@ -4,272 +4,321 @@
     ViewBag.Title = "Mascotas Perdidas";
 }
 
-<div class="page-header mb-4">
-    <h2><i class="fas fa-search"></i> Mascotas Perdidas</h2>
-    <p class="lead">Ayuda a reunir a estas mascotas con sus familias</p>
-</div>
+<div class="perdidas-section fade-in">
+    <div class="container">
+        <!-- Encabezado -->
+        <div class="page-header text-center mb-4">
+            <h2 class="display-5 text-brown">
+                <i class="fas fa-search header-icon"></i> Mascotas Perdidas
+            </h2>
+            <p class="lead-text mt-2">
+                Ayuda a reunir a estas mascotas con sus familias. Cada reporte cuenta.
+            </p>
+        </div>
 
-<!-- Filtros -->
-<div class="card mb-4 shadow-custom">
-    <div class="card-body">
-        <form method="get" action="@Url.Action("MascotasPerdidas", "Rescate")" class="form-inline justify-content-center">
-            <div class="form-group mx-2 mb-2">
-                <label class="mr-2">Especie:</label>
-                <select name="especie" class="form-control">
-                    <option value="Todos" @(ViewBag.EspecieSeleccionada == "Todos" ? "selected" : "")>Todas</option>
-                    <option value="Perro" @(ViewBag.EspecieSeleccionada == "Perro" ? "selected" : "")>Perros</option>
-                    <option value="Gato" @(ViewBag.EspecieSeleccionada == "Gato" ? "selected" : "")>Gatos</option>
-                </select>
-            </div>
-
-            <div class="form-group mx-2 mb-2">
-                <label class="mr-2">Estado:</label>
-                <select name="estado" class="form-control">
-                    <option value="Todos" @(ViewBag.EstadoSeleccionado == "Todos" ? "selected" : "")>Todos</option>
-                    <option value="Perdida" @(ViewBag.EstadoSeleccionado == "Perdida" ? "selected" : "")>Perdidas</option>
-                    <option value="Encontrada" @(ViewBag.EstadoSeleccionado == "Encontrada" ? "selected" : "")>Encontradas</option>
-                    <option value="Cerrado" @(ViewBag.EstadoSeleccionado == "Cerrado" ? "selected" : "")>Cerrados</option>
-                </select>
-            </div>
-
-            <div class="form-group mx-2 mb-2">
-                <label class="mr-2">Ubicación:</label>
-                <input type="text" name="ubicacion" class="form-control" placeholder="Ubicación aproximada" value="@ViewBag.UbicacionSeleccionada" />
-            </div>
-
-            <button type="submit" class="btn btn-primary mx-2 mb-2">
-                <i class="fas fa-search"></i> Buscar
-            </button>
-        </form>
-    </div>
-</div>
-
-<div class="text-right mb-3">
-    @if (Request.IsAuthenticated)
-    {
-        <a href="@Url.Action("ReportarMascotaPerdida", "Rescate")" class="btn btn-danger">
-            <i class="fas fa-exclamation-circle"></i> Reportar Mascota Perdida
-        </a>
-    }
-    else
-    {
-        <a href="@Url.Action("Login", "Account", new { returnUrl = Url.Action("ReportarMascotaPerdida", "Rescate") })" class="btn btn-outline-danger">
-            <i class="fas fa-sign-in-alt"></i> Inicia sesión para reportar
-        </a>
-    }
-</div>
-
-<!-- Listado de Mascotas Perdidas -->
-<div class="row">
-    @if (Model != null && Model.Any())
-    {
-        foreach (var mascota in Model)
-        {
-            <div class="col-md-4 mb-4">
-                <div class="card shadow-custom h-100">
-                    <!-- Imagen -->
-                    @if (mascota.ImagenMascota != null && mascota.ImagenMascota.Length > 0)
-                    {
-                        <img src="data:image/jpeg;base64,@Convert.ToBase64String(mascota.ImagenMascota)"
-                             class="card-img-top"
-                             style="height: 250px; object-fit: cover;"
-                             alt="@mascota.NombreMascota">
-                    }
-                    else
-                    {
-                        <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 250px;">
-                            <i class="fas fa-paw fa-5x text-muted"></i>
-                        </div>
-                    }
-
-                    <!-- Badge de estado -->
-                    <div class="card-img-overlay">
-                        @if (mascota.Estado == "Perdida")
-                        {
-                            <span class="badge badge-danger"><i class="fas fa-exclamation-triangle"></i> PERDIDA</span>
-                        }
-                        else if (mascota.Estado == "Encontrada")
-                        {
-                            <span class="badge badge-success"><i class="fas fa-check-circle"></i> ENCONTRADA</span>
-                        }
-                        else
-                        {
-                            <span class="badge badge-secondary"><i class="fas fa-times-circle"></i> CERRADO</span>
-                        }
+        <!-- Filtros de búsqueda -->
+        <div class="filtros-card fade-in">
+            <div class="filtros-body">
+                <form method="get" action="@Url.Action("MascotasPerdidas", "Rescate")" class="row g-3 justify-content-center">
+                    <div class="col-lg-3 col-md-6">
+                        <label class="form-label">
+                            <i class="fas fa-paw me-2" style="color: #E74C3C"></i>Especie
+                        </label>
+                        <select name="especie" class="form-select">
+                            <option value="Todos" @(ViewBag.EspecieSeleccionada == "Todos" ? "selected" : "")>Todas las especies</option>
+                            <option value="Perro" @(ViewBag.EspecieSeleccionada == "Perro" ? "selected" : "")>🐶 Perros</option>
+                            <option value="Gato" @(ViewBag.EspecieSeleccionada == "Gato" ? "selected" : "")>🐱 Gatos</option>
+                        </select>
                     </div>
 
-                    <div class="card-body">
-                        <h5 class="card-title">@mascota.NombreMascota</h5>
+                    <div class="col-lg-3 col-md-6">
+                        <label class="form-label">
+                            <i class="fas fa-info-circle me-2" style="color: #E74C3C"></i>Estado
+                        </label>
+                        <select name="estado" class="form-select">
+                            <option value="Todos" @(ViewBag.EstadoSeleccionado == "Todos" ? "selected" : "")>Todos los estados</option>
+                            <option value="Perdida" @(ViewBag.EstadoSeleccionado == "Perdida" ? "selected" : "")>Perdidas</option>
+                            <option value="Encontrada" @(ViewBag.EstadoSeleccionado == "Encontrada" ? "selected" : "")>Encontradas</option>
+                            <option value="Cerrado" @(ViewBag.EstadoSeleccionado == "Cerrado" ? "selected" : "")>Cerrados</option>
+                        </select>
+                    </div>
 
-                        <div class="mb-2">
-                            <span class="badge badge-info">
-                                <i class="fas @(mascota.Especie == "Perro" ? "fa-dog" : "fa-cat")"></i> @mascota.Especie
-                            </span>
-                            @if (!string.IsNullOrEmpty(mascota.Raza))
-                            {
-                                <span class="badge badge-light">@mascota.Raza</span>
-                            }
-                            <span class="badge badge-light">
-                                <i class="fas @(mascota.Sexo == "M" ? "fa-mars" : "fa-venus")"></i>
-                                @(mascota.Sexo == "M" ? "Macho" : "Hembra")
-                            </span>
-                        </div>
+                    <div class="col-lg-3 col-md-6">
+                        <label class="form-label">
+                            <i class="fas fa-map-marker-alt me-2" style="color: #E74C3C"></i>Ubicación
+                        </label>
+                        <input type="text" name="ubicacion" class="form-control"
+                               placeholder="Ej: La Carolina, Quito"
+                               value="@ViewBag.UbicacionSeleccionada" />
+                    </div>
 
-                        <div class="mb-3">
-                            <p class="mb-1"><strong>Color:</strong> @mascota.Color</p>
-                            <p class="mb-1"><strong>Edad:</strong> @mascota.Edad</p>
-                        </div>
+                    <div class="col-lg-3 col-md-6 d-flex align-items-end">
+                        <button type="submit" class="btn w-100"
+                                style="background: linear-gradient(135deg, #E74C3C 0%, #C0392B 100%); color: white; border: none; padding: 10px 15px; border-radius: 8px; font-weight: 600;">
+                            <i class="fas fa-search me-2"></i> Buscar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
 
-                        <hr />
+        <!-- Botón para reportar -->
+        <div class="btn-reportar-container fade-in">
+            @if (Request.IsAuthenticated)
+            {
+                <a href="@Url.Action("ReportarMascotaPerdida", "Rescate")" class="btn-reportar">
+                    <i class="fas fa-exclamation-circle"></i> Reportar Mascota Perdida
+                </a>
+            }
+            else
+            {
+                <a href="@Url.Action("Login", "Account", new { returnUrl = Url.Action("ReportarMascotaPerdida", "Rescate") })"
+                   class="btn-reportar">
+                    <i class="fas fa-sign-in-alt"></i> Inicia sesión para reportar
+                </a>
+            }
+        </div>
 
-                        <div class="mb-3">
-                            <h6><i class="fas fa-map-marker-alt text-danger"></i> Información de Pérdida</h6>
-                            <p class="mb-1"><strong>Fecha:</strong> @mascota.FechaPerdida.ToString("dd/MM/yyyy")</p>
-                            <p class="mb-1"><strong>Lugar:</strong> @mascota.UbicacionPerdida</p>
+        <!-- Listado de Mascotas Perdidas -->
+        <div class="row">
+            @if (Model != null && Model.Any())
+            {
+                foreach (var mascota in Model)
+                {
+                    <div class="col-xl-4 col-lg-6 mb-4">
+                        <div class="perdida-card stagger-fade">
+                            <!-- Imagen -->
+                            <div class="perdida-imagen">
+                                @if (mascota.ImagenMascota != null && mascota.ImagenMascota.Length > 0)
+                                {
+                                    <img src="data:image/jpeg;base64,@Convert.ToBase64String(mascota.ImagenMascota)"
+                                         alt="@mascota.NombreMascota">
+                                }
+                                else
+                                {
+                                    <div class="w-100 h-100 d-flex align-items-center justify-content-center"
+                                         style="background: linear-gradient(135deg, var(--bg-light) 0%, var(--pink) 100%);">
+                                        <i class="fas fa-paw fa-5x text-white"></i>
+                                    </div>
+                                }
 
-                            @if (!string.IsNullOrEmpty(mascota.CaracteristicasDistintivas))
-                            {
-                                <p class="mb-1">
-                                    <strong>Características:</strong>
-                                    @if (mascota.CaracteristicasDistintivas.Length > 100)
+                                <!-- Badge de estado -->
+                                <span class="perdida-badge-estado @(mascota.Estado == "Perdida" ? "badge-perdida" :
+                                                            mascota.Estado == "Encontrada" ? "badge-encontrada" : "badge-cerrado")">
+                                    @if (mascota.Estado == "Perdida")
                                     {
-                                        @(mascota.CaracteristicasDistintivas.Substring(0, 100) + "...")
+                                        <i class="fas fa-exclamation-triangle me-1"></i>
+                                        @mascota.Estado.ToUpper()
+                                    }
+                                    else if (mascota.Estado == "Encontrada")
+                                    {
+                                        <i class="fas fa-check-circle me-1"></i>
+                                        @mascota.Estado.ToUpper()
                                     }
                                     else
                                     {
-                                        @mascota.CaracteristicasDistintivas
+                                        <i class="fas fa-times-circle me-1"></i>
+                                        @mascota.Estado.ToUpper()
                                     }
-                                </p>
-                            }
-                        </div>
-
-                        <!-- Recompensa -->
-                        @if (mascota.Recompensa.HasValue && mascota.Recompensa > 0)
-                        {
-                            <div class="alert alert-warning text-center py-2 mb-3">
-                                <i class="fas fa-award"></i> <strong>Recompensa:</strong>
-                                $@mascota.Recompensa.Value.ToString("N2")
+                                </span>
                             </div>
-                        }
 
-                        <!-- Contacto -->
-                        @if (mascota.Usuarios != null)
-                        {
-                            <div class="contacto-info">
-                                <h6><i class="fas fa-user text-primary"></i> Información de Contacto</h6>
-                                <p class="mb-1"><strong>Dueño:</strong> @mascota.Usuarios.NombreCompleto</p>
-                                <p class="mb-0"><i class="fas fa-phone text-success"></i> @mascota.Usuarios.Telefono</p>
-                                @if (!string.IsNullOrEmpty(mascota.Usuarios.Email))
+                            <div class="perdida-info">
+                                <h5 class="perdida-nombre">@mascota.NombreMascota</h5>
+
+                                <!-- Badges de características -->
+                                <div class="perdida-badges">
+                                    <span class="badge-especie">
+                                        <i class="fas @(mascota.Especie == "Perro" ? "fa-dog" : "fa-cat") me-1"></i>
+                                        @mascota.Especie
+                                    </span>
+
+                                    @if (!string.IsNullOrEmpty(mascota.Raza))
+                                    {
+                                        <span class="badge-raza">@mascota.Raza</span>
+                                    }
+
+                                    <span class="badge-sexo">
+                                        <i class="fas @(mascota.Sexo == "M" ? "fa-mars" : "fa-venus") me-1"></i>
+                                        @(mascota.Sexo == "M" ? "Macho" : "Hembra")
+                                    </span>
+                                </div>
+
+                                <!-- Datos básicos -->
+                                <div class="perdida-datos">
+                                    <p><i class="fas fa-palette"></i> <strong>Color:</strong> @mascota.Color</p>
+                                    <p><i class="fas fa-birthday-cake"></i> <strong>Edad:</strong> @mascota.Edad</p>
+                                </div>
+
+                                <!-- Información de pérdida -->
+                                <div class="info-perdida">
+                                    <h6><i class="fas fa-map-marker-alt"></i> Información de Pérdida</h6>
+                                    <p class="mb-1"><strong>Fecha:</strong> @mascota.FechaPerdida.ToString("dd/MM/yyyy")</p>
+                                    <p class="mb-1"><strong>Lugar:</strong> @mascota.UbicacionPerdida</p>
+
+                                    @if (!string.IsNullOrEmpty(mascota.CaracteristicasDistintivas))
+                                    {
+                                        <p class="mb-0">
+                                            <strong>Características:</strong>
+                                            @(mascota.CaracteristicasDistintivas.Length > 100 ?
+                                              mascota.CaracteristicasDistintivas.Substring(0, 100) + "..." :
+                                              mascota.CaracteristicasDistintivas)
+                                        </p>
+                                    }
+                                </div>
+
+                                <!-- Recompensa -->
+                                @if (mascota.Recompensa.HasValue && mascota.Recompensa > 0)
                                 {
-                                    <p class="mb-0"><i class="fas fa-envelope text-info"></i> @mascota.Usuarios.Email</p>
+                                    <div class="recompensa-badge">
+                                        <i class="fas fa-award"></i>
+                                        <strong>Recompensa:</strong>
+                                        $@mascota.Recompensa.Value.ToString("N2")
+                                    </div>
+                                }
+
+                                <!-- Contacto -->
+                                @if (mascota.Usuarios != null)
+                                {
+                                    <div class="contacto-info">
+                                        <h6><i class="fas fa-user"></i> Información de Contacto</h6>
+                                        <p class="mb-1"><strong>Dueño:</strong> @mascota.Usuarios.NombreCompleto</p>
+                                        <p class="mb-0">
+                                            <i class="fas fa-phone text-success me-1"></i>
+                                            @mascota.Usuarios.Telefono
+                                        </p>
+                                        @if (!string.IsNullOrEmpty(mascota.Usuarios.Email))
+                                        {
+                                            <p class="mb-0">
+                                                <i class="fas fa-envelope text-info me-1"></i>
+                                                @mascota.Usuarios.Email
+                                            </p>
+                                        }
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="alert alert-secondary">
+                                        <i class="fas fa-user-slash me-2"></i>
+                                        Información de contacto no disponible
+                                    </div>
                                 }
                             </div>
+
+                            <!-- Botones de acción -->
+                            <div class="perdida-footer">
+                                <button type="button" class="btn-contacto"
+                                        data-toggle="modal" data-target="#infoContactoModal"
+                                        data-nombre="@mascota.NombreMascota"
+                                        data-dueno="@mascota.Usuarios?.NombreCompleto"
+                                        data-telefono="@mascota.Usuarios?.Telefono"
+                                        data-email="@mascota.Usuarios?.Email">
+                                    <i class="fas fa-phone-alt"></i> Ver Contacto
+                                </button>
+
+                                @if (mascota.Estado == "Perdida" && Request.IsAuthenticated)
+                                {
+                                    <button type="button" class="btn-avistamiento"
+                                            data-toggle="modal" data-target="#reportarAvistamientoModal"
+                                            data-mascotaid="@mascota.MascotaPerdidaId"
+                                            data-nombremascota="@mascota.NombreMascota">
+                                        <i class="fas fa-eye"></i> Reportar Avistamiento
+                                    </button>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="col-12">
+                    <div class="empty-state">
+                        <i class="fas fa-search"></i>
+                        <h4 class="text-brown mb-3">No hay mascotas perdidas reportadas</h4>
+                        <p class="text-secondary mb-4">
+                            No encontramos mascotas perdidas con los filtros seleccionados.
+                            Si encontraste o perdiste una mascota, por favor repórtala.
+                        </p>
+                        @if (Request.IsAuthenticated)
+                        {
+                            <a href="@Url.Action("ReportarMascotaPerdida", "Rescate")"
+                               class="btn-reportar">
+                                <i class="fas fa-exclamation-circle"></i> Reportar Mascota Perdida
+                            </a>
                         }
                         else
                         {
-                            <div class="alert alert-secondary">
-                                <i class="fas fa-user-slash"></i> Información de contacto no disponible
-                            </div>
-                        }
-                    </div>
-
-                    <div class="card-footer text-center">
-                        <button type="button" class="btn btn-sm btn-outline-primary"
-                                data-toggle="modal" data-target="#infoContactoModal"
-                                data-nombre="@mascota.NombreMascota"
-                                data-dueno="@mascota.Usuarios?.NombreCompleto"
-                                data-telefono="@mascota.Usuarios?.Telefono"
-                                data-email="@mascota.Usuarios?.Email">
-                            <i class="fas fa-phone-alt"></i> Ver Contacto
-                        </button>
-
-                        @if (mascota.Estado == "Perdida" && Request.IsAuthenticated)
-                        {
-                            <button type="button" class="btn btn-sm btn-outline-success ml-2"
-                                    data-toggle="modal" data-target="#reportarAvistamientoModal"
-                                    data-mascotaid="@mascota.MascotaPerdidaId"
-                                    data-nombremascota="@mascota.NombreMascota">
-                                <i class="fas fa-eye"></i> Reportar Avistamiento
-                            </button>
+                            <a href="@Url.Action("Login", "Account", new { returnUrl = Url.Action("ReportarMascotaPerdida", "Rescate") })"
+                               class="btn-reportar">
+                                <i class="fas fa-sign-in-alt"></i> Inicia sesión para reportar
+                            </a>
                         }
                     </div>
                 </div>
-            </div>
-        }
-    }
-    else
-    {
-        <div class="col-12">
-            <div class="alert alert-info text-center py-5">
-                <i class="fas fa-info-circle fa-3x mb-3"></i>
-                <h4>No hay mascotas perdidas reportadas</h4>
-                <p class="lead">Si encontraste una mascota perdida, por favor repórtala.</p>
-                @if (Request.IsAuthenticated)
-                {
-                    <a href="@Url.Action("ReportarMascotaPerdida", "Rescate")" class="btn btn-danger btn-lg">
-                        <i class="fas fa-exclamation-circle"></i> Reportar Mascota Perdida
-                    </a>
-                }
-            </div>
+            }
         </div>
-    }
+
+        <!-- Paginación -->
+        @if (ViewBag.TotalPages != null && ViewBag.TotalPages > 1)
+        {
+            <nav aria-label="Paginación" class="pagination-custom">
+                <ul class="pagination justify-content-center">
+                    @if (ViewBag.CurrentPage > 1)
+                    {
+                        <li class="page-item">
+                            <a class="page-link page-link-custom"
+                               href="@Url.Action("MascotasPerdidas", "Rescate", new {
+                                   page = ViewBag.CurrentPage - 1,
+                                   especie = ViewBag.EspecieSeleccionada,
+                                   estado = ViewBag.EstadoSeleccionado,
+                                   ubicacion = ViewBag.UbicacionSeleccionada
+                               })">
+                                <i class="fas fa-chevron-left me-1"></i> Anterior
+                            </a>
+                        </li>
+                    }
+
+                    @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                    {
+                        <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                            <a class="page-link page-link-custom"
+                               href="@Url.Action("MascotasPerdidas", "Rescate", new {
+                                   page = i,
+                                   especie = ViewBag.EspecieSeleccionada,
+                                   estado = ViewBag.EstadoSeleccionado,
+                                   ubicacion = ViewBag.UbicacionSeleccionada
+                               })">@i</a>
+                        </li>
+                    }
+
+                    @if (ViewBag.CurrentPage < ViewBag.TotalPages)
+                    {
+                        <li class="page-item">
+                            <a class="page-link page-link-custom"
+                               href="@Url.Action("MascotasPerdidas", "Rescate", new {
+                                   page = ViewBag.CurrentPage + 1,
+                                   especie = ViewBag.EspecieSeleccionada,
+                                   estado = ViewBag.EstadoSeleccionado,
+                                   ubicacion = ViewBag.UbicacionSeleccionada
+                               })">
+                                Siguiente <i class="fas fa-chevron-right ms-1"></i>
+                            </a>
+                        </li>
+                    }
+                </ul>
+            </nav>
+        }
+    </div>
 </div>
-
-<!-- Paginación -->
-@if (ViewBag.TotalPages != null && ViewBag.TotalPages > 1)
-{
-    <nav aria-label="Paginación" class="mt-4">
-        <ul class="pagination justify-content-center">
-            @if (ViewBag.CurrentPage > 1)
-            {
-                <li class="page-item">
-                    <a class="page-link" href="@Url.Action("MascotasPerdidas", "Rescate", new {
-                        page = ViewBag.CurrentPage - 1,
-                        especie = ViewBag.EspecieSeleccionada,
-                        estado = ViewBag.EstadoSeleccionado,
-                        ubicacion = ViewBag.UbicacionSeleccionada
-                    })">
-                        <i class="fas fa-chevron-left"></i> Anterior
-                    </a>
-                </li>
-            }
-
-            @for (int i = 1; i <= ViewBag.TotalPages; i++)
-            {
-                <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
-                    <a class="page-link" href="@Url.Action("MascotasPerdidas", "Rescate", new {
-                        page = i,
-                        especie = ViewBag.EspecieSeleccionada,
-                        estado = ViewBag.EstadoSeleccionado,
-                        ubicacion = ViewBag.UbicacionSeleccionada
-                    })">@i</a>
-                </li>
-            }
-
-            @if (ViewBag.CurrentPage < ViewBag.TotalPages)
-            {
-                <li class="page-item">
-                    <a class="page-link" href="@Url.Action("MascotasPerdidas", "Rescate", new {
-                        page = ViewBag.CurrentPage + 1,
-                        especie = ViewBag.EspecieSeleccionada,
-                        estado = ViewBag.EstadoSeleccionado,
-                        ubicacion = ViewBag.UbicacionSeleccionada
-                    })">
-                        Siguiente <i class="fas fa-chevron-right"></i>
-                    </a>
-                </li>
-            }
-        </ul>
-    </nav>
-}
 
 <!-- Modal para mostrar contacto -->
 <div class="modal fade" id="infoContactoModal" tabindex="-1" role="dialog" aria-labelledby="infoContactoModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
-            <div class="modal-header bg-primary text-white">
+            <div class="modal-header" style="background: linear-gradient(135deg, var(--green) 0%, #86b57a 100%); color: white;">
                 <h5 class="modal-title" id="infoContactoModalLabel">
-                    <i class="fas fa-phone-alt"></i> Información de Contacto
+                    <i class="fas fa-phone-alt me-2"></i> Información de Contacto
                 </h5>
                 <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
@@ -280,16 +329,16 @@
                 <p><strong>Dueño:</strong> <span id="modalDuenoNombre"></span></p>
                 <p><strong>Teléfono:</strong> <span id="modalTelefono"></span></p>
                 <p><strong>Email:</strong> <span id="modalEmail"></span></p>
-                <div class="alert alert-info mt-3">
+                <div class="alert alert-green mt-3">
                     <small>
-                        <i class="fas fa-info-circle"></i>
+                        <i class="fas fa-info-circle me-2"></i>
                         Por favor, contacta solo si tienes información relevante sobre la mascota.
                     </small>
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">
-                    <i class="fas fa-times"></i> Cerrar
+                <button type="button" class="btn btn-outline-green" data-dismiss="modal">
+                    <i class="fas fa-times me-2"></i> Cerrar
                 </button>
             </div>
         </div>
@@ -303,11 +352,11 @@
             @using (Html.BeginForm("ReportarAvistamiento", "Rescate", FormMethod.Post))
             {
                 @Html.AntiForgeryToken()
-                <div class="modal-header bg-success text-white">
+                <div class="modal-header" style="background: linear-gradient(135deg, var(--pink) 0%, #f9c2b0 100%); color: var(--brown);">
                     <h5 class="modal-title" id="reportarAvistamientoModalLabel">
-                        <i class="fas fa-eye"></i> Reportar Avistamiento
+                        <i class="fas fa-eye me-2"></i> Reportar Avistamiento
                     </h5>
-                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="color: var(--brown);">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
@@ -316,31 +365,31 @@
                     <p>Estás reportando un avistamiento de: <strong id="modalMascotaNombreAvistamiento"></strong></p>
 
                     <div class="form-group">
-                        <label for="ubicacionAvistamiento">Ubicación del avistamiento *</label>
+                        <label for="ubicacionAvistamiento" class="form-label">Ubicación del avistamiento *</label>
                         <input type="text" class="form-control" name="ubicacionAvistamiento" id="ubicacionAvistamiento" required placeholder="Ej: Parque La Carolina, Quito" />
                     </div>
 
                     <div class="form-group">
-                        <label for="fechaAvistamiento">Fecha del avistamiento *</label>
+                        <label for="fechaAvistamiento" class="form-label">Fecha del avistamiento *</label>
                         <input type="date" class="form-control" name="fechaAvistamiento" id="fechaAvistamiento" required value="@DateTime.Now.ToString("yyyy-MM-dd")" />
                     </div>
 
                     <div class="form-group">
-                        <label for="descripcionAvistamiento">Descripción *</label>
+                        <label for="descripcionAvistamiento" class="form-label">Descripción *</label>
                         <textarea class="form-control" name="descripcionAvistamiento" id="descripcionAvistamiento" rows="3" required placeholder="Describe cómo viste a la mascota, en qué condiciones, etc."></textarea>
                     </div>
 
                     <div class="form-group">
-                        <label for="telefonoContacto">Tu teléfono de contacto *</label>
+                        <label for="telefonoContacto" class="form-label">Tu teléfono de contacto *</label>
                         <input type="tel" class="form-control" name="telefonoContacto" id="telefonoContacto" required placeholder="Ej: 0987654321" />
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">
-                        <i class="fas fa-times"></i> Cancelar
+                    <button type="button" class="btn btn-outline-green" data-dismiss="modal">
+                        <i class="fas fa-times me-2"></i> Cancelar
                     </button>
-                    <button type="submit" class="btn btn-success">
-                        <i class="fas fa-paper-plane"></i> Enviar Reporte
+                    <button type="submit" class="btn btn-pink">
+                        <i class="fas fa-paper-plane me-2"></i> Enviar Reporte
                     </button>
                 </div>
             }
@@ -350,29 +399,517 @@
 
 @section Styles {
     <style>
-        .shadow-custom {
-            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-            transition: transform 0.3s ease;
-            border: none;
-            border-radius: 10px;
+        /* ESTILOS ESPECÍFICOS PARA MASCOTAS PERDIDAS */
+        .perdidas-section {
+            background: linear-gradient(135deg, var(--bg-light) 0%, white 100%);
+            min-height: 100vh;
+            padding: 30px 0;
         }
 
-            .shadow-custom:hover {
-                transform: translateY(-5px);
+        .page-header {
+            padding: 25px 0;
+            margin-bottom: 30px;
+            border-bottom: 3px solid var(--green);
+            background: linear-gradient(135deg, rgba(151, 199, 139, 0.1) 0%, rgba(242, 233, 216, 0.1) 100%);
+            border-radius: 15px;
+        }
+
+        .header-icon {
+            color: #E74C3C;
+            margin-right: 15px;
+        }
+
+        .lead-text {
+            color: var(--brown);
+            font-size: 1.1rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* FILTROS DE BÚSQUEDA */
+        .filtros-card {
+            border: 2px solid #E74C3C;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 30px;
+            background: white;
+            box-shadow: 0 5px 15px rgba(231, 76, 60, 0.1);
+        }
+
+        .filtros-body {
+            padding: 25px;
+            background-color: rgba(231, 76, 60, 0.05);
+        }
+
+        .form-label {
+            color: var(--brown);
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .form-control, .form-select {
+            border: 2px solid rgba(231, 76, 60, 0.3);
+            border-radius: 8px;
+            padding: 10px 15px;
+            transition: all 0.3s ease;
+            color: var(--brown);
+        }
+
+            .form-control:focus, .form-select:focus {
+                border-color: #E74C3C;
+                box-shadow: 0 0 0 0.2rem rgba(231, 76, 60, 0.25);
             }
 
-        .card-img-overlay .badge {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            font-size: 0.9rem;
+        /* BOTÓN DE REPORTE */
+        .btn-reportar-container {
+            margin-bottom: 30px;
+            padding: 15px;
+            background-color: rgba(231, 76, 60, 0.05);
+            border-radius: 12px;
+            border: 2px solid rgba(231, 76, 60, 0.2);
+            text-align: right;
         }
 
+        .btn-reportar {
+            background: linear-gradient(135deg, #E74C3C 0%, #C0392B 100%);
+            color: white !important;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+            .btn-reportar:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 8px 20px rgba(231, 76, 60, 0.4);
+                color: white !important;
+            }
+
+        /* CARD DE MASCOTA PERDIDA */
+        .perdida-card {
+            border: 2px solid transparent;
+            border-radius: 15px;
+            overflow: hidden;
+            transition: all 0.4s ease;
+            background: white;
+            height: 100%;
+            position: relative;
+        }
+
+            .perdida-card:hover {
+                transform: translateY(-10px);
+                box-shadow: 0 15px 35px rgba(231, 76, 60, 0.15) !important;
+                border-color: #E74C3C;
+            }
+
+        .perdida-imagen {
+            height: 280px;
+            overflow: hidden;
+            position: relative;
+        }
+
+            .perdida-imagen img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                transition: transform 0.5s ease;
+            }
+
+        .perdida-card:hover .perdida-imagen img {
+            transform: scale(1.1);
+        }
+
+        .perdida-badge-estado {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            z-index: 10;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .badge-perdida {
+            background: linear-gradient(135deg, #E74C3C 0%, #C0392B 100%);
+            color: white;
+        }
+
+        .badge-encontrada {
+            background: linear-gradient(135deg, var(--green) 0%, #86b57a 100%);
+            color: white;
+        }
+
+        .badge-cerrado {
+            background: linear-gradient(135deg, #95A5A6 0%, #7F8C8D 100%);
+            color: white;
+        }
+
+        .perdida-info {
+            padding: 20px;
+        }
+
+        .perdida-nombre {
+            color: var(--brown);
+            font-weight: 700;
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+            text-align: center;
+            border-bottom: 2px solid #E74C3C;
+            padding-bottom: 10px;
+        }
+
+        .perdida-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 15px;
+            justify-content: center;
+        }
+
+        .badge-especie {
+            background: linear-gradient(135deg, var(--green) 0%, #86b57a 100%);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .badge-raza {
+            background: linear-gradient(135deg, var(--pink) 0%, #f9c2b0 100%);
+            color: var(--brown);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .badge-sexo {
+            background: linear-gradient(135deg, #5DADE2 0%, #2E86C1 100%);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .perdida-datos {
+            color: var(--text-secondary);
+            margin-bottom: 15px;
+            padding: 15px;
+            background-color: rgba(231, 76, 60, 0.05);
+            border-radius: 8px;
+            border-left: 3px solid #E74C3C;
+        }
+
+            .perdida-datos p {
+                margin-bottom: 8px;
+            }
+
+                .perdida-datos p:last-child {
+                    margin-bottom: 0;
+                }
+
+            .perdida-datos i {
+                width: 20px;
+                margin-right: 10px;
+                text-align: center;
+                color: #E74C3C;
+            }
+
+        /* INFORMACIÓN DE PÉRDIDA */
+        .info-perdida {
+            background-color: rgba(231, 76, 60, 0.05);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border: 1px solid rgba(231, 76, 60, 0.2);
+        }
+
+            .info-perdida h6 {
+                color: #E74C3C;
+                font-weight: 600;
+                margin-bottom: 10px;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+
+        /* RECOMPENSA */
+        .recompensa-badge {
+            background: linear-gradient(135deg, var(--yellow) 0%, #e6b85c 100%);
+            color: var(--brown);
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 700;
+            text-align: center;
+            margin: 15px 0;
+            border: 2px dashed var(--yellow);
+        }
+
+            .recompensa-badge i {
+                margin-right: 8px;
+            }
+
+        /* INFORMACIÓN DE CONTACTO */
         .contacto-info {
-            background-color: #f8f9fa;
-            padding: 10px;
-            border-radius: 5px;
-            border-left: 4px solid #007bff;
+            background-color: rgba(151, 199, 139, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            border-left: 3px solid var(--green);
+        }
+
+            .contacto-info h6 {
+                color: var(--brown);
+                font-weight: 600;
+                margin-bottom: 10px;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+
+        /* BOTONES DE ACCIÓN */
+        .perdida-footer {
+            padding: 20px;
+            background-color: rgba(231, 76, 60, 0.05);
+            border-top: 1px solid rgba(231, 76, 60, 0.2);
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn-contacto {
+            background: linear-gradient(135deg, var(--green) 0%, #86b57a 100%);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 6px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+            .btn-contacto:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(151, 199, 139, 0.3);
+                color: white;
+            }
+
+        .btn-avistamiento {
+            background: linear-gradient(135deg, var(--pink) 0%, #f9c2b0 100%);
+            color: var(--brown);
+            border: none;
+            padding: 8px 15px;
+            border-radius: 6px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+            .btn-avistamiento:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(251, 205, 192, 0.3);
+                color: var(--brown);
+            }
+
+        .btn-outline-green {
+            border: 2px solid var(--green);
+            color: var(--brown);
+        }
+
+        .btn-pink {
+            background: var(--pink);
+            color: var(--brown);
+        }
+
+        .alert-green {
+            background-color: rgba(151, 199, 139, 0.1);
+            border: 1px solid var(--green);
+            color: var(--brown);
+        }
+
+        /* ESTADO SIN MASCOTAS */
+        .empty-state {
+            padding: 60px 20px;
+            text-align: center;
+            background-color: rgba(231, 76, 60, 0.05);
+            border-radius: 15px;
+            border: 2px solid #E74C3C;
+            margin: 20px 0;
+        }
+
+            .empty-state i {
+                font-size: 4rem;
+                color: #E74C3C;
+                margin-bottom: 20px;
+            }
+
+            .empty-state h4 {
+                color: var(--brown);
+                margin-bottom: 15px;
+            }
+
+            .empty-state p {
+                color: var(--text-secondary);
+                max-width: 600px;
+                margin: 0 auto 25px;
+            }
+
+        /* PAGINACIÓN */
+        .pagination-custom {
+            margin: 40px 0 20px;
+        }
+
+        .page-link-custom {
+            border: 2px solid rgba(231, 76, 60, 0.3);
+            color: var(--brown);
+            margin: 0 5px;
+            border-radius: 8px;
+            padding: 10px 18px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+            .page-link-custom:hover {
+                background-color: #E74C3C;
+                border-color: #E74C3C;
+                color: white;
+                transform: translateY(-2px);
+            }
+
+        .page-item.active .page-link-custom {
+            background-color: #E74C3C;
+            border-color: #E74C3C;
+            color: white;
+        }
+
+        .page-item.disabled .page-link-custom {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* RESPONSIVE - ✅ CORREGIDO */
+        @@media (max-width: 768px) {
+            .page-header {
+                padding: 15px 0;
+                margin-bottom: 20px;
+            }
+
+            .filtros-body {
+                padding: 15px;
+            }
+
+            .btn-reportar-container {
+                text-align: center;
+            }
+
+            .perdida-imagen {
+                height: 220px;
+            }
+
+            .perdida-info {
+                padding: 15px;
+            }
+
+            .perdida-nombre {
+                font-size: 1.2rem;
+            }
+
+            .perdida-footer {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+                .perdida-footer button {
+                    width: 100%;
+                }
+
+            .empty-state {
+                padding: 40px 15px;
+            }
+
+                .empty-state i {
+                    font-size: 3rem;
+                }
+
+            .page-link-custom {
+                padding: 8px 14px;
+                margin: 0 3px;
+                font-size: 0.9rem;
+            }
+        }
+
+        /* ANIMACIONES - ✅ CORREGIDO */
+        .fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @@keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @@keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.4);
+            }
+
+            70% {
+                box-shadow: 0 0 0 10px rgba(231, 76, 60, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(231, 76, 60, 0);
+            }
+        }
+
+        /* EFECTO PARA LAS CARDS */
+        .perdida-card:nth-child(1) {
+            animation-delay: 0.1s;
+        }
+
+        .perdida-card:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .perdida-card:nth-child(3) {
+            animation-delay: 0.3s;
+        }
+
+        .perdida-card:nth-child(4) {
+            animation-delay: 0.4s;
+        }
+
+        .perdida-card:nth-child(5) {
+            animation-delay: 0.5s;
+        }
+
+        .perdida-card:nth-child(6) {
+            animation-delay: 0.6s;
         }
     </style>
 }
@@ -412,6 +949,11 @@
 
             // Formato de fecha para input date
             $('#fechaAvistamiento').val(new Date().toISOString().split('T')[0]);
+
+            // Efecto de pulso para las cards de mascotas perdidas
+            $('.badge-perdida').each(function() {
+                $(this).closest('.perdida-card').addClass('pulse');
+            });
         });
     </script>
 }

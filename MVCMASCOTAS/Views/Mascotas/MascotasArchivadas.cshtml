@@ -1,0 +1,339 @@
+﻿@model IEnumerable<MVCMASCOTAS.Models.Mascotas>
+
+@{
+    ViewBag.Title = "Mascotas Archivadas";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>
+            <i class="fas fa-archive text-secondary"></i> Mascotas Archivadas
+        </h2>
+        <a href="@Url.Action("Gestionar", "Mascotas")" class="btn btn-primary">
+            <i class="fas fa-arrow-left"></i> Volver a Gestionar
+        </a>
+    </div>
+
+    <div class="alert alert-warning">
+        <i class="fas fa-exclamation-triangle me-2"></i>
+        <strong>Importante:</strong> Las mascotas archivadas solo pueden ser eliminadas físicamente si:
+        <ul class="mb-0 mt-2">
+            <li>Tienen estado "Fallecida"</li>
+            <li>Han pasado al menos 2 años desde su fallecimiento</li>
+            <li>No tienen registros relacionados (adopciones, tratamientos, etc.)</li>
+        </ul>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table id="tablaArchivadas" class="table table-hover table-striped">
+                    <thead class="table-secondary">
+                        <tr>
+                            <th>ID</th>
+                            <th>Foto</th>
+                            <th>Nombre</th>
+                            <th>Especie</th>
+                            <th class="text-center">Sexo</th>
+                            <th>Estado</th>
+                            <th>Fecha Ingreso</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model != null && Model.Any())
+                        {
+                            foreach (var mascota in Model)
+                            {
+                                string sexoTexto = mascota.Sexo == "M" ? "Macho" : "Hembra";
+                                string sexoSimbolo = mascota.Sexo == "M" ? "♂" : "♀";
+                                string imagenUrl = "/Content/images/no-image.png";
+
+                                if (mascota.ImagenPrincipal != null && mascota.ImagenPrincipal.Length > 0)
+                                {
+                                    imagenUrl = MVCMASCOTAS.Helpers.ImageHelper.GetImageDataUri(mascota.ImagenPrincipal);
+                                }
+
+                                <tr>
+                                    <td><strong>#@mascota.MascotaId</strong></td>
+                                    <td>
+                                        <img src="@imagenUrl"
+                                             alt="@mascota.Nombre"
+                                             style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px; filter: grayscale(50%);"
+                                             onerror="this.src='/Content/images/no-image.png'">
+                                    </td>
+                                    <td>
+                                        <strong>@mascota.Nombre</strong>
+                                        @if (!string.IsNullOrEmpty(mascota.Raza))
+                                        {
+                                            <br /><small class="text-muted">@mascota.Raza</small>
+                                        }
+                                    </td>
+                                    <td>@mascota.Especie</td>
+                                    <td class="text-center">
+                                        @if (mascota.Sexo == "M")
+                                        {
+                                            <span class="badge bg-info" title="@sexoTexto">
+                                                <i class="fas fa-mars"></i> @sexoSimbolo
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-pink" title="@sexoTexto">
+                                                <i class="fas fa-venus"></i> @sexoSimbolo
+                                            </span>
+                                        }
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-secondary">
+                                            @mascota.Estado
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <small>@(mascota.FechaIngreso?.ToString("dd/MM/yyyy") ?? "N/A")</small>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm" role="group">
+                                            <button type="button"
+                                                    class="btn btn-success btn-restaurar"
+                                                    data-id="@mascota.MascotaId"
+                                                    data-nombre="@mascota.Nombre"
+                                                    title="Restaurar">
+                                                <i class="fas fa-undo"></i>
+                                            </button>
+                                            <button type="button"
+                                                    class="btn btn-danger btn-eliminar"
+                                                    data-id="@mascota.MascotaId"
+                                                    data-nombre="@mascota.Nombre"
+                                                    title="Eliminar Físicamente">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="8" class="text-center py-5">
+                                    <div class="alert alert-info mb-0">
+                                        <i class="fas fa-info-circle fa-3x mb-3 d-block"></i>
+                                        <h5>No hay mascotas archivadas</h5>
+                                        <p class="mb-0 text-muted">Las mascotas archivadas aparecerán aquí.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Restaurar -->
+<div class="modal fade" id="modalRestaurar" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-undo me-2"></i>Restaurar Mascota
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="formRestaurar" method="post" action="@Url.Action("RestaurarMascota", "Mascotas")">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="id" id="restaurarId">
+                <div class="modal-body">
+                    <p>¿Está seguro de restaurar a <strong id="restaurarNombre"></strong>?</p>
+                    <div class="mb-3">
+                        <label class="form-label">Motivo de restauración *</label>
+                        <textarea name="motivo"
+                                  class="form-control"
+                                  rows="3"
+                                  required
+                                  placeholder="Explique por qué está restaurando esta mascota..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-undo me-2"></i>Restaurar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Eliminar Físicamente -->
+<div class="modal fade" id="modalEliminar" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-exclamation-triangle me-2"></i>Eliminar Físicamente
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="formEliminar" method="post" action="@Url.Action("EliminarFisicamente", "Mascotas")">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="id" id="eliminarId">
+                <div class="modal-body">
+                    <div id="validacionMensaje" class="alert" style="display:none;"></div>
+
+                    <div id="formEliminarContenido">
+                        <div class="alert alert-danger">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            <strong>¡ADVERTENCIA!</strong> Esta acción es irreversible.
+                        </div>
+
+                        <p>
+                            Está a punto de eliminar permanentemente a <strong id="eliminarNombre"></strong> del sistema.
+                        </p>
+
+                        <div class="mb-3">
+                            <label class="form-label">Justificación detallada (mínimo 20 caracteres) *</label>
+                            <textarea name="justificacion"
+                                      class="form-control"
+                                      rows="4"
+                                      required
+                                      minlength="20"
+                                      placeholder="Explique detalladamente por qué es necesario eliminar físicamente este registro..."></textarea>
+                            <small class="text-muted">
+                                Esta justificación quedará registrada en auditoría.
+                            </small>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-danger" id="btnConfirmarEliminar" style="display:none;">
+                        <i class="fas fa-trash me-2"></i>Eliminar Permanentemente
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <!-- DataTables -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
+    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            // Inicializar DataTables
+            $('#tablaArchivadas').DataTable({
+                language: {
+                    url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/es-ES.json'
+                },
+                order: [[0, 'desc']],
+                pageLength: 25
+            });
+
+            // Restaurar mascota
+            $('.btn-restaurar').click(function () {
+                var id = $(this).data('id');
+                var nombre = $(this).data('nombre');
+
+                $('#restaurarId').val(id);
+                $('#restaurarNombre').text(nombre);
+                $('#modalRestaurar').modal('show');
+            });
+
+            // Eliminar físicamente
+            $('.btn-eliminar').click(function () {
+                var id = $(this).data('id');
+                var nombre = $(this).data('nombre');
+
+                $('#eliminarId').val(id);
+                $('#eliminarNombre').text(nombre);
+                $('#validacionMensaje').hide();
+                $('#formEliminarContenido').hide();
+                $('#btnConfirmarEliminar').hide();
+
+                // Validar si se puede eliminar
+                $.ajax({
+                    url: '@Url.Action("ValidarEliminacionFisica", "Mascotas")',
+                    type: 'GET',
+                    data: { id: id },
+                    success: function (response) {
+                        if (response.success) {
+                            $('#validacionMensaje')
+                                .removeClass('alert-danger')
+                                .addClass('alert-success')
+                                .html('<i class="fas fa-check-circle me-2"></i>' + response.message)
+                                .show();
+                            $('#formEliminarContenido').show();
+                            $('#btnConfirmarEliminar').show();
+                        } else {
+                            $('#validacionMensaje')
+                                .removeClass('alert-success')
+                                .addClass('alert-danger')
+                                .html('<i class="fas fa-times-circle me-2"></i><strong>No se puede eliminar:</strong> ' + response.message)
+                                .show();
+                        }
+                    },
+                    error: function () {
+                        $('#validacionMensaje')
+                            .removeClass('alert-success')
+                            .addClass('alert-danger')
+                            .html('<i class="fas fa-times-circle me-2"></i>Error al validar')
+                            .show();
+                    }
+                });
+
+                $('#modalEliminar').modal('show');
+            });
+
+            // Validación de formularios
+            $('#formRestaurar').submit(function (e) {
+                var motivo = $(this).find('textarea[name="motivo"]').val();
+                if (motivo.trim().length < 10) {
+                    e.preventDefault();
+                    Swal.fire('Error', 'El motivo debe tener al menos 10 caracteres', 'error');
+                    return false;
+                }
+            });
+
+            $('#formEliminar').submit(function (e) {
+                var justificacion = $(this).find('textarea[name="justificacion"]').val();
+                if (justificacion.trim().length < 20) {
+                    e.preventDefault();
+                    Swal.fire('Error', 'La justificación debe tener al menos 20 caracteres', 'error');
+                    return false;
+                }
+
+                // Confirmación adicional
+                e.preventDefault();
+                var form = this;
+                Swal.fire({
+                    title: '¿Está completamente seguro?',
+                    text: "Esta acción NO se puede deshacer. El registro será eliminado permanentemente.",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Sí, eliminar permanentemente',
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    }
+                });
+            });
+        });
+    </script>
+}
+
+<style>
+    .badge.bg-pink {
+        background-color: #FBCDC0 !important;
+        color: #5C4B43 !important;
+    }
+</style>

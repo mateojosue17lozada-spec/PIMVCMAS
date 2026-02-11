@@ -1,105 +1,698 @@
 ﻿@{
-    ViewBag.Title = "Reportar un Rescate";
+    ViewBag.Title = "Rescate de Animales";
 }
 
-<div class="jumbotron jumbotron-fluid text-center" style="background: linear-gradient(135deg, #e74c3c, #c0392b); color: white;">
+<div class="rescate-section fade-in">
     <div class="container">
-        <h1 class="display-4"><i class="fas fa-first-aid"></i> ¿Encontraste un Animal en Peligro?</h1>
-        <p class="lead">Repórtalo y ayúdanos a salvarlo</p>
-    </div>
-</div>
+        <!-- Hero Section -->
+        <div class="hero-rescate slide-up">
+            <div class="hero-icon">
+                <i class="fas fa-first-aid"></i>
+            </div>
+            <h1 class="hero-title">¿Encontraste un Animal en Peligro?</h1>
+            <p class="hero-subtitle">Repórtalo inmediatamente y ayúdanos a salvar una vida. Tu acción puede marcar la diferencia.</p>
+        </div>
 
-<!-- Estadísticas -->
-<div class="container my-5">
-    <div class="row text-center">
-        <div class="col-md-3">
-            <div class="stat-box bg-danger">
-                <div class="stat-value">@ViewBag.TotalRescates</div>
-                <div class="stat-label">Total de Rescates</div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="stat-box bg-warning">
-                <div class="stat-value">@ViewBag.RescatesPendientes</div>
-                <div class="stat-label">Pendientes</div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="stat-box bg-info">
-                <div class="stat-value">@ViewBag.RescatesEnProceso</div>
-                <div class="stat-label">En Proceso</div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="stat-box bg-success">
-                <div class="stat-value">@ViewBag.RescatesCompletados</div>
-                <div class="stat-label">Completados</div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Información sobre rescates -->
-<div class="container my-5">
-    <div class="row">
-        <div class="col-md-6">
-            <div class="card h-100 shadow-custom">
-                <div class="card-body">
-                    <h3><i class="fas fa-exclamation-triangle text-danger"></i> ¿Cuándo Reportar?</h3>
-                    <ul class="mt-3">
-                        <li>Animal herido o enfermo</li>
-                        <li>Animal abandonado o perdido</li>
-                        <li>Animal en situación de maltrato</li>
-                        <li>Animal atrapado o en peligro</li>
-                        <li>Camada de cachorros abandonados</li>
-                    </ul>
+        <!-- Estadísticas -->
+        <div class="estadisticas-grid">
+            <div class="row">
+                <div class="col-lg-3 col-md-6">
+                    <div class="estadistica-card estadistica-roja slide-up" style="animation-delay: 0.1s">
+                        <div class="estadistica-icon">
+                            <i class="fas fa-ambulance"></i>
+                        </div>
+                        <div class="estadistica-valor">
+                            @ViewBag.TotalRescates
+                        </div>
+                        <div class="estadistica-label">
+                            Total de Rescates
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <div class="estadistica-card estadistica-amarilla slide-up" style="animation-delay: 0.2s">
+                        <div class="estadistica-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="estadistica-valor">
+                            @ViewBag.RescatesPendientes
+                        </div>
+                        <div class="estadistica-label">
+                            Pendientes
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <div class="estadistica-card estadistica-azul slide-up" style="animation-delay: 0.3s">
+                        <div class="estadistica-icon">
+                            <i class="fas fa-spinner"></i>
+                        </div>
+                        <div class="estadistica-valor">
+                            @ViewBag.RescatesEnProceso
+                        </div>
+                        <div class="estadistica-label">
+                            En Proceso
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <div class="estadistica-card estadistica-verde slide-up" style="animation-delay: 0.4s">
+                        <div class="estadistica-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="estadistica-valor">
+                            @ViewBag.RescatesCompletados
+                        </div>
+                        <div class="estadistica-label">
+                            Completados
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <div class="col-md-6">
-            <div class="card h-100 shadow-custom">
-                <div class="card-body">
-                    <h3><i class="fas fa-clipboard-list text-primary"></i> ¿Qué Necesitamos?</h3>
-                    <ul class="mt-3">
-                        <li>Ubicación exacta del animal</li>
-                        <li>Descripción del estado del animal</li>
-                        <li>Fotos si es posible</li>
-                        <li>Tus datos de contacto</li>
-                        <li>Cualquier información adicional</li>
-                    </ul>
+        <!-- Información sobre rescates -->
+        <div class="info-cards-grid">
+            <div class="row">
+                <div class="col-lg-6 mb-4">
+                    <div class="info-card slide-up" style="animation-delay: 0.2s">
+                        <div class="info-card-header">
+                            <i class="fas fa-exclamation-triangle" style="color: #E74C3C"></i>
+                            ¿Cuándo Reportar?
+                        </div>
+                        <ul class="info-card-list">
+                            <li>Animal herido o enfermo visiblemente</li>
+                            <li>Animal abandonado o perdido en la calle</li>
+                            <li>Animal en situación de maltrato o abuso</li>
+                            <li>Animal atrapado o en peligro inminente</li>
+                            <li>Camada de cachorros/gatitos abandonados</li>
+                            <li>Animal silvestre en zona urbana</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-lg-6 mb-4">
+                    <div class="info-card slide-up" style="animation-delay: 0.3s">
+                        <div class="info-card-header">
+                            <i class="fas fa-clipboard-list" style="color: #5DADE2"></i>
+                            ¿Qué Necesitamos?
+                        </div>
+                        <ul class="info-card-list">
+                            <li>Ubicación exacta del animal (dirección, referencia)</li>
+                            <li>Descripción detallada del estado del animal</li>
+                            <li>Fotos o videos si es posible tomar sin riesgo</li>
+                            <li>Tus datos de contacto (teléfono, email)</li>
+                            <li>Hora aproximada en que viste al animal</li>
+                            <li>Condiciones del entorno (tráfico, clima, etc.)</li>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-</div>
 
-<!-- CTA Reportar -->
-<div class="container my-5">
-    <div class="card shadow-custom bg-danger">
-        <div class="card-body text-center py-5">
-            <h2 class="text-white mb-4"><i class="fas fa-hand-holding-medical"></i> ¿Necesita un Animal tu Ayuda?</h2>
-            <a href="@Url.Action("Reportar", "Rescate")" class="btn btn-light btn-lg">
+        <!-- CTA Reportar -->
+        <div class="cta-reporte slide-up" style="animation-delay: 0.4s">
+            <div class="cta-icon">
+                <i class="fas fa-hand-holding-medical"></i>
+            </div>
+            <h2 class="cta-title">¿Necesita un Animal tu Ayuda Inmediata?</h2>
+            <p class="mb-4" style="opacity: 0.9;">No esperes, cada minuto cuenta para salvar una vida</p>
+            <a href="@Url.Action("Reportar", "Rescate")" class="btn-cta">
                 <i class="fas fa-plus-circle"></i> Reportar un Rescate
             </a>
         </div>
+
+        <!-- Mascotas Perdidas -->
+        <div class="perdidas-section slide-up" style="animation-delay: 0.5s">
+            <div class="perdidas-header">
+                <i class="fas fa-search" style="color: var(--green)"></i>
+                <h2 class="mb-0">Mascotas Perdidas</h2>
+            </div>
+            <p class="perdidas-subtitle">
+                Ayuda a reunir a las mascotas perdidas con sus familias.
+                Cada reporte cuenta para un final feliz.
+            </p>
+            <div class="perdidas-buttons">
+                <a href="@Url.Action("MascotasPerdidas", "Rescate")" class="btn-perdidas btn-primary-custom">
+                    <i class="fas fa-paw"></i> Ver Mascotas Perdidas
+                </a>
+                @if (Request.IsAuthenticated)
+                {
+                    <a href="@Url.Action("ReportarMascotaPerdida", "Rescate")" class="btn-perdidas btn-outline-custom">
+                        <i class="fas fa-exclamation-circle"></i> Reportar Mascota Perdida
+                    </a>
+                }
+                else
+                {
+                    <a href="@Url.Action("Login", "Account", new { returnUrl = Url.Action("ReportarMascotaPerdida", "Rescate") })"
+                       class="btn-perdidas btn-outline-custom">
+                        <i class="fas fa-sign-in-alt"></i> Inicia sesión para reportar
+                    </a>
+                }
+            </div>
+        </div>
+
+        <!-- Información de contacto de emergencia -->
+        <div class="emergencias-section slide-up" style="animation-delay: 0.6s">
+            <div class="emergencias-header">
+                <i class="fas fa-phone-alt"></i>
+                <h3 class="mb-0">Emergencias 24/7</h3>
+            </div>
+            <p class="emergencias-subtitle">
+                Si el animal está en peligro inminente o necesita atención veterinaria urgente:
+            </p>
+            <div class="emergencias-telefono">
+                (02) 123-4567
+            </div>
+            <p class="emergencias-horario mb-0">
+                <i class="fas fa-clock me-2"></i>Línea de rescate disponible las 24 horas
+            </p>
+        </div>
     </div>
 </div>
 
-<!-- Mascotas Perdidas -->
-<div class="container my-5">
-    <h2 class="text-center mb-4"><i class="fas fa-search"></i> Mascotas Perdidas</h2>
-    <p class="text-center text-muted">Ayuda a encontrar a estas mascotas perdidas</p>
-
-    <div class="text-center">
-        <a href="@Url.Action("MascotasPerdidas", "Rescate")" class="btn btn-primary btn-lg">
-            <i class="fas fa-paw"></i> Ver Mascotas Perdidas
-        </a>
-        @if (Request.IsAuthenticated)
-        {
-            <a href="@Url.Action("ReportarMascotaPerdida", "Rescate")" class="btn btn-outline-primary btn-lg">
-                <i class="fas fa-exclamation-circle"></i> Reportar Mascota Perdida
-            </a>
+@section Styles {
+    <style>
+        /* ESTILOS ESPECÍFICOS PARA PÁGINA DE RESCATE */
+        .rescate-section {
+            background: linear-gradient(135deg, var(--bg-light) 0%, white 100%);
+            min-height: 100vh;
+            padding: 30px 0;
         }
-    </div>
-</div>
+
+        /* HERO SECTION */
+        .hero-rescate {
+            background: linear-gradient(135deg, #E74C3C 0%, #C0392B 100%);
+            color: white;
+            padding: 60px 0;
+            text-align: center;
+            border-radius: 15px;
+            margin-bottom: 50px;
+            position: relative;
+            overflow: hidden;
+        }
+
+            .hero-rescate::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none" opacity="0.1"><path d="M0,0 L100,0 L100,100 Z" fill="white"/></svg>');
+                background-size: cover;
+            }
+
+        .hero-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            color: white;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
+        }
+
+        .hero-title {
+            font-weight: 800;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            margin-bottom: 15px;
+        }
+
+        .hero-subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* ESTADÍSTICAS */
+        .estadisticas-grid {
+            margin: 50px 0;
+        }
+
+        .estadistica-card {
+            border: 2px solid transparent;
+            border-radius: 15px;
+            padding: 30px 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+            .estadistica-card::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 100%);
+                opacity: 0;
+                transition: opacity 0.3s ease;
+            }
+
+            .estadistica-card:hover {
+                transform: translateY(-10px);
+                box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+            }
+
+                .estadistica-card:hover::before {
+                    opacity: 1;
+                }
+
+        .estadistica-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            opacity: 0.9;
+        }
+
+        .estadistica-valor {
+            font-size: 2.8rem;
+            font-weight: 800;
+            margin: 10px 0;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .estadistica-label {
+            font-size: 1rem;
+            opacity: 0.9;
+            font-weight: 600;
+        }
+
+        .estadistica-roja {
+            background: linear-gradient(135deg, #E74C3C 0%, #C0392B 100%);
+        }
+
+        .estadistica-amarilla {
+            background: linear-gradient(135deg, var(--yellow) 0%, #e6b85c 100%);
+        }
+
+        .estadistica-azul {
+            background: linear-gradient(135deg, #5DADE2 0%, #2E86C1 100%);
+        }
+
+        .estadistica-verde {
+            background: linear-gradient(135deg, var(--green) 0%, #86b57a 100%);
+        }
+
+        /* INFORMACIÓN CARDS */
+        .info-cards-grid {
+            margin: 50px 0;
+        }
+
+        .info-card {
+            border: 2px solid var(--green);
+            border-radius: 15px;
+            padding: 30px;
+            height: 100%;
+            background: white;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(151, 199, 139, 0.1);
+        }
+
+            .info-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 15px 30px rgba(151, 199, 139, 0.2);
+                border-color: #E74C3C;
+            }
+
+        .info-card-header {
+            color: var(--brown);
+            font-weight: 700;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 1.3rem;
+        }
+
+            .info-card-header i {
+                font-size: 2rem;
+            }
+
+        .info-card-list {
+            list-style: none;
+            padding-left: 0;
+        }
+
+            .info-card-list li {
+                padding: 10px 0;
+                border-bottom: 1px solid rgba(151, 199, 139, 0.2);
+                color: var(--text-secondary);
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+
+                .info-card-list li:before {
+                    content: '✓';
+                    color: var(--green);
+                    font-weight: bold;
+                    width: 20px;
+                }
+
+                .info-card-list li:last-child {
+                    border-bottom: none;
+                }
+
+        /* CTA DE REPORTE */
+        .cta-reporte {
+            background: linear-gradient(135deg, #E74C3C 0%, #C0392B 100%);
+            border-radius: 15px;
+            padding: 50px 30px;
+            text-align: center;
+            margin: 50px 0;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+            .cta-reporte::before {
+                content: '';
+                position: absolute;
+                top: -50%;
+                left: -50%;
+                width: 200%;
+                height: 200%;
+                background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+                animation: pulse-cta 3s infinite;
+            }
+
+        .cta-icon {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
+        }
+
+        .cta-title {
+            font-weight: 700;
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+        }
+
+        .btn-cta {
+            background: white;
+            color: #E74C3C !important;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            position: relative;
+            z-index: 10;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+            .btn-cta:hover {
+                transform: translateY(-3px) scale(1.05);
+                box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+                color: #C0392B !important;
+            }
+
+        /* MASCOTAS PERDIDAS SECTION */
+        .perdidas-section {
+            background-color: rgba(151, 199, 139, 0.1);
+            border-radius: 15px;
+            padding: 40px;
+            margin: 50px 0;
+            text-align: center;
+            border: 2px solid var(--green);
+        }
+
+        .perdidas-header {
+            color: var(--brown);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            font-size: 1.5rem;
+        }
+
+        .perdidas-subtitle {
+            color: var(--text-secondary);
+            margin-bottom: 30px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .perdidas-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-perdidas {
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-primary-custom {
+            background: linear-gradient(135deg, var(--green) 0%, #86b57a 100%);
+            color: white !important;
+            border: none;
+        }
+
+            .btn-primary-custom:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 8px 20px rgba(151, 199, 139, 0.3);
+                color: white !important;
+            }
+
+        .btn-outline-custom {
+            background: transparent;
+            border: 2px solid var(--green);
+            color: var(--brown);
+        }
+
+            .btn-outline-custom:hover {
+                background: var(--green);
+                color: white !important;
+                transform: translateY(-3px);
+                box-shadow: 0 8px 20px rgba(151, 199, 139, 0.2);
+            }
+
+        /* EMERGENCIAS SECTION */
+        .emergencias-section {
+            background-color: rgba(231, 76, 60, 0.1);
+            border-radius: 15px;
+            padding: 30px;
+            border: 2px solid #E74C3C;
+            margin: 50px 0;
+        }
+
+        .emergencias-header {
+            color: #E74C3C;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+
+        .emergencias-subtitle {
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+        }
+
+        .emergencias-telefono {
+            color: #E74C3C;
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin: 15px 0;
+            text-shadow: 0 2px 4px rgba(231, 76, 60, 0.2);
+        }
+
+        .emergencias-horario {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* ANIMACIONES */
+        .fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .slide-up {
+            animation: slideUp 0.6s ease-out;
+        }
+
+        @@keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        @@keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @@keyframes pulse-cta {
+            0% {
+                transform: scale(1);
+                opacity: 0.5;
+            }
+
+            50% {
+                transform: scale(1.1);
+                opacity: 0.8;
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 0.5;
+            }
+        }
+
+        /* RESPONSIVE - ✅ CORREGIDO */
+        @@media (max-width: 768px) {
+            .hero-rescate {
+                padding: 40px 20px;
+                margin-bottom: 30px;
+            }
+
+            .hero-icon {
+                font-size: 3rem;
+            }
+
+            .hero-title {
+                font-size: 2rem;
+            }
+
+            .estadistica-card {
+                padding: 20px 15px;
+            }
+
+            .estadistica-valor {
+                font-size: 2.2rem;
+            }
+
+            .info-card {
+                padding: 20px;
+                margin-bottom: 20px;
+            }
+
+            .cta-reporte {
+                padding: 30px 20px;
+            }
+
+            .cta-icon {
+                font-size: 2.5rem;
+            }
+
+            .cta-title {
+                font-size: 1.5rem;
+            }
+
+            .btn-cta {
+                padding: 12px 30px;
+                font-size: 1rem;
+            }
+
+            .perdidas-section {
+                padding: 30px 20px;
+            }
+
+            .perdidas-buttons {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .btn-perdidas {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .emergencias-telefono {
+                font-size: 2rem;
+            }
+        }
+    </style>
+}
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Contador animado para las estadísticas
+            function animateCounter(element, target) {
+                let current = 0;
+                const increment = target / 100;
+                const timer = setInterval(() => {
+                    current += increment;
+                    if (current >= target) {
+                        current = target;
+                        clearInterval(timer);
+                    }
+                    element.textContent = Math.floor(current);
+                }, 20);
+            }
+
+            // Animar los contadores cuando sean visibles
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const valueElement = entry.target.querySelector('.estadistica-valor');
+                        const target = parseInt(valueElement.textContent);
+                        if (!isNaN(target) && target > 0) {
+                            valueElement.textContent = '0';
+                            animateCounter(valueElement, target);
+                        }
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.5 });
+
+            // Observar todas las cards de estadísticas
+            document.querySelectorAll('.estadistica-card').forEach(card => {
+                observer.observe(card);
+            });
+
+            // Efecto hover para las cards de información
+            const infoCards = document.querySelectorAll('.info-card');
+            infoCards.forEach(card => {
+                card.addEventListener('mouseenter', function () {
+                    this.style.transform = 'translateY(-5px)';
+                });
+
+                card.addEventListener('mouseleave', function () {
+                    this.style.transform = 'translateY(0)';
+                });
+            });
+
+            // Efecto para el botón de CTA
+            const ctaButton = document.querySelector('.btn-cta');
+            if (ctaButton) {
+                ctaButton.addEventListener('mouseenter', function () {
+                    this.style.transform = 'translateY(-3px) scale(1.05)';
+                });
+
+                ctaButton.addEventListener('mouseleave', function () {
+                    this.style.transform = 'translateY(0) scale(1)';
+                });
+            }
+        });
+    </script>
+}

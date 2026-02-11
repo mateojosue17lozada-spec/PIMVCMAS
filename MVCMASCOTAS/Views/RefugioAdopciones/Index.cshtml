@@ -1,0 +1,71 @@
+﻿@model IEnumerable<MVCMASCOTAS.Models.RefugioAdopcion>
+
+@{
+    ViewBag.Title = "Refugios de Adopción";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="page-header mb-4">
+    <h2><i class="fas fa-home"></i> Gestión de Refugios</h2>
+    <p class="text-muted">Administra los refugios asociados</p>
+</div>
+
+<div class="mb-3">
+    <a href="@Url.Action("Create")" class="btn btn-success">
+        <i class="fas fa-plus"></i> Nuevo Refugio
+    </a>
+</div>
+
+<div class="card shadow-custom">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead class="thead-light">
+                    <tr>
+                        <th><i class="fas fa-home"></i> Nombre del Refugio</th>
+                        <th><i class="fas fa-phone"></i> Contacto</th>
+                        <th><i class="fas fa-map-marker-alt"></i> Dirección</th>
+                        <th><i class="fas fa-user"></i> Encargado</th>
+                        <th><i class="fas fa-toggle-on"></i> Estado</th>
+                        <th class="text-center">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td><strong>@item.NombreRefugio</strong></td>
+                            <td>@item.Contacto</td>
+                            <td>@item.Direccion</td>
+                            <td>@item.PersonaEncargada</td>
+                            <td>
+                                @if (item.Estado == true)
+                                {
+                                    <span class="badge badge-success">Activo</span>
+                                }
+                                else
+                                {
+                                    <span class="badge badge-secondary">Inactivo</span>
+                                }
+                            </td>
+                            <td class="text-center">
+                                <a href="@Url.Action("Edit", new { id = item.IdRefugio })"
+                                   class="btn btn-sm btn-warning" title="Editar">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a href="@Url.Action("Details", new { id = item.IdRefugio })"
+                                   class="btn btn-sm btn-info" title="Ver detalles">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a href="@Url.Action("Delete", new { id = item.IdRefugio })"
+                                   class="btn btn-sm btn-danger" title="Eliminar">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

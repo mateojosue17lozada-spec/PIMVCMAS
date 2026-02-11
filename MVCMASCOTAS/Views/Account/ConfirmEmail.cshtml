@@ -1,0 +1,189 @@
+﻿@{
+    ViewBag.Title = "Confirmar Email";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!-- Hero Section -->
+<section class="py-4">
+    <div class="container">
+        <div class="text-center">
+            <h1 class="display-5 fw-bold mb-2 text-brown">
+                <i class="fa fa-envelope text-green"></i> Confirmar Email
+            </h1>
+        </div>
+    </div>
+</section>
+
+<!-- Main Content -->
+<section class="py-5 bg-light-mint">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-6">
+                @if (ViewBag.Success != null && ViewBag.Success)
+                {
+                    <!-- ✅ CONFIRMACIÓN EXITOSA -->
+                    <div class="card border-green shadow-hover">
+                        <div class="card-header bg-green text-white text-center">
+                            <i class="fa fa-check-circle fa-3x mb-3"></i>
+                            <h2 class="mb-0">¡Email Confirmado!</h2>
+                        </div>
+                        <div class="card-body text-center py-5">
+                            <i class="fa fa-envelope-open fa-5x text-green mb-4"></i>
+                            <h4 class="text-green mb-3">Tu correo ha sido verificado exitosamente</h4>
+                            <p class="lead mb-4 text-secondary">
+                                Tu cuenta está ahora completamente activa. Ya puedes acceder a todas las funciones del sistema.
+                            </p>
+
+                            <div class="alert alert-green border-green">
+                                <i class="fa fa-info-circle text-green"></i>
+                                <strong class="text-brown">¡Bienvenido al Refugio de Mascotas!</strong><br>
+                                <span class="text-secondary">Ahora puedes iniciar sesión y comenzar a explorar todas nuestras funciones.</span>
+                            </div>
+
+                            <div class="mt-4">
+                                <a href="@Url.Action("Login", "Account")" class="btn btn-green btn-lg text-white mb-2">
+                                    <i class="fa fa-sign-in-alt"></i> Iniciar Sesión Ahora
+                                </a>
+                                <a href="@Url.Action("Index", "Home")" class="btn btn-outline-green btn-lg mb-2">
+                                    <i class="fa fa-home"></i> Ir al Inicio
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                }
+                else if (ViewBag.Error != null)
+                {
+                    <!-- ❌ ERROR EN LA CONFIRMACIÓN -->
+                    <div class="card border-green shadow-hover">
+                        <div class="card-header bg-yellow text-brown text-center">
+                            <i class="fa fa-exclamation-triangle fa-3x mb-3"></i>
+                            <h2 class="mb-0">Error al Confirmar Email</h2>
+                        </div>
+                        <div class="card-body text-center py-5">
+                            <i class="fa fa-times-circle fa-5x text-brown mb-4"></i>
+                            <h4 class="text-brown mb-3">No se pudo confirmar tu correo</h4>
+
+                            <div class="alert alert-green border-green">
+                                <i class="fa fa-exclamation-circle text-green"></i>
+                                <strong class="text-brown">Detalles del Error:</strong><br>
+                                <span class="text-secondary">@ViewBag.Error</span>
+                            </div>
+
+                            <div class="card mb-4 border-green">
+                                <div class="card-header bg-light-mint">
+                                    <h5 class="mb-0 text-brown"><i class="fa fa-lightbulb text-green"></i> Posibles causas:</h5>
+                                </div>
+                                <div class="card-body text-left">
+                                    <ul class="mb-0 text-secondary">
+                                        <li><i class="fa fa-check-circle text-green me-2"></i> El enlace de confirmación ya fue usado anteriormente</li>
+                                        <li><i class="fa fa-clock text-green me-2"></i> El enlace ha expirado (válido por 24 horas)</li>
+                                        <li><i class="fa fa-link text-green me-2"></i> El enlace está incompleto o dañado</li>
+                                        <li><i class="fa fa-user-check text-green me-2"></i> La cuenta ya está confirmada</li>
+                                        <li><i class="fa fa-user-times text-green me-2"></i> El usuario no existe</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div class="alert alert-green border-green">
+                                <i class="fa fa-info-circle text-green"></i>
+                                <strong class="text-brown">Sugerencia:</strong>
+                                <span class="text-secondary">Si tu cuenta ya está confirmada, intenta iniciar sesión directamente.</span>
+                            </div>
+
+                            <div class="mt-4">
+                                <a href="@Url.Action("Login", "Account")" class="btn btn-green btn-lg text-white mb-2">
+                                    <i class="fa fa-sign-in-alt"></i> Intentar Iniciar Sesión
+                                </a>
+                                <a href="@Url.Action("Register", "Account")" class="btn btn-pink btn-lg mb-2">
+                                    <i class="fa fa-user-plus"></i> Crear Nueva Cuenta
+                                </a>
+                                <a href="@Url.Action("Contact", "Home")" class="btn btn-outline-green btn-lg mb-2">
+                                    <i class="fa fa-envelope"></i> Contactar Soporte
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <!-- ⏳ PROCESANDO -->
+                    <div class="card border-green shadow-hover">
+                        <div class="card-header bg-green text-white text-center">
+                            <i class="fa fa-spinner fa-spin fa-3x mb-3"></i>
+                            <h2 class="mb-0">Confirmando Email...</h2>
+                        </div>
+                        <div class="card-body text-center py-5">
+                            <div class="spinner-border text-green mb-4" role="status" style="width: 3rem; height: 3rem;">
+                                <span class="sr-only">Cargando...</span>
+                            </div>
+                            <h5 class="text-green mb-3">Estamos procesando tu solicitud...</h5>
+                            <p class="text-secondary">Esto puede tomar unos segundos. Por favor, espera.</p>
+
+                            <div class="alert alert-green border-green mt-4">
+                                <i class="fa fa-hourglass-half text-green"></i>
+                                <strong class="text-brown">Estado:</strong>
+                                <span class="text-secondary">Verificando tu cuenta...</span>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Styles {
+    <style>
+        /* Estilos específicos para Confirmar Email */
+        .card {
+            border-radius: 15px;
+            overflow: hidden;
+            border-width: 3px;
+        }
+
+        .card-header {
+            padding: 2rem 1.5rem;
+        }
+
+        .btn-lg {
+            padding: 0.75rem 1.5rem;
+            font-size: 1.1rem;
+            border-radius: 8px;
+        }
+
+        .card-body ul {
+            padding-left: 20px;
+        }
+
+            .card-body ul li {
+                margin-bottom: 10px;
+            }
+
+        .fa-5x {
+            font-size: 5em;
+        }
+
+        .spinner-border {
+            border-width: 0.3rem;
+        }
+
+        @@media (max-width: 768px) {
+            .card-header {
+                padding: 1.5rem 1rem;
+            }
+
+                .card-header h2 {
+                    font-size: 1.5rem;
+                }
+
+            .fa-5x {
+                font-size: 3.5em;
+            }
+
+            .btn-lg {
+                font-size: 1rem;
+                padding: 0.6rem 1.2rem;
+            }
+        }
+    </style>
+}

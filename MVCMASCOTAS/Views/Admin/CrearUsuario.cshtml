@@ -1,0 +1,662 @@
+﻿@model MVCMASCOTAS.Models.ViewModels.RegisterViewModel
+@{
+    ViewBag.Title = "Crear Nuevo Usuario";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!-- Hero Section -->
+<section class="py-4">
+    <div class="container">
+        <div class="text-center">
+            <h1 class="display-5 fw-bold mb-2 text-brown">
+                <i class="fa fa-user-plus text-green"></i> Crear Nuevo Usuario
+            </h1>
+            <p class="lead mb-3 text-secondary">Complete el formulario para registrar un nuevo usuario en el sistema</p>
+        </div>
+    </div>
+</section>
+
+<!-- Main Content -->
+<section class="py-5 bg-light-mint">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="card border-green shadow-hover">
+                    <div class="card-header bg-green text-white text-center py-4">
+                        <h3 class="mb-2"><i class="fa fa-user-plus"></i> Crear Nuevo Usuario</h3>
+                        <p class="mb-0">Registra un nuevo usuario en el sistema</p>
+                    </div>
+                    <div class="card-body p-4 p-md-5">
+                        @using (Html.BeginForm("CrearUsuario", "Admin", FormMethod.Post,
+                               new
+                               {
+                                   @class = "needs-validation",
+                                   enctype = "multipart/form-data",
+                                   novalidate = "novalidate",
+                                   id = "crearUsuarioForm"
+                               }))
+                        {
+                            @Html.AntiForgeryToken()
+
+                            if (TempData["SuccessMessage"] != null)
+                            {
+                                <div class="alert alert-green border-green alert-dismissible fade show" role="alert">
+                                    <i class="fa fa-check-circle text-green"></i>
+                                    <strong class="text-brown">@TempData["SuccessMessage"]</strong>
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                            }
+
+                            if (TempData["ErrorMessage"] != null)
+                            {
+                                <div class="alert alert-danger border-danger alert-dismissible fade show" role="alert">
+                                    <i class="fa fa-exclamation-circle"></i>
+                                    <strong>@TempData["ErrorMessage"]</strong>
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                            }
+
+                            @Html.ValidationSummary(true, "", new { @class = "alert alert-green border-green" })
+
+                            <!-- Información Personal -->
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group mb-4">
+                                        <label class="form-label text-brown fw-medium">
+                                            <i class="fa fa-user text-green"></i> Nombre Completo *
+                                        </label>
+                                        @Html.TextBoxFor(m => m.NombreCompleto, new
+                                        {
+                                            @class = "form-control border-green",
+                                            placeholder = "Ej: Juan Pérez",
+                                            required = "required",
+                                            maxlength = "150",
+                                            autocomplete = "name"
+                                        })
+                                        @Html.ValidationMessageFor(m => m.NombreCompleto, "", new { @class = "text-danger small mt-1" })
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="form-group mb-4">
+                                        <label class="form-label text-brown fw-medium">
+                                            <i class="fa fa-id-card text-green"></i> Cédula *
+                                        </label>
+                                        @Html.TextBoxFor(m => m.Cedula, new
+                                        {
+                                            @class = "form-control border-green",
+                                            id = "Cedula",
+                                            placeholder = "Ej: 1712345678",
+                                            maxlength = "10",
+                                            required = "required",
+                                            autocomplete = "off",
+                                            pattern = "[0-9]{10}",
+                                            title = "10 dígitos numéricos"
+                                        })
+                                        @Html.ValidationMessageFor(m => m.Cedula, "", new { @class = "text-danger small mt-1" })
+                                        <small class="form-text text-secondary mt-2">
+                                            <i class="fa fa-info-circle text-green"></i> 10 dígitos sin guiones
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Contacto -->
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group mb-4">
+                                        <label class="form-label text-brown fw-medium">
+                                            <i class="fa fa-envelope text-green"></i> Email *
+                                        </label>
+                                        @Html.TextBoxFor(m => m.Email, new
+                                        {
+                                            @class = "form-control border-green",
+                                            type = "email",
+                                            placeholder = "Ej: juan@email.com",
+                                            required = "required",
+                                            maxlength = "150",
+                                            autocomplete = "email"
+                                        })
+                                        @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger small mt-1" })
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="form-group mb-4">
+                                        <label class="form-label text-brown fw-medium">
+                                            <i class="fa fa-phone text-green"></i> Teléfono *
+                                        </label>
+                                        @Html.TextBoxFor(m => m.Telefono, new
+                                        {
+                                            @class = "form-control border-green",
+                                            id = "Telefono",
+                                            placeholder = "Ej: 0987654321",
+                                            required = "required",
+                                            maxlength = "10",
+                                            autocomplete = "tel",
+                                            pattern = "[0-9]{10}",
+                                            title = "10 dígitos numéricos"
+                                        })
+                                        @Html.ValidationMessageFor(m => m.Telefono, "", new { @class = "text-danger small mt-1" })
+                                        <small class="form-text text-secondary mt-2">
+                                            <i class="fa fa-info-circle text-green"></i> 10 dígitos sin guiones
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Dirección -->
+                            <div class="form-group mb-4">
+                                <label class="form-label text-brown fw-medium">
+                                    <i class="fa fa-map-marker-alt text-green"></i> Dirección *
+                                </label>
+                                @Html.TextAreaFor(m => m.Direccion, new
+                                {
+                                    @class = "form-control border-green",
+                                    rows = "2",
+                                    placeholder = "Dirección completa incluyendo calles, sector...",
+                                    required = "required",
+                                    maxlength = "255",
+                                    autocomplete = "street-address"
+                                })
+                                @Html.ValidationMessageFor(m => m.Direccion, "", new { @class = "text-danger small mt-1" })
+                            </div>
+
+                            <!-- Ciudad y Provincia -->
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group mb-4">
+                                        <label class="form-label text-brown fw-medium">
+                                            <i class="fa fa-city text-green"></i> Ciudad
+                                        </label>
+                                        @Html.TextBoxFor(m => m.Ciudad, new
+                                        {
+                                            @class = "form-control border-green",
+                                            placeholder = "Ej: Quito",
+                                            maxlength = "100",
+                                            autocomplete = "address-level2"
+                                        })
+                                        @Html.ValidationMessageFor(m => m.Ciudad, "", new { @class = "text-danger small mt-1" })
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group mb-4">
+                                        <label class="form-label text-brown fw-medium">
+                                            <i class="fa fa-map text-green"></i> Provincia
+                                        </label>
+                                        @Html.TextBoxFor(m => m.Provincia, new
+                                        {
+                                            @class = "form-control border-green",
+                                            placeholder = "Ej: Pichincha",
+                                            maxlength = "100",
+                                            autocomplete = "address-level1"
+                                        })
+                                        @Html.ValidationMessageFor(m => m.Provincia, "", new { @class = "text-danger small mt-1" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Contraseñas -->
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group mb-4">
+                                        <label class="form-label text-brown fw-medium">
+                                            <i class="fa fa-lock text-green"></i> Contraseña *
+                                        </label>
+                                        <div class="input-group">
+                                            @Html.PasswordFor(m => m.Password, new
+                                            {
+                                                @class = "form-control border-green",
+                                                id = "Password",
+                                                placeholder = "Mínimo 8 caracteres con letras y números",
+                                                required = "required",
+                                                minlength = "8",
+                                                maxlength = "100",
+                                                autocomplete = "new-password"
+                                            })
+                                            <button type="button" class="btn btn-outline-green toggle-password" data-target="#Password">
+                                                <i class="fa fa-eye"></i>
+                                            </button>
+                                        </div>
+                                        @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger small mt-1" })
+                                        <div class="password-requirements small text-secondary mt-2">
+                                            <i class="fa fa-info-circle text-green"></i> Requisitos de contraseña:
+                                            <ul class="mb-0 ps-3">
+                                                <li>Mínimo 8 caracteres</li>
+                                                <li>Al menos una letra</li>
+                                                <li>Al menos un número</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="form-group mb-4">
+                                        <label class="form-label text-brown fw-medium">
+                                            <i class="fa fa-lock text-green"></i> Confirmar Contraseña *
+                                        </label>
+                                        <div class="input-group">
+                                            @Html.PasswordFor(m => m.ConfirmPassword, new
+                                            {
+                                                @class = "form-control border-green",
+                                                id = "ConfirmPassword",
+                                                placeholder = "Repite tu contraseña",
+                                                required = "required",
+                                                autocomplete = "new-password"
+                                            })
+                                            <button type="button" class="btn btn-outline-green toggle-password" data-target="#ConfirmPassword">
+                                                <i class="fa fa-eye"></i>
+                                            </button>
+                                        </div>
+                                        @Html.ValidationMessageFor(m => m.ConfirmPassword, "", new { @class = "text-danger small mt-1" })
+                                        <div id="passwordMatch" class="mt-2 d-none">
+                                            <small class="text-success">
+                                                <i class="fa fa-check-circle"></i> Las contraseñas coinciden
+                                            </small>
+                                        </div>
+                                        <div id="passwordMismatch" class="mt-2 d-none">
+                                            <small class="text-danger">
+                                                <i class="fa fa-times-circle"></i> Las contraseñas no coinciden
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Sección de Roles (SOLO en CrearUsuario) -->
+                            <div class="form-group mb-4">
+                                <label class="form-label text-brown fw-medium">
+                                    <i class="fa fa-user-tag text-green"></i> Roles del Usuario *
+                                </label>
+                                <div class="border border-green p-3 rounded" style="max-height: 200px; overflow-y: auto;">
+                                    @if (ViewBag.Roles != null)
+                                    {
+                                        var rolesList = ViewBag.Roles as IEnumerable<dynamic>;
+                                        if (rolesList != null && rolesList.Any())
+                                        {
+                                            foreach (var rol in rolesList)
+                                            {
+                                                <div class="form-check mb-2">
+                                                    <input class="form-check-input border-green"
+                                                           type="checkbox"
+                                                           name="rolesSeleccionados"
+                                                           id="rol_@rol.RolId"
+                                                           value="@rol.RolId">
+                                                    <label class="form-check-label text-brown" for="rol_@rol.RolId">
+                                                        @rol.NombreRol
+                                                        @if (!string.IsNullOrEmpty(rol.Descripcion))
+                                                        {
+                                                            <small class="text-muted d-block">@rol.Descripcion</small>
+                                                        }
+                                                    </label>
+                                                </div>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <div class="alert alert-green border-green">
+                                                <i class="fa fa-exclamation-triangle text-green"></i> No hay roles disponibles en el sistema.
+                                            </div>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <div class="alert alert-green border-green">
+                                            <i class="fa fa-exclamation-triangle text-green"></i> No hay roles disponibles en el sistema.
+                                        </div>
+                                    }
+                                </div>
+                                @if (!ViewData.ModelState.IsValid && ViewData.ModelState["rolesSeleccionados"]?.Errors != null)
+                                {
+                                    <span class="text-danger small mt-2">
+                                        @ViewData.ModelState["rolesSeleccionados"].Errors.FirstOrDefault()?.ErrorMessage
+                                    </span>
+                                }
+                            </div>
+
+                            <!-- Foto de Perfil -->
+                            <div class="form-group mb-4">
+                                <label class="form-label text-brown fw-medium">
+                                    <i class="fa fa-camera text-green"></i> Foto de Perfil (Opcional)
+                                </label>
+                                <div class="input-group">
+                                    <input type="file" class="form-control border-green" id="ImagenPerfil" name="ImagenPerfil" accept="image/*" />
+                                    <label class="input-group-text btn-outline-green" for="ImagenPerfil">
+                                        <i class="fa fa-cloud-upload-alt"></i> Examinar
+                                    </label>
+                                </div>
+                                <small class="form-text text-secondary mt-2">
+                                    <i class="fa fa-info-circle text-green"></i> Formatos: JPG, PNG, GIF. Tamaño máximo: 5MB
+                                </small>
+
+                                <!-- Vista previa de imagen -->
+                                <div id="imagePreview" class="text-center mt-3" style="display: none;">
+                                    <p class="mb-2 text-brown">
+                                        <i class="fa fa-eye text-green"></i> Vista Previa:
+                                    </p>
+                                    <img id="previewImage" class="img-thumbnail rounded-circle border-green"
+                                         style="width: 150px; height: 150px; object-fit: cover;" />
+                                </div>
+                            </div>
+
+                            <!-- Pregunta de Seguridad -->
+                            <div class="form-group mb-4">
+                                <label class="form-label text-brown fw-medium">
+                                    <i class="fa fa-shield-alt text-green"></i> Pregunta de Seguridad *
+                                </label>
+                                <div class="card border-green">
+                                    <div class="card-body">
+                                        <p class="mb-2 text-secondary">¿Cuánto es 2 + 2?</p>
+                                        @Html.TextBoxFor(m => m.PreguntaSeguridad, new
+                                        {
+                                            @class = "form-control border-green",
+                                            type = "number",
+                                            placeholder = "Ingresa la respuesta",
+                                            required = "required"
+                                        })
+                                        @Html.ValidationMessageFor(m => m.PreguntaSeguridad, "", new { @class = "text-danger small mt-1" })
+                                        <small class="form-text text-secondary mt-2">
+                                            <i class="fa fa-info-circle text-green"></i> Esta pregunta ayuda a verificar que no eres un bot
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Términos y Condiciones -->
+                            <div class="form-group form-check mt-4">
+                                @Html.CheckBoxFor(m => m.AceptaTerminos, new
+                                {
+                                    @class = "form-check-input",
+                                    id = "AceptaTerminos",
+                                    required = "required"
+                                })
+                                <label class="form-check-label text-brown" for="AceptaTerminos">
+                                    Acepto los <a href="@Url.Action("Terminos", "Home")" target="_blank" class="text-green">términos y condiciones</a> *
+                                </label>
+                                @Html.ValidationMessageFor(m => m.AceptaTerminos, "", new { @class = "text-danger d-block" })
+                            </div>
+
+                            <!-- Botón de Registro -->
+                            <div class="d-grid mt-4">
+                                <button type="submit" class="btn btn-green btn-lg text-white py-3" id="btnCrearUsuario">
+                                    <i class="fa fa-user-plus"></i> Crear Usuario
+                                </button>
+                            </div>
+                        }
+
+                        <div class="text-center mt-4 pt-4 border-top border-green">
+                            <p class="text-brown mb-3">¿Desea cancelar la creación?</p>
+                            <a href="@Url.Action("Usuarios", "Admin")" class="btn btn-outline-green btn-lg">
+                                <i class="fa fa-arrow-left"></i> Volver a Usuarios
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Styles {
+    <style>
+        /* Estilos específicos para Crear Usuario */
+        .password-requirements {
+            background-color: rgba(151, 199, 139, 0.1);
+            padding: 10px 15px;
+            border-radius: 8px;
+            border-left: 4px solid var(--green);
+        }
+
+        .form-check-input:checked {
+            background-color: var(--green);
+            border-color: var(--green);
+        }
+
+        .form-check-input:focus {
+            border-color: var(--green);
+            box-shadow: 0 0 0 0.25rem rgba(151, 199, 139, 0.25);
+        }
+
+        .form-control:focus {
+            border-color: var(--green) !important;
+            box-shadow: 0 0 0 0.25rem rgba(151, 199, 139, 0.25) !important;
+        }
+
+        .input-group .btn-outline-green {
+            border-left: none;
+        }
+
+        .input-group-text.btn-outline-green {
+            cursor: pointer;
+        }
+
+        .img-thumbnail.rounded-circle {
+            border: 2px solid var(--green);
+            transition: all 0.3s ease;
+        }
+
+            .img-thumbnail.rounded-circle:hover {
+                transform: scale(1.05);
+                box-shadow: 0 5px 15px rgba(151, 199, 139, 0.3);
+            }
+    </style>
+}
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    <script>
+        $(document).ready(function () {
+            console.log("Formulario Crear Usuario cargado");
+
+            // Toggle password visibility
+            $('.toggle-password').click(function () {
+                var target = $(this).data('target');
+                var input = $(target);
+                var icon = $(this).find('i');
+
+                if (input.attr('type') === 'password') {
+                    input.attr('type', 'text');
+                    icon.removeClass('fa-eye').addClass('fa-eye-slash');
+                } else {
+                    input.attr('type', 'password');
+                    icon.removeClass('fa-eye-slash').addClass('fa-eye');
+                }
+            });
+
+            // Vista previa de imagen
+            $('#ImagenPerfil').on('change', function () {
+                var input = this;
+                if (input.files && input.files[0]) {
+                    var file = input.files[0];
+                    var fileSize = file.size / 1024 / 1024; // en MB
+
+                    if (fileSize > 5) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Archivo demasiado grande',
+                            text: 'La imagen no debe exceder 5 MB.',
+                            confirmButtonColor: '#97C78B'
+                        });
+                        $(this).val('');
+                        return;
+                    }
+
+                    var reader = new FileReader();
+                    reader.onload = function (e) {
+                        $('#previewImage').attr('src', e.target.result);
+                        $('#imagePreview').show();
+                    };
+                    reader.readAsDataURL(input.files[0]);
+                } else {
+                    $('#imagePreview').hide();
+                }
+            });
+
+            // Validación en tiempo real de contraseña
+            $('#Password').on('input', function () {
+                var password = $(this).val();
+                var hasLetter = /[a-zA-Z]/.test(password);
+                var hasDigit = /\d/.test(password);
+                var isValid = password.length >= 8 && hasLetter && hasDigit;
+
+                if (isValid) {
+                    $(this).removeClass('is-invalid').addClass('is-valid');
+                } else {
+                    $(this).removeClass('is-valid').addClass('is-invalid');
+                }
+
+                // Actualizar confirmación si ya hay valor
+                if ($('#ConfirmPassword').val()) {
+                    checkPasswordMatch();
+                }
+            });
+
+            // Validación en tiempo real de confirmación
+            $('#ConfirmPassword').on('input', checkPasswordMatch);
+
+            function checkPasswordMatch() {
+                var password = $('#Password').val();
+                var confirmPassword = $('#ConfirmPassword').val();
+
+                if (confirmPassword === '') {
+                    $('#ConfirmPassword').removeClass('is-invalid is-valid');
+                    $('#passwordMatch').addClass('d-none');
+                    $('#passwordMismatch').addClass('d-none');
+                    return;
+                }
+
+                if (password === confirmPassword) {
+                    $('#ConfirmPassword').removeClass('is-invalid').addClass('is-valid');
+                    $('#passwordMatch').removeClass('d-none');
+                    $('#passwordMismatch').addClass('d-none');
+                } else {
+                    $('#ConfirmPassword').removeClass('is-valid').addClass('is-invalid');
+                    $('#passwordMatch').addClass('d-none');
+                    $('#passwordMismatch').removeClass('d-none');
+                }
+            }
+
+            // Validación del formulario al enviar
+            $('#crearUsuarioForm').on('submit', function (e) {
+                console.log("Validando formulario...");
+
+                // Validar que al menos un rol esté seleccionado
+                if ($('input[name="rolesSeleccionados"]:checked').length === 0) {
+                    e.preventDefault();
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Rol requerido',
+                        text: 'Debe seleccionar al menos un rol para el usuario.',
+                        confirmButtonColor: '#97C78B'
+                    });
+                    return false;
+                }
+
+                // Validar cédula
+                var cedula = $('#Cedula').val();
+                if (cedula.length !== 10 || !/^\d+$/.test(cedula)) {
+                    e.preventDefault();
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Cédula inválida',
+                        text: 'La cédula debe tener exactamente 10 dígitos numéricos.',
+                        confirmButtonColor: '#97C78B'
+                    });
+                    $('#Cedula').focus();
+                    return false;
+                }
+
+                // Validar teléfono
+                var telefono = $('#Telefono').val();
+                if (telefono.length !== 10 || !/^\d+$/.test(telefono)) {
+                    e.preventDefault();
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Teléfono inválido',
+                        text: 'El teléfono debe tener exactamente 10 dígitos numéricos.',
+                        confirmButtonColor: '#97C78B'
+                    });
+                    $('#Telefono').focus();
+                    return false;
+                }
+
+                // Validar contraseña
+                var password = $('#Password').val();
+                var hasLetter = /[a-zA-Z]/.test(password);
+                var hasDigit = /\d/.test(password);
+
+                if (password.length < 8) {
+                    e.preventDefault();
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Contraseña muy corta',
+                        text: 'La contraseña debe tener al menos 8 caracteres.',
+                        confirmButtonColor: '#97C78B'
+                    });
+                    $('#Password').focus();
+                    return false;
+                }
+
+                if (!hasLetter || !hasDigit) {
+                    e.preventDefault();
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Contraseña inválida',
+                        text: 'La contraseña debe incluir letras y números.',
+                        confirmButtonColor: '#97C78B'
+                    });
+                    $('#Password').focus();
+                    return false;
+                }
+
+                // Validar que las contraseñas coincidan
+                var confirmPassword = $('#ConfirmPassword').val();
+                if (password !== confirmPassword) {
+                    e.preventDefault();
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Contraseñas no coinciden',
+                        text: 'Las contraseñas deben ser idénticas.',
+                        confirmButtonColor: '#97C78B'
+                    });
+                    $('#ConfirmPassword').focus();
+                    return false;
+                }
+
+                // Validar pregunta de seguridad
+                var pregunta = $('#PreguntaSeguridad').val();
+                if (pregunta !== "4") {
+                    e.preventDefault();
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Respuesta incorrecta',
+                        text: 'La respuesta a la pregunta de seguridad es incorrecta.',
+                        confirmButtonColor: '#97C78B'
+                    });
+                    $('#PreguntaSeguridad').focus();
+                    return false;
+                }
+
+                // Validar términos
+                if (!$('#AceptaTerminos').is(':checked')) {
+                    e.preventDefault();
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Términos no aceptados',
+                        text: 'Debe aceptar los términos y condiciones para continuar.',
+                        confirmButtonColor: '#97C78B'
+                    });
+                    $('#AceptaTerminos').focus();
+                    return false;
+                }
+
+                console.log("Formulario válido, enviando...");
+                $('#btnCrearUsuario').prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Creando Usuario...');
+                return true;
+            });
+
+            // Auto-focus en el primer campo
+            $('#NombreCompleto').focus();
+        });
+    </script>
+}

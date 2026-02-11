@@ -18,6 +18,7 @@ namespace MVCMASCOTAS.Models
         public Roles()
         {
             this.UsuariosRoles = new HashSet<UsuariosRoles>();
+            this.RolPermisos = new HashSet<RolPermisos>();
         }
     
         public int RolId { get; set; }
@@ -28,5 +29,7 @@ namespace MVCMASCOTAS.Models
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<UsuariosRoles> UsuariosRoles { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<RolPermisos> RolPermisos { get; set; }
     }
 }

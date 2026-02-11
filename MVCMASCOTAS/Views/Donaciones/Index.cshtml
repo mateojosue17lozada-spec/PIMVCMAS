@@ -1,173 +1,1060 @@
 ﻿@{
     ViewBag.Title = "Donaciones";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    // Obtener datos del ViewBag y convertirlos correctamente
+    var totalDonaciones = ViewBag.TotalDonaciones as int? ?? 0;
+    var montoTotal = ViewBag.MontoTotalRecaudado as decimal? ?? 0;
+    var donacionesEsteMes = ViewBag.DonacionesEsteMes as int? ?? 0;
+
+    // Manejar correctamente las últimas donaciones
+    dynamic ultimasDonaciones = ViewBag.UltimasDonaciones;
+    bool tieneUltimasDonaciones = false;
+    int countUltimasDonaciones = 0;
+
+    if (ultimasDonaciones != null)
+    {
+        try
+        {
+            // Intentar contar si es una colección
+            var enumerable = ultimasDonaciones as System.Collections.IEnumerable;
+            if (enumerable != null)
+            {
+                countUltimasDonaciones = 0;
+                foreach (var item in enumerable)
+                {
+                    countUltimasDonaciones++;
+                }
+                tieneUltimasDonaciones = countUltimasDonaciones > 0;
+            }
+        }
+        catch
+        {
+            tieneUltimasDonaciones = false;
+        }
+    }
 }
 
-<div class="jumbotron jumbotron-fluid text-center" style="background: linear-gradient(135deg, #2ecc71, #27ae60); color: white;">
+<style>
+    /* ESTILOS ESPECÍFICOS PARA PÁGINA DE DONACIONES */
+    .donaciones-section {
+        background: linear-gradient(135deg, var(--bg-light) 0%, white 100%);
+        min-height: 100vh;
+        padding: 30px 0;
+    }
+
+    /* HERO SECTION */
+    .hero-donaciones {
+        background: linear-gradient(135deg, var(--pink) 0%, #f9c2b0 100%);
+        color: var(--brown);
+        padding: 50px 0;
+        text-align: center;
+        border-radius: 15px;
+        margin-bottom: 50px;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(251, 205, 192, 0.3);
+    }
+
+        .hero-donaciones::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%);
+        }
+
+    .hero-icon {
+        font-size: 4rem;
+        margin-bottom: 20px;
+        color: var(--brown);
+        filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));
+    }
+
+    .hero-title {
+        font-weight: 800;
+        margin-bottom: 15px;
+        color: var(--brown);
+    }
+
+    /* ESTADÍSTICAS */
+    .estadisticas-grid {
+        margin: 50px 0;
+    }
+
+    .estadistica-card {
+        border: 2px solid transparent;
+        border-radius: 15px;
+        padding: 30px 20px;
+        text-align: center;
+        transition: all 0.4s ease;
+        margin-bottom: 20px;
+        color: white;
+        position: relative;
+        overflow: hidden;
+    }
+
+        .estadistica-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .estadistica-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+
+            .estadistica-card:hover::before {
+                opacity: 1;
+            }
+
+    .estadistica-icon {
+        font-size: 2.8rem;
+        margin-bottom: 20px;
+        opacity: 0.9;
+        filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+    }
+
+    .estadistica-valor {
+        font-size: 3rem;
+        font-weight: 800;
+        margin: 15px 0;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .estadistica-label {
+        font-size: 1.1rem;
+        opacity: 0.9;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+    }
+
+    .estadistica-azul {
+        background: linear-gradient(135deg, #5DADE2 0%, #2E86C1 100%);
+    }
+
+    .estadistica-verde {
+        background: linear-gradient(135deg, var(--green) 0%, #86b57a 100%);
+    }
+
+    .estadistica-pink {
+        background: linear-gradient(135deg, var(--pink) 0%, #f9c2b0 100%);
+        color: var(--brown);
+    }
+
+    /* BOTONES DE ACCIÓN */
+    .acciones-grid {
+        margin: 50px 0;
+        padding: 30px;
+        background-color: rgba(151, 199, 139, 0.1);
+        border-radius: 15px;
+        border: 2px solid rgba(151, 199, 139, 0.3);
+    }
+
+    .btn-accion {
+        padding: 20px 30px;
+        border-radius: 10px;
+        font-weight: 700;
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 15px;
+        text-decoration: none !important;
+        border: 2px solid transparent;
+        min-height: 80px;
+    }
+
+        .btn-accion i {
+            font-size: 1.5rem;
+        }
+
+    .btn-donar {
+        background: linear-gradient(135deg, var(--green) 0%, #86b57a 100%);
+        color: white !important;
+    }
+
+        .btn-donar:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(151, 199, 139, 0.4);
+            border-color: white;
+        }
+
+    .btn-mis-donaciones {
+        background: linear-gradient(135deg, #5DADE2 0%, #2E86C1 100%);
+        color: white !important;
+    }
+
+        .btn-mis-donaciones:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(93, 173, 226, 0.4);
+            border-color: white;
+        }
+
+    .btn-apadrinamiento {
+        background: linear-gradient(135deg, var(--pink) 0%, #f9c2b0 100%);
+        color: var(--brown) !important;
+    }
+
+        .btn-apadrinamiento:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(251, 205, 192, 0.4);
+            border-color: var(--brown);
+        }
+
+    /* TABLA DE DONACIONES */
+    .tabla-donaciones {
+        border: 2px solid var(--green);
+        border-radius: 15px;
+        overflow: hidden;
+        margin: 50px 0;
+        background: white;
+        box-shadow: 0 10px 30px rgba(151, 199, 139, 0.1);
+    }
+
+    .tabla-header {
+        background: linear-gradient(135deg, var(--green) 0%, #86b57a 100%);
+        color: white;
+        padding: 20px 30px;
+        font-weight: 600;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .tabla-badge {
+        background-color: rgba(255,255,255,0.2);
+        color: white;
+        padding: 8px 15px;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+
+    .donaciones-table {
+        margin: 0;
+        border: none;
+    }
+
+        .donaciones-table thead {
+            background-color: rgba(151, 199, 139, 0.1);
+        }
+
+        .donaciones-table th {
+            border: none;
+            padding: 20px;
+            font-weight: 600;
+            color: var(--brown);
+            border-bottom: 2px solid var(--green);
+        }
+
+        .donaciones-table td {
+            padding: 18px 20px;
+            vertical-align: middle;
+            border-color: rgba(151, 199, 139, 0.1);
+            color: var(--text-secondary);
+        }
+
+        .donaciones-table tbody tr {
+            transition: all 0.2s ease;
+            border-bottom: 1px solid rgba(151, 199, 139, 0.1);
+        }
+
+            .donaciones-table tbody tr:hover {
+                background-color: rgba(151, 199, 139, 0.05);
+                transform: translateX(5px);
+            }
+
+    .badge-donacion {
+        padding: 8px 15px;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.85rem;
+    }
+
+    .badge-monetaria {
+        background: linear-gradient(135deg, var(--green) 0%, #86b57a 100%);
+        color: white;
+    }
+
+    .badge-apadrinamiento {
+        background: linear-gradient(135deg, var(--yellow) 0%, #e6b85c 100%);
+        color: var(--brown);
+    }
+
+    .badge-especie {
+        background: linear-gradient(135deg, var(--pink) 0%, #f9c2b0 100%);
+        color: var(--brown);
+    }
+
+    /* ESTADO SIN DONACIONES */
+    .empty-state {
+        padding: 60px 20px;
+        text-align: center;
+        background-color: rgba(151, 199, 139, 0.1);
+        border-radius: 15px;
+        border: 2px dashed var(--green);
+        margin: 20px 0;
+    }
+
+        .empty-state i {
+            font-size: 4rem;
+            color: var(--green);
+            margin-bottom: 20px;
+            opacity: 0.7;
+        }
+
+        .empty-state h4 {
+            color: var(--brown);
+            margin-bottom: 15px;
+        }
+
+        .empty-state p {
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto 25px;
+        }
+
+    /* TIPOS DE DONACIÓN */
+    .tipos-donacion-grid {
+        margin: 50px 0;
+    }
+
+    .tipo-card {
+        border: 2px solid transparent;
+        border-radius: 15px;
+        padding: 30px;
+        text-align: center;
+        transition: all 0.4s ease;
+        height: 100%;
+        background: white;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    }
+
+        .tipo-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+
+    .tipo-icon {
+        font-size: 3rem;
+        margin-bottom: 20px;
+    }
+
+    .tipo-title {
+        color: var(--brown);
+        font-weight: 700;
+        margin-bottom: 15px;
+        font-size: 1.3rem;
+    }
+
+    .tipo-descripcion {
+        color: var(--text-secondary);
+        line-height: 1.6;
+    }
+
+    .card-monetaria {
+        border-color: var(--green);
+    }
+
+        .card-monetaria .tipo-icon {
+            color: var(--green);
+        }
+
+    .card-apadrinamiento {
+        border-color: var(--yellow);
+    }
+
+        .card-apadrinamiento .tipo-icon {
+            color: var(--yellow);
+        }
+
+    .card-especie {
+        border-color: var(--pink);
+    }
+
+        .card-especie .tipo-icon {
+            color: var(--pink);
+        }
+
+    /* ALERTAS */
+    .alert-donacion {
+        border-radius: 10px;
+        border: none;
+        padding: 20px 25px;
+        margin: 20px 0;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    }
+
+    .alert-danger-custom {
+        background: linear-gradient(135deg, #F1948A 0%, #E74C3C 100%);
+        color: white;
+    }
+
+    .alert-success-custom {
+        background: linear-gradient(135deg, var(--green) 0%, #86b57a 100%);
+        color: white;
+    }
+
+    /* ANIMACIONES */
+    .fade-in {
+        animation: fadeIn 0.5s ease-out;
+    }
+
+    .slide-up {
+        animation: slideUp 0.6s ease-out;
+    }
+
+    .stagger-delay-1 {
+        animation-delay: 0.1s;
+    }
+
+    .stagger-delay-2 {
+        animation-delay: 0.2s;
+    }
+
+    .stagger-delay-3 {
+        animation-delay: 0.3s;
+    }
+
+    .stagger-delay-4 {
+        animation-delay: 0.4s;
+    }
+
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+
+        to {
+            opacity: 1;
+        }
+    }
+
+    @@keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @@keyframes float {
+        0%, 100% {
+            transform: translateY(0);
+        }
+
+        50% {
+            transform: translateY(-10px);
+        }
+    }
+
+    .float-animation {
+        animation: float 3s ease-in-out infinite;
+    }
+
+    /* RESPONSIVE */
+    @@media (max-width: 768px) {
+        .hero-donaciones {
+            padding: 30px 20px;
+            margin-bottom: 30px;
+        }
+
+        .hero-icon {
+            font-size: 3rem;
+        }
+
+        .estadistica-card {
+            padding: 20px 15px;
+        }
+
+        .estadistica-valor {
+            font-size: 2.5rem;
+        }
+
+        .estadistica-icon {
+            font-size: 2.2rem;
+        }
+
+        .btn-accion {
+            padding: 15px 20px;
+            font-size: 1rem;
+            margin-bottom: 15px;
+        }
+
+        .tabla-header {
+            padding: 15px 20px;
+            flex-direction: column;
+            gap: 10px;
+            text-align: center;
+        }
+
+        .donaciones-table th,
+        .donaciones-table td {
+            padding: 12px 15px;
+        }
+
+        .tipo-card {
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+    }
+</style>
+
+<div class="donaciones-section fade-in">
     <div class="container">
-        <h1 class="display-4"><i class="fas fa-hand-holding-heart"></i> ¡Tu Ayuda Marca la Diferencia!</h1>
-        <p class="lead">Cada donación nos permite rescatar, cuidar y encontrar hogares para animales necesitados</p>
-    </div>
-</div>
-
-<!-- Estadísticas -->
-<div class="container my-5">
-    <div class="row text-center">
-        <div class="col-md-4">
-            <div class="stat-box bg-success">
-                <div class="stat-value">@ViewBag.TotalDonaciones</div>
-                <div class="stat-label">Donaciones Recibidas</div>
+        <!-- Hero Section -->
+        <div class="hero-donaciones slide-up">
+            <div class="hero-icon float-animation">
+                <i class="fas fa-hand-holding-heart"></i>
             </div>
+            <h1 class="hero-title">Donaciones que Transforman Vidas</h1>
+            <p class="lead" style="color: var(--brown); max-width: 600px; margin: 0 auto;">
+                Cada contribución nos ayuda a brindar cuidado, amor y un hogar seguro a los animales que más lo necesitan.
+            </p>
         </div>
-        <div class="col-md-4">
-            <div class="stat-box bg-primary">
-                <div class="stat-value">$@ViewBag.MontoTotalRecaudado.ToString("N2")</div>
-                <div class="stat-label">Total Recaudado</div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="stat-box bg-warning">
-                <div class="stat-value">@ViewBag.DonacionesEsteMes</div>
-                <div class="stat-label">Donaciones Este Mes</div>
-            </div>
-        </div>
-    </div>
-</div>
 
-<!-- Tipos de Donaciones -->
-<div class="container my-5">
-    <h2 class="text-center mb-5"><i class="fas fa-gift"></i> Formas de Ayudar</h2>
+        <!-- Mostrar mensaje de error si existe -->
+        @if (ViewBag.Error != null)
+        {
+            <div class="alert alert-danger-custom alert-donacion fade show" role="alert">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-exclamation-triangle fa-2x me-3"></i>
+                    <div>
+                        <h5 class="alert-heading mb-2">¡Atención!</h5>
+                        @ViewBag.Error
+                    </div>
+                </div>
+                <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-3" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
 
-    <div class="row">
-        <div class="col-md-6 mb-4">
-            <div class="card h-100 shadow-custom">
-                <div class="card-body text-center">
-                    <i class="fas fa-dollar-sign fa-4x text-success mb-3"></i>
-                    <h4 class="card-title">Donación Monetaria</h4>
-                    <p class="card-text">Tu donación nos ayuda a cubrir gastos veterinarios, alimentación y mantenimiento del refugio.</p>
-                    <ul class="text-left">
-                        <li>Atención veterinaria</li>
-                        <li>Alimento y suplementos</li>
-                        <li>Medicamentos</li>
-                        <li>Mantenimiento del refugio</li>
-                    </ul>
-                    <a href="@Url.Action("Donar", "Donaciones")" class="btn btn-success btn-lg btn-block mt-3">
-                        <i class="fas fa-hand-holding-usd"></i> Donar Ahora
-                    </a>
+        <!-- Mostrar mensaje de éxito -->
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success-custom alert-donacion fade show" role="alert">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-check-circle fa-2x me-3"></i>
+                    <div>
+                        <h5 class="alert-heading mb-2">¡Éxito!</h5>
+                        @TempData["SuccessMessage"]
+                    </div>
+                </div>
+                <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-3" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+
+        <!-- Estadísticas -->
+        <div class="estadisticas-grid">
+            <div class="row">
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="estadistica-card estadistica-azul slide-up stagger-delay-1">
+                        <div class="estadistica-icon">
+                            <i class="fas fa-hand-holding-heart"></i>
+                        </div>
+                        <div class="estadistica-valor">
+                            @totalDonaciones
+                        </div>
+                        <div class="estadistica-label">
+                            Donaciones Totales
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="estadistica-card estadistica-verde slide-up stagger-delay-2">
+                        <div class="estadistica-icon">
+                            <i class="fas fa-dollar-sign"></i>
+                        </div>
+                        <div class="estadistica-valor">
+                            @montoTotal.ToString("C")
+                        </div>
+                        <div class="estadistica-label">
+                            Total Recaudado
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="estadistica-card estadistica-pink slide-up stagger-delay-3">
+                        <div class="estadistica-icon">
+                            <i class="fas fa-calendar-alt"></i>
+                        </div>
+                        <div class="estadistica-valor" style="color: var(--brown)">
+                            @donacionesEsteMes
+                        </div>
+                        <div class="estadistica-label" style="color: var(--brown)">
+                            Donaciones Este Mes
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <div class="col-md-6 mb-4">
-            <div class="card h-100 shadow-custom">
-                <div class="card-body text-center">
-                    <i class="fas fa-box fa-4x text-primary mb-3"></i>
-                    <h4 class="card-title">Donación en Especie</h4>
-                    <p class="card-text">También aceptamos donaciones de productos y materiales que necesitamos.</p>
-                    <ul class="text-left">
-                        <li>Alimento para mascotas</li>
-                        <li>Juguetes y accesorios</li>
-                        <li>Productos de limpieza</li>
-                        <li>Mantas y camas</li>
-                    </ul>
-                    <a href="@Url.Action("Donar", "Donaciones")" class="btn btn-primary btn-lg btn-block mt-3">
-                        <i class="fas fa-boxes"></i> Donar en Especie
+        <!-- Botones de Acción - CORREGIDOS -->
+        <div class="acciones-grid slide-up" style="animation-delay: 0.3s">
+            <div class="row g-4">
+                <div class="col-lg-4 col-md-6">
+                    <a href="@Url.Action("Donar", "Donaciones")" class="btn-accion btn-donar">
+                        <i class="fas fa-heart"></i>
+                        <span>Hacer una Donación</span>
                     </a>
                 </div>
-            </div>
-        </div>
-    </div>
-</div>
 
-<!-- Apadrinamiento -->
-<div class="bg-light py-5">
-    <div class="container">
-        <div class="row align-items-center">
-            <div class="col-md-6">
-                <h2><i class="fas fa-heart"></i> Programa de Apadrinamiento</h2>
-                <p class="lead">¿No puedes adoptar pero quieres ayudar? ¡Apadrina una mascota!</p>
-                <p>Con una contribución mensual ayudas a cubrir los gastos de cuidado de una mascota específica. Recibirás:</p>
-                <ul>
-                    <li>Actualizaciones mensuales con fotos</li>
-                    <li>Certificado de apadrinamiento</li>
-                    <li>Visitas programadas (opcional)</li>
-                    <li>Reconocimiento en redes sociales</li>
-                </ul>
-                @if (Request.IsAuthenticated)
+                @if (User.Identity.IsAuthenticated)
                 {
-                    <a href="@Url.Action("Apadrinar", "Donaciones")" class="btn btn-danger btn-lg">
-                        <i class="fas fa-heart"></i> Apadrinar una Mascota
-                    </a>
+                    <div class="col-lg-4 col-md-6">
+                        <a href="@Url.Action("MisDonaciones", "Donaciones")" class="btn-accion btn-mis-donaciones">
+                            <i class="fas fa-history"></i>
+                            <span>Mis Donaciones</span>
+                        </a>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6">
+                        <a href="@Url.Action("MisApadrinamientos", "Apadrinar")" class="btn-accion btn-apadrinamiento">
+                            <i class="fas fa-paw"></i>
+                            <span>Mis Apadrinamientos</span>
+                        </a>
+                    </div>
                 }
                 else
                 {
-                    <a href="@Url.Action("Login", "Account")" class="btn btn-danger btn-lg">
-                        <i class="fas fa-sign-in-alt"></i> Iniciar Sesión para Apadrinar
-                    </a>
+                    <div class="col-lg-8 col-md-12">
+                        <div class="alert alert-green text-center p-3">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <a href="@Url.Action("Login", "Account")" class="text-brown fw-bold">Inicia sesión</a>
+                            para ver tus donaciones y apadrinamientos
+                        </div>
+                    </div>
                 }
             </div>
-            <div class="col-md-6 text-center">
-                <i class="fas fa-paw fa-10x text-danger"></i>
-            </div>
         </div>
-    </div>
-</div>
 
-<!-- Últimas Donaciones -->
-@if (ViewBag.UltimasDonaciones != null && ViewBag.UltimasDonaciones.Count > 0)
-{
-    <div class="container my-5">
-        <h2 class="text-center mb-4"><i class="fas fa-users"></i> Nuestros Donantes</h2>
-        <div class="card shadow-custom">
-            <div class="card-body">
+        <!-- Últimas Donaciones -->
+        <div class="tabla-donaciones slide-up" style="animation-delay: 0.4s">
+            <div class="tabla-header">
+                <h3 class="mb-0">
+                    <i class="fas fa-list-alt me-2"></i> Últimas Donaciones
+                </h3>
+                @if (tieneUltimasDonaciones)
+                {
+                    <span class="tabla-badge">
+                        @countUltimasDonaciones donaciones recientes
+                    </span>
+                }
+            </div>
+
+            @if (tieneUltimasDonaciones)
+            {
                 <div class="table-responsive">
-                    <table class="table table-hover">
+                    <table class="table donaciones-table">
                         <thead>
                             <tr>
-                                <th>Donante</th>
-                                <th>Tipo</th>
-                                <th>Fecha</th>
+                                <th class="text-center">Donante</th>
+                                <th class="text-center">Tipo</th>
+                                <th class="text-center">Monto</th>
+                                <th class="text-center">Fecha</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach (var donacion in ViewBag.UltimasDonaciones)
+                            @foreach (dynamic donacion in ultimasDonaciones)
                             {
                                 <tr>
-                                    <td><i class="fas fa-user-circle"></i> @donacion.Donante</td>
-                                    <td><span class="badge badge-info">@donacion.Tipo</span></td>
-                                    <td>@donacion.Fecha.ToString("dd/MM/yyyy")</td>
+                                    <td class="text-center">
+                                        <!-- Donante -->
+                                        @{
+                                            object donanteObj = null;
+                                            bool tieneDonante = false;
+
+                                            try
+                                            {
+                                                donanteObj = donacion.Donante;
+                                                tieneDonante = donanteObj != null;
+                                            }
+                                            catch (Microsoft.CSharp.RuntimeBinder.RuntimeBinderException)
+                                            {
+                                                tieneDonante = false;
+                                            }
+                                        }
+
+                                        @if (tieneDonante)
+                                        {
+                                            string donanteStr = donanteObj.ToString();
+                                            if (donanteStr.Equals("Anónimo", StringComparison.OrdinalIgnoreCase) ||
+                                                donanteStr.Equals("Anonimo", StringComparison.OrdinalIgnoreCase))
+                                            {
+                                                <span class="text-secondary">
+                                                    <i class="fas fa-user-secret me-2"></i>Anónimo
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <strong class="text-brown">@donanteStr</strong>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <span class="text-secondary">Desconocido</span>
+                                        }
+                                    </td>
+                                    <td class="text-center">
+                                        <!-- Tipo - CON LÓGICA MEJORADA Y SIN CONTAINS CON 2 ARGUMENTOS -->
+                                        @{
+                                            object tipoObj = null;
+                                            bool tieneTipo = false;
+
+                                            try
+                                            {
+                                                tipoObj = donacion.Tipo;
+                                                tieneTipo = tipoObj != null;
+                                            }
+                                            catch (Microsoft.CSharp.RuntimeBinder.RuntimeBinderException)
+                                            {
+                                                tieneTipo = false;
+                                            }
+                                        }
+
+                                        @if (tieneTipo)
+                                        {
+                                            string tipo = tipoObj.ToString();
+                                            string tipoParaBadge = "Desconocido";
+                                            string claseBadge = "bg-secondary";
+
+                                            // Lógica mejorada para determinar el tipo usando IndexOf (compatible con Razor)
+                                            if (tipo != null)
+                                            {
+                                                // Convertir a minúsculas para comparación insensible
+                                                string tipoLower = tipo.ToLower();
+
+                                                if (tipoLower.Contains("monetaria"))
+                                                {
+                                                    tipoParaBadge = "Monetaria";
+                                                    claseBadge = "badge-monetaria";
+                                                }
+                                                else if (tipoLower.Contains("apadrinamiento"))
+                                                {
+                                                    tipoParaBadge = "Apadrinamiento";
+                                                    claseBadge = "badge-apadrinamiento";
+                                                }
+                                                else if (tipoLower.Contains("especie"))
+                                                {
+                                                    tipoParaBadge = "Especie";
+                                                    claseBadge = "badge-especie";
+                                                }
+                                                else if (tipoLower.Contains("recurrente"))
+                                                {
+                                                    tipoParaBadge = "Monetaria";
+                                                    claseBadge = "badge-monetaria";
+                                                }
+                                                else if (tipoLower.Contains("única") || tipoLower.Contains("unica"))
+                                                {
+                                                    // Verificar si es donación en especie basado en el monto
+                                                    // Usar try-catch separado para evitar conflictos de variables
+                                                    try
+                                                    {
+                                                        object montoObjVerificar = donacion.Monto;
+                                                        if (montoObjVerificar != null)
+                                                        {
+                                                            decimal montoVerificar = Convert.ToDecimal(montoObjVerificar);
+                                                            tipoParaBadge = montoVerificar == 0 ? "Especie" : "Monetaria";
+                                                            claseBadge = montoVerificar == 0 ? "badge-especie" : "badge-monetaria";
+                                                        }
+                                                    }
+                                                    catch
+                                                    {
+                                                        tipoParaBadge = "Donación";
+                                                    }
+                                                }
+                                            }
+
+                                            <span class="badge-donacion @claseBadge">
+                                                @tipoParaBadge
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary">N/A</span>
+                                        }
+                                    </td>
+                                    <td class="text-center">
+                                        <!-- Monto - CORREGIDO PARA EVITAR CONFLICTOS DE VARIABLES -->
+                                        @{
+                                            bool esEspecie = false;
+                                            object montoObjeto = null; // Nombre diferente para evitar conflicto
+                                            bool tieneMonto = false;
+
+                                            try
+                                            {
+                                                montoObjeto = donacion.Monto;
+                                                tieneMonto = montoObjeto != null;
+
+                                                // Determinar si es especie
+                                                if (tieneTipo && tipoObj != null)
+                                                {
+                                                    string tipoStr = tipoObj.ToString();
+                                                    if (tipoStr != null)
+                                                    {
+                                                        esEspecie = tipoStr.ToLower().Contains("especie");
+                                                    }
+                                                }
+
+                                                // Si no se determinó por tipo, verificar por monto
+                                                if (!esEspecie && tieneMonto)
+                                                {
+                                                    try
+                                                    {
+                                                        decimal montoDecimal = Convert.ToDecimal(montoObjeto);
+                                                        esEspecie = montoDecimal == 0;
+                                                    }
+                                                    catch { }
+                                                }
+                                            }
+                                            catch (Microsoft.CSharp.RuntimeBinder.RuntimeBinderException)
+                                            {
+                                                tieneMonto = false;
+                                            }
+                                        }
+
+                                        @if (esEspecie)
+                                        {
+                                            <span class="text-brown">
+                                                <i class="fas fa-box-open me-2"></i>En especie
+                                            </span>
+                                        }
+                                        else if (tieneMonto)
+                                        {
+                                            try
+                                            {
+                                                decimal monto = Convert.ToDecimal(montoObjeto);
+                                                <strong class="text-green">@monto.ToString("C")</strong>
+                                            }
+                                            catch
+                                            {
+                                                <span class="text-secondary">N/A</span>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <span class="text-secondary">N/A</span>
+                                        }
+                                    </td>
+                                    <td class="text-center">
+                                        <!-- Fecha -->
+                                        @{
+                                            object fechaObj = null;
+                                            bool tieneFecha = false;
+
+                                            try
+                                            {
+                                                fechaObj = donacion.Fecha;
+                                                tieneFecha = fechaObj != null;
+                                            }
+                                            catch (Microsoft.CSharp.RuntimeBinder.RuntimeBinderException)
+                                            {
+                                                tieneFecha = false;
+                                            }
+                                        }
+
+                                        @if (tieneFecha)
+                                        {
+                                            try
+                                            {
+                                                DateTime fecha = Convert.ToDateTime(fechaObj);
+                                                <span class="text-brown">
+                                                    <i class="far fa-calendar-alt me-2"></i>
+                                                    @fecha.ToString("dd/MM/yyyy")
+                                                </span>
+                                            }
+                                            catch
+                                            {
+                                                <span class="text-secondary">Fecha inválida</span>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <span class="text-secondary">No especificada</span>
+                                        }
+                                    </td>
                                 </tr>
                             }
                         </tbody>
                     </table>
                 </div>
-            </div>
+            }
+            else
+            {
+                <div class="empty-state">
+                    <i class="fas fa-hand-holding-heart"></i>
+                    <h4 class="text-brown mb-3">No hay donaciones recientes</h4>
+                    <p class="text-secondary mb-4">
+                        Sé el primero en hacer una donación. Tu contribución puede marcar la diferencia
+                        en la vida de un animal que necesita ayuda.
+                    </p>
+                    <a href="@Url.Action("Donar", "Donaciones")" class="btn btn-green px-4">
+                        <i class="fas fa-heart me-2"></i> Haz tu primera donación
+                    </a>
+                </div>
+            }
         </div>
-    </div>
-}
 
-<!-- Transparencia -->
-<div class="container my-5">
-    <div class="card shadow-custom">
-        <div class="card-body">
-            <h3 class="text-center mb-4"><i class="fas fa-shield-alt"></i> Compromiso de Transparencia</h3>
-            <p class="text-center">En el Refugio de Animales Quito, nos comprometemos a usar cada donación de manera responsable y transparente.</p>
-            <div class="row text-center mt-4">
-                <div class="col-md-4">
-                    <i class="fas fa-file-invoice-dollar fa-3x text-primary mb-3"></i>
-                    <h5>Reportes Financieros</h5>
-                    <p>Publicamos reportes trimestrales</p>
+        <!-- Tipos de Donación -->
+        <div class="tipos-donacion-grid slide-up" style="animation-delay: 0.5s">
+            <div class="row">
+                <div class="col-md-12 mb-4 text-center">
+                    <h2 class="text-brown">
+                        <i class="fas fa-question-circle me-2"></i> ¿Cómo puedes ayudar?
+                    </h2>
+                    <p class="text-secondary" style="max-width: 800px; margin: 0 auto;">
+                        Existen diferentes formas de contribuir. Elige la que mejor se adapte a tus posibilidades.
+                    </p>
                 </div>
-                <div class="col-md-4">
-                    <i class="fas fa-camera fa-3x text-success mb-3"></i>
-                    <h5>Actualizaciones</h5>
-                    <p>Compartimos el impacto de tu ayuda</p>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-lg-4 col-md-6">
+                    <div class="tipo-card card-monetaria stagger-delay-1">
+                        <div class="tipo-icon">
+                            <i class="fas fa-money-bill-wave"></i>
+                        </div>
+                        <h4 class="tipo-title">Donación Monetaria</h4>
+                        <p class="tipo-descripcion">
+                            Contribución única o recurrente para cubrir gastos veterinarios, alimentación,
+                            medicamentos y cuidados generales de los animales.
+                        </p>
+                    </div>
                 </div>
-                <div class="col-md-4">
-                    <i class="fas fa-hands-helping fa-3x text-warning mb-3"></i>
-                    <h5>Compromiso</h5>
-                    <p>100% dedicados al bienestar animal</p>
+
+                <div class="col-lg-4 col-md-6">
+                    <div class="tipo-card card-apadrinamiento stagger-delay-2">
+                        <div class="tipo-icon">
+                            <i class="fas fa-paw"></i>
+                        </div>
+                        <h4 class="tipo-title">Apadrinamiento</h4>
+                        <p class="tipo-descripcion">
+                            Apadrina una mascota específica con una contribución mensual. Recibirás
+                            actualizaciones periódicas sobre el bienestar de tu ahijado.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6">
+                    <div class="tipo-card card-especie stagger-delay-3">
+                        <div class="tipo-icon">
+                            <i class="fas fa-box-open"></i>
+                        </div>
+                        <h4 class="tipo-title">Donación en Especie</h4>
+                        <p class="tipo-descripcion">
+                            Contribuye con alimentos, medicinas, cobijas, juguetes, collares,
+                            correas y otros insumos esenciales para el cuidado de los animales.
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Contador animado para estadísticas
+            function animateCounter(element, target, prefix = '', suffix = '') {
+                let current = 0;
+                const increment = target / 50; // Más suave
+                const timer = setInterval(() => {
+                    current += increment;
+                    if (current >= target) {
+                        current = target;
+                        clearInterval(timer);
+                    }
+
+                    if (prefix === '$') {
+                        element.textContent = prefix + Math.floor(current).toLocaleString('en-US');
+                    } else {
+                        element.textContent = prefix + Math.floor(current) + suffix;
+                    }
+                }, 30);
+            }
+
+            // Animar estadísticas cuando sean visibles
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const card = entry.target;
+                        const valueElement = card.querySelector('.estadistica-valor');
+                        let originalText = valueElement.textContent.trim();
+
+                        // Extraer el valor numérico
+                        let target = 0;
+                        if (originalText.includes('$')) {
+                            // Es un valor monetario
+                            const cleanText = originalText.replace(/[^0-9.]/g, '');
+                            target = parseFloat(cleanText) || 0;
+                            valueElement.textContent = '$0';
+                            setTimeout(() => animateCounter(valueElement, target, '$'), 300);
+                        } else {
+                            // Es un número simple
+                            target = parseInt(originalText.replace(/[^0-9]/g, '')) || 0;
+                            valueElement.textContent = '0';
+                            setTimeout(() => animateCounter(valueElement, target), 300);
+                        }
+
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.5 });
+
+            // Observar todas las cards de estadísticas
+            document.querySelectorAll('.estadistica-card').forEach(card => {
+                observer.observe(card);
+            });
+
+            // Efectos hover para cards
+            const tipoCards = document.querySelectorAll('.tipo-card');
+            tipoCards.forEach(card => {
+                card.addEventListener('mouseenter', function () {
+                    this.style.transform = 'translateY(-10px)';
+                });
+
+                card.addEventListener('mouseleave', function () {
+                    this.style.transform = 'translateY(0)';
+                });
+            });
+
+            // Efectos hover para estadísticas
+            const estadisticaCards = document.querySelectorAll('.estadistica-card');
+            estadisticaCards.forEach(card => {
+                card.addEventListener('mouseenter', function () {
+                    this.style.transform = 'translateY(-10px) scale(1.02)';
+                });
+
+                card.addEventListener('mouseleave', function () {
+                    this.style.transform = 'translateY(0) scale(1)';
+                });
+            });
+
+            // Auto-ocultar alertas después de 5 segundos
+            setTimeout(function () {
+                const alerts = document.querySelectorAll('.alert');
+                alerts.forEach(alert => {
+                    const bsAlert = new bootstrap.Alert(alert);
+                    bsAlert.close();
+                });
+            }, 5000);
+        });
+    </script>
+}

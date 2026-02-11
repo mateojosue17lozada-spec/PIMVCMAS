@@ -262,11 +262,16 @@
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\AdminController.cs" />
     <Compile Include="Controllers\AdopcionController.cs" />
+    <Compile Include="Controllers\ApadrinarController.cs" />
+    <Compile Include="Controllers\CampaniaAdopcionesController.cs" />
     <Compile Include="Controllers\ContabilidadController.cs" />
     <Compile Include="Controllers\DonacionesController.cs" />
     <Compile Include="Controllers\ErrorController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\MascotasController.cs" />
+    <Compile Include="Controllers\RefugioAdopcionesController.cs" />
     <Compile Include="Controllers\RescateController.cs" />
+    <Compile Include="Controllers\TestController.cs" />
     <Compile Include="Controllers\TiendaController.cs" />
     <Compile Include="Controllers\VeterinarioController.cs" />
     <Compile Include="Controllers\VoluntariadoController.cs" />
@@ -292,6 +297,9 @@
     <Compile Include="Models\AuditoriaAcciones.cs">
       <DependentUpon>RefugioMascotasModel.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\CampaniaAdopcion.cs">
+      <DependentUpon>RefugioMascotasModel.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\CategoriasProducto.cs">
       <DependentUpon>RefugioMascotasModel.tt</DependentUpon>
     </Compile>
@@ -312,6 +320,9 @@
       <DependentUpon>RefugioMascotasModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\FormularioAdopcionDetalle.cs">
+      <DependentUpon>RefugioMascotasModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\HistorialEstadosMascota.cs">
       <DependentUpon>RefugioMascotasModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\HistorialMedico.cs">
@@ -350,6 +361,9 @@
     <Compile Include="Models\Productos.cs">
       <DependentUpon>RefugioMascotasModel.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\RefugioAdopcion.cs">
+      <DependentUpon>RefugioMascotasModel.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\RefugioMascotasModel.Context.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -371,6 +385,9 @@
     <Compile Include="Models\Roles.cs">
       <DependentUpon>RefugioMascotasModel.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\RolPermisos.cs">
+      <DependentUpon>RefugioMascotasModel.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\SeguimientoAdopcion.cs">
       <DependentUpon>RefugioMascotasModel.tt</DependentUpon>
     </Compile>
@@ -389,10 +406,17 @@
     <Compile Include="Models\Vacunas.cs">
       <DependentUpon>RefugioMascotasModel.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\ViewModels\ApadrinarViewModel.cs" />
     <Compile Include="Models\ViewModels\CarritoViewModel.cs" />
     <Compile Include="Models\ViewModels\ChangePasswordViewModel.cs" />
+    <Compile Include="Models\ViewModels\ConfiguracionResumenViewModel.cs" />
+    <Compile Include="Models\ViewModels\ConfiguracionViewModel.cs" />
+    <Compile Include="Models\ViewModels\CrearRolViewModel.cs" />
     <Compile Include="Models\ViewModels\DashboardViewModel.cs" />
+    <Compile Include="Models\ViewModels\DetalleMascotaPerdidaViewModel.cs" />
     <Compile Include="Models\ViewModels\DonacionViewModel.cs" />
+    <Compile Include="Models\ViewModels\EditarRolViewModel.cs" />
+    <Compile Include="Models\ViewModels\EditarUsuarioViewModel.cs" />
     <Compile Include="Models\ViewModels\EditProfileViewModel.cs" />
     <Compile Include="Models\ViewModels\ForgotPasswordViewModel.cs" />
     <Compile Include="Models\ViewModels\FormularioAdopcionViewModel.cs" />
@@ -402,7 +426,10 @@
     <Compile Include="Models\ViewModels\PaginacionViewModel.cs" />
     <Compile Include="Models\ViewModels\ProductoViewModel.cs" />
     <Compile Include="Models\ViewModels\RegisterViewModel.cs" />
+    <Compile Include="Models\ViewModels\RegistroAuditoriaViewModel.cs" />
+    <Compile Include="Models\ViewModels\ReporteMascotaPerdidaViewModel.cs" />
     <Compile Include="Models\ViewModels\ResetPasswordViewModel.cs" />
+    <Compile Include="Models\ViewModels\ResultadoValidacionImagen.cs" />
     <Compile Include="Models\ViewModels\SolicitudAdopcionViewModel.cs" />
     <Compile Include="Models\vw_BalanceContable.cs">
       <DependentUpon>RefugioMascotasModel.tt</DependentUpon>
@@ -447,6 +474,7 @@
     <Content Include="Content\custom.css" />
     <Content Include="Content\font-awesome.css" />
     <Content Include="Content\font-awesome.min.css" />
+    <Content Include="Content\images\no-image.png" />
     <Content Include="favicon.ico" />
     <Content Include="fonts\fontawesome-webfont.svg" />
     <Content Include="Global.asax" />
@@ -628,7 +656,7 @@
     <Content Include="Views\Shared\_AlertasMensajes.cshtml" />
     <Content Include="Views\Shared\_Paginacion.cshtml" />
     <Content Include="Views\Account\ForgotPassword.cshtml" />
-    <Content Include="Views\Account\Profile.cshtml" />
+    <Content Include="Views\Account\MiPerfil.cshtml" />
     <Content Include="Views\Mascotas\Index.cshtml" />
     <Content Include="Views\Mascotas\Detalle.cshtml" />
     <Content Include="Views\Mascotas\Crear.cshtml" />
@@ -645,9 +673,9 @@
     <Content Include="Views\Veterinario\Vacunas.cshtml" />
     <Content Include="Views\Veterinario\Tratamientos.cshtml" />
     <Content Include="Views\Donaciones\Donar.cshtml" />
-    <Content Include="Views\Donaciones\Apadrinar.cshtml" />
+    <Content Include="Views\Apadrinar\Apadrinar.cshtml" />
     <Content Include="Views\Donaciones\MisDonaciones.cshtml" />
-    <Content Include="Views\Donaciones\MisApadrinamientos.cshtml" />
+    <Content Include="Views\Apadrinar\MisApadrinamientos.cshtml" />
     <Content Include="Views\Tienda\Index.cshtml" />
     <Content Include="Views\Tienda\Detalle.cshtml" />
     <Content Include="Views\Tienda\Carrito.cshtml" />
@@ -673,8 +701,7 @@
     <Content Include="Views\Rescate\Index.cshtml" />
     <Content Include="Views\Admin\SolicitudAdopcion.cshtml" />
     <Content Include="Views\Admin\DetallesSolicitud.cshtml" />
-    <Content Include="Views\Admin\Mascotas.cshtml" />
-    <Content Include="Views\Contabilidad\DetallesMovimientos.cshtml" />
+    <Content Include="Views\Contabilidad\DetallesMovimiento.cshtml" />
     <Content Include="Views\Contabilidad\EditarMovimiento.cshtml" />
     <Content Include="Views\Account\EditProfile.cshtml" />
     <Content Include="Views\Shared\Unauthorized.cshtml" />
@@ -689,6 +716,46 @@
     <Content Include="Scripts\popper.js.map" />
     <Content Include="Scripts\popper-utils.min.js.map" />
     <Content Include="Scripts\popper-utils.js.map" />
+    <Content Include="Views\Test\Index.cshtml" />
+    <Content Include="Views\Home\Terminos.cshtml" />
+    <Content Include="Views\Admin\CrearUsuario.cshtml" />
+    <Content Include="Views\Error\Unauthorized.cshtml" />
+    <Content Include="Views\Error\Index.cshtml" />
+    <Content Include="Views\Admin\EditarUsuario.cshtml" />
+    <Content Include="Views\Admin\VerUsuario.cshtml" />
+    <Content Include="Views\Admin\CrearRol.cshtml" />
+    <Content Include="Views\Admin\EditarRol.cshtml" />
+    <Content Include="Views\Admin\PermisosRol.cshtml" />
+    <Content Include="Views\Home\Services.cshtml" />
+    <Content Include="Views\Rescate\DetalleMascotaPerdida.cshtml" />
+    <Content Include="Views\Rescate\ReportarMascotaPerdida.cshtml" />
+    <Content Include="Views\RefugioAdopciones\Create.cshtml" />
+    <Content Include="Views\RefugioAdopciones\Delete.cshtml" />
+    <Content Include="Views\RefugioAdopciones\Details.cshtml" />
+    <Content Include="Views\RefugioAdopciones\Edit.cshtml" />
+    <Content Include="Views\RefugioAdopciones\Index.cshtml" />
+    <Content Include="Views\CampaniaAdopciones\Create.cshtml" />
+    <Content Include="Views\CampaniaAdopciones\Delete.cshtml" />
+    <Content Include="Views\CampaniaAdopciones\Details.cshtml" />
+    <Content Include="Views\CampaniaAdopciones\Edit.cshtml" />
+    <Content Include="Views\CampaniaAdopciones\Index.cshtml" />
+    <Content Include="Views\Account\ChangePassword.cshtml" />
+    <Content Include="Views\Account\ResetPassword.cshtml" />
+    <Content Include="Views\Adopcion\Detalles.cshtml" />
+    <Content Include="Views\Account\ConfirmEmail.cshtml" />
+    <Content Include="Views\Apadrinar\Index.cshtml" />
+    <Content Include="Views\Apadrinar\Confirmar.cshtml" />
+    <Content Include="Views\Apadrinar\Detalle.cshtml" />
+    <Content Include="Views\Mascotas\Listado.cshtml" />
+    <Content Include="Views\Mascotas\SeguimientoAdopciones.cshtml" />
+    <Content Include="Views\Mascotas\RegistrarSeguimiento.cshtml" />
+    <Content Include="Views\Mascotas\SeguimientoMascota.cshtml" />
+    <Content Include="Views\Mascotas\CrearSeguimientoManual.cshtml" />
+    <Content Include="Views\Mascotas\EditarSeguimiento.cshtml" />
+    <Content Include="Views\Mascotas\HistorialEstados.cshtml" />
+    <Content Include="Views\Mascotas\ContratosAdopcion.cshtml" />
+    <Content Include="Views\Mascotas\DetalleContrato.cshtml" />
+    <Content Include="Views\Mascotas\MascotasArchivadas.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\Uploads\Documentos\" />

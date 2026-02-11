@@ -425,7 +425,7 @@ namespace MVCMASCOTAS.Controllers
                 <p>¡Gracias por tu compra!<br/>Equipo de la Tienda del Refugio</p>
             ";
 
-            _ = EmailHelper.SendEmailAsync(usuario.Email, subject, body);
+            _ = EmailHelper.SendNotificationAsync(usuario.Email, subject, body);
 
             TempData["SuccessMessage"] = $"¡Pedido confirmado! Número de pedido: {pedido.NumeroPedido}";
             return RedirectToAction("MisPedidos");

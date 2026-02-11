@@ -2,126 +2,396 @@
 
 @{
     ViewBag.Title = "Contrato de Adopción";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>Contrato</h2>
-<style>
-    .contrato-section {
-        page-break-inside: avoid;
-        margin-bottom: 20px;
-    }
-
-    .firma-box {
-        border-top: 2px solid #000;
-        width: 200px;
-        margin-top: 50px;
-        padding-top: 5px;
-        text-align: center;
-    }
-
-    @@media print {
-        .no-print {
-            display: none;
-        }
-    }
-</style>
-
-<div class="page-header mb-4 no-print">
-    <h2><i class="fas fa-file-contract"></i> Contrato de Adopción</h2>
-    <p class="text-muted">Contrato de adopción #@Model.SolicitudId</p>
+<div class="page-header mb-4 fade-in-up">
+    <div class="d-flex justify-content-between align-items-center no-print">
+        <div>
+            <h2 class="text-brown"><i class="fa fa-file-contract text-green"></i> Contrato de Adopción</h2>
+            <p class="text-secondary">Contrato de adopción #@Model.SolicitudId</p>
+        </div>
+        <div>
+            <a href="@Url.Action("MisSolicitudes", "Adopcion")" class="btn btn-outline-green">
+                <i class="fa fa-arrow-left"></i> Volver
+            </a>
+        </div>
+    </div>
 </div>
 
-<div class="card shadow-custom mb-4">
-    <div class="card-body">
+<div class="card shadow-hover border-green mb-4">
+    <div class="card-body bg-light-mint">
         <div class="text-center mb-4">
-            <h3>CONTRATO DE ADOPCIÓN DE MASCOTA</h3>
-            <p><strong>Refugio de Mascotas</strong></p>
-            <p>Fecha: @DateTime.Now.ToString("dd/MM/yyyy")</p>
+            <h3 class="text-brown">CONTRATO DE ADOPCIÓN DE MASCOTA</h3>
+            <p class="text-brown"><strong>Refugio de Mascotas</strong></p>
+            <p class="text-secondary">Fecha: @DateTime.Now.ToString("dd/MM/yyyy")</p>
         </div>
 
         <div class="contrato-section">
-            <h5>1. PARTES DEL CONTRATO</h5>
-            <p><strong>EL REFUGIO:</strong> Refugio de Mascotas, con domicilio en @ViewBag.DireccionRefugio</p>
-            <p><strong>EL ADOPTANTE:</strong> @Model.Usuarios.NombreCompleto, con cédula @Model.Usuarios.Cedula, domiciliado en @Model.Usuarios.Direccion</p>
+            <h5 class="text-green">1. PARTES DEL CONTRATO</h5>
+            <p class="text-brown"><strong class="text-green">EL REFUGIO:</strong> Refugio de Mascotas, con domicilio en @ViewBag.DireccionRefugio</p>
+            <p class="text-brown"><strong class="text-green">EL ADOPTANTE:</strong> @Model.Usuarios.NombreCompleto, con cédula @Model.Usuarios.Cedula, domiciliado en @Model.Usuarios.Direccion</p>
         </div>
 
         <div class="contrato-section">
-            <h5>2. OBJETO DEL CONTRATO</h5>
-            <p>El presente contrato tiene por objeto la adopción de la mascota identificada como:</p>
-            <ul>
-                <li><strong>Nombre:</strong> @Model.Mascotas.Nombre</li>
-                <li><strong>Especie:</strong> @Model.Mascotas.Especie</li>
-                <li><strong>Raza:</strong> @Model.Mascotas.Raza</li>
-                <li><strong>Sexo:</strong> @Model.Mascotas.Sexo</li>
-                <li><strong>Edad Aproximada:</strong> @Model.Mascotas.EdadAproximada</li>
+            <h5 class="text-green">2. OBJETO DEL CONTRATO</h5>
+            <p class="text-brown">El presente contrato tiene por objeto la adopción de la mascota identificada como:</p>
+            <ul class="list-unstyled pl-3">
+                <li class="text-brown mb-1"><i class="fa fa-paw text-green mr-2"></i><strong>Nombre:</strong> @Model.Mascotas.Nombre</li>
+                <li class="text-brown mb-1"><i class="fa fa-paw text-green mr-2"></i><strong>Especie:</strong> @Model.Mascotas.Especie</li>
+                <li class="text-brown mb-1"><i class="fa fa-paw text-green mr-2"></i><strong>Raza:</strong> @Model.Mascotas.Raza</li>
+                <li class="text-brown mb-1"><i class="fa fa-paw text-green mr-2"></i><strong>Sexo:</strong> @Model.Mascotas.Sexo</li>
+                <li class="text-brown"><i class="fa fa-paw text-green mr-2"></i><strong>Edad Aproximada:</strong> @Model.Mascotas.EdadAproximada</li>
             </ul>
         </div>
 
         <div class="contrato-section">
-            <h5>3. OBLIGACIONES DEL ADOPTANTE</h5>
-            <ol>
-                <li>Proporcionar alimentación adecuada y agua fresca diariamente.</li>
-                <li>Brindar atención veterinaria cuando sea necesario.</li>
-                <li>Mantener al día las vacunas y desparasitaciones.</li>
-                <li>Proporcionar un ambiente seguro y adecuado para la mascota.</li>
-                <li>No abandonar, maltratar o ceder la mascota sin autorización del refugio.</li>
-                <li>Permitir visitas de seguimiento por parte del refugio.</li>
-                <li>Notificar al refugio en caso de pérdida, enfermedad grave o fallecimiento.</li>
+            <h5 class="text-green">3. OBLIGACIONES DEL ADOPTANTE</h5>
+            <ol class="text-brown pl-3">
+                <li class="mb-2">Proporcionar alimentación adecuada y agua fresca diariamente.</li>
+                <li class="mb-2">Brindar atención veterinaria cuando sea necesario.</li>
+                <li class="mb-2">Mantener al día las vacunas y desparasitaciones.</li>
+                <li class="mb-2">Proporcionar un ambiente seguro y adecuado para la mascota.</li>
+                <li class="mb-2">No abandonar, maltratar o ceder la mascota sin autorización del refugio.</li>
+                <li class="mb-2">Permitir visitas de seguimiento por parte del refugio.</li>
+                <li class="mb-2">Notificar al refugio en caso de pérdida, enfermedad grave o fallecimiento.</li>
                 <li>Esterilizar a la mascota si aún no lo está (dentro de 60 días).</li>
             </ol>
         </div>
 
         <div class="contrato-section">
-            <h5>4. DERECHOS DEL REFUGIO</h5>
-            <ol>
-                <li>Realizar visitas de seguimiento durante el primer año.</li>
-                <li>Recuperar la mascota en caso de incumplimiento del contrato.</li>
+            <h5 class="text-green">4. DERECHOS DEL REFUGIO</h5>
+            <ol class="text-brown pl-3">
+                <li class="mb-2">Realizar visitas de seguimiento durante el primer año.</li>
+                <li class="mb-2">Recuperar la mascota en caso de incumplimiento del contrato.</li>
                 <li>Solicitar informes sobre el estado de la mascota.</li>
             </ol>
         </div>
 
         <div class="contrato-section">
-            <h5>5. CLÁUSULAS ESPECIALES</h5>
-            <!-- OPCIÓN 1: Si quieres usar una propiedad que SÍ existe en tu modelo -->
-            <p>@Model.Observaciones</p> <!-- Usando Observaciones que SÍ existe en tu tabla -->
-            <!-- OPCIÓN 2: Texto fijo -->
-            <!-- <p>No se aplican cláusulas especiales adicionales a las ya mencionadas.</p> -->
-            <!-- OPCIÓN 3: Si quieres crear la propiedad CondicionesEspeciales -->
-            <!-- <p>@ViewBag.CondicionesEspeciales</p> -->
+            <h5 class="text-green">5. CLÁUSULAS ESPECIALES</h5>
+            @if (!string.IsNullOrEmpty(Model.Observaciones))
+            {
+                <div class="alert alert-green border-green">
+                    <i class="fa fa-exclamation-circle text-green mr-2"></i>
+                    <span class="text-brown">@Model.Observaciones</span>
+                </div>
+            }
+            else
+            {
+                <p class="text-brown">No se aplican cláusulas especiales adicionales a las ya mencionadas.</p>
+            }
         </div>
 
         <div class="contrato-section">
-            <h5>6. ACEPTACIÓN</h5>
-            <p>El adoptante declara haber leído y comprendido todas las cláusulas del presente contrato y se compromete a cumplirlas fielmente.</p>
+            <h5 class="text-green">6. ACEPTACIÓN</h5>
+            <p class="text-brown">El adoptante declara haber leído y comprendido todas las cláusulas del presente contrato y se compromete a cumplirlas fielmente.</p>
         </div>
 
         <div class="row mt-5">
             <div class="col-md-6 text-center">
                 <div class="firma-box mx-auto">
-                    Firma del Adoptante
+                    <span class="text-brown">Firma del Adoptante</span>
                 </div>
-                <p class="mt-2"><strong>@Model.Usuarios.NombreCompleto</strong></p>
-                <p>C.I.: @Model.Usuarios.Cedula</p>
+                <p class="mt-2 text-brown"><strong>@Model.Usuarios.NombreCompleto</strong></p>
+                <p class="text-secondary">C.I.: @Model.Usuarios.Cedula</p>
             </div>
             <div class="col-md-6 text-center">
                 <div class="firma-box mx-auto">
-                    Firma del Refugio
+                    <span class="text-brown">Firma del Refugio</span>
                 </div>
-                <p class="mt-2"><strong>Representante Legal</strong></p>
-                <p>Refugio de Mascotas</p>
+                <p class="mt-2 text-brown"><strong>Representante Legal</strong></p>
+                <p class="text-secondary">Refugio de Mascotas</p>
             </div>
         </div>
     </div>
 </div>
 
-<div class="no-print text-center mb-4">
-    <button onclick="window.print()" class="btn btn-primary btn-lg">
-        <i class="fas fa-print"></i> Imprimir Contrato
-    </button>
-    <a href="@Url.Action("DescargarContrato", "Adopcion", new { id = Model.SolicitudId })" class="btn btn-success btn-lg">
-        <i class="fas fa-download"></i> Descargar PDF
-    </a>
-    <a href="@Url.Action("MisSolicitudes", "Adopcion")" class="btn btn-outline-secondary btn-lg">
-        <i class="fas fa-arrow-left"></i> Volver
-    </a>
+<div class="no-print text-center mb-4 fade-in-up">
+    <div class="d-flex justify-content-center flex-wrap">
+        <button onclick="window.print()" class="btn btn-green btn-lg m-2">
+            <i class="fa fa-print"></i> Imprimir Contrato
+        </button>
+        <a href="@Url.Action("DescargarContrato", "Adopcion", new { id = Model.SolicitudId })" class="btn btn-yellow btn-lg m-2">
+            <i class="fa fa-download"></i> Descargar PDF
+        </a>
+        <a href="@Url.Action("MisSolicitudes", "Adopcion")" class="btn btn-outline-green btn-lg m-2">
+            <i class="fa fa-arrow-left"></i> Volver a Solicitudes
+        </a>
+    </div>
 </div>
+
+@section Styles {
+    <style>
+        .page-header {
+            border-bottom: 2px solid var(--green);
+            padding-bottom: 1rem;
+        }
+
+        .card {
+            border-radius: 12px !important;
+            border: 2px solid var(--green) !important;
+        }
+
+        .card-header {
+            border-radius: 10px 10px 0 0 !important;
+            padding: 1rem 1.35rem !important;
+        }
+
+        .contrato-section {
+            page-break-inside: avoid;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(151, 199, 139, 0.3);
+        }
+
+            .contrato-section:last-child {
+                border-bottom: none;
+                margin-bottom: 0;
+                padding-bottom: 0;
+            }
+
+        .firma-box {
+            border-top: 2px solid var(--green);
+            width: 200px;
+            margin-top: 50px;
+            padding-top: 10px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        ol {
+            counter-reset: item;
+        }
+
+            ol li {
+                counter-increment: item;
+                margin-bottom: 10px;
+            }
+
+                ol li:before {
+                    content: counter(item) ". ";
+                    font-weight: bold;
+                    color: var(--green);
+                    margin-right: 10px;
+                }
+
+        /* Estilos para impresión */
+        @@media print {
+            .no-print {
+                display: none !important;
+            }
+
+            body {
+                background-color: white !important;
+                color: black !important;
+            }
+
+            .card {
+                border: 1px solid #ccc !important;
+                box-shadow: none !important;
+            }
+
+            .card-body {
+                background-color: white !important;
+            }
+
+            .text-brown {
+                color: black !important;
+            }
+
+            .text-green {
+                color: #333 !important;
+            }
+
+            .text-secondary {
+                color: #666 !important;
+            }
+
+            .alert-green {
+                border: 1px solid #ccc !important;
+                background-color: #f9f9f9 !important;
+            }
+
+            .firma-box {
+                border-top: 2px solid #000 !important;
+            }
+
+            .contrato-section {
+                page-break-inside: avoid;
+            }
+
+            .page-header {
+                display: none !important;
+            }
+        }
+
+        /* Estilos para pantalla */
+        @@media screen {
+            .contrato-section h5 {
+                background-color: rgba(151, 199, 139, 0.1);
+                padding: 10px 15px;
+                border-radius: 8px;
+                border-left: 4px solid var(--green);
+            }
+        }
+
+        /* Responsive */
+        @@media (max-width: 768px) {
+            .firma-box {
+                width: 150px;
+                margin-top: 30px;
+            }
+
+            .btn-lg {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+
+            .page-header .d-flex {
+                flex-direction: column;
+                align-items: flex-start !important;
+            }
+
+                .page-header .d-flex > div {
+                    margin-bottom: 10px;
+                    width: 100%;
+                }
+
+            .contrato-section {
+                margin-bottom: 20px;
+                padding-bottom: 15px;
+            }
+
+            .d-flex.justify-content-center.flex-wrap {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+
+        /* Animaciones */
+        .fade-in-up {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        /* Efecto hover solo en pantalla */
+        @@media screen {
+            .shadow-hover:hover {
+                transform: translateY(-3px);
+                border-color: var(--green) !important;
+            }
+        }
+
+        /* Estilo para listas sin viñetas */
+        .list-unstyled li {
+            padding-left: 20px;
+            position: relative;
+        }
+
+            .list-unstyled li i {
+                position: absolute;
+                left: 0;
+                top: 3px;
+            }
+    </style>
+}
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            console.log('Vista Contrato de Adopción cargada');
+
+            // Efecto hover en tarjetas
+            $('.shadow-hover').hover(
+                function () {
+                    $(this).addClass('shadow-lg');
+                },
+                function () {
+                    $(this).removeClass('shadow-lg');
+                }
+            );
+
+            // Confirmación antes de descargar PDF
+            $('a[href*="DescargarContrato"]').click(function (e) {
+                e.preventDefault();
+                var href = $(this).attr('href');
+
+                Swal.fire({
+                    title: '¿Descargar contrato?',
+                    text: 'Se generará un archivo PDF del contrato de adopción.',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#F2C66D',
+                    cancelButtonColor: '#97C78B',
+                    confirmButtonText: '<i class="fa fa-download"></i> Sí, descargar',
+                    cancelButtonText: '<i class="fa fa-times"></i> Cancelar',
+                    showClass: {
+                        popup: 'animate__animated animate__fadeInDown'
+                    },
+                    hideClass: {
+                        popup: 'animate__animated animate__fadeOutUp'
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = href;
+                    }
+                });
+            });
+
+            // Confirmación antes de imprimir
+            $('button[onclick*="print"]').click(function (e) {
+                e.preventDefault();
+
+                Swal.fire({
+                    title: '¿Imprimir contrato?',
+                    html: `<p class="text-brown">¿Está listo para imprimir el contrato de adopción?</p>
+                          <div class="alert alert-green border-green mt-2">
+                              <small><i class="fa fa-info-circle text-green"></i> Asegúrese de que la impresora esté configurada correctamente.</small>
+                          </div>`,
+                    icon: 'info',
+                    showCancelButton: true,
+                    confirmButtonColor: '#97C78B',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: '<i class="fa fa-print"></i> Imprimir',
+                    cancelButtonText: '<i class="fa fa-times"></i> Cancelar',
+                    showClass: {
+                        popup: 'animate__animated animate__fadeInDown'
+                    },
+                    hideClass: {
+                        popup: 'animate__animated animate__fadeOutUp'
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.print();
+                    }
+                });
+            });
+
+            // Notificaciones de TempData
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <text>
+                Swal.fire({
+                    icon: 'success',
+                    title: '¡Éxito!',
+                    text: '@Html.Raw(TempData["SuccessMessage"])',
+                    confirmButtonColor: '#97C78B',
+                    timer: 3000
+                });
+                </text>
+            }
+
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <text>
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: '@Html.Raw(TempData["ErrorMessage"])',
+                    confirmButtonColor: '#FBCDC0'
+                });
+                </text>
+            }
+        });
+    </script>
+}

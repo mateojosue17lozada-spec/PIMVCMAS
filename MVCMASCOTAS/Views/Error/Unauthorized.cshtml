@@ -1,0 +1,211 @@
+﻿@{
+    ViewBag.Title = "Acceso No Autorizado";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    // Determinar tipo de error
+    var statusCode = Response.StatusCode;
+    var isUnauthorized = statusCode == 401;
+    var errorTitle = isUnauthorized ? "No Autorizado" : "Acceso Denegado";
+    var errorIcon = isUnauthorized ? "fa-user-lock" : "fa-lock";
+    var errorMessage = isUnauthorized
+        ? "Debes iniciar sesión para acceder a esta página."
+        : "No tienes permisos suficientes para acceder a esta página.";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card border-warning shadow-lg">
+                <div class="card-header bg-warning text-dark">
+                    <div class="d-flex align-items-center">
+                        <i class="fas @errorIcon fa-2x mr-3"></i>
+                        <h2 class="mb-0">@errorTitle</h2>
+                    </div>
+                </div>
+
+                <div class="card-body text-center py-5">
+                    <!-- Icono -->
+                    <div class="mb-4">
+                        <i class="fas @errorIcon fa-6x text-warning"></i>
+                    </div>
+
+                    <!-- Título y mensaje -->
+                    <h3 class="text-warning mb-3">@errorTitle</h3>
+                    <p class="lead mb-4">@errorMessage</p>
+
+                    <!-- Información del usuario -->
+                    <div class="alert alert-info mb-4">
+                        <h5><i class="fas fa-user"></i> Información de Usuario</h5>
+                        <p class="mb-1"><strong>Usuario:</strong> @(User.Identity.IsAuthenticated ? User.Identity.Name : "No autenticado")</p>
+                        <p class="mb-1"><strong>Estado:</strong> @(User.Identity.IsAuthenticated ? "Autenticado" : "No autenticado")</p>
+
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            <p class="mb-0"><strong>Roles detectados:</strong></p>
+                            <div class="d-flex flex-wrap justify-content-center mt-1">
+                                @if (User.IsInRole("Administrador"))
+                                {
+                                    <span class="badge badge-danger mr-1 mb-1">Administrador</span>
+                                }
+                                @if (User.IsInRole("Veterinario"))
+                                {
+                                    <span class="badge badge-info mr-1 mb-1">Veterinario</span>
+                                }
+                                @if (User.IsInRole("Rescatista"))
+                                {
+                                    <span class="badge badge-success mr-1 mb-1">Rescatista</span>
+                                }
+                                @if (User.IsInRole("Voluntario"))
+                                {
+                                    <span class="badge badge-warning mr-1 mb-1">Voluntario</span>
+                                }
+                                @if (User.IsInRole("Usuario"))
+                                {
+                                    <span class="badge badge-secondary mr-1 mb-1">Usuario</span>
+                                }
+                            </div>
+                        }
+                    </div>
+
+                    <!-- Información de la página -->
+                    <div class="alert alert-light mb-4">
+                        <p class="mb-1"><strong>Página solicitada:</strong> <code>@Request.Url?.PathAndQuery</code></p>
+                        <p class="mb-0"><strong>Código de error:</strong> <span class="badge badge-warning">@statusCode</span></p>
+                    </div>
+
+                    <!-- Soluciones -->
+                    <div class="card mb-4">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0"><i class="fas fa-lightbulb"></i> Soluciones posibles:</h5>
+                        </div>
+                        <div class="card-body text-left">
+                            <ul class="mb-0">
+                                @if (isUnauthorized)
+                                {
+                                    <li>Inicia sesión con una cuenta válida</li>
+                                    <li>Verifica que tu correo esté confirmado</li>
+                                    <li>Contacta al administrador si necesitas una cuenta</li>
+                                }
+                                else
+                                {
+                                    <li>Solicita permisos al administrador del sistema</li>
+                                    <li>Verifica que tengas el rol correcto asignado</li>
+                                    <li>Contacta al administrador para ajustar permisos</li>
+                                }
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Botones de acción -->
+                    <div class="btn-group-vertical w-100" role="group">
+                        @if (isUnauthorized)
+                        {
+                            <a href="@Url.Action("Login", "Account", new { returnUrl = Request.Url?.PathAndQuery })"
+                               class="btn btn-primary btn-lg mb-2">
+                                <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+                            </a>
+                            <a href="@Url.Action("Register", "Account")"
+                               class="btn btn-success btn-lg mb-2">
+                                <i class="fas fa-user-plus"></i> Crear Cuenta
+                            </a>
+                        }
+                        else if (User.Identity.IsAuthenticated)
+                        {
+                            <a href="@Url.Action("MiPerfil", "Account")"
+                               class="btn btn-info btn-lg mb-2">
+                                <i class="fas fa-user"></i> Ver Mi Perfil
+                            </a>
+
+                            if (User.IsInRole("Usuario"))
+                            {
+                                <a href="@Url.Action("Index", "Home")"
+                                   class="btn btn-primary btn-lg mb-2">
+                                    <i class="fas fa-paw"></i> Ver Mascotas
+                                </a>
+                            }
+                        }
+
+                        <a href="@Url.Action("Index", "Home")"
+                           class="btn btn-secondary btn-lg mb-2">
+                            <i class="fas fa-home"></i> Volver al Inicio
+                        </a>
+
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            <a href="@Url.Action("Logout", "Account")"
+                               class="btn btn-outline-warning btn-lg">
+                                <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                            </a>
+                        }
+                    </div>
+                </div>
+
+                <div class="card-footer text-center text-muted">
+                    <small>
+                        <i class="fas fa-shield-alt"></i>
+                        Sistema de Gestión de Adopción de Mascotas - Ecuador
+                        <br>
+                        <i class="fas fa-copyright"></i>
+                        © @DateTime.Now.Year - Refugio de Mascotas - Todos los derechos reservados
+                    </small>
+                </div>
+            </div>
+
+            <!-- Enlace para contactar al administrador -->
+            <div class="text-center mt-3">
+                <a href="mailto:admin@refugiomascotas.org?subject=Acceso denegado - @Request.Url?.PathAndQuery"
+                   class="btn btn-link">
+                    <i class="fas fa-envelope"></i> Contactar al administrador
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        .card {
+            border-radius: 15px;
+            overflow: hidden;
+            border-width: 3px;
+        }
+
+        .card-header {
+            padding: 1.25rem;
+        }
+
+        .badge {
+            font-size: 0.9em;
+            padding: 0.5em 0.8em;
+        }
+
+        .btn-lg {
+            padding: 0.75rem 1.5rem;
+            font-size: 1.1rem;
+        }
+
+        .btn-group-vertical .btn {
+            border-radius: 8px !important;
+            margin-bottom: 10px;
+        }
+
+        ul {
+            padding-left: 20px;
+        }
+
+        li {
+            margin-bottom: 5px;
+        }
+
+        @@media (max-width: 768px) {
+            .card-body {
+                padding: 1.5rem;
+            }
+
+            .btn-lg {
+                font-size: 1rem;
+                padding: 0.6rem 1.2rem;
+            }
+        }
+    </style>
+}

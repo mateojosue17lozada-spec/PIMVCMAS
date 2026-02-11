@@ -1,6 +1,8 @@
-﻿using System;
+﻿using MVCMASCOTAS.Controllers;
+using MVCMASCOTAS.Helpers;
 using MVCMASCOTAS.Models;
 using MVCMASCOTAS.Models.CustomModels;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -20,7 +22,6 @@ namespace MVCMASCOTAS.Services
         // Crear solicitud de adopción
         public SolicitudAdopcion CrearSolicitud(int mascotaId, int usuarioId)
         {
-            // Verificar si ya existe una solicitud pendiente
             var solicitudExistente = db.SolicitudAdopcion
                 .FirstOrDefault(s => s.MascotaId == mascotaId &&
                                     s.UsuarioId == usuarioId &&
@@ -42,6 +43,15 @@ namespace MVCMASCOTAS.Services
             db.SolicitudAdopcion.Add(solicitud);
             db.SaveChanges();
 
+            // ✅ Usar tu método específico de auditoría
+            var mascota = db.Mascotas.Find(mascotaId);
+            AuditoriaHelper.RegistrarSolicitudAdopcion(
+                solicitudId: solicitud.SolicitudId,
+                usuarioId: usuarioId,
+                mascotaId: mascotaId,
+                nombreMascota: mascota?.Nombre ?? "Desconocida"
+            );
+
             return solicitud;
         }
 
@@ -53,7 +63,6 @@ namespace MVCMASCOTAS.Services
             db.FormularioAdopcionDetalle.Add(formulario);
             db.SaveChanges();
 
-            // Cambiar estado a "En evaluación"
             var solicitud = db.SolicitudAdopcion.Find(solicitudId);
             if (solicitud != null)
             {
@@ -73,10 +82,8 @@ namespace MVCMASCOTAS.Services
 
             if (formulario == null) return;
 
-            // Realizar evaluación automática
-            var resultado = evaluacionService.EvaluarSolicitudAdopcion(formulario);
+            var resultado = evaluacionService.EvaluarSolicitud(formulario);
 
-            // Actualizar solicitud
             solicitud.PuntajeEvaluacion = resultado.PuntajeTotal;
             solicitud.ResultadoEvaluacion = resultado.Resultado;
             solicitud.FechaEvaluacion = DateTime.Now;
@@ -90,7 +97,6 @@ namespace MVCMASCOTAS.Services
 
             db.SaveChanges();
 
-            // Registrar evaluación detallada - CORREGIDO según estructura real
             var evaluacion = new EvaluacionAdopcion
             {
                 SolicitudId = solicitudId,
@@ -101,7 +107,7 @@ namespace MVCMASCOTAS.Services
                 PuntajeDisponibilidad = resultado.PuntajeDisponibilidad,
                 PuntajeReferencias = resultado.PuntajeReferencias,
                 PuntajeCompromiso = resultado.PuntajeCompromiso,
-                PuntajeTotal = resultado.PuntajeTotal, // CORRECTO: es PuntajeTotal, no Puntaje
+                PuntajeTotal = resultado.PuntajeTotal,
                 Resultado = resultado.Resultado,
                 Observaciones = resultado.Recomendacion
             };
@@ -124,16 +130,15 @@ namespace MVCMASCOTAS.Services
                 solicitud.Observaciones = observaciones;
                 db.SaveChanges();
 
-                // Actualizar estado de la mascota - CORREGIDO: "Adoptada", no "Adoptado"
-                var mascota = db.Mascotas.Find(solicitud.MascotaId);
-                if (mascota != null)
-                {
-                    mascota.Estado = "Adoptada";
-                    mascota.FechaAdopcion = DateTime.Now;
-                    db.SaveChanges();
-                }
+                // ✅ NO cambiar estado a "Adoptada" aquí - se hace al firmar contrato
+                // var mascota = db.Mascotas.Find(solicitud.MascotaId);
+                // if (mascota != null)
+                // {
+                //     mascota.Estado = "Adoptada";  // ❌ ELIMINAR
+                //     mascota.FechaAdopcion = DateTime.Now;
+                //     db.SaveChanges();
+                // }
 
-                // Crear evaluación manual
                 var evaluacion = new EvaluacionAdopcion
                 {
                     SolicitudId = solicitudId,
@@ -144,6 +149,16 @@ namespace MVCMASCOTAS.Services
                 };
                 db.EvaluacionAdopcion.Add(evaluacion);
                 db.SaveChanges();
+
+                // ✅ Auditoría
+                var usuario = db.Usuarios.Find(solicitud.UsuarioId);
+                var mascota = db.Mascotas.Find(solicitud.MascotaId);
+                AuditoriaHelper.RegistrarAprobacionAdopcion(
+                    solicitudId: solicitudId,
+                    aprobadorId: evaluadorId,
+                    nombreAdoptante: usuario?.NombreCompleto ?? "Desconocido",
+                    nombreMascota: mascota?.Nombre ?? "Desconocida"
+                );
             }
         }
 
@@ -161,7 +176,6 @@ namespace MVCMASCOTAS.Services
                 solicitud.MotivoRechazo = motivoRechazo;
                 db.SaveChanges();
 
-                // Crear evaluación de rechazo
                 var evaluacion = new EvaluacionAdopcion
                 {
                     SolicitudId = solicitudId,
@@ -172,6 +186,13 @@ namespace MVCMASCOTAS.Services
                 };
                 db.EvaluacionAdopcion.Add(evaluacion);
                 db.SaveChanges();
+
+                // ✅ Auditoría
+                AuditoriaHelper.RegistrarRechazoAdopcion(
+                    solicitudId: solicitudId,
+                    rechazadorId: evaluadorId,
+                    motivo: motivoRechazo
+                );
             }
         }
 
@@ -184,7 +205,6 @@ namespace MVCMASCOTAS.Services
                 .ToList();
         }
 
-        // Obtener solicitudes de un usuario
         public List<SolicitudAdopcion> ObtenerSolicitudesUsuario(int usuarioId)
         {
             return db.SolicitudAdopcion
@@ -194,7 +214,6 @@ namespace MVCMASCOTAS.Services
                 .ToList();
         }
 
-        // Obtener solicitud por ID
         public SolicitudAdopcion ObtenerSolicitudPorId(int solicitudId)
         {
             return db.SolicitudAdopcion
@@ -203,22 +222,19 @@ namespace MVCMASCOTAS.Services
                 .FirstOrDefault(s => s.SolicitudId == solicitudId);
         }
 
-        // Obtener formulario de una solicitud
         public FormularioAdopcionDetalle ObtenerFormularioSolicitud(int solicitudId)
         {
             return db.FormularioAdopcionDetalle
                 .FirstOrDefault(f => f.SolicitudId == solicitudId);
         }
 
-        // Obtener evaluación de una solicitud
         public EvaluacionAdopcion ObtenerEvaluacionSolicitud(int solicitudId)
         {
             return db.EvaluacionAdopcion
-                .Include("Usuarios") // Evaluador
+                .Include("Usuarios")
                 .FirstOrDefault(e => e.SolicitudId == solicitudId);
         }
 
-        // Verificar si usuario tiene solicitud para mascota
         public bool TieneSolicitudPendiente(int usuarioId, int mascotaId)
         {
             return db.SolicitudAdopcion
@@ -227,7 +243,6 @@ namespace MVCMASCOTAS.Services
                          (s.Estado == "Pendiente" || s.Estado == "En evaluación"));
         }
 
-        // Obtener estadísticas de adopciones
         public int ObtenerAdopcionesDelMes(int mes, int anio)
         {
             return db.Mascotas
@@ -243,14 +258,14 @@ namespace MVCMASCOTAS.Services
                 .Count(s => s.Estado == "Pendiente" || s.Estado == "En evaluación");
         }
 
-        // Registrar seguimiento post-adopción - CORREGIDO según estructura real
+        // Registrar seguimiento post-adopción
         public void RegistrarSeguimiento(int contratoId, int responsableId, string estadoMascota,
             string condicionesVivienda, string relacionAdoptante, string observaciones)
         {
             var seguimiento = new SeguimientoAdopcion
             {
-                ContratoId = contratoId, // CORRECTO: ContratoId, no SolicitudId
-                ResponsableSeguimiento = responsableId, // CORRECTO: ResponsableSeguimiento, no ResponsableId
+                ContratoId = contratoId,
+                ResponsableSeguimiento = responsableId,
                 FechaSeguimiento = DateTime.Now,
                 TipoSeguimiento = "Rutinario",
                 EstadoMascota = estadoMascota,
@@ -264,7 +279,6 @@ namespace MVCMASCOTAS.Services
             db.SaveChanges();
         }
 
-        // Obtener seguimientos de una adopción - CORREGIDO
         public List<SeguimientoAdopcion> ObtenerSeguimientos(int contratoId)
         {
             return db.SeguimientoAdopcion
@@ -273,17 +287,16 @@ namespace MVCMASCOTAS.Services
                 .ToList();
         }
 
-        // Obtener contrato de adopción por solicitud
         public ContratoAdopcion ObtenerContratoPorSolicitud(int solicitudId)
         {
             return db.ContratoAdopcion
                 .FirstOrDefault(c => c.SolicitudId == solicitudId);
         }
 
-        // Crear contrato de adopción
+        // ✅ NUEVO: Crear contrato Y cambiar estado a "Adoptada"
         public ContratoAdopcion CrearContrato(int solicitudId, string numeroContrato,
             string terminosCondiciones, string representanteRefugioNombre,
-            string representanteRefugioCedula)
+            string representanteRefugioCedula, int usuarioCreador)
         {
             var solicitud = db.SolicitudAdopcion
                 .Include("Usuarios")
@@ -292,31 +305,63 @@ namespace MVCMASCOTAS.Services
 
             if (solicitud == null) return null;
 
-            var contrato = new ContratoAdopcion
+            using (var transaction = db.Database.BeginTransaction())
             {
-                SolicitudId = solicitudId,
-                NumeroContrato = numeroContrato,
-                FechaContrato = DateTime.Now,
-                AdoptanteNombre = solicitud.Usuarios.NombreCompleto,
-                AdoptanteCedula = solicitud.Usuarios.Cedula,
-                AdoptanteDireccion = solicitud.Usuarios.Direccion ?? "",
-                AdoptanteTelefono = solicitud.Usuarios.Telefono ?? "",
-                RepresentanteRefugioNombre = representanteRefugioNombre,
-                RepresentanteRefugioCedula = representanteRefugioCedula,
-                MascotaNombre = solicitud.Mascotas.Nombre,
-                MascotaEspecie = solicitud.Mascotas.Especie,
-                MascotaMicrochip = solicitud.Mascotas.Microchip,
-                TerminosCondiciones = terminosCondiciones,
-                Estado = "Activo"
-            };
+                try
+                {
+                    var contrato = new ContratoAdopcion
+                    {
+                        SolicitudId = solicitudId,
+                        NumeroContrato = numeroContrato,
+                        FechaContrato = DateTime.Now,
+                        AdoptanteNombre = solicitud.Usuarios.NombreCompleto,
+                        AdoptanteCedula = solicitud.Usuarios.Cedula,
+                        AdoptanteDireccion = solicitud.Usuarios.Direccion ?? "",
+                        AdoptanteTelefono = solicitud.Usuarios.Telefono ?? "",
+                        RepresentanteRefugioNombre = representanteRefugioNombre,
+                        RepresentanteRefugioCedula = representanteRefugioCedula,
+                        MascotaNombre = solicitud.Mascotas.Nombre,
+                        MascotaEspecie = solicitud.Mascotas.Especie,
+                        MascotaMicrochip = solicitud.Mascotas.Microchip,
+                        TerminosCondiciones = terminosCondiciones,
+                        Estado = "Activo"
+                    };
 
-            db.ContratoAdopcion.Add(contrato);
-            db.SaveChanges();
+                    db.ContratoAdopcion.Add(contrato);
+                    db.SaveChanges();
 
-            return contrato;
+                    // ✅ AHORA SÍ cambiar mascota a "Adoptada"
+                    var mascota = db.Mascotas.Find(solicitud.MascotaId);
+                    if (mascota != null)
+                    {
+                        mascota.Estado = "Adoptada";
+                        mascota.FechaAdopcion = DateTime.Now;
+                        db.SaveChanges();
+                    }
+
+                    // ✅ Cambiar solicitud a "Completada"
+                    solicitud.Estado = "Completada";
+                    db.SaveChanges();
+
+                    // ✅ Auditoría
+                    AuditoriaHelper.RegistrarAccion(
+                        accion: "Creación de Contrato",
+                        controlador: "Adopcion",
+                        detalles: $"Contrato {numeroContrato} creado para {solicitud.Usuarios.NombreCompleto} - Mascota: {solicitud.Mascotas.Nombre}",
+                        usuarioId: usuarioCreador
+                    );
+
+                    transaction.Commit();
+                    return contrato;
+                }
+                catch
+                {
+                    transaction.Rollback();
+                    throw;
+                }
+            }
         }
 
-        // Generar número de contrato único
         public string GenerarNumeroContrato()
         {
             string prefijo = "CONTRATO-";
@@ -338,7 +383,6 @@ namespace MVCMASCOTAS.Services
             return $"{prefijo}{fecha}-{secuencia:D4}";
         }
 
-        // Obtener estadísticas completas de adopciones
         public EstadisticasAdopcion ObtenerEstadisticasAdopcion()
         {
             var hoy = DateTime.Now;
@@ -360,7 +404,6 @@ namespace MVCMASCOTAS.Services
             };
         }
 
-        // Marcar seguimiento como completado
         public void CompletarSeguimiento(int seguimientoId, bool requiereIntervencion,
             string recomendaciones, DateTime? proximoSeguimiento)
         {
@@ -381,7 +424,6 @@ namespace MVCMASCOTAS.Services
         }
     }
 
-    // Clase para estadísticas de adopción
     public class EstadisticasAdopcion
     {
         public int TotalAdopciones { get; set; }

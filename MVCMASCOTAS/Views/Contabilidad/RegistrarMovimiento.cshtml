@@ -5,357 +5,388 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="container-fluid">
-    <!-- Encabezado -->
-    <div class="page-header mb-4">
-        <h2><i class="fas fa-exchange-alt me-2"></i> Movimientos Contables</h2>
-        <p class="text-muted">Registro de ingresos y egresos del refugio</p>
-    </div>
-
-    <!-- Botones de acción -->
-    <div class="mb-4">
-        <a href="@Url.Action("RegistrarMovimiento", "Contabilidad")" class="btn btn-success">
-            <i class="fas fa-plus me-1"></i> Nuevo Movimiento
-        </a>
-        <a href="@Url.Action("Dashboard", "Contabilidad")" class="btn btn-outline-secondary">
-            <i class="fas fa-arrow-left me-1"></i> Volver al Dashboard
-        </a>
-        <a href="@Url.Action("ExportarMovimientos", "Contabilidad")" class="btn btn-info">
-            <i class="fas fa-file-excel me-1"></i> Exportar a Excel
-        </a>
-        <button type="button" class="btn btn-warning" onclick="mostrarFiltros()">
-            <i class="fas fa-filter me-1"></i> Filtros Avanzados
-        </button>
-    </div>
-
-    <!-- Filtros Avanzados (Ocultos por defecto) -->
-    <div class="card shadow-custom mb-4" id="filtrosAvanzados" style="display: none;">
-        <div class="card-header bg-primary text-white">
-            <h5 class="mb-0"><i class="fas fa-filter me-2"></i> Filtros Avanzados</h5>
+<div class="movimientos-section fade-in">
+    <div class="container">
+        <!-- Encabezado -->
+        <div class="page-header text-center mb-4">
+            <h2 class="display-5 text-brown">
+                <i class="fas fa-exchange-alt header-icon"></i> Movimientos Contables
+            </h2>
+            <p class="text-secondary mt-2">Registro de ingresos y egresos del refugio de mascotas</p>
         </div>
-        <div class="card-body">
-            @using (Html.BeginForm("Movimientos", "Contabilidad", FormMethod.Get, new { @class = "row g-3" }))
-            {
-                <div class="col-md-3">
-                    <label class="form-label">Tipo:</label>
-                    <select name="tipo" class="form-select">
-                        <option value="">Todos</option>
-                        <option value="Ingreso" @(ViewBag.FiltroTipo == "Ingreso" ? "selected" : "")>Ingresos</option>
-                        <option value="Egreso" @(ViewBag.FiltroTipo == "Egreso" ? "selected" : "")>Egresos</option>
-                    </select>
+
+        <!-- Botones de acción principales -->
+        <div class="btn-action-group slide-up">
+            <div class="row g-3">
+                <div class="col-lg-3 col-md-6">
+                    <a href="@Url.Action("RegistrarMovimiento", "Contabilidad")" class="btn btn-green btn-action-custom w-100">
+                        <i class="fas fa-plus me-2"></i> Nuevo Movimiento
+                    </a>
                 </div>
-                <div class="col-md-3">
-                    <label class="form-label">Categoría:</label>
-                    <input type="text" name="categoria" value="@ViewBag.FiltroCategoria"
-                           class="form-control" placeholder="Categoría" />
+                <div class="col-lg-3 col-md-6">
+                    <a href="@Url.Action("Dashboard", "Contabilidad")" class="btn btn-outline-green btn-action-custom w-100">
+                        <i class="fas fa-arrow-left me-2"></i> Volver al Dashboard
+                    </a>
                 </div>
-                <div class="col-md-2">
-                    <label class="form-label">Fecha Desde:</label>
-                    <input type="date" name="fechaDesde" value="@ViewBag.FechaDesde"
-                           class="form-control" />
+                <div class="col-lg-3 col-md-6">
+                    <a href="@Url.Action("ExportarMovimientos", "Contabilidad")" class="btn btn-pink btn-action-custom w-100">
+                        <i class="fas fa-file-excel me-2"></i> Exportar a Excel
+                    </a>
                 </div>
-                <div class="col-md-2">
-                    <label class="form-label">Fecha Hasta:</label>
-                    <input type="date" name="fechaHasta" value="@ViewBag.FechaHasta"
-                           class="form-control" />
-                </div>
-                <div class="col-md-2 d-flex align-items-end">
-                    <button type="submit" class="btn btn-primary w-100">
-                        <i class="fas fa-search me-1"></i> Buscar
+                <div class="col-lg-3 col-md-6">
+                    <button type="button" class="btn btn-yellow btn-action-custom w-100" onclick="mostrarFiltros()">
+                        <i class="fas fa-filter me-2"></i> Filtros Avanzados
                     </button>
                 </div>
-            }
+            </div>
         </div>
-    </div>
 
-    <!-- Resumen de Totales -->
-    <div class="row mb-4">
-        <div class="col-md-3">
-            <div class="card text-white bg-success shadow-custom">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="card-title mb-1">Total Ingresos</h6>
-                            <h3 class="mb-0">$@ViewBag.TotalIngresos.ToString("N2")</h3>
-                        </div>
-                        <div class="display-4 opacity-75">
-                            <i class="fas fa-arrow-up"></i>
-                        </div>
+        <!-- Filtros Avanzados -->
+        <div class="filtros-card" id="filtrosAvanzados" style="display: none;">
+            <div class="filtros-header" onclick="toggleFiltros()">
+                <h5 class="mb-0">
+                    <i class="fas fa-filter me-2"></i> Filtros Avanzados
+                    <i class="fas fa-chevron-down float-end"></i>
+                </h5>
+            </div>
+            <div class="filtros-body">
+                @using (Html.BeginForm("Movimientos", "Contabilidad", FormMethod.Get, new { @class = "row g-3" }))
+                {
+                    <div class="col-md-3">
+                        <label class="form-label">Tipo de Movimiento:</label>
+                        <select name="tipo" class="form-select">
+                            <option value="">Todos los tipos</option>
+                            <option value="Ingreso" @((ViewBag.FiltroTipo != null && ViewBag.FiltroTipo == "Ingreso") ? "selected" : "")>Ingresos</option>
+                            <option value="Egreso" @((ViewBag.FiltroTipo != null && ViewBag.FiltroTipo == "Egreso") ? "selected" : "")>Egresos</option>
+                        </select>
                     </div>
-                    <small class="opacity-75">Este mes: $@ViewBag.IngresosMes.ToString("N2")</small>
-                </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Categoría:</label>
+                        <input type="text" name="categoria" value="@(ViewBag.FiltroCategoria ?? "")"
+                               class="form-control" placeholder="Ej: Veterinaria, Donación" />
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">Fecha Desde:</label>
+                        <input type="date" name="fechaDesde" value="@(ViewBag.FechaDesde ?? "")"
+                               class="form-control" />
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">Fecha Hasta:</label>
+                        <input type="date" name="fechaHasta" value="@(ViewBag.FechaHasta ?? "")"
+                               class="form-control" />
+                    </div>
+                    <div class="col-md-2 d-flex align-items-end">
+                        <button type="submit" class="btn btn-green w-100">
+                            <i class="fas fa-search me-2"></i> Aplicar Filtros
+                        </button>
+                    </div>
+                }
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="card text-white bg-danger shadow-custom">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="card-title mb-1">Total Egresos</h6>
-                            <h3 class="mb-0">$@ViewBag.TotalEgresos.ToString("N2")</h3>
-                        </div>
-                        <div class="display-4 opacity-75">
-                            <i class="fas fa-arrow-down"></i>
-                        </div>
-                    </div>
-                    <small class="opacity-75">Este mes: $@ViewBag.EgresosMes.ToString("N2")</small>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card text-white bg-primary shadow-custom">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="card-title mb-1">Balance Actual</h6>
-                            <h3 class="mb-0">$@ViewBag.Balance.ToString("N2")</h3>
-                        </div>
-                        <div class="display-4 opacity-75">
-                            <i class="fas fa-balance-scale"></i>
-                        </div>
-                    </div>
-                    <small class="opacity-75">
-                        @if (ViewBag.BalanceMes > 0)
-                        {
-                            <i class="fas fa-caret-up text-success"></i>
-                            <span class="text-success">+$@ViewBag.BalanceMes.ToString("N2") este mes</span>
-                        }
-                        else if (ViewBag.BalanceMes < 0)
-                        {
-                            <i class="fas fa-caret-down text-danger"></i>
-                            <span class="text-danger">-$@Math.Abs(ViewBag.BalanceMes).ToString("N2") este mes</span>
-                        }
-                        else
-                        {
-                            <span>Balance neutro este mes</span>
-                        }
-                    </small>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card text-white bg-info shadow-custom">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="card-title mb-1">Total Movimientos</h6>
-                            <h3 class="mb-0">@ViewBag.TotalMovimientos</h3>
-                        </div>
-                        <div class="display-4 opacity-75">
-                            <i class="fas fa-list"></i>
-                        </div>
-                    </div>
-                    <small class="opacity-75">Este mes: @ViewBag.MovimientosMes</small>
-                </div>
-            </div>
-        </div>
-    </div>
 
-    <!-- Gráfico de distribución -->
-    <div class="row mb-4">
-        <div class="col-md-6">
-            <div class="card shadow-custom">
-                <div class="card-header bg-dark text-white">
-                    <h6 class="mb-0"><i class="fas fa-chart-pie me-2"></i> Distribución de Ingresos</h6>
-                </div>
-                <div class="card-body">
-                    <div id="graficoIngresos" style="height: 250px;"></div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-6">
-            <div class="card shadow-custom">
-                <div class="card-header bg-dark text-white">
-                    <h6 class="mb-0"><i class="fas fa-chart-pie me-2"></i> Distribución de Egresos</h6>
-                </div>
-                <div class="card-body">
-                    <div id="graficoEgresos" style="height: 250px;"></div>
+        <!-- Estadísticas de Totales -->
+        <div class="row mb-4 slide-up" style="animation-delay: 0.1s">
+            <div class="col-md-3 col-sm-6">
+                <div class="card stat-card card-ingreso">
+                    <div class="card-body text-center">
+                        <i class="fas fa-arrow-up stat-icon"></i>
+                        <h3 class="stat-value">
+                            $@((ViewBag.TotalIngresos ?? 0).ToString("N2"))
+                        </h3>
+                        <p class="stat-label">Total Ingresos</p>
+                        <small class="opacity-75 d-block">
+                            <i class="fas fa-calendar-alt me-1"></i>
+                            Este mes: $@((ViewBag.IngresosMes ?? 0).ToString("N2"))
+                        </small>
+                    </div>
                 </div>
             </div>
-        </div>
-    </div>
 
-    <!-- Tabla de movimientos -->
-    <div class="card shadow-custom">
-        <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
-            <h5 class="mb-0"><i class="fas fa-table me-2"></i> Registro de Movimientos</h5>
-            <div>
-                <span class="badge bg-light text-dark">
+            <div class="col-md-3 col-sm-6">
+                <div class="card stat-card card-egreso">
+                    <div class="card-body text-center">
+                        <i class="fas fa-arrow-down stat-icon"></i>
+                        <h3 class="stat-value">
+                            $@((ViewBag.TotalEgresos ?? 0).ToString("N2"))
+                        </h3>
+                        <p class="stat-label">Total Egresos</p>
+                        <small class="opacity-75 d-block">
+                            <i class="fas fa-calendar-alt me-1"></i>
+                            Este mes: $@((ViewBag.EgresosMes ?? 0).ToString("N2"))
+                        </small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3 col-sm-6">
+                <div class="card stat-card card-balance">
+                    <div class="card-body text-center">
+                        <i class="fas fa-balance-scale stat-icon"></i>
+                        <h3 class="stat-value">
+                            $@((ViewBag.Balance ?? 0).ToString("N2"))
+                        </h3>
+                        <p class="stat-label">Balance Actual</p>
+                        <small class="opacity-75 d-block">
+                            @{
+                                var balanceMes = ViewBag.BalanceMes ?? 0;
+                                if (balanceMes > 0)
+                                {
+                                    <i class="fas fa-caret-up text-success"></i>
+                                    <span class="text-success">+$@(balanceMes.ToString("N2")) este mes</span>
+                                }
+                                else if (balanceMes < 0)
+                                {
+                                    <i class="fas fa-caret-down text-danger"></i>
+                                    <span class="text-danger">-$@(Math.Abs(balanceMes).ToString("N2")) este mes</span>
+                                }
+                                else
+                                {
+                                    <span>Balance neutro este mes</span>
+                                }
+                            }
+                        </small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3 col-sm-6">
+                <div class="card stat-card card-total">
+                    <div class="card-body text-center">
+                        <i class="fas fa-list stat-icon"></i>
+                        <h3 class="stat-value" style="color: var(--brown)">
+                            @(ViewBag.TotalMovimientos ?? 0)
+                        </h3>
+                        <p class="stat-label" style="color: var(--brown)">Total Movimientos</p>
+                        <small class="opacity-75 d-block" style="color: var(--brown)">
+                            <i class="fas fa-calendar-alt me-1"></i>
+                            Este mes: @(ViewBag.MovimientosMes ?? 0)
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gráficos de distribución -->
+        <div class="row mb-4 slide-up" style="animation-delay: 0.2s">
+            <div class="col-lg-6 mb-4">
+                <div class="grafico-card">
+                    <div class="grafico-header">
+                        <h6 class="mb-0">
+                            <i class="fas fa-chart-pie me-2"></i> Distribución de Ingresos
+                        </h6>
+                    </div>
+                    <div class="grafico-body">
+                        <div id="graficoIngresos" style="width: 100%; height: 250px;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6 mb-4">
+                <div class="grafico-card">
+                    <div class="grafico-header">
+                        <h6 class="mb-0">
+                            <i class="fas fa-chart-pie me-2"></i> Distribución de Egresos
+                        </h6>
+                    </div>
+                    <div class="grafico-body">
+                        <div id="graficoEgresos" style="width: 100%; height: 250px;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabla de movimientos -->
+        <div class="tabla-movimientos slide-up" style="animation-delay: 0.3s">
+            <div class="tabla-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                    <i class="fas fa-table me-2"></i> Registro de Movimientos
+                </h5>
+                <span class="badge badge-id">
+                    <i class="fas fa-layer-group me-1"></i>
                     Mostrando @(Model != null ? Model.Count() : 0) registros
                 </span>
             </div>
-        </div>
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-hover table-striped">
-                    <thead class="table-dark">
-                        <tr>
-                            <th width="100">ID</th>
-                            <th width="120">Fecha</th>
-                            <th width="100">Tipo</th>
-                            <th width="150">Categoría</th>
-                            <th>Concepto</th>
-                            <th width="120">Monto</th>
-                            <th width="150">Responsable</th>
-                            <th width="100" class="text-center">Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @if (Model != null && Model.Any())
-                        {
-                            foreach (var mov in Model)
-                            {
+
+            <div class="tabla-body">
+                @if (Model != null && Model.Any())
+                {
+                    <div class="table-responsive">
+                        <table class="table movimientos-table">
+                            <thead>
                                 <tr>
-                                    <td><span class="badge bg-secondary">#@mov.MovimientoId</span></td>
-                                    <td>
-                                        @if (mov.FechaMovimiento.HasValue)
-                                        {
-                                            <span class="text-nowrap">
-                                                @mov.FechaMovimiento.Value.ToString("dd/MM/yyyy")<br>
-                                                <small class="text-muted">@mov.FechaMovimiento.Value.ToString("HH:mm")</small>
-                                            </span>
-                                        }
-                                        else
-                                        {
-                                            <span class="text-muted">N/A</span>
-                                        }
-                                    </td>
-                                    <td>
-                                        @if (mov.TipoMovimiento == "Ingreso")
-                                        {
-                                            <span class="badge bg-success">
-                                                <i class="fas fa-arrow-up me-1"></i>@mov.TipoMovimiento
-                                            </span>
-                                        }
-                                        else
-                                        {
-                                            <span class="badge bg-danger">
-                                                <i class="fas fa-arrow-down me-1"></i>@mov.TipoMovimiento
-                                            </span>
-                                        }
-                                    </td>
-                                    <td>
-                                        <span class="badge bg-info">@mov.Categoria</span>
-                                    </td>
-                                    <td>
-                                        <div class="fw-bold">@mov.Concepto</div>
-                                        @if (!string.IsNullOrEmpty(mov.Observaciones))
-                                        {
-                                            <small class="text-muted">@mov.Observaciones</small>
-                                        }
-                                    </td>
-                                    <td class="fw-bold @(mov.TipoMovimiento == "Ingreso" ? "text-success" : "text-danger")">
-                                        @(mov.TipoMovimiento == "Ingreso" ? "+" : "-") $@mov.Monto.ToString("N2")
-                                    </td>
-                                    <td>
-                                        @if (mov.Usuarios != null)
-                                        {
-                                            <div>
-                                                <span class="badge bg-primary">@mov.Usuarios.NombreCompleto</span>
-                                                <br>
-                                                <small class="text-muted">ID: @mov.ResponsableRegistro</small>
-                                            </div>
-                                        }
-                                        else
-                                        {
-                                            <span class="badge bg-secondary">Sistema</span>
-                                        }
-                                    </td>
-                                    <td class="text-center">
-                                        <button type="button" class="btn btn-sm btn-outline-info"
-                                                onclick="mostrarDetalleMovimiento(@mov.MovimientoId)"
-                                                title="Ver detalle">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                        <button type="button" class="btn btn-sm btn-outline-warning"
-                                                onclick="editarMovimiento(@mov.MovimientoId)"
-                                                title="Editar">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                        <button type="button" class="btn btn-sm btn-outline-danger"
-                                                onclick="eliminarMovimiento(@mov.MovimientoId)"
-                                                title="Eliminar">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </td>
+                                    <th width="80" class="text-center">ID</th>
+                                    <th width="120" class="text-center">Fecha</th>
+                                    <th width="100" class="text-center">Tipo</th>
+                                    <th width="140">Categoría</th>
+                                    <th>Concepto</th>
+                                    <th width="120" class="text-right">Monto</th>
+                                    <th width="140">Responsable</th>
+                                    <th width="120" class="text-center">Acciones</th>
                                 </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var mov in Model)
+                                {
+                                    <tr>
+                                        <td class="text-center">
+                                            <span class="badge badge-id">#@mov.MovimientoId</span>
+                                        </td>
+                                        <td class="text-center">
+                                            @if (mov.FechaMovimiento.HasValue)
+                                            {
+                                                <div class="text-brown">
+                                                    <i class="far fa-calendar-alt me-1 text-green"></i>
+                                                    @mov.FechaMovimiento.Value.ToString("dd/MM/yyyy")
+                                                </div>
+                                                <small class="text-secondary">
+                                                    <i class="far fa-clock me-1"></i>
+                                                    @mov.FechaMovimiento.Value.ToString("HH:mm")
+                                                </small>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-secondary">N/A</span>
+                                            }
+                                        </td>
+                                        <td class="text-center">
+                                            @if (mov.TipoMovimiento == "Ingreso")
+                                            {
+                                                <span class="badge badge-movimiento badge-ingreso">
+                                                    <i class="fas fa-arrow-up me-1"></i>@mov.TipoMovimiento
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge badge-movimiento badge-egreso">
+                                                    <i class="fas fa-arrow-down me-1"></i>@mov.TipoMovimiento
+                                                </span>
+                                            }
+                                        </td>
+                                        <td>
+                                            <span class="badge badge-categoria">
+                                                <i class="fas fa-tag me-1"></i>@mov.Categoria
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <div class="fw-bold text-brown">@mov.Concepto</div>
+                                            @if (!string.IsNullOrEmpty(mov.Observaciones))
+                                            {
+                                                <small class="text-secondary">
+                                                    <i class="far fa-sticky-note me-1"></i>
+                                                    @(mov.Observaciones.Length > 50 ? mov.Observaciones.Substring(0, 50) + "..." : mov.Observaciones)
+                                                </small>
+                                            }
+                                        </td>
+                                        <td class="text-right font-weight-bold @(mov.TipoMovimiento == "Ingreso" ? "text-green" : "text-danger")">
+                                            <i class="fas @(mov.TipoMovimiento == "Ingreso" ? "fa-plus-circle" : "fa-minus-circle") me-1"></i>
+                                            $@mov.Monto.ToString("N2")
+                                        </td>
+                                        <td>
+                                            @if (mov.Usuarios != null)
+                                            {
+                                                <span class="badge badge-responsable">
+                                                    <i class="fas fa-user me-1"></i>
+                                                    @mov.Usuarios.NombreCompleto
+                                                </span>
+                                                <small class="text-secondary d-block">
+                                                    ID: @mov.ResponsableRegistro
+                                                </small>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge badge-secondary">
+                                                    <i class="fas fa-robot me-1"></i>
+                                                    Sistema
+                                                </span>
+                                            }
+                                        </td>
+                                        <td class="text-center">
+                                            <button type="button" class="btn btn-table-action btn-view"
+                                                    onclick="mostrarDetalleMovimiento(@mov.MovimientoId)"
+                                                    title="Ver detalle">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-table-action btn-edit"
+                                                    onclick="editarMovimiento(@mov.MovimientoId)"
+                                                    title="Editar movimiento">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-table-action btn-delete"
+                                                    onclick="eliminarMovimiento(@mov.MovimientoId)"
+                                                    title="Eliminar movimiento">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <div class="empty-state">
+                        <i class="fas fa-info-circle"></i>
+                        <h5 class="text-brown mb-3">No se encontraron movimientos</h5>
+                        <p class="text-secondary mb-4">No hay movimientos contables registrados con los filtros aplicados.</p>
+                        <a href="@Url.Action("RegistrarMovimiento", "Contabilidad")" class="btn btn-green">
+                            <i class="fas fa-plus me-2"></i> Crear Primer Movimiento
+                        </a>
+                    </div>
+                }
+            </div>
+
+            @if (ViewBag.TotalPages != null && ViewBag.TotalPages > 1)
+            {
+                <div class="pagination-custom">
+                    <nav aria-label="Paginación de movimientos">
+                        <ul class="pagination justify-content-center mb-0">
+                            @if (ViewBag.CurrentPage > 1)
+                            {
+                                <li class="page-item">
+                                    <a class="page-link page-link-custom" href="@Url.Action("Movimientos", "Contabilidad", new {
+                                        page = ViewBag.CurrentPage - 1,
+                                        tipo = ViewBag.FiltroTipo,
+                                        categoria = ViewBag.FiltroCategoria,
+                                        fechaDesde = ViewBag.FechaDesde,
+                                        fechaHasta = ViewBag.FechaHasta
+                                    })">
+                                        <i class="fas fa-chevron-left"></i>
+                                    </a>
+                                </li>
                             }
-                        }
-                        else
-                        {
-                            <tr>
-                                <td colspan="8" class="text-center py-5">
-                                    <div class="alert alert-info mb-0">
-                                        <i class="fas fa-info-circle fa-2x mb-3"></i>
-                                        <h5>No se encontraron movimientos</h5>
-                                        <p class="mb-0">No hay movimientos contables registrados.</p>
-                                    </div>
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        <div class="card-footer bg-light">
-            <div class="row">
-                <div class="col-md-6">
-                    <small class="text-muted">
-                        <i class="fas fa-info-circle me-1"></i>
-                        Última actualización: @DateTime.Now.ToString("dd/MM/yyyy HH:mm")
-                    </small>
+
+                            @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                            {
+                                <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                                    <a class="page-link page-link-custom" href="@Url.Action("Movimientos", "Contabilidad", new {
+                                        page = i,
+                                        tipo = ViewBag.FiltroTipo,
+                                        categoria = ViewBag.FiltroCategoria,
+                                        fechaDesde = ViewBag.FechaDesde,
+                                        fechaHasta = ViewBag.FechaHasta
+                                    })">@i</a>
+                                </li>
+                            }
+
+                            @if (ViewBag.CurrentPage < ViewBag.TotalPages)
+                            {
+                                <li class="page-item">
+                                    <a class="page-link page-link-custom" href="@Url.Action("Movimientos", "Contabilidad", new {
+                                        page = ViewBag.CurrentPage + 1,
+                                        tipo = ViewBag.FiltroTipo,
+                                        categoria = ViewBag.FiltroCategoria,
+                                        fechaDesde = ViewBag.FechaDesde,
+                                        fechaHasta = ViewBag.FechaHasta
+                                    })">
+                                        <i class="fas fa-chevron-right"></i>
+                                    </a>
+                                </li>
+                            }
+                        </ul>
+                    </nav>
                 </div>
-                <div class="col-md-6 text-end">
-                    <!-- Paginación si existe -->
-                    @if (ViewBag.TotalPages != null && ViewBag.TotalPages > 1)
-                    {
-                        <nav aria-label="Paginación">
-                            <ul class="pagination pagination-sm justify-content-end mb-0">
-                                @if (ViewBag.CurrentPage > 1)
-                                {
-                                    <li class="page-item">
-                                        <a class="page-link" href="@Url.Action("Movimientos", "Contabilidad", new {
-                                            page = ViewBag.CurrentPage - 1,
-                                            tipo = ViewBag.FiltroTipo,
-                                            categoria = ViewBag.FiltroCategoria,
-                                            fechaDesde = ViewBag.FechaDesde,
-                                            fechaHasta = ViewBag.FechaHasta
-                                        })">
-                                            <i class="fas fa-chevron-left"></i>
-                                        </a>
-                                    </li>
-                                }
-                                @for (int i = 1; i <= ViewBag.TotalPages; i++)
-                                {
-                                    <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
-                                        <a class="page-link" href="@Url.Action("Movimientos", "Contabilidad", new {
-                                            page = i,
-                                            tipo = ViewBag.FiltroTipo,
-                                            categoria = ViewBag.FiltroCategoria,
-                                            fechaDesde = ViewBag.FechaDesde,
-                                            fechaHasta = ViewBag.FechaHasta
-                                        })">@i</a>
-                                    </li>
-                                }
-                                @if (ViewBag.CurrentPage < ViewBag.TotalPages)
-                                {
-                                    <li class="page-item">
-                                        <a class="page-link" href="@Url.Action("Movimientos", "Contabilidad", new {
-                                            page = ViewBag.CurrentPage + 1,
-                                            tipo = ViewBag.FiltroTipo,
-                                            categoria = ViewBag.FiltroCategoria,
-                                            fechaDesde = ViewBag.FechaDesde,
-                                            fechaHasta = ViewBag.FechaHasta
-                                        })">
-                                            <i class="fas fa-chevron-right"></i>
-                                        </a>
-                                    </li>
-                                }
-                            </ul>
-                        </nav>
-                    }
-                </div>
-            </div>
+            }
         </div>
     </div>
 </div>
@@ -364,9 +395,9 @@
 <div class="modal fade" id="detalleModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <div class="modal-header bg-dark text-white">
+            <div class="modal-header bg-green text-white">
                 <h5 class="modal-title">
-                    <i class="fas fa-info-circle me-2"></i>Detalle del Movimiento
+                    <i class="fas fa-info-circle me-2"></i> Detalle del Movimiento
                 </h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
@@ -374,59 +405,515 @@
                 <div id="detalleContenido"></div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                <button type="button" class="btn btn-primary" id="btnImprimirMovimiento">
-                    <i class="fas fa-print me-1"></i>Imprimir
+                <button type="button" class="btn btn-outline-green" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-2"></i> Cerrar
+                </button>
+                <button type="button" class="btn btn-green" id="btnImprimirMovimiento">
+                    <i class="fas fa-print me-2"></i> Imprimir
                 </button>
             </div>
         </div>
     </div>
 </div>
 
+@section Styles {
+    <style>
+        /* ESTILOS ESPECÍFICOS PARA MOVIMIENTOS CONTABLES */
+        .movimientos-section {
+            background: linear-gradient(135deg, var(--bg-light) 0%, white 100%);
+            min-height: 100vh;
+            padding: 30px 0;
+        }
+
+        .page-header {
+            padding: 25px 0;
+            margin-bottom: 30px;
+            border-bottom: 3px solid var(--green);
+        }
+
+        .header-icon {
+            color: var(--green);
+            margin-right: 15px;
+        }
+
+        /* BOTONES DE ACCIÓN */
+        .btn-action-group {
+            background-color: white;
+            padding: 20px;
+            border-radius: 12px;
+            border: 2px solid var(--green);
+            margin-bottom: 25px;
+        }
+
+        .btn-action-custom {
+            padding: 10px 20px;
+            font-weight: 600;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+            .btn-action-custom:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            }
+
+        /* FILTROS AVANZADOS */
+        .filtros-card {
+            border: 2px solid var(--green);
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 25px;
+            background: white;
+        }
+
+        .filtros-header {
+            background: linear-gradient(135deg, var(--green) 0%, #86b57a 100%);
+            padding: 15px 20px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+            .filtros-header:hover {
+                background: linear-gradient(135deg, #86b57a 0%, #86b57a 100%);
+            }
+
+        .filtros-body {
+            padding: 20px;
+            background-color: rgba(151, 199, 139, 0.05);
+        }
+
+        .form-label {
+            color: var(--brown);
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .form-control, .form-select {
+            border: 2px solid rgba(151, 199, 139, 0.3);
+            border-radius: 8px;
+            padding: 10px 15px;
+            transition: all 0.3s ease;
+        }
+
+            .form-control:focus, .form-select:focus {
+                border-color: var(--green);
+                box-shadow: 0 0 0 0.2rem rgba(151, 199, 139, 0.25);
+            }
+
+        /* ESTADÍSTICAS */
+        .stat-card {
+            transition: all 0.3s ease;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 2px solid transparent;
+            margin-bottom: 20px;
+            padding: 20px 15px;
+        }
+
+            .stat-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 10px 25px rgba(151, 199, 139, 0.2) !important;
+                border-color: var(--green);
+            }
+
+        .stat-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            opacity: 0.9;
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin: 10px 0;
+            color: white;
+        }
+
+        .stat-label {
+            font-size: 0.95rem;
+            opacity: 0.9;
+            color: white;
+            font-weight: 500;
+        }
+
+        /* COLORES PARA ESTADÍSTICAS */
+        .card-ingreso {
+            background: linear-gradient(135deg, var(--green) 0%, #86b57a 100%) !important;
+            color: white;
+        }
+
+        .card-egreso {
+            background: linear-gradient(135deg, #F1948A 0%, #E74C3C 100%) !important;
+            color: white;
+        }
+
+        .card-balance {
+            background: linear-gradient(135deg, #5DADE2 0%, #2E86C1 100%) !important;
+            color: white;
+        }
+
+        .card-total {
+            background: linear-gradient(135deg, var(--pink) 0%, #f9c2b0 100%) !important;
+            color: var(--brown);
+        }
+
+        /* GRÁFICOS */
+        .graficos-container {
+            margin-bottom: 30px;
+        }
+
+        .grafico-card {
+            border: 2px solid var(--green);
+            border-radius: 12px;
+            overflow: hidden;
+            height: 100%;
+            background: white;
+        }
+
+        .grafico-header {
+            background-color: var(--green);
+            color: white;
+            padding: 15px 20px;
+            font-weight: 600;
+        }
+
+        .grafico-body {
+            padding: 20px;
+            min-height: 280px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* TABLA DE MOVIMIENTOS */
+        .tabla-movimientos {
+            border: 2px solid var(--green);
+            border-radius: 12px;
+            overflow: hidden;
+            background: white;
+        }
+
+        .tabla-header {
+            background: linear-gradient(135deg, var(--green) 0%, #86b57a 100%);
+            color: white;
+            padding: 15px 20px;
+            font-weight: 600;
+        }
+
+        .tabla-body {
+            padding: 0;
+        }
+
+        .movimientos-table {
+            margin: 0;
+            border: none;
+        }
+
+            .movimientos-table thead {
+                background-color: rgba(151, 199, 139, 0.1);
+            }
+
+            .movimientos-table th {
+                border: none;
+                padding: 15px;
+                font-weight: 600;
+                color: var(--brown);
+                border-bottom: 2px solid var(--green);
+            }
+
+            .movimientos-table td {
+                padding: 12px 15px;
+                vertical-align: middle;
+                border-color: rgba(151, 199, 139, 0.1);
+                color: var(--text-secondary);
+            }
+
+            .movimientos-table tbody tr {
+                transition: all 0.2s ease;
+                border-bottom: 1px solid rgba(151, 199, 139, 0.1);
+            }
+
+                .movimientos-table tbody tr:hover {
+                    background-color: rgba(151, 199, 139, 0.05);
+                    transform: translateX(5px);
+                }
+
+                .movimientos-table tbody tr:last-child {
+                    border-bottom: none;
+                }
+
+        /* BADGES PERSONALIZADOS */
+        .badge-movimiento {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        .badge-ingreso {
+            background-color: var(--green) !important;
+            color: white !important;
+        }
+
+        .badge-egreso {
+            background-color: #E74C3C !important;
+            color: white !important;
+        }
+
+        .badge-categoria {
+            background-color: var(--pink) !important;
+            color: var(--brown) !important;
+        }
+
+        .badge-responsable {
+            background-color: var(--yellow) !important;
+            color: var(--brown) !important;
+        }
+
+        .badge-id {
+            background-color: rgba(92, 75, 67, 0.1) !important;
+            color: var(--brown) !important;
+            font-family: monospace;
+        }
+
+        /* BOTONES DE ACCIÓN EN TABLA */
+        .btn-table-action {
+            width: 36px;
+            height: 36px;
+            padding: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            border: 2px solid transparent;
+            transition: all 0.2s ease;
+            margin: 2px;
+        }
+
+            .btn-table-action:hover {
+                transform: scale(1.1);
+            }
+
+        .btn-view {
+            background-color: rgba(151, 199, 139, 0.1);
+            color: var(--green);
+        }
+
+            .btn-view:hover {
+                background-color: var(--green);
+                color: white;
+                border-color: var(--green);
+            }
+
+        .btn-edit {
+            background-color: rgba(242, 198, 109, 0.1);
+            color: var(--brown);
+        }
+
+            .btn-edit:hover {
+                background-color: var(--yellow);
+                color: var(--brown);
+                border-color: var(--yellow);
+            }
+
+        .btn-delete {
+            background-color: rgba(231, 76, 60, 0.1);
+            color: #E74C3C;
+        }
+
+            .btn-delete:hover {
+                background-color: #E74C3C;
+                color: white;
+                border-color: #E74C3C;
+            }
+
+        /* PAGINACIÓN */
+        .pagination-custom {
+            margin: 0;
+            padding: 15px 20px;
+            background-color: rgba(151, 199, 139, 0.05);
+            border-top: 1px solid rgba(151, 199, 139, 0.2);
+        }
+
+        .page-link-custom {
+            border: 2px solid rgba(151, 199, 139, 0.3);
+            color: var(--brown);
+            margin: 0 3px;
+            border-radius: 8px;
+            padding: 8px 15px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+            .page-link-custom:hover {
+                background-color: var(--green);
+                border-color: var(--green);
+                color: white;
+                transform: translateY(-2px);
+            }
+
+        .page-item.active .page-link-custom {
+            background-color: var(--green);
+            border-color: var(--green);
+            color: white;
+        }
+
+        /* MENSAJE SIN DATOS */
+        .empty-state {
+            padding: 40px 20px;
+            text-align: center;
+            background-color: rgba(151, 199, 139, 0.05);
+            border-radius: 12px;
+            margin: 20px;
+        }
+
+            .empty-state i {
+                font-size: 3rem;
+                color: var(--green);
+                margin-bottom: 15px;
+            }
+
+        /* RESPONSIVE - ✅ CORREGIDO */
+        @@media (max-width: 768px) {
+            .page-header {
+                padding: 15px 0;
+                margin-bottom: 20px;
+            }
+
+            .btn-action-group {
+                padding: 15px;
+            }
+
+            .stat-card {
+                margin-bottom: 15px;
+                padding: 15px 10px;
+            }
+
+            .stat-value {
+                font-size: 1.5rem;
+            }
+
+            .stat-icon {
+                font-size: 2rem;
+            }
+
+            .movimientos-table th,
+            .movimientos-table td {
+                padding: 8px 10px;
+                font-size: 0.9rem;
+            }
+
+            .btn-table-action {
+                width: 32px;
+                height: 32px;
+                margin: 1px;
+            }
+        }
+
+        /* ANIMACIONES - ✅ CORREGIDO */
+        .fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .slide-up {
+            animation: slideUp 0.6s ease-out;
+        }
+
+        @@keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        @@keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+}
+
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     <script>
-        // Datos de ejemplo para gráficos (deberías obtenerlos de tu controlador)
-        var ingresosPorCategoria = [
-            { name: 'Donaciones', value: 4500 },
-            { name: 'Apadrinamientos', value: 3200 },
-            { name: 'Ventas Tienda', value: 1800 },
-            { name: 'Eventos', value: 1200 },
-            { name: 'Subvenciones', value: 800 }
-        ];
+        // Mostrar/ocultar filtros avanzados
+        function mostrarFiltros() {
+            var filtros = document.getElementById('filtrosAvanzados');
+            var isVisible = filtros.style.display === 'block';
+            filtros.style.display = isVisible ? 'none' : 'block';
 
-        var egresosPorCategoria = [
-            { name: 'Alimentos', value: 2800 },
-            { name: 'Veterinaria', value: 2200 },
-            { name: 'Medicamentos', value: 1500 },
-            { name: 'Servicios', value: 900 },
-            { name: 'Mantenimiento', value: 600 }
-        ];
+            // Animar la flecha
+            var chevron = filtros.querySelector('.fa-chevron-down');
+            if (chevron) {
+                chevron.style.transform = isVisible ? 'rotate(0deg)' : 'rotate(180deg)';
+                chevron.style.transition = 'transform 0.3s ease';
+            }
+        }
 
-        // Función para inicializar gráficos
+        function toggleFiltros() {
+            var body = document.querySelector('.filtros-body');
+            var chevron = document.querySelector('.filtros-header .fa-chevron-down');
+
+            if (body.style.display === 'none') {
+                body.style.display = 'block';
+                chevron.style.transform = 'rotate(180deg)';
+            } else {
+                body.style.display = 'none';
+                chevron.style.transform = 'rotate(0deg)';
+            }
+        }
+
+        // Inicializar gráficos
         function inicializarGraficos() {
+            // Colores de la paleta
+            var coloresVerdes = ['#97C78B', '#86b57a', '#75a169', '#648d58', '#537947'];
+            var coloresRojos = ['#F1948A', '#E74C3C', '#d6453a', '#c53d31', '#b43528'];
+
             // Gráfico de ingresos
             var optionsIngresos = {
-                series: ingresosPorCategoria.map(item => item.value),
+                series: [4500, 3200, 1800, 1200, 800],
                 chart: {
                     type: 'donut',
-                    height: 250
+                    height: 250,
+                    foreColor: '#5C4B43'
                 },
-                labels: ingresosPorCategoria.map(item => item.name),
-                colors: ['#28a745', '#20c997', '#17a2b8', '#6f42c1', '#fd7e14'],
+                labels: ['Donaciones', 'Apadrinamientos', 'Ventas Tienda', 'Eventos', 'Subvenciones'],
+                colors: coloresVerdes,
                 legend: {
-                    position: 'bottom'
+                    position: 'bottom',
+                    fontFamily: 'Segoe UI, Tahoma, Geneva, Verdana, sans-serif'
                 },
                 dataLabels: {
                     enabled: true,
-                    formatter: function(val, opts) {
-                        return opts.w.config.labels[opts.seriesIndex] + ': $' + opts.w.config.series[opts.seriesIndex].toFixed(2);
+                    style: {
+                        fontSize: '12px',
+                        fontFamily: 'Segoe UI, Tahoma, Geneva, Verdana, sans-serif'
                     }
                 },
                 tooltip: {
                     y: {
                         formatter: function(value) {
                             return '$' + value.toFixed(2);
+                        }
+                    }
+                },
+                plotOptions: {
+                    pie: {
+                        donut: {
+                            size: '65%'
                         }
                     }
                 }
@@ -437,26 +924,36 @@
 
             // Gráfico de egresos
             var optionsEgresos = {
-                series: egresosPorCategoria.map(item => item.value),
+                series: [2800, 2200, 1500, 900, 600],
                 chart: {
                     type: 'donut',
-                    height: 250
+                    height: 250,
+                    foreColor: '#5C4B43'
                 },
-                labels: egresosPorCategoria.map(item => item.name),
-                colors: ['#dc3545', '#e83e8c', '#ffc107', '#6c757d', '#343a40'],
+                labels: ['Alimentos', 'Veterinaria', 'Medicamentos', 'Servicios', 'Mantenimiento'],
+                colors: coloresRojos,
                 legend: {
-                    position: 'bottom'
+                    position: 'bottom',
+                    fontFamily: 'Segoe UI, Tahoma, Geneva, Verdana, sans-serif'
                 },
                 dataLabels: {
                     enabled: true,
-                    formatter: function(val, opts) {
-                        return opts.w.config.labels[opts.seriesIndex] + ': $' + opts.w.config.series[opts.seriesIndex].toFixed(2);
+                    style: {
+                        fontSize: '12px',
+                        fontFamily: 'Segoe UI, Tahoma, Geneva, Verdana, sans-serif'
                     }
                 },
                 tooltip: {
                     y: {
                         formatter: function(value) {
                             return '$' + value.toFixed(2);
+                        }
+                    }
+                },
+                plotOptions: {
+                    pie: {
+                        donut: {
+                            size: '65%'
                         }
                     }
                 }
@@ -466,231 +963,40 @@
             chartEgresos.render();
         }
 
-        // Mostrar/ocultar filtros avanzados
-        function mostrarFiltros() {
-            var filtros = document.getElementById('filtrosAvanzados');
-            if (filtros.style.display === 'none') {
-                filtros.style.display = 'block';
-            } else {
-                filtros.style.display = 'none';
-            }
-        }
-
-        // Mostrar detalle del movimiento
+        // Funciones para la tabla
         function mostrarDetalleMovimiento(id) {
-            $.ajax({
-                url: '@Url.Action("ObtenerDetalleMovimiento", "Contabilidad")',
-                type: 'GET',
-                data: { id: id },
-                success: function (data) {
-                    if (data.success) {
-                        $('#detalleContenido').html(`
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <h6><i class="fas fa-id-badge me-2"></i>ID del Movimiento</h6>
-                                        <p class="mb-0"><span class="badge bg-primary">#${data.movimiento.MovimientoId}</span></p>
-                                    </div>
-                                    <div class="mb-3">
-                                        <h6><i class="fas fa-calendar me-2"></i>Fecha y Hora</h6>
-                                        <p class="mb-0">${data.movimiento.FechaMovimiento}</p>
-                                    </div>
-                                    <div class="mb-3">
-                                        <h6><i class="fas fa-exchange-alt me-2"></i>Tipo de Movimiento</h6>
-                                        <p class="mb-0">
-                                            <span class="badge ${data.movimiento.TipoMovimiento === 'Ingreso' ? 'bg-success' : 'bg-danger'}">
-                                                ${data.movimiento.TipoMovimiento}
-                                            </span>
-                                        </p>
-                                    </div>
-                                    <div class="mb-3">
-                                        <h6><i class="fas fa-tag me-2"></i>Categoría</h6>
-                                        <p class="mb-0"><span class="badge bg-info">${data.movimiento.Categoria}</span></p>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <h6><i class="fas fa-file-invoice-dollar me-2"></i>Monto</h6>
-                                        <h3 class="${data.movimiento.TipoMovimiento === 'Ingreso' ? 'text-success' : 'text-danger'}">
-                                            ${data.movimiento.TipoMovimiento === 'Ingreso' ? '+' : '-'}$${data.movimiento.Monto.toFixed(2)}
-                                        </h3>
-                                    </div>
-                                    <div class="mb-3">
-                                        <h6><i class="fas fa-user me-2"></i>Responsable</h6>
-                                        <p class="mb-0">
-                                            <span class="badge bg-primary">${data.movimiento.ResponsableNombre}</span>
-                                        </p>
-                                    </div>
-                                    <div class="mb-3">
-                                        <h6><i class="fas fa-credit-card me-2"></i>Método de Pago</h6>
-                                        <p class="mb-0">${data.movimiento.MetodoPago || 'No especificado'}</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-12">
-                                    <div class="mb-3">
-                                        <h6><i class="fas fa-align-left me-2"></i>Concepto</h6>
-                                        <p class="mb-0">${data.movimiento.Concepto}</p>
-                                    </div>
-                                    ${data.movimiento.Observaciones ? `
-                                    <div class="mb-3">
-                                        <h6><i class="fas fa-sticky-note me-2"></i>Observaciones</h6>
-                                        <div class="border p-3 bg-light rounded">
-                                            <p class="mb-0">${data.movimiento.Observaciones}</p>
-                                        </div>
-                                    </div>` : ''}
-                                    ${data.movimiento.NumeroComprobante ? `
-                                    <div class="mb-3">
-                                        <h6><i class="fas fa-receipt me-2"></i>Comprobante</h6>
-                                        <p class="mb-0">Número: ${data.movimiento.NumeroComprobante}</p>
-                                    </div>` : ''}
-                                </div>
-                            </div>
-                        `);
-
-                        // Configurar botón de impresión
-                        $('#btnImprimirMovimiento').off('click').on('click', function() {
-                            window.print();
-                        });
-
-                        var modal = new bootstrap.Modal(document.getElementById('detalleModal'));
-                        modal.show();
-                    } else {
-                        mostrarAlerta('Error', 'No se pudo obtener el detalle del movimiento.', 'error');
-                    }
-                },
-                error: function () {
-                    mostrarAlerta('Error', 'Error al cargar los detalles.', 'error');
-                }
-            });
+            // Implementar carga de detalles vía AJAX
+            window.location.href = '@Url.Action("DetallesMovimiento", "Contabilidad")/' + id;
         }
 
-        // Editar movimiento
         function editarMovimiento(id) {
             window.location.href = '@Url.Action("EditarMovimiento", "Contabilidad")/' + id;
         }
 
-        // Eliminar movimiento
         function eliminarMovimiento(id) {
-            Swal.fire({
-                title: '¿Está seguro?',
-                text: "Esta acción eliminará permanentemente el movimiento contable.",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#dc3545',
-                cancelButtonColor: '#6c757d',
-                confirmButtonText: 'Sí, eliminar',
-                cancelButtonText: 'Cancelar'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $.ajax({
-                        url: '@Url.Action("EliminarMovimiento", "Contabilidad")',
-                        type: 'POST',
-                        data: { id: id },
-                        success: function (data) {
-                            if (data.success) {
-                                Swal.fire({
-                                    title: '¡Eliminado!',
-                                    text: 'El movimiento ha sido eliminado correctamente.',
-                                    icon: 'success',
-                                    confirmButtonText: 'Aceptar'
-                                }).then(() => {
-                                    location.reload();
-                                });
-                            } else {
-                                Swal.fire({
-                                    title: 'Error',
-                                    text: data.message || 'No se pudo eliminar el movimiento.',
-                                    icon: 'error',
-                                    confirmButtonText: 'Aceptar'
-                                });
-                            }
-                        },
-                        error: function () {
-                            Swal.fire({
-                                title: 'Error',
-                                text: 'Error al procesar la solicitud.',
-                                icon: 'error',
-                                confirmButtonText: 'Aceptar'
-                            });
-                        }
-                    });
-                }
-            });
-        }
-
-        function mostrarAlerta(titulo, mensaje, tipo) {
-            Swal.fire({
-                title: titulo,
-                text: mensaje,
-                icon: tipo,
-                confirmButtonText: 'Aceptar'
-            });
+            if (confirm('¿Está seguro de eliminar este movimiento?')) {
+                // Implementar eliminación vía AJAX o form submit
+                window.location.href = '@Url.Action("EliminarMovimiento", "Contabilidad")/' + id;
+            }
         }
 
         // Inicializar al cargar la página
         $(document).ready(function () {
             inicializarGraficos();
+
+            // Tooltips para botones de acción
             $('[title]').tooltip();
 
-            // Configurar datepickers
+            // Configurar fecha por defecto en filtros
             $('input[type="date"]').each(function() {
                 if (!$(this).val()) {
                     var today = new Date();
-                    var firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
-                    var lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0);
-
                     if ($(this).attr('name') === 'fechaDesde') {
+                        var firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
                         $(this).val(firstDay.toISOString().split('T')[0]);
-                    }
-                    if ($(this).attr('name') === 'fechaHasta') {
-                        $(this).val(lastDay.toISOString().split('T')[0]);
                     }
                 }
             });
         });
     </script>
-
-    <style>
-        .shadow-custom {
-            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-            border: 1px solid rgba(0, 0, 0, 0.125);
-            transition: transform 0.3s ease;
-        }
-
-        .shadow-custom:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-        }
-
-        .table-hover tbody tr:hover {
-            background-color: rgba(0, 123, 255, 0.05);
-        }
-
-        .badge {
-            font-size: 0.85em;
-            font-weight: 500;
-            padding: 0.35em 0.65em;
-        }
-
-        .text-nowrap {
-            white-space: nowrap;
-        }
-
-        .display-4 {
-            font-size: 2.5rem;
-        }
-
-        @@media print {
-            .no-print {
-                display: none !important;
-            }
-
-            .card {
-                border: none !important;
-                box-shadow: none !important;
-            }
-        }
-    </style>
 }

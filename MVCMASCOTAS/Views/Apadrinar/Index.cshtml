@@ -1,0 +1,331 @@
+﻿@model IEnumerable<MVCMASCOTAS.Models.ViewModels.MascotaResumenViewModel>
+
+@{
+    ViewBag.Title = "Apadrinar una Mascota";
+    ViewData["Title"] = "Apadrinar una Mascota";
+}
+
+<!-- Contenido principal -->
+<div class="container body-content mt-4">
+    <div class="page-header mb-4">
+        <h2 class="text-brown font-weight-bold"><i class="fa fa-heart text-green"></i> Programa de Apadrinamiento</h2>
+        <p class="lead text-secondary">Ayuda a cubrir los gastos de cuidado de una mascota con una contribución mensual</p>
+    </div>
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-green border-green alert-dismissible fade show" role="alert">
+            <i class="fa fa-exclamation-triangle text-green"></i> <strong class="text-brown">@TempData["ErrorMessage"]</strong>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    }
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-green border-green alert-dismissible fade show" role="alert">
+            <i class="fa fa-check-circle text-green"></i> <strong class="text-brown">@TempData["SuccessMessage"]</strong>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    }
+
+    @if (TempData["WarningMessage"] != null)
+    {
+        <div class="alert alert-warning border-warning alert-dismissible fade show" role="alert">
+            <i class="fa fa-exclamation-circle text-warning"></i> <strong class="text-brown">@TempData["WarningMessage"]</strong>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    }
+
+    <div class="alert alert-green border-green mb-4">
+        <div class="d-flex">
+            <i class="fa fa-info-circle fa-2x text-green me-3 align-self-start mt-1"></i>
+            <div>
+                <h5 class="text-brown mb-2">¿Cómo funciona el apadrinamiento?</h5>
+                <div class="row">
+                    <div class="col-md-6">
+                        <ul class="mb-0 text-secondary">
+                            <li><i class="fa fa-check-circle text-green me-2"></i>Eliges una mascota para apadrinar</li>
+                            <li><i class="fa fa-check-circle text-green me-2"></i>Contribución mensual mínima de $10</li>
+                            <li><i class="fa fa-check-circle text-green me-2"></i>Actualizaciones mensuales con fotos</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <ul class="mb-0 text-secondary">
+                            <li><i class="fa fa-check-circle text-green me-2"></i>Certificado de apadrinamiento digital</li>
+                            <li><i class="fa fa-check-circle text-green me-2"></i>Visitas programadas (con cita previa)</li>
+                            <li><i class="fa fa-check-circle text-green me-2"></i>Tu nombre en nuestro muro de honor</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        @if (Model != null && Model.Any())
+        {
+            foreach (var mascota in Model)
+            {
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100 shadow-hover border-green">
+                        @if (mascota.ImagenPrincipal != null && mascota.ImagenPrincipal.Length > 0)
+                        {
+                            <div class="card-img-top">
+                                <img src="data:image/jpeg;base64,@Convert.ToBase64String(mascota.ImagenPrincipal)"
+                                     style="height: 250px; object-fit: cover; width: 100%;"
+                                     alt="@mascota.Nombre">
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="card-img-top">
+                                <img src="~/Content/images/no-image.png"
+                                     style="height: 250px; object-fit: cover; width: 100%;"
+                                     alt="Sin imagen">
+                            </div>
+                        }
+                        <div class="card-body bg-light-mint">
+                            <h5 class="card-title text-brown">
+                                <i class="fa fa-paw text-green me-2"></i>@mascota.Nombre
+                                @if (mascota.Esterilizado)
+                                {
+                                    <span class="badge bg-green badge-estado ml-2" title="Esterilizado">
+                                        <i class="fa fa-check-circle"></i> Esterilizado
+                                    </span>
+                                }
+                            </h5>
+                            <p class="card-text text-secondary">
+                                <i class="fa fa-dog text-green me-2"></i> <strong>Especie:</strong> @mascota.Especie<br />
+                                @if (!string.IsNullOrEmpty(mascota.Raza))
+                                {
+                                    <i class="fa fa-paw text-green me-2"></i> <strong>Raza:</strong> @mascota.Raza<br />
+                                }
+                                <i class="fa fa-venus-mars text-green me-2"></i> <strong>Sexo:</strong>
+                                @if (mascota.Sexo == "M")
+                                {
+                                    <span>Macho</span>
+                                }
+                                else if (mascota.Sexo == "F")
+                                {
+                                    <span>Hembra</span>
+                                }
+                                else
+                                {
+                                    <span>@mascota.Sexo</span>
+                                }
+                                <br />
+                                <i class="fa fa-calendar text-green me-2"></i> <strong>Edad:</strong> @mascota.EdadAproximada<br />
+                                @if (!string.IsNullOrEmpty(mascota.Tamanio))
+                                {
+                                    <i class="fa fa-ruler-combined text-green me-2"></i> <strong>Tamaño:</strong> @mascota.Tamanio<br />
+                                }
+                                @if (!string.IsNullOrEmpty(mascota.Color))
+                                {
+                                    <i class="fa fa-palette text-green me-2"></i> <strong>Color:</strong> @mascota.Color<br />
+                                }
+                                <i class="fa fa-heartbeat text-green me-2"></i> <strong>Estado:</strong>
+                                <span class="badge badge-estado
+                                    @(mascota.Estado == "Rescatada" ? "bg-yellow" :
+                                      mascota.Estado == "En tratamiento" ? "bg-info" :
+                                      mascota.Estado == "Disponible para adopción" ? "bg-green" :
+                                      mascota.Estado == "En cuarentena" ? "bg-secondary" :
+                                      "bg-light")">
+                                    @mascota.Estado
+                                </span>
+                            </p>
+                            @if (!string.IsNullOrEmpty(mascota.DescripcionGeneral))
+                            {
+                                <div class="mt-3">
+                                    <p class="text-secondary small mb-0">
+                                        <strong class="text-brown"><i class="fa fa-file-alt text-green me-2"></i>Descripción:</strong><br>
+                                        @(mascota.DescripcionGeneral.Length > 100 ? mascota.DescripcionGeneral.Substring(0, 100) + "..." : mascota.DescripcionGeneral)
+                                    </p>
+                                </div>
+                            }
+
+                            <!-- Mostrar mensaje si el usuario ya apadrina esta mascota -->
+                            @if (ViewBag.ApadrinamientosUsuario != null)
+                            {
+                                var apadrinamientosUsuario = ViewBag.ApadrinamientosUsuario as System.Collections.Generic.List<int> ?? new List<int>();
+                                if (apadrinamientosUsuario.Contains(mascota.MascotaId))
+                                {
+                                    <div class="mt-3">
+                                        <div class="alert-green p-2 rounded small mb-0">
+                                            <i class="fa fa-check-circle text-green me-1"></i> <span class="text-brown">Ya apadrinas a esta mascota</span>
+                                        </div>
+                                    </div>
+                                }
+                            }
+                        </div>
+                        <div class="card-footer bg-white border-top border-green">
+                            @if (ViewBag.ApadrinamientosUsuario != null)
+                            {
+                                var apadrinamientosUsuario = ViewBag.ApadrinamientosUsuario as System.Collections.Generic.List<int> ?? new List<int>();
+                                if (apadrinamientosUsuario.Contains(mascota.MascotaId))
+                                {
+                                    <a href="@Url.Action("MisApadrinamientos", "Apadrinar")" class="btn btn-green btn-block">
+                                        <i class="fa fa-heart me-2"></i> Ya apadrinado
+                                    </a>
+                                }
+                                else
+                                {
+                                    <a href="@Url.Action("Confirmar", "Apadrinar", new { id = mascota.MascotaId })"
+                                       class="btn btn-green btn-block">
+                                        <i class="fa fa-heart me-2"></i> Apadrinar a @mascota.Nombre
+                                    </a>
+                                }
+                            }
+                            else
+                            {
+                                <a href="@Url.Action("Confirmar", "Apadrinar", new { id = mascota.MascotaId })"
+                                   class="btn btn-green btn-block">
+                                    <i class="fa fa-heart me-2"></i> Apadrinar a @mascota.Nombre
+                                </a>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="col-12">
+                <div class="card shadow-hover border-green text-center py-4">
+                    <div class="card-body bg-light-mint">
+                        <i class="fa fa-exclamation-triangle fa-3x text-secondary mb-3"></i>
+                        <h4 class="text-brown mb-2">No hay mascotas disponibles para apadrinamiento</h4>
+                        <p class="text-secondary mb-2">Todas nuestras mascotas tienen padrinos activos en este momento.</p>
+                        <p class="text-secondary mb-0">
+                            ¡Puedes realizar una
+                            <a href="@Url.Action("Donar", "Donaciones")" class="text-green font-weight-bold">
+                                donación general
+                            </a>
+                            para ayudar a todas!
+                        </p>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        /* Estilos específicos para esta página */
+        .badge-estado {
+            font-size: 0.8em;
+            padding: 0.3em 0.6em;
+        }
+
+        .badge.bg-info {
+            background-color: #17a2b8 !important;
+            color: white !important;
+        }
+
+        .badge.bg-light {
+            background-color: #f8f9fa !important;
+            color: #212529 !important;
+        }
+
+        .badge.bg-secondary {
+            background-color: #6c757d !important;
+            color: white !important;
+        }
+
+        .alert-warning {
+            background-color: rgba(255, 193, 7, 0.1) !important;
+        }
+
+        .text-warning {
+            color: #ffc107 !important;
+        }
+
+        .border-warning {
+            border-color: #ffc107 !important;
+        }
+
+        .me-2 {
+            margin-right: 0.5rem !important;
+        }
+
+        .me-3 {
+            margin-right: 1rem !important;
+        }
+
+        .ml-2 {
+            margin-left: 0.5rem !important;
+        }
+
+        .mt-1 {
+            margin-top: 0.25rem !important;
+        }
+
+        .align-self-start {
+            align-self: flex-start !important;
+        }
+
+        .card-img-top {
+            overflow: hidden;
+        }
+
+            .card-img-top img {
+                transition: transform 0.5s ease;
+            }
+
+            .card-img-top:hover img {
+                transform: scale(1.05);
+            }
+    </style>
+}
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            console.log('Lista de mascotas para apadrinar cargada');
+
+            // Auto-ocultar alertas después de 5 segundos
+            setTimeout(function() {
+                $('.alert-dismissible').alert('close');
+            }, 5000);
+
+            // Si no está autenticado y hace clic en apadrinar
+            $('.btn-green').on('click', function(e) {
+                var isAuthenticated = @(User.Identity.IsAuthenticated ? "true" : "false");
+                if (!isAuthenticated) {
+                    e.preventDefault();
+                    showLoginAlert();
+                }
+            });
+        });
+
+        // Alerta para usuarios no autenticados
+        function showLoginAlert() {
+            Swal.fire({
+                title: '¡Necesitas iniciar sesión!',
+                html: '<div class="text-center">' +
+                      '<i class="fa fa-user-lock fa-3x text-green mb-3"></i>' +
+                      '<h4 class="text-brown">Para apadrinar una mascota necesitas una cuenta</h4>' +
+                      '<p class="text-secondary">Puedes iniciar sesión o crear una cuenta gratuita en segundos.</p>' +
+                      '</div>',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#97C78B',
+                cancelButtonColor: '#5C4B43',
+                confirmButtonText: '<i class="fa fa-sign-in-alt me-2"></i> Iniciar Sesión',
+                cancelButtonText: '<i class="fa fa-user-plus me-2"></i> Crear Cuenta'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = '@Url.Action("Login", "Account", new { returnUrl = Url.Action("Index", "Apadrinar") })';
+                } else if (result.dismiss === Swal.DismissReason.cancel) {
+                    window.location.href = '@Url.Action("Register", "Account")';
+                }
+            });
+        }
+    </script>
+}

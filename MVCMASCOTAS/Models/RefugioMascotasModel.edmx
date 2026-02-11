@@ -4,7 +4,7 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-      <Schema Namespace="RefugioMascotasDBModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+    <Schema Namespace="RefugioMascotasDBModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
         <EntityType Name="Actividades">
           <Key>
             <PropertyRef Name="ActividadId" />
@@ -70,6 +70,20 @@
           <Property Name="FechaAccion" Type="datetime" />
           <Property Name="DireccionIP" Type="nvarchar" MaxLength="50" />
           <Property Name="Detalles" Type="nvarchar(max)" />
+        </EntityType>
+        <EntityType Name="CampaniaAdopcion">
+          <Key>
+            <PropertyRef Name="IdCampania" />
+          </Key>
+          <Property Name="IdCampania" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="NombreCampania" Type="nvarchar" MaxLength="150" Nullable="false" />
+          <Property Name="Lugar" Type="nvarchar" MaxLength="200" Nullable="false" />
+          <Property Name="Fecha" Type="date" Nullable="false" />
+          <Property Name="Hora" Type="time" Precision="7" Nullable="false" />
+          <Property Name="Actividades" Type="nvarchar" MaxLength="500" Nullable="false" />
+          <Property Name="Foto" Type="varbinary(max)" />
+          <Property Name="Estado" Type="bit" Nullable="false" />
+          <Property Name="FechaCreacion" Type="datetime" Nullable="false" />
         </EntityType>
         <EntityType Name="CategoriasProducto">
           <Key>
@@ -188,6 +202,19 @@
           <Property Name="ReferenciaPersonal2" Type="nvarchar" MaxLength="255" />
           <Property Name="TelefonoReferencia2" Type="nvarchar" MaxLength="20" />
           <Property Name="FechaLlenado" Type="datetime" />
+        </EntityType>
+        <EntityType Name="HistorialEstadosMascota">
+          <Key>
+            <PropertyRef Name="HistorialId" />
+          </Key>
+          <Property Name="HistorialId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="MascotaId" Type="int" Nullable="false" />
+          <Property Name="EstadoAnterior" Type="nvarchar" MaxLength="50" />
+          <Property Name="EstadoNuevo" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="Motivo" Type="nvarchar" MaxLength="500" />
+          <Property Name="FechaCambio" Type="datetime" />
+          <Property Name="UsuarioId" Type="int" Nullable="false" />
+          <Property Name="Observaciones" Type="nvarchar" MaxLength="1000" />
         </EntityType>
         <EntityType Name="HistorialMedico">
           <Key>
@@ -394,6 +421,22 @@
           <Property Name="Destacado" Type="bit" />
           <Property Name="FechaCreacion" Type="datetime" />
         </EntityType>
+        <EntityType Name="RefugioAdopcion">
+          <Key>
+            <PropertyRef Name="IdRefugio" />
+          </Key>
+          <Property Name="IdRefugio" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="NombreRefugio" Type="nvarchar" MaxLength="150" Nullable="false" />
+          <Property Name="Contacto" Type="nvarchar" MaxLength="100" Nullable="false" />
+          <Property Name="Direccion" Type="nvarchar" MaxLength="250" Nullable="false" />
+          <Property Name="PersonaEncargada" Type="nvarchar" MaxLength="150" Nullable="false" />
+          <Property Name="Estado" Type="bit" Nullable="false" />
+          <Property Name="FechaRegistro" Type="datetime" Nullable="false" />
+          <Property Name="Capacidad" Type="int" />
+          <Property Name="MascotasActuales" Type="int" />
+          <Property Name="Telefono" Type="nvarchar" MaxLength="20" />
+          <Property Name="Email" Type="nvarchar" MaxLength="100" />
+        </EntityType>
         <EntityType Name="ReportesRescate">
           <Key>
             <PropertyRef Name="ReporteId" />
@@ -427,6 +470,16 @@
           <Property Name="FechaCreacion" Type="datetime" />
           <Property Name="Activo" Type="bit" />
         </EntityType>
+        <EntityType Name="RolPermisos">
+          <Key>
+            <PropertyRef Name="RolPermisoId" />
+          </Key>
+          <Property Name="RolPermisoId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="RolId" Type="int" Nullable="false" />
+          <Property Name="Permiso" Type="nvarchar" MaxLength="100" Nullable="false" />
+          <Property Name="FechaAsignacion" Type="datetime" />
+          <Property Name="AsignadoPor" Type="int" />
+        </EntityType>
         <EntityType Name="SeguimientoAdopcion">
           <Key>
             <PropertyRef Name="SeguimientoId" />
@@ -441,7 +494,7 @@
           <Property Name="RelacionConAdoptante" Type="nvarchar" MaxLength="50" />
           <Property Name="Observaciones" Type="nvarchar(max)" />
           <Property Name="Recomendaciones" Type="nvarchar(max)" />
-          <Property Name="RequiereIntervencion" Type="bit" />
+          <Property Name="RequiereIntervencion" Type="bit" Nullable="false" />
           <Property Name="ProximoSeguimiento" Type="datetime" />
           <Property Name="FotosEvidencia" Type="nvarchar" MaxLength="500" />
         </EntityType>
@@ -461,6 +514,7 @@
           <Property Name="MotivoRechazo" Type="nvarchar(max)" />
           <Property Name="FechaRespuesta" Type="datetime" />
           <Property Name="Observaciones" Type="nvarchar(max)" />
+          <Property Name="EstadoAdopcion" Type="nvarchar" MaxLength="50" Nullable="false" />
         </EntityType>
         <EntityType Name="Tratamientos">
           <Key>
@@ -498,6 +552,12 @@
           <Property Name="Activo" Type="bit" />
           <Property Name="EmailConfirmado" Type="bit" />
           <Property Name="TelefonoConfirmado" Type="bit" />
+          <Property Name="FechaUltimoCambioPassword" Type="datetime" />
+          <Property Name="IntentosFallidos" Type="int" />
+          <Property Name="FechaBloqueoTemporal" Type="datetime" />
+          <Property Name="FechaDesbloqueo" Type="datetime" />
+          <Property Name="BloqueadoPermanentemente" Type="bit" />
+          <Property Name="FechaUltimoIntentoFallido" Type="datetime" />
         </EntityType>
         <EntityType Name="UsuariosRoles">
           <Key>
@@ -704,6 +764,20 @@ advertencia 6002: La tabla o vista 'RefugioMascotasDB.dbo.vw_ResumenAdopciones' 
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK__Historial__Masco__1C873BEC">
+          <End Role="Mascotas" Type="Self.Mascotas" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="HistorialEstadosMascota" Type="Self.HistorialEstadosMascota" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Mascotas">
+              <PropertyRef Name="MascotaId" />
+            </Principal>
+            <Dependent Role="HistorialEstadosMascota">
+              <PropertyRef Name="MascotaId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK__Historial__Masco__45F365D3">
           <End Role="Mascotas" Type="Self.Mascotas" Multiplicity="1">
             <OnDelete Action="Cascade" />
@@ -715,6 +789,18 @@ advertencia 6002: La tabla o vista 'RefugioMascotasDB.dbo.vw_ResumenAdopciones' 
             </Principal>
             <Dependent Role="HistorialMedico">
               <PropertyRef Name="MascotaId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__Historial__Usuar__1D7B6025">
+          <End Role="Usuarios" Type="Self.Usuarios" Multiplicity="1" />
+          <End Role="HistorialEstadosMascota" Type="Self.HistorialEstadosMascota" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Usuarios">
+              <PropertyRef Name="UsuarioId" />
+            </Principal>
+            <Dependent Role="HistorialEstadosMascota">
+              <PropertyRef Name="UsuarioId" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -1114,17 +1200,58 @@ advertencia 6002: La tabla o vista 'RefugioMascotasDB.dbo.vw_ResumenAdopciones' 
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_RolPermisos_Roles">
+          <End Role="Roles" Type="Self.Roles" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="RolPermisos" Type="Self.RolPermisos" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Roles">
+              <PropertyRef Name="RolId" />
+            </Principal>
+            <Dependent Role="RolPermisos">
+              <PropertyRef Name="RolId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_RolPermisos_Usuarios">
+          <End Role="Usuarios" Type="Self.Usuarios" Multiplicity="0..1" />
+          <End Role="RolPermisos" Type="Self.RolPermisos" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Usuarios">
+              <PropertyRef Name="UsuarioId" />
+            </Principal>
+            <Dependent Role="RolPermisos">
+              <PropertyRef Name="AsignadoPor" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Function Name="sp_ArchivarMascota" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="MascotaId" Type="int" Mode="In" />
+          <Parameter Name="UsuarioId" Type="int" Mode="In" />
+          <Parameter Name="Motivo" Type="nvarchar" Mode="In" />
+          <Parameter Name="Resultado" Type="nvarchar" Mode="InOut" />
+        </Function>
+        <Function Name="sp_RestaurarMascota" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="MascotaId" Type="int" Mode="In" />
+          <Parameter Name="UsuarioId" Type="int" Mode="In" />
+          <Parameter Name="NuevoEstado" Type="nvarchar" Mode="In" />
+          <Parameter Name="Motivo" Type="nvarchar" Mode="In" />
+          <Parameter Name="Resultado" Type="nvarchar" Mode="InOut" />
+        </Function>
         <EntityContainer Name="RefugioMascotasDBModelStoreContainer">
           <EntitySet Name="Actividades" EntityType="Self.Actividades" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Apadrinamientos" EntityType="Self.Apadrinamientos" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ApoyosEmpresariales" EntityType="Self.ApoyosEmpresariales" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="AuditoriaAcciones" EntityType="Self.AuditoriaAcciones" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="CampaniaAdopcion" EntityType="Self.CampaniaAdopcion" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="CategoriasProducto" EntityType="Self.CategoriasProducto" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ConfiguracionSistema" EntityType="Self.ConfiguracionSistema" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ContratoAdopcion" EntityType="Self.ContratoAdopcion" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Donaciones" EntityType="Self.Donaciones" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="EvaluacionAdopcion" EntityType="Self.EvaluacionAdopcion" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="FormularioAdopcionDetalle" EntityType="Self.FormularioAdopcionDetalle" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="HistorialEstadosMascota" EntityType="Self.HistorialEstadosMascota" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="HistorialMedico" EntityType="Self.HistorialMedico" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="HorasVoluntariado" EntityType="Self.HorasVoluntariado" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ImagenesAdicionales" EntityType="Self.ImagenesAdicionales" Schema="dbo" store:Type="Tables" />
@@ -1137,8 +1264,10 @@ advertencia 6002: La tabla o vista 'RefugioMascotasDB.dbo.vw_ResumenAdopciones' 
           <EntitySet Name="PedidoDetalle" EntityType="Self.PedidoDetalle" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Pedidos" EntityType="Self.Pedidos" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Productos" EntityType="Self.Productos" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="RefugioAdopcion" EntityType="Self.RefugioAdopcion" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ReportesRescate" EntityType="Self.ReportesRescate" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Roles" EntityType="Self.Roles" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="RolPermisos" EntityType="Self.RolPermisos" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="SeguimientoAdopcion" EntityType="Self.SeguimientoAdopcion" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="SolicitudAdopcion" EntityType="Self.SolicitudAdopcion" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Tratamientos" EntityType="Self.Tratamientos" Schema="dbo" store:Type="Tables" />
@@ -1226,9 +1355,17 @@ advertencia 6002: La tabla o vista 'RefugioMascotasDB.dbo.vw_ResumenAdopciones' 
             <End Role="SolicitudAdopcion" EntitySet="SolicitudAdopcion" />
             <End Role="FormularioAdopcionDetalle" EntitySet="FormularioAdopcionDetalle" />
           </AssociationSet>
+          <AssociationSet Name="FK__Historial__Masco__1C873BEC" Association="Self.FK__Historial__Masco__1C873BEC">
+            <End Role="Mascotas" EntitySet="Mascotas" />
+            <End Role="HistorialEstadosMascota" EntitySet="HistorialEstadosMascota" />
+          </AssociationSet>
           <AssociationSet Name="FK__Historial__Masco__45F365D3" Association="Self.FK__Historial__Masco__45F365D3">
             <End Role="Mascotas" EntitySet="Mascotas" />
             <End Role="HistorialMedico" EntitySet="HistorialMedico" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Historial__Usuar__1D7B6025" Association="Self.FK__Historial__Usuar__1D7B6025">
+            <End Role="Usuarios" EntitySet="Usuarios" />
+            <End Role="HistorialEstadosMascota" EntitySet="HistorialEstadosMascota" />
           </AssociationSet>
           <AssociationSet Name="FK__Historial__Veter__46E78A0C" Association="Self.FK__Historial__Veter__46E78A0C">
             <End Role="Usuarios" EntitySet="Usuarios" />
@@ -1358,9 +1495,16 @@ advertencia 6002: La tabla o vista 'RefugioMascotasDB.dbo.vw_ResumenAdopciones' 
             <End Role="Usuarios" EntitySet="Usuarios" />
             <End Role="UsuariosRoles" EntitySet="UsuariosRoles" />
           </AssociationSet>
+          <AssociationSet Name="FK_RolPermisos_Roles" Association="Self.FK_RolPermisos_Roles">
+            <End Role="Roles" EntitySet="Roles" />
+            <End Role="RolPermisos" EntitySet="RolPermisos" />
+          </AssociationSet>
+          <AssociationSet Name="FK_RolPermisos_Usuarios" Association="Self.FK_RolPermisos_Usuarios">
+            <End Role="Usuarios" EntitySet="Usuarios" />
+            <End Role="RolPermisos" EntitySet="RolPermisos" />
+          </AssociationSet>
         </EntityContainer>
-      </Schema>
-    </edmx:StorageModels>
+      </Schema></edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="RefugioMascotasDBModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
@@ -1662,6 +1806,7 @@ advertencia 6002: La tabla o vista 'RefugioMascotasDB.dbo.vw_ResumenAdopciones' 
           <NavigationProperty Name="ReportesRescate" Relationship="Self.FK__ReportesR__Masco__367C1819" FromRole="Mascotas" ToRole="ReportesRescate" />
           <NavigationProperty Name="SolicitudAdopcion" Relationship="Self.FK__Solicitud__Masco__5AEE82B9" FromRole="Mascotas" ToRole="SolicitudAdopcion" />
           <NavigationProperty Name="Tratamientos" Relationship="Self.FK__Tratamien__Masco__5441852A" FromRole="Mascotas" ToRole="Tratamientos" />
+          <NavigationProperty Name="HistorialEstadosMascota" Relationship="RefugioMascotasDBModel.FK__Historial__Masco__1C873BEC" FromRole="Mascotas" ToRole="HistorialEstadosMascota" />
         </EntityType>
         <EntityType Name="MascotasPerdidas">
           <Key>
@@ -1832,6 +1977,7 @@ advertencia 6002: La tabla o vista 'RefugioMascotasDB.dbo.vw_ResumenAdopciones' 
           <Property Name="FechaCreacion" Type="DateTime" Precision="3" />
           <Property Name="Activo" Type="Boolean" />
           <NavigationProperty Name="UsuariosRoles" Relationship="Self.FK__UsuariosR__RolId__35BCFE0A" FromRole="Roles" ToRole="UsuariosRoles" />
+          <NavigationProperty Name="RolPermisos" Relationship="RefugioMascotasDBModel.FK_RolPermisos_Roles" FromRole="Roles" ToRole="RolPermisos" />
         </EntityType>
         <EntityType Name="SeguimientoAdopcion">
           <Key>
@@ -1847,7 +1993,7 @@ advertencia 6002: La tabla o vista 'RefugioMascotasDB.dbo.vw_ResumenAdopciones' 
           <Property Name="RelacionConAdoptante" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
           <Property Name="Observaciones" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
           <Property Name="Recomendaciones" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="RequiereIntervencion" Type="Boolean" />
+          <Property Name="RequiereIntervencion" Type="Boolean" Nullable="false" />
           <Property Name="ProximoSeguimiento" Type="DateTime" Precision="3" />
           <Property Name="FotosEvidencia" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
           <NavigationProperty Name="ContratoAdopcion" Relationship="Self.FK__Seguimien__Contr__75A278F5" FromRole="SeguimientoAdopcion" ToRole="ContratoAdopcion" />
@@ -1875,6 +2021,7 @@ advertencia 6002: La tabla o vista 'RefugioMascotasDB.dbo.vw_ResumenAdopciones' 
           <NavigationProperty Name="Mascotas" Relationship="Self.FK__Solicitud__Masco__5AEE82B9" FromRole="SolicitudAdopcion" ToRole="Mascotas" />
           <NavigationProperty Name="Usuarios" Relationship="Self.FK__Solicitud__Evalu__5CD6CB2B" FromRole="SolicitudAdopcion" ToRole="Usuarios" />
           <NavigationProperty Name="Usuarios1" Relationship="Self.FK__Solicitud__Usuar__5BE2A6F2" FromRole="SolicitudAdopcion" ToRole="Usuarios" />
+          <Property Name="EstadoAdopcion" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
         </EntityType>
         <EntityType Name="Tratamientos">
           <Key>
@@ -1939,6 +2086,14 @@ advertencia 6002: La tabla o vista 'RefugioMascotasDB.dbo.vw_ResumenAdopciones' 
           <NavigationProperty Name="Tratamientos" Relationship="Self.FK__Tratamien__Veter__5535A963" FromRole="Usuarios" ToRole="Tratamientos" />
           <NavigationProperty Name="UsuariosRoles" Relationship="Self.FK__UsuariosR__Asign__36B12243" FromRole="Usuarios" ToRole="UsuariosRoles" />
           <NavigationProperty Name="UsuariosRoles1" Relationship="Self.FK__UsuariosR__Usuar__34C8D9D1" FromRole="Usuarios" ToRole="UsuariosRoles" />
+          <Property Name="FechaUltimoCambioPassword" Type="DateTime" Precision="3" />
+          <NavigationProperty Name="RolPermisos" Relationship="RefugioMascotasDBModel.FK_RolPermisos_Usuarios" FromRole="Usuarios" ToRole="RolPermisos" />
+          <NavigationProperty Name="HistorialEstadosMascota" Relationship="RefugioMascotasDBModel.FK__Historial__Usuar__1D7B6025" FromRole="Usuarios" ToRole="HistorialEstadosMascota" />
+          <Property Name="IntentosFallidos" Type="Int32" />
+          <Property Name="FechaBloqueoTemporal" Type="DateTime" Precision="3" />
+          <Property Name="FechaDesbloqueo" Type="DateTime" Precision="3" />
+          <Property Name="BloqueadoPermanentemente" Type="Boolean" />
+          <Property Name="FechaUltimoIntentoFallido" Type="DateTime" Precision="3" />
         </EntityType>
         <EntityType Name="UsuariosRoles">
           <Key>
@@ -2759,7 +2914,149 @@ advertencia 6002: La tabla o vista 'RefugioMascotasDB.dbo.vw_ResumenAdopciones' 
             <End Role="Usuarios" EntitySet="Usuarios" />
             <End Role="UsuariosRoles" EntitySet="UsuariosRoles" />
           </AssociationSet>
+          <EntitySet Name="CampaniaAdopcion" EntityType="RefugioMascotasDBModel.CampaniaAdopcion" />
+          <EntitySet Name="RefugioAdopcion" EntityType="RefugioMascotasDBModel.RefugioAdopcion" />
+          <EntitySet Name="RolPermisos" EntityType="RefugioMascotasDBModel.RolPermisos" />
+          <AssociationSet Name="FK_RolPermisos_Roles" Association="RefugioMascotasDBModel.FK_RolPermisos_Roles">
+            <End Role="Roles" EntitySet="Roles" />
+            <End Role="RolPermisos" EntitySet="RolPermisos" />
+          </AssociationSet>
+          <AssociationSet Name="FK_RolPermisos_Usuarios" Association="RefugioMascotasDBModel.FK_RolPermisos_Usuarios">
+            <End Role="Usuarios" EntitySet="Usuarios" />
+            <End Role="RolPermisos" EntitySet="RolPermisos" />
+          </AssociationSet>
+          <EntitySet Name="HistorialEstadosMascota" EntityType="RefugioMascotasDBModel.HistorialEstadosMascota" />
+          <AssociationSet Name="FK__Historial__Masco__1C873BEC" Association="RefugioMascotasDBModel.FK__Historial__Masco__1C873BEC">
+            <End Role="Mascotas" EntitySet="Mascotas" />
+            <End Role="HistorialEstadosMascota" EntitySet="HistorialEstadosMascota" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Historial__Usuar__1D7B6025" Association="RefugioMascotasDBModel.FK__Historial__Usuar__1D7B6025">
+            <End Role="Usuarios" EntitySet="Usuarios" />
+            <End Role="HistorialEstadosMascota" EntitySet="HistorialEstadosMascota" />
+          </AssociationSet>
+          <FunctionImport Name="sp_ArchivarMascota">
+            <Parameter Name="MascotaId" Mode="In" Type="Int32" />
+            <Parameter Name="UsuarioId" Mode="In" Type="Int32" />
+            <Parameter Name="Motivo" Mode="In" Type="String" />
+            <Parameter Name="Resultado" Mode="InOut" Type="String" />
+          </FunctionImport>
+          <FunctionImport Name="sp_RestaurarMascota">
+            <Parameter Name="MascotaId" Mode="In" Type="Int32" />
+            <Parameter Name="UsuarioId" Mode="In" Type="Int32" />
+            <Parameter Name="NuevoEstado" Mode="In" Type="String" />
+            <Parameter Name="Motivo" Mode="In" Type="String" />
+            <Parameter Name="Resultado" Mode="InOut" Type="String" />
+          </FunctionImport>
         </EntityContainer>
+        <EntityType Name="CampaniaAdopcion">
+          <Key>
+            <PropertyRef Name="IdCampania" />
+          </Key>
+          <Property Name="IdCampania" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="NombreCampania" Type="String" Nullable="false" MaxLength="150" FixedLength="false" Unicode="true" />
+          <Property Name="Lugar" Type="String" Nullable="false" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Name="Fecha" Type="DateTime" Nullable="false" Precision="0" />
+          <Property Name="Hora" Type="Time" Nullable="false" Precision="7" />
+          <Property Name="Actividades" Type="String" Nullable="false" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="Foto" Type="Binary" MaxLength="Max" FixedLength="false" />
+          <Property Name="Estado" Type="Boolean" Nullable="false" />
+          <Property Name="FechaCreacion" Type="DateTime" Nullable="false" Precision="3" />
+        </EntityType>
+        <EntityType Name="RefugioAdopcion">
+          <Key>
+            <PropertyRef Name="IdRefugio" />
+          </Key>
+          <Property Name="IdRefugio" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="NombreRefugio" Type="String" Nullable="false" MaxLength="150" FixedLength="false" Unicode="true" />
+          <Property Name="Contacto" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="Direccion" Type="String" Nullable="false" MaxLength="250" FixedLength="false" Unicode="true" />
+          <Property Name="PersonaEncargada" Type="String" Nullable="false" MaxLength="150" FixedLength="false" Unicode="true" />
+          <Property Name="Estado" Type="Boolean" Nullable="false" />
+          <Property Name="FechaRegistro" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="Capacidad" Type="Int32" />
+          <Property Name="MascotasActuales" Type="Int32" />
+          <Property Name="Telefono" Type="String" MaxLength="20" FixedLength="false" Unicode="true" />
+          <Property Name="Email" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+        </EntityType>
+        <EntityType Name="RolPermisos">
+          <Key>
+            <PropertyRef Name="RolPermisoId" />
+          </Key>
+          <Property Name="RolPermisoId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="RolId" Type="Int32" Nullable="false" />
+          <Property Name="Permiso" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="FechaAsignacion" Type="DateTime" Precision="3" />
+          <Property Name="AsignadoPor" Type="Int32" />
+          <NavigationProperty Name="Roles" Relationship="RefugioMascotasDBModel.FK_RolPermisos_Roles" FromRole="RolPermisos" ToRole="Roles" />
+          <NavigationProperty Name="Usuarios" Relationship="RefugioMascotasDBModel.FK_RolPermisos_Usuarios" FromRole="RolPermisos" ToRole="Usuarios" />
+        </EntityType>
+        <Association Name="FK_RolPermisos_Roles">
+          <End Type="RefugioMascotasDBModel.Roles" Role="Roles" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Type="RefugioMascotasDBModel.RolPermisos" Role="RolPermisos" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Roles">
+              <PropertyRef Name="RolId" />
+            </Principal>
+            <Dependent Role="RolPermisos">
+              <PropertyRef Name="RolId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_RolPermisos_Usuarios">
+          <End Type="RefugioMascotasDBModel.Usuarios" Role="Usuarios" Multiplicity="0..1" />
+          <End Type="RefugioMascotasDBModel.RolPermisos" Role="RolPermisos" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Usuarios">
+              <PropertyRef Name="UsuarioId" />
+            </Principal>
+            <Dependent Role="RolPermisos">
+              <PropertyRef Name="AsignadoPor" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="HistorialEstadosMascota">
+          <Key>
+            <PropertyRef Name="HistorialId" />
+          </Key>
+          <Property Name="HistorialId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="MascotaId" Type="Int32" Nullable="false" />
+          <Property Name="EstadoAnterior" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="EstadoNuevo" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="Motivo" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="FechaCambio" Type="DateTime" Precision="3" />
+          <Property Name="UsuarioId" Type="Int32" Nullable="false" />
+          <Property Name="Observaciones" Type="String" MaxLength="1000" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="Mascotas" Relationship="RefugioMascotasDBModel.FK__Historial__Masco__1C873BEC" FromRole="HistorialEstadosMascota" ToRole="Mascotas" />
+          <NavigationProperty Name="Usuarios" Relationship="RefugioMascotasDBModel.FK__Historial__Usuar__1D7B6025" FromRole="HistorialEstadosMascota" ToRole="Usuarios" />
+        </EntityType>
+        <Association Name="FK__Historial__Masco__1C873BEC">
+          <End Type="RefugioMascotasDBModel.Mascotas" Role="Mascotas" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Type="RefugioMascotasDBModel.HistorialEstadosMascota" Role="HistorialEstadosMascota" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Mascotas">
+              <PropertyRef Name="MascotaId" />
+            </Principal>
+            <Dependent Role="HistorialEstadosMascota">
+              <PropertyRef Name="MascotaId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__Historial__Usuar__1D7B6025">
+          <End Type="RefugioMascotasDBModel.Usuarios" Role="Usuarios" Multiplicity="1" />
+          <End Type="RefugioMascotasDBModel.HistorialEstadosMascota" Role="HistorialEstadosMascota" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Usuarios">
+              <PropertyRef Name="UsuarioId" />
+            </Principal>
+            <Dependent Role="HistorialEstadosMascota">
+              <PropertyRef Name="UsuarioId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -3234,6 +3531,7 @@ advertencia 6002: La tabla o vista 'RefugioMascotasDB.dbo.vw_ResumenAdopciones' 
           <EntitySetMapping Name="SolicitudAdopcion">
             <EntityTypeMapping TypeName="RefugioMascotasDBModel.SolicitudAdopcion">
               <MappingFragment StoreEntitySet="SolicitudAdopcion">
+                <ScalarProperty Name="EstadoAdopcion" ColumnName="EstadoAdopcion" />
                 <ScalarProperty Name="SolicitudId" ColumnName="SolicitudId" />
                 <ScalarProperty Name="MascotaId" ColumnName="MascotaId" />
                 <ScalarProperty Name="UsuarioId" ColumnName="UsuarioId" />
@@ -3269,6 +3567,12 @@ advertencia 6002: La tabla o vista 'RefugioMascotasDB.dbo.vw_ResumenAdopciones' 
           <EntitySetMapping Name="Usuarios">
             <EntityTypeMapping TypeName="RefugioMascotasDBModel.Usuarios">
               <MappingFragment StoreEntitySet="Usuarios">
+                <ScalarProperty Name="FechaUltimoIntentoFallido" ColumnName="FechaUltimoIntentoFallido" />
+                <ScalarProperty Name="BloqueadoPermanentemente" ColumnName="BloqueadoPermanentemente" />
+                <ScalarProperty Name="FechaDesbloqueo" ColumnName="FechaDesbloqueo" />
+                <ScalarProperty Name="FechaBloqueoTemporal" ColumnName="FechaBloqueoTemporal" />
+                <ScalarProperty Name="IntentosFallidos" ColumnName="IntentosFallidos" />
+                <ScalarProperty Name="FechaUltimoCambioPassword" ColumnName="FechaUltimoCambioPassword" />
                 <ScalarProperty Name="UsuarioId" ColumnName="UsuarioId" />
                 <ScalarProperty Name="NombreCompleto" ColumnName="NombreCompleto" />
                 <ScalarProperty Name="Email" ColumnName="Email" />
@@ -3359,6 +3663,65 @@ advertencia 6002: La tabla o vista 'RefugioMascotasDB.dbo.vw_ResumenAdopciones' 
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
+          <EntitySetMapping Name="CampaniaAdopcion">
+            <EntityTypeMapping TypeName="RefugioMascotasDBModel.CampaniaAdopcion">
+              <MappingFragment StoreEntitySet="CampaniaAdopcion">
+                <ScalarProperty Name="FechaCreacion" ColumnName="FechaCreacion" />
+                <ScalarProperty Name="Estado" ColumnName="Estado" />
+                <ScalarProperty Name="Foto" ColumnName="Foto" />
+                <ScalarProperty Name="Actividades" ColumnName="Actividades" />
+                <ScalarProperty Name="Hora" ColumnName="Hora" />
+                <ScalarProperty Name="Fecha" ColumnName="Fecha" />
+                <ScalarProperty Name="Lugar" ColumnName="Lugar" />
+                <ScalarProperty Name="NombreCampania" ColumnName="NombreCampania" />
+                <ScalarProperty Name="IdCampania" ColumnName="IdCampania" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="RefugioAdopcion">
+            <EntityTypeMapping TypeName="RefugioMascotasDBModel.RefugioAdopcion">
+              <MappingFragment StoreEntitySet="RefugioAdopcion">
+                <ScalarProperty Name="Email" ColumnName="Email" />
+                <ScalarProperty Name="Telefono" ColumnName="Telefono" />
+                <ScalarProperty Name="MascotasActuales" ColumnName="MascotasActuales" />
+                <ScalarProperty Name="Capacidad" ColumnName="Capacidad" />
+                <ScalarProperty Name="FechaRegistro" ColumnName="FechaRegistro" />
+                <ScalarProperty Name="Estado" ColumnName="Estado" />
+                <ScalarProperty Name="PersonaEncargada" ColumnName="PersonaEncargada" />
+                <ScalarProperty Name="Direccion" ColumnName="Direccion" />
+                <ScalarProperty Name="Contacto" ColumnName="Contacto" />
+                <ScalarProperty Name="NombreRefugio" ColumnName="NombreRefugio" />
+                <ScalarProperty Name="IdRefugio" ColumnName="IdRefugio" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="RolPermisos">
+            <EntityTypeMapping TypeName="RefugioMascotasDBModel.RolPermisos">
+              <MappingFragment StoreEntitySet="RolPermisos">
+                <ScalarProperty Name="AsignadoPor" ColumnName="AsignadoPor" />
+                <ScalarProperty Name="FechaAsignacion" ColumnName="FechaAsignacion" />
+                <ScalarProperty Name="Permiso" ColumnName="Permiso" />
+                <ScalarProperty Name="RolId" ColumnName="RolId" />
+                <ScalarProperty Name="RolPermisoId" ColumnName="RolPermisoId" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="HistorialEstadosMascota">
+            <EntityTypeMapping TypeName="RefugioMascotasDBModel.HistorialEstadosMascota">
+              <MappingFragment StoreEntitySet="HistorialEstadosMascota">
+                <ScalarProperty Name="Observaciones" ColumnName="Observaciones" />
+                <ScalarProperty Name="UsuarioId" ColumnName="UsuarioId" />
+                <ScalarProperty Name="FechaCambio" ColumnName="FechaCambio" />
+                <ScalarProperty Name="Motivo" ColumnName="Motivo" />
+                <ScalarProperty Name="EstadoNuevo" ColumnName="EstadoNuevo" />
+                <ScalarProperty Name="EstadoAnterior" ColumnName="EstadoAnterior" />
+                <ScalarProperty Name="MascotaId" ColumnName="MascotaId" />
+                <ScalarProperty Name="HistorialId" ColumnName="HistorialId" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <FunctionImportMapping FunctionImportName="sp_ArchivarMascota" FunctionName="RefugioMascotasDBModel.Store.sp_ArchivarMascota" />
+          <FunctionImportMapping FunctionImportName="sp_RestaurarMascota" FunctionName="RefugioMascotasDBModel.Store.sp_RestaurarMascota" />
         </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>

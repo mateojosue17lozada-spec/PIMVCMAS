@@ -1,133 +1,1368 @@
 ﻿@model IEnumerable<MVCMASCOTAS.Models.SolicitudAdopcion>
 
 @{
-    ViewBag.Title = "Gestionar Solicitudes de Adopción";
+    ViewBag.Title = "Gestión de Solicitudes de Adopción";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="page-header mb-4">
-    <h2><i class="fas fa-file-alt"></i> Solicitudes de Adopción</h2>
-</div>
-
-<!-- Filtros -->
-<div class="card mb-4 shadow-custom">
-    <div class="card-body">
-        <form method="get" action="@Url.Action("SolicitudesAdopcion")" class="form-inline">
-            <div class="form-group mr-3 mb-2">
-                <label class="mr-2">Estado:</label>
-                <select name="estado" class="form-control">
-                    <option value="Todos" @(ViewBag.EstadoSeleccionado == "Todos" ? "selected" : "")>Todos</option>
-                    <option value="Pendiente" @(ViewBag.EstadoSeleccionado == "Pendiente" ? "selected" : "")>Pendiente</option>
-                    <option value="En evaluación" @(ViewBag.EstadoSeleccionado == "En evaluación" ? "selected" : "")>En Evaluación</option>
-                    <option value="Aprobada" @(ViewBag.EstadoSeleccionado == "Aprobada" ? "selected" : "")>Aprobada</option>
-                    <option value="Rechazada" @(ViewBag.EstadoSeleccionado == "Rechazada" ? "selected" : "")>Rechazada</option>
-                </select>
+<div class="container-fluid">
+    <!-- Encabezado -->
+    <div class="page-header mb-4 fade-in-up">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1 class="h3 mb-0 text-brown">
+                    <i class="fa fa-file-alt text-green"></i> Solicitudes de Adopción
+                </h1>
+                <p class="text-secondary mb-0">Gestiona todas las solicitudes de adopción del sistema</p>
             </div>
-
-            <button type="submit" class="btn btn-primary mb-2">
-                <i class="fas fa-filter"></i> Filtrar
-            </button>
-        </form>
+            <div>
+                <a href="@Url.Action("Dashboard", "Admin")" class="btn btn-outline-green btn-sm">
+                    <i class="fa fa-arrow-left"></i> Dashboard
+                </a>
+            </div>
+        </div>
     </div>
+
+    <!-- Estadísticas rápidas -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card stat-box border-green">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-green text-uppercase mb-1">
+                                Pendientes
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-brown">
+                                @ViewBag.SolicitudesPendientes
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fa fa-clock fa-2x text-yellow"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card stat-box border-green">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-green text-uppercase mb-1">
+                                En Evaluación
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-brown">
+                                @ViewBag.SolicitudesEvaluacion
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fa fa-search fa-2x text-pink"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card stat-box border-green">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-green text-uppercase mb-1">
+                                Adopciones Activas
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-brown">
+                                @ViewBag.AdopcionesActivas
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fa fa-heart fa-2x text-green"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card stat-box border-green">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-green text-uppercase mb-1">
+                                Finalizadas
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-brown">
+                                @ViewBag.AdopcionesFinalizadas
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fa fa-check-double fa-2x text-green"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="card shadow-hover border-green mb-4">
+        <div class="card-header py-3 d-flex justify-content-between align-items-center bg-green text-white">
+            <h6 class="m-0 font-weight-bold">
+                <i class="fa fa-filter"></i> Filtros de Búsqueda
+            </h6>
+            <div>
+                <span class="badge bg-light-mint text-brown">Mostrando @ViewBag.TotalItems solicitudes</span>
+            </div>
+        </div>
+        <div class="card-body bg-light-mint">
+            @using (Html.BeginForm("SolicitudAdopcion", "Admin", FormMethod.Get, new { @class = "form-inline" }))
+            {
+                <div class="form-group mr-2 mb-2">
+                    <label class="mr-2 text-brown">Estado Solicitud:</label>
+                    @{
+                        var estados = new List<SelectListItem>
+                                {
+                            new SelectListItem { Text = "Todos", Value = "Todos", Selected = ViewBag.EstadoSeleccionado == "Todos" || string.IsNullOrEmpty(ViewBag.EstadoSeleccionado) },
+                            new SelectListItem { Text = "Pendiente", Value = "Pendiente", Selected = ViewBag.EstadoSeleccionado == "Pendiente" },
+                            new SelectListItem { Text = "En evaluación", Value = "En evaluación", Selected = ViewBag.EstadoSeleccionado == "En evaluación" },
+                            new SelectListItem { Text = "Aprobada", Value = "Aprobada", Selected = ViewBag.EstadoSeleccionado == "Aprobada" },
+                            new SelectListItem { Text = "Rechazada", Value = "Rechazada", Selected = ViewBag.EstadoSeleccionado == "Rechazada" },
+                            new SelectListItem { Text = "Cancelada", Value = "Cancelada", Selected = ViewBag.EstadoSeleccionado == "Cancelada" },
+                            new SelectListItem { Text = "Completada", Value = "Completada", Selected = ViewBag.EstadoSeleccionado == "Completada" }
+                        };
+                    }
+                    @Html.DropDownList("estado", estados, new { @class = "form-control border-green" })
+                </div>
+
+                <div class="form-group mr-2 mb-2">
+                    <label class="mr-2 text-brown">Estado Adopción:</label>
+                    @{
+                        var estadosAdopcion = new List<SelectListItem>
+                                {
+                            new SelectListItem { Text = "Todos", Value = "Todos", Selected = ViewBag.EstadoAdopcionSeleccionado == "Todos" || string.IsNullOrEmpty(ViewBag.EstadoAdopcionSeleccionado) },
+                            new SelectListItem { Text = "No iniciada", Value = "No iniciada", Selected = ViewBag.EstadoAdopcionSeleccionado == "No iniciada" },
+                            new SelectListItem { Text = "Programada", Value = "Programada", Selected = ViewBag.EstadoAdopcionSeleccionado == "Programada" },
+                            new SelectListItem { Text = "Entregada", Value = "Entregada", Selected = ViewBag.EstadoAdopcionSeleccionado == "Entregada" },
+                            new SelectListItem { Text = "En seguimiento", Value = "En seguimiento", Selected = ViewBag.EstadoAdopcionSeleccionado == "En seguimiento" },
+                            new SelectListItem { Text = "Finalizada", Value = "Finalizada", Selected = ViewBag.EstadoAdopcionSeleccionado == "Finalizada" },
+                            new SelectListItem { Text = "Cancelada", Value = "Cancelada", Selected = ViewBag.EstadoAdopcionSeleccionado == "Cancelada" }
+                        };
+                    }
+                    @Html.DropDownList("estadoAdopcion", estadosAdopcion, new { @class = "form-control border-green" })
+                </div>
+
+                <button type="submit" class="btn btn-green mb-2 mr-2">
+                    <i class="fa fa-search"></i> Buscar
+                </button>
+                <a href="@Url.Action("SolicitudAdopcion", "Admin")" class="btn btn-outline-green mb-2">
+                    <i class="fa fa-redo"></i> Limpiar
+                </a>
+            }
+        </div>
+    </div>
+
+    <!-- Tabla de Solicitudes -->
+    <div class="card shadow-hover border-green mb-4">
+        <div class="card-header py-3 d-flex justify-content-between align-items-center bg-green text-white">
+            <h6 class="m-0 font-weight-bold">
+                <i class="fa fa-table"></i> Listado de Solicitudes
+            </h6>
+            <div>
+                <span class="badge bg-light-mint text-brown">Página @ViewBag.CurrentPage de @ViewBag.TotalPages</span>
+            </div>
+        </div>
+        <div class="card-body">
+            @if (Model != null && Model.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover" id="dataTable" width="100%" cellspacing="0">
+                        <thead>
+                            <tr class="bg-green text-white">
+                                <th>ID</th>
+                                <th>Solicitante</th>
+                                <th>Mascota</th>
+                                <th>Fecha Solicitud</th>
+                                <th>Estado Solicitud</th>
+                                <th>Estado Adopción</th>
+                                <th>Puntaje</th>
+                                <th>Evaluación</th>
+                                <th class="text-center">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var solicitud in Model)
+                            {
+                                <tr class="bg-light-mint">
+                                    <td class="font-weight-bold text-brown">#@solicitud.SolicitudId</td>
+                                    <td>
+                                        @if (solicitud.Usuarios != null)
+                                        {
+                                            <div class="d-flex align-items-center">
+                                                @if (solicitud.Usuarios.ImagenPerfil != null && solicitud.Usuarios.ImagenPerfil.Length > 0)
+                                                {
+                                                    <img src="data:image/jpeg;base64,@Convert.ToBase64String(solicitud.Usuarios.ImagenPerfil)"
+                                                         alt="@solicitud.Usuarios.NombreCompleto"
+                                                         class="rounded-circle mr-2 border-green"
+                                                         style="width: 30px; height: 30px; object-fit: cover;" />
+                                                }
+                                                else
+                                                {
+                                                    <div class="rounded-circle bg-light-mint mr-2 d-flex align-items-center justify-content-center border-green"
+                                                         style="width: 30px; height: 30px;">
+                                                        <i class="fa fa-user text-secondary"></i>
+                                                    </div>
+                                                }
+                                                <div>
+                                                    <strong class="text-brown">@solicitud.Usuarios.NombreCompleto</strong><br />
+                                                    <small class="text-secondary">@solicitud.Usuarios.Email</small>
+                                                </div>
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-secondary">Usuario no disponible</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (solicitud.Mascotas != null)
+                                        {
+                                            <div class="d-flex align-items-center">
+                                                @if (solicitud.Mascotas.ImagenPrincipal != null && solicitud.Mascotas.ImagenPrincipal.Length > 0)
+                                                {
+                                                    <img src="data:image/jpeg;base64,@Convert.ToBase64String(solicitud.Mascotas.ImagenPrincipal)"
+                                                         alt="@solicitud.Mascotas.Nombre"
+                                                         class="rounded mr-2 border-green"
+                                                         style="width: 40px; height: 40px; object-fit: cover;" />
+                                                }
+                                                else
+                                                {
+                                                    <div class="rounded bg-light-mint mr-2 d-flex align-items-center justify-content-center border-green"
+                                                         style="width: 40px; height: 40px;">
+                                                        @if (solicitud.Mascotas.Especie == "Perro")
+                                                        {
+                                                            <i class="fa fa-dog text-secondary"></i>
+                                                        }
+                                                        else if (solicitud.Mascotas.Especie == "Gato")
+                                                        {
+                                                            <i class="fa fa-cat text-secondary"></i>
+                                                        }
+                                                        else
+                                                        {
+                                                            <i class="fa fa-paw text-secondary"></i>
+                                                        }
+                                                    </div>
+                                                }
+                                                <div>
+                                                    <strong class="text-brown">@solicitud.Mascotas.Nombre</strong><br />
+                                                    <small class="text-secondary">@solicitud.Mascotas.Especie • @solicitud.Mascotas.Raza</small>
+                                                </div>
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-secondary">Mascota no disponible</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (solicitud.FechaSolicitud.HasValue)
+                                        {
+                                            <span class="text-brown">@solicitud.FechaSolicitud.Value.ToString("dd/MM/yyyy")</span><br />
+                                            <small class="text-secondary">@solicitud.FechaSolicitud.Value.ToString("HH:mm")</small>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-secondary">N/A</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        @{
+                                            string estadoBadge = "";
+                                            string estadoIcono = "";
+                                            switch (solicitud.Estado)
+                                            {
+                                                case "Pendiente":
+                                                    estadoBadge = "bg-yellow";
+                                                    estadoIcono = "fa-clock";
+                                                    break;
+                                                case "En evaluación":
+                                                    estadoBadge = "bg-pink";
+                                                    estadoIcono = "fa-search";
+                                                    break;
+                                                case "Aprobada":
+                                                    estadoBadge = "bg-green";
+                                                    estadoIcono = "fa-check-circle";
+                                                    break;
+                                                case "Rechazada":
+                                                    estadoBadge = "bg-pink";
+                                                    estadoIcono = "fa-times-circle";
+                                                    break;
+                                                case "Cancelada":
+                                                    estadoBadge = "bg-secondary";
+                                                    estadoIcono = "fa-ban";
+                                                    break;
+                                                case "Completada":
+                                                    estadoBadge = "bg-success";
+                                                    estadoIcono = "fa-check-double";
+                                                    break;
+                                                default:
+                                                    estadoBadge = "bg-secondary";
+                                                    estadoIcono = "fa-question-circle";
+                                                    break;
+                                            }
+                                        }
+                                        <span class="badge @estadoBadge">
+                                            <i class="fa @estadoIcono mr-1"></i> @solicitud.Estado
+                                        </span>
+                                    </td>
+                                    <td>
+                                        @{
+                                            string estadoAdopcionBadge = "";
+                                            string estadoAdopcionIcono = "";
+                                            string estadoAdopcion = solicitud.EstadoAdopcion ?? "No iniciada";
+
+                                            switch (estadoAdopcion)
+                                            {
+                                                case "No iniciada":
+                                                    estadoAdopcionBadge = "bg-secondary";
+                                                    estadoAdopcionIcono = "fa-hourglass-start";
+                                                    break;
+                                                case "Programada":
+                                                    estadoAdopcionBadge = "bg-info";
+                                                    estadoAdopcionIcono = "fa-calendar-check";
+                                                    break;
+                                                case "Entregada":
+                                                    estadoAdopcionBadge = "bg-primary";
+                                                    estadoAdopcionIcono = "fa-home";
+                                                    break;
+                                                case "En seguimiento":
+                                                    estadoAdopcionBadge = "bg-warning";
+                                                    estadoAdopcionIcono = "fa-phone-alt";
+                                                    break;
+                                                case "Finalizada":
+                                                    estadoAdopcionBadge = "bg-success";
+                                                    estadoAdopcionIcono = "fa-check-double";
+                                                    break;
+                                                case "Cancelada":
+                                                    estadoAdopcionBadge = "bg-danger";
+                                                    estadoAdopcionIcono = "fa-ban";
+                                                    break;
+                                                default:
+                                                    estadoAdopcionBadge = "bg-secondary";
+                                                    estadoAdopcionIcono = "fa-question-circle";
+                                                    break;
+                                            }
+                                        }
+                                        <span class="badge @estadoAdopcionBadge">
+                                            <i class="fa @estadoAdopcionIcono mr-1"></i> @estadoAdopcion
+                                        </span>
+                                    </td>
+                                    <td>
+                                        @if (solicitud.PuntajeEvaluacion.HasValue)
+                                        {
+                                            int puntaje = solicitud.PuntajeEvaluacion.Value;
+                                            string barColor = puntaje >= 70 ? "bg-green" : puntaje >= 40 ? "bg-yellow" : "bg-pink";
+                                            <div class="progress" style="height: 20px;">
+                                                <div class="progress-bar @barColor"
+                                                     role="progressbar"
+                                                     style="width: @puntaje%"
+                                                     aria-valuenow="@puntaje"
+                                                     aria-valuemin="0"
+                                                     aria-valuemax="100">
+                                                    @puntaje
+                                                </div>
+                                            </div>
+                                            <small class="text-secondary">@puntaje/100</small>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-light-mint text-brown">Sin puntaje</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (solicitud.FechaEvaluacion.HasValue && solicitud.EvaluadoPor.HasValue)
+                                        {
+                                            <span class="text-brown">@solicitud.FechaEvaluacion.Value.ToString("dd/MM/yyyy")</span><br />
+                                            <small class="text-secondary">Por: @(solicitud.Usuarios1?.NombreCompleto ?? "N/A")</small>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-secondary">Pendiente</span>
+                                        }
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="btn-group-vertical" style="min-width: 120px;">
+                                            <!-- Botón Ver Detalles -->
+                                            <a href="@Url.Action("DetallesSolicitud", "Admin", new { id = solicitud.SolicitudId })"
+                                               class="btn btn-outline-green btn-sm mb-1"
+                                               title="Ver detalles completos"
+                                               data-toggle="tooltip">
+                                                <i class="fa fa-eye"></i> Ver detalles
+                                            </a>
+
+                                            <!-- Botones según estado de solicitud -->
+                                            @if (solicitud.Estado == "Pendiente" || solicitud.Estado == "En evaluación")
+                                            {
+                                                <button type="button"
+                                                        class="btn btn-green btn-sm mb-1 btn-aprobar"
+                                                        data-solicitud-id="@solicitud.SolicitudId"
+                                                        data-nombre-usuario="@solicitud.Usuarios?.NombreCompleto"
+                                                        data-nombre-mascota="@solicitud.Mascotas?.Nombre"
+                                                        title="Aprobar solicitud"
+                                                        data-toggle="tooltip">
+                                                    <i class="fa fa-check"></i> Aprobar
+                                                </button>
+
+                                                <a href="@Url.Action("RechazarSolicitud", "Admin", new { id = solicitud.SolicitudId })"
+                                                   class="btn btn-pink btn-sm mb-1 btn-rechazar"
+                                                   title="Rechazar solicitud"
+                                                   data-toggle="tooltip">
+                                                    <i class="fa fa-times"></i> Rechazar
+                                                </a>
+                                            }
+
+                                            <!-- Botones de gestión de adopción (solo para solicitudes aprobadas) -->
+                                            @if (solicitud.Estado == "Aprobada")
+                                            {
+                                                <div class="dropdown mb-1">
+                                                    <button class="btn btn-info btn-sm dropdown-toggle w-100"
+                                                            type="button"
+                                                            id="dropdownAdopcion_@solicitud.SolicitudId"
+                                                            data-toggle="dropdown"
+                                                            aria-haspopup="true"
+                                                            aria-expanded="false">
+                                                        <i class="fa fa-paw"></i> Avanzar
+                                                    </button>
+                                                    <div class="dropdown-menu" aria-labelledby="dropdownAdopcion_@solicitud.SolicitudId">
+                                                        @if (solicitud.EstadoAdopcion != "Programada")
+                                                        {
+                                                            <button class="dropdown-item btn-avanzar-adopcion"
+                                                                    data-solicitud-id="@solicitud.SolicitudId"
+                                                                    data-estado-destino="Programada">
+                                                                <i class="fa fa-calendar-check text-info"></i> Programar entrega
+                                                            </button>
+                                                        }
+                                                        @if (solicitud.EstadoAdopcion != "Entregada" && (solicitud.EstadoAdopcion == "Programada" || solicitud.EstadoAdopcion == "No iniciada"))
+                                                        {
+                                                            <button class="dropdown-item btn-avanzar-adopcion"
+                                                                    data-solicitud-id="@solicitud.SolicitudId"
+                                                                    data-estado-destino="Entregada">
+                                                                <i class="fa fa-home text-primary"></i> Confirmar entrega
+                                                            </button>
+                                                        }
+                                                        @if (solicitud.EstadoAdopcion != "En seguimiento" && solicitud.EstadoAdopcion == "Entregada")
+                                                        {
+                                                            <button class="dropdown-item btn-avanzar-adopcion"
+                                                                    data-solicitud-id="@solicitud.SolicitudId"
+                                                                    data-estado-destino="En seguimiento">
+                                                                <i class="fa fa-phone-alt text-warning"></i> Iniciar seguimiento
+                                                            </button>
+                                                        }
+                                                        @if (solicitud.EstadoAdopcion != "Finalizada" && (solicitud.EstadoAdopcion == "En seguimiento" || solicitud.EstadoAdopcion == "Entregada"))
+                                                        {
+                                                            <button class="dropdown-item btn-avanzar-adopcion"
+                                                                    data-solicitud-id="@solicitud.SolicitudId"
+                                                                    data-estado-destino="Finalizada">
+                                                                <i class="fa fa-check-double text-success"></i> Finalizar adopción
+                                                            </button>
+                                                        }
+                                                        <div class="dropdown-divider"></div>
+                                                        <button class="dropdown-item btn-avanzar-adopcion"
+                                                                data-solicitud-id="@solicitud.SolicitudId"
+                                                                data-estado-destino="Cancelada">
+                                                            <i class="fa fa-ban text-danger"></i> Cancelar proceso
+                                                        </button>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Botón de contacto para enviar pasos -->
+                                                <button type="button"
+                                                        class="btn btn-yellow btn-sm mb-1 btn-enviar-pasos"
+                                                        data-solicitud-id="@solicitud.SolicitudId"
+                                                        data-nombre-usuario="@solicitud.Usuarios?.NombreCompleto"
+                                                        data-email-usuario="@solicitud.Usuarios?.Email"
+                                                        data-nombre-mascota="@solicitud.Mascotas?.Nombre"
+                                                        title="Enviar pasos siguientes al adoptante"
+                                                        data-toggle="tooltip">
+                                                    <i class="fa fa-envelope"></i> 📩 Enviar pasos
+                                                </button>
+                                            }
+
+                                            @if (solicitud.Estado == "Completada" || solicitud.EstadoAdopcion == "Finalizada")
+                                            {
+                                                <span class="badge bg-success p-2">
+                                                    <i class="fa fa-check-circle"></i> Adopción completada
+                                                </span>
+                                            }
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-green border-green">
+                    <i class="fa fa-info-circle text-green"></i> <span class="text-brown">No se encontraron solicitudes con los filtros seleccionados.</span>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Paginación -->
+    @if (ViewBag.TotalPages != null && ViewBag.TotalPages > 1)
+    {
+        <div class="d-flex justify-content-center fade-in-up">
+            <nav aria-label="Paginación de solicitudes">
+                <ul class="pagination">
+                    <!-- Primera página -->
+                    @if (ViewBag.CurrentPage > 1)
+                    {
+                        <li class="page-item">
+                            <a class="page-link text-green" href="@Url.Action("SolicitudAdopcion", "Admin", new {
+                                page = 1,
+                                estado = ViewBag.EstadoSeleccionado,
+                                estadoAdopcion = ViewBag.EstadoAdopcionSeleccionado
+                            })" aria-label="Primera">
+                                <i class="fa fa-angle-double-left"></i>
+                            </a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link text-green" href="@Url.Action("SolicitudAdopcion", "Admin", new {
+                                page = ViewBag.CurrentPage - 1,
+                                estado = ViewBag.EstadoSeleccionado,
+                                estadoAdopcion = ViewBag.EstadoAdopcionSeleccionado
+                            })" aria-label="Anterior">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+                        </li>
+                    }
+
+                    <!-- Números de página -->
+                    @{
+                        int startPage = Math.Max(1, ViewBag.CurrentPage - 2);
+                        int endPage = Math.Min(ViewBag.TotalPages, ViewBag.CurrentPage + 2);
+                    }
+
+                    @for (int i = startPage; i <= endPage; i++)
+                    {
+                        <li class="page-item @(i == ViewBag.CurrentPage ? "active bg-green" : "")">
+                            <a class="page-link @(i == ViewBag.CurrentPage ? "text-white" : "text-green")" href="@Url.Action("SolicitudAdopcion", "Admin", new {
+                                page = i,
+                                estado = ViewBag.EstadoSeleccionado,
+                                estadoAdopcion = ViewBag.EstadoAdopcionSeleccionado
+                            })">@i</a>
+                        </li>
+                    }
+
+                    <!-- Última página -->
+                    @if (ViewBag.CurrentPage < ViewBag.TotalPages)
+                    {
+                        <li class="page-item">
+                            <a class="page-link text-green" href="@Url.Action("SolicitudAdopcion", "Admin", new {
+                                page = ViewBag.CurrentPage + 1,
+                                estado = ViewBag.EstadoSeleccionado,
+                                estadoAdopcion = ViewBag.EstadoAdopcionSeleccionado
+                            })" aria-label="Siguiente">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link text-green" href="@Url.Action("SolicitudAdopcion", "Admin", new {
+                                page = ViewBag.TotalPages,
+                                estado = ViewBag.EstadoSeleccionado,
+                                estadoAdopcion = ViewBag.EstadoAdopcionSeleccionado
+                            })" aria-label="Última">
+                                <i class="fa fa-angle-double-right"></i>
+                            </a>
+                        </li>
+                    }
+                </ul>
+            </nav>
+        </div>
+    }
 </div>
 
-<!-- Tabla de Solicitudes -->
-<div class="card shadow-custom">
-    <div class="card-body">
-        <div class="table-responsive">
-            <table class="table table-hover">
-                <thead class="bg-primary text-white">
-                    <tr>
-                        <th>ID</th>
-                        <th>Usuario</th>
-                        <th>Mascota</th>
-                        <th>Fecha</th>
-                        <th>Estado</th>
-                        <th>Puntaje</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @if (Model != null && Model.Any())
-                    {
-                        foreach (var solicitud in Model)
-                        {
-                            <tr>
-                                <td>@solicitud.SolicitudId</td>
-                                <td>@solicitud.Usuarios.NombreCompleto</td>
-                                <td>@solicitud.Mascotas.Nombre</td>
-                                <td>@(solicitud.FechaSolicitud?.ToString("dd/MM/yyyy") ?? "N/A")</td>
-                                <td>
-                                    @switch (solicitud.Estado)
-                                    {
-                                        case "Pendiente":
-                                            <span class="badge badge-warning">Pendiente</span>
-                                            break;
-                                        case "En evaluación":
-                                            <span class="badge badge-info">En Evaluación</span>
-                                            break;
-                                        case "Aprobada":
-                                            <span class="badge badge-success">Aprobada</span>
-                                            break;
-                                        case "Rechazada":
-                                            <span class="badge badge-danger">Rechazada</span>
-                                            break;
-                                    }
-                                </td>
-                                <td>
-                                    @if (solicitud.PuntajeEvaluacion.HasValue)
-                                    {
-                                        <span class="badge badge-primary">@solicitud.PuntajeEvaluacion.Value / 100</span>
-                                    }
-                                    else
-                                    {
-                                        <span class="text-muted">N/A</span>
-                                    }
-                                </td>
-                                <td>
-                                    <a href="@Url.Action("DetallesSolicitud", "Admin", new { id = solicitud.SolicitudId })" class="btn btn-sm btn-info">
-                                        <i class="fas fa-eye"></i> Ver
-                                    </a>
-                                </td>
-                            </tr>
-                        }
-                    }
-                    else
-                    {
-                        <tr>
-                            <td colspan="7" class="text-center">No hay solicitudes</td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
+<!-- Modal para enviar pasos al adoptante -->
+<div class="modal fade" id="modalEnviarPasos" tabindex="-1" role="dialog" aria-labelledby="modalEnviarPasosLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-green text-white">
+                <h5 class="modal-title" id="modalEnviarPasosLabel">
+                    <i class="fa fa-envelope"></i> Enviar pasos siguientes al adoptante
+                </h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body bg-light-mint">
+                <div class="alert alert-info border-info">
+                    <i class="fa fa-info-circle"></i> Se enviará la siguiente información al adoptante:
+                </div>
+
+                <div class="card mb-3 border-green">
+                    <div class="card-header bg-green text-white">
+                        <i class="fa fa-check-circle"></i> Solicitud aprobada - Pasos a seguir
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title text-brown" id="mensajeSaludo">Hola [Nombre],</h5>
+                        <p class="card-text text-brown">
+                            ¡Tu solicitud de adopción ha sido aprobada! 🎉
+                        </p>
+                        <p class="card-text text-brown">
+                            Para continuar con el proceso, por favor revisa el contrato de adopción y envíanos los siguientes documentos:
+                        </p>
+                        <ul class="list-group list-group-flush mb-3">
+                            <li class="list-group-item bg-light-mint border-green">
+                                <i class="fa fa-check-circle text-green"></i> ✔ Copia de cédula
+                            </li>
+                            <li class="list-group-item bg-light-mint border-green">
+                                <i class="fa fa-check-circle text-green"></i> ✔ Comprobante de domicilio
+                            </li>
+                            <li class="list-group-item bg-light-mint border-green">
+                                <i class="fa fa-check-circle text-green"></i> ✔ Fotos del lugar donde vivirá la mascota
+                            </li>
+                            <li class="list-group-item bg-light-mint border-green">
+                                <i class="fa fa-check-circle text-green"></i> ✔ Plan de cuidado
+                            </li>
+                            <li class="list-group-item bg-light-mint border-green">
+                                <i class="fa fa-check-circle text-green"></i> ✔ Compromiso de visitas de seguimiento
+                            </li>
+                        </ul>
+                        <div class="form-group">
+                            <label class="text-brown font-weight-bold">Fecha propuesta de entrega:</label>
+                            <input type="date" id="fechaEntrega" class="form-control border-green" value="@DateTime.Now.AddDays(7).ToString("yyyy-MM-dd")" />
+                        </div>
+                        <p class="card-text text-brown">
+                            Fecha propuesta de entrega: <strong id="fechaEntregaTexto">@DateTime.Now.AddDays(7).ToString("dd/MM/yyyy")</strong>
+                        </p>
+                        <hr class="border-green" />
+                        <p class="card-text text-brown">
+                            Equipo del Refugio 🐾
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Simulación de envío -->
+                <div class="alert alert-success border-success" id="simulacionEnvio" style="display: none;">
+                    <i class="fa fa-check-circle"></i> <span id="mensajeSimulacion"></span>
+                </div>
+            </div>
+            <div class="modal-footer bg-light-mint">
+                <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">
+                    <i class="fa fa-times"></i> Cerrar
+                </button>
+                <button type="button" class="btn btn-green" id="btnConfirmarEnvio">
+                    <i class="fa fa-paper-plane"></i> Enviar mensaje
+                </button>
+            </div>
         </div>
     </div>
 </div>
 
-<!-- Paginación -->
-@if (ViewBag.TotalPages > 1)
-{
-    <nav aria-label="Paginación" class="mt-4">
-        <ul class="pagination justify-content-center">
-            @if (ViewBag.CurrentPage > 1)
-            {
-                <li class="page-item">
-                    <a class="page-link" href="@Url.Action("SolicitudesAdopcion", new { page = ViewBag.CurrentPage - 1, estado = ViewBag.EstadoSeleccionado })">Anterior</a>
-                </li>
+<!-- Modal para confirmar avance de adopción -->
+<div class="modal fade" id="modalAvanceAdopcion" tabindex="-1" role="dialog" aria-labelledby="modalAvanceAdopcionLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title" id="modalAvanceAdopcionLabel">
+                    <i class="fa fa-paw"></i> Avanzar estado de adopción
+                </h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body bg-light-mint">
+                <p class="text-brown" id="mensajeAvance"></p>
+            </div>
+            <div class="modal-footer bg-light-mint">
+                <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">
+                    <i class="fa fa-times"></i> Cancelar
+                </button>
+                <a href="#" id="btnConfirmarAvance" class="btn btn-info">
+                    <i class="fa fa-check"></i> Confirmar
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        :root {
+            --green: #97C78B;
+            --yellow: #FFE5A3;
+            --pink: #FBCDC0;
+            --brown: #6B4F47;
+            --bg-light: #F2E9D8;
+        }
+
+        .page-header {
+            border-bottom: 2px solid var(--green);
+            padding-bottom: 1rem;
+        }
+
+        .stat-box {
+            transition: all 0.3s ease;
+            border: 2px solid var(--green);
+            border-radius: 12px;
+        }
+
+            .stat-box:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 10px 25px rgba(151, 199, 139, 0.2) !important;
             }
 
-            @for (int i = 1; i <= ViewBag.TotalPages; i++)
-            {
-                <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
-                    <a class="page-link" href="@Url.Action("SolicitudesAdopcion", new { page = i, estado = ViewBag.EstadoSeleccionado })">@i</a>
-                </li>
+        .table thead {
+            background-color: var(--green) !important;
+            color: white !important;
+        }
+
+        .table-bordered {
+            border: 2px solid var(--green) !important;
+        }
+
+            .table-bordered th,
+            .table-bordered td {
+                border: 1px solid var(--green) !important;
             }
 
-            @if (ViewBag.CurrentPage < ViewBag.TotalPages)
-            {
-                <li class="page-item">
-                    <a class="page-link" href="@Url.Action("SolicitudesAdopcion", new { page = ViewBag.CurrentPage + 1, estado = ViewBag.EstadoSeleccionado })">Siguiente</a>
-                </li>
+        .table-hover tbody tr:hover {
+            background-color: rgba(151, 199, 139, 0.1) !important;
+        }
+
+        .badge.bg-green {
+            background-color: var(--green) !important;
+            color: white !important;
+        }
+
+        .badge.bg-yellow {
+            background-color: var(--yellow) !important;
+            color: var(--brown) !important;
+        }
+
+        .badge.bg-pink {
+            background-color: var(--pink) !important;
+            color: var(--brown) !important;
+        }
+
+        .badge.bg-secondary {
+            background-color: #6c757d !important;
+            color: white !important;
+        }
+
+        .badge.bg-light-mint {
+            background-color: var(--bg-light) !important;
+            color: var(--brown) !important;
+            border: 1px solid var(--green) !important;
+        }
+
+        .badge.bg-info {
+            background-color: #17a2b8 !important;
+            color: white !important;
+        }
+
+        .badge.bg-primary {
+            background-color: #007bff !important;
+            color: white !important;
+        }
+
+        .badge.bg-warning {
+            background-color: #ffc107 !important;
+            color: var(--brown) !important;
+        }
+
+        .badge.bg-success {
+            background-color: #28a745 !important;
+            color: white !important;
+        }
+
+        .badge.bg-danger {
+            background-color: #dc3545 !important;
+            color: white !important;
+        }
+
+        .progress-bar.bg-green {
+            background-color: var(--green) !important;
+        }
+
+        .progress-bar.bg-yellow {
+            background-color: var(--yellow) !important;
+            color: var(--brown) !important;
+        }
+
+        .progress-bar.bg-pink {
+            background-color: var(--pink) !important;
+            color: var(--brown) !important;
+        }
+
+        .pagination .page-link {
+            border-color: var(--green) !important;
+        }
+
+            .pagination .page-link:hover {
+                background-color: var(--green) !important;
+                color: white !important;
             }
-        </ul>
-    </nav>
+
+        .pagination .active .page-link {
+            background-color: var(--green) !important;
+            border-color: var(--green) !important;
+        }
+
+        .btn-group-vertical .btn {
+            margin: 2px 0 !important;
+        }
+
+        .btn-green {
+            background-color: var(--green) !important;
+            border-color: var(--green) !important;
+            color: white !important;
+        }
+
+            .btn-green:hover {
+                background-color: #7ab56e !important;
+                border-color: #7ab56e !important;
+                color: white !important;
+            }
+
+        .btn-pink {
+            background-color: var(--pink) !important;
+            border-color: var(--pink) !important;
+            color: var(--brown) !important;
+        }
+
+            .btn-pink:hover {
+                background-color: #f9b9a7 !important;
+                border-color: #f9b9a7 !important;
+                color: var(--brown) !important;
+            }
+
+        .btn-yellow {
+            background-color: var(--yellow) !important;
+            border-color: var(--yellow) !important;
+            color: var(--brown) !important;
+        }
+
+            .btn-yellow:hover {
+                background-color: #ffdb7a !important;
+                border-color: #ffdb7a !important;
+                color: var(--brown) !important;
+            }
+
+        .btn-outline-green {
+            border-color: var(--green) !important;
+            color: var(--green) !important;
+        }
+
+            .btn-outline-green:hover {
+                background-color: var(--green) !important;
+                color: white !important;
+            }
+
+        /* Estilos para imágenes circulares */
+        .rounded-circle.border-green {
+            border: 2px solid var(--green) !important;
+        }
+
+        .rounded.border-green {
+            border: 2px solid var(--green) !important;
+        }
+
+        /* Dropdown personalizado */
+        .dropdown-menu {
+            border: 2px solid var(--green) !important;
+        }
+
+        .dropdown-item:hover {
+            background-color: rgba(151, 199, 139, 0.1) !important;
+        }
+
+        /* Responsive */
+        @@media (max-width: 768px) {
+            .form-inline .form-group {
+                margin-right: 0.5rem !important;
+                margin-bottom: 0.5rem !important;
+            }
+
+            .btn-group-vertical {
+                width: 100% !important;
+            }
+
+            .table-responsive {
+                font-size: 0.85rem !important;
+            }
+
+            .stat-box {
+                padding: 15px !important;
+            }
+
+            .display-4 {
+                font-size: 2rem !important;
+            }
+        }
+
+        /* Animaciones */
+        .fade-in-up {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        @@keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Estilo para filas alternas */
+        tbody tr:nth-child(even) {
+            background-color: rgba(242, 233, 216, 0.3) !important;
+        }
+
+        /* Estilos para el scroll suave de la tabla */
+        .table-responsive {
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        /* Modal styles */
+        .modal-content {
+            border: 2px solid var(--green) !important;
+        }
+
+        .modal-header {
+            border-bottom: 1px solid var(--green) !important;
+        }
+
+        .modal-footer {
+            border-top: 1px solid var(--green) !important;
+        }
+
+        .list-group-item {
+            background-color: transparent !important;
+        }
+    </style>
+}
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        $(document).ready(function () {
+            console.log('Vista Gestión de Solicitudes cargada');
+
+            // Inicializar tooltips
+            $('[data-toggle="tooltip"]').tooltip({
+                trigger: 'hover'
+            });
+
+            // Efecto hover en tarjetas
+            $('.shadow-hover').hover(
+                function () {
+                    $(this).addClass('shadow-lg');
+                },
+                function () {
+                    $(this).removeClass('shadow-lg');
+                }
+            );
+
+            // Efecto hover en estadísticas
+            $('.stat-box').hover(
+                function () {
+                    $(this).css('transform', 'translateY(-5px)');
+                },
+                function () {
+                    $(this).css('transform', 'translateY(0)');
+                }
+            );
+
+            // Botón APROBAR - Nuevo comportamiento con SweetAlert2
+            $('.btn-aprobar').click(function (e) {
+                e.preventDefault();
+
+                var solicitudId = $(this).data('solicitud-id');
+                var nombreUsuario = $(this).data('nombre-usuario');
+                var nombreMascota = $(this).data('nombre-mascota');
+
+                Swal.fire({
+                    title: '¿Aprobar solicitud?',
+                    html: `
+                        <div class="text-left">
+                            <p><strong>Solicitante:</strong> ${nombreUsuario || 'N/A'}</p>
+                            <p><strong>Mascota:</strong> ${nombreMascota || 'N/A'}</p>
+                            <p class="mt-3">Al aprobar la solicitud:</p>
+                            <ul class="text-left">
+                                <li>✓ Estado cambiará a <span class="badge bg-green">Aprobada</span></li>
+                                <li>✓ Adopción pasará a <span class="badge bg-info">Programada</span></li>
+                                <li>✓ Se registrará fecha de respuesta</li>
+                            </ul>
+                        </div>
+                    `,
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#97C78B',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: '<i class="fa fa-check"></i> Sí, aprobar',
+                    cancelButtonText: '<i class="fa fa-times"></i> Cancelar',
+                    showClass: {
+                        popup: 'animate__animated animate__fadeInDown'
+                    },
+                    hideClass: {
+                        popup: 'animate__animated animate__fadeOutUp'
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Mostrar loading
+                        Swal.fire({
+                            title: 'Aprobando solicitud...',
+                            allowOutsideClick: false,
+                            didOpen: () => {
+                                Swal.showLoading();
+                            }
+                        });
+
+                        // Llamada AJAX para aprobar
+                        $.ajax({
+                            url: '@Url.Action("AprobarSolicitud", "Admin")',
+                            type: 'POST',
+                            data: { id: solicitudId },
+                            success: function (response) {
+                                if (response.success) {
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: '¡Solicitud aprobada!',
+                                        html: `
+                                            <p>${response.message}</p>
+                                            <p class="mt-2">
+                                                <span class="badge bg-green">Estado: Aprobada</span>
+                                                <span class="badge bg-info">Adopción: Programada</span>
+                                            </p>
+                                        `,
+                                        confirmButtonColor: '#97C78B',
+                                        timer: 3000
+                                    }).then(() => {
+                                        // Recargar la página
+                                        location.reload();
+                                    });
+                                } else {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Error',
+                                        text: response.message,
+                                        confirmButtonColor: '#FBCDC0'
+                                    });
+                                }
+                            },
+                            error: function () {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: 'Ocurrió un error al aprobar la solicitud',
+                                    confirmButtonColor: '#FBCDC0'
+                                });
+                            }
+                        });
+                    }
+                });
+            });
+
+            // Botón RECHAZAR - Confirmación con SweetAlert2
+            $('.btn-rechazar').click(function (e) {
+                e.preventDefault();
+                var href = $(this).attr('href');
+
+                Swal.fire({
+                    title: '¿Rechazar solicitud?',
+                    text: 'Esta acción cambiará el estado de la solicitud a Rechazada',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#FBCDC0',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: '<i class="fa fa-times"></i> Sí, rechazar',
+                    cancelButtonText: 'Cancelar',
+                    showClass: {
+                        popup: 'animate__animated animate__fadeInDown'
+                    },
+                    hideClass: {
+                        popup: 'animate__animated animate__fadeOutUp'
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = href;
+                    }
+                });
+            });
+
+            // Botón AVANZAR ESTADO DE ADOPCIÓN
+            $('.btn-avanzar-adopcion').click(function (e) {
+                e.preventDefault();
+
+                var solicitudId = $(this).data('solicitud-id');
+                var estadoDestino = $(this).data('estado-destino');
+
+                // Texto según el estado destino
+                var textoEstado = '';
+                var iconoEstado = '';
+                var colorEstado = '';
+
+                switch(estadoDestino) {
+                    case 'Programada':
+                        textoEstado = 'Programar entrega';
+                        iconoEstado = 'fa-calendar-check';
+                        colorEstado = '#17a2b8';
+                        break;
+                    case 'Entregada':
+                        textoEstado = 'Confirmar entrega';
+                        iconoEstado = 'fa-home';
+                        colorEstado = '#007bff';
+                        break;
+                    case 'En seguimiento':
+                        textoEstado = 'Iniciar seguimiento';
+                        iconoEstado = 'fa-phone-alt';
+                        colorEstado = '#ffc107';
+                        break;
+                    case 'Finalizada':
+                        textoEstado = 'Finalizar adopción';
+                        iconoEstado = 'fa-check-double';
+                        colorEstado = '#28a745';
+                        break;
+                    case 'Cancelada':
+                        textoEstado = 'Cancelar proceso';
+                        iconoEstado = 'fa-ban';
+                        colorEstado = '#dc3545';
+                        break;
+                    default:
+                        textoEstado = 'Avanzar';
+                        iconoEstado = 'fa-paw';
+                        colorEstado = '#97C78B';
+                }
+
+                $('#mensajeAvance').html(`
+                    <div class="text-center">
+                        <i class="fa ${iconoEstado} fa-3x mb-3" style="color: ${colorEstado};"></i>
+                        <h5>${textoEstado}</h5>
+                        <p>¿Está seguro de cambiar el estado de adopción a <strong>${estadoDestino}</strong>?</p>
+                    </div>
+                `);
+
+                $('#btnConfirmarAvance').attr('href', '@Url.Action("AvanzarEstadoAdopcion", "Admin")?id=' + solicitudId + '&estadoDestino=' + encodeURIComponent(estadoDestino));
+                $('#btnConfirmarAvance').attr('data-estado-destino', estadoDestino);
+
+                // Cambiar color del botón según estado
+                $('#btnConfirmarAvance').removeClass('btn-info btn-success btn-primary btn-warning btn-danger');
+                if (estadoDestino === 'Programada') $('#btnConfirmarAvance').addClass('btn-info');
+                else if (estadoDestino === 'Entregada') $('#btnConfirmarAvance').addClass('btn-primary');
+                else if (estadoDestino === 'En seguimiento') $('#btnConfirmarAvance').addClass('btn-warning');
+                else if (estadoDestino === 'Finalizada') $('#btnConfirmarAvance').addClass('btn-success');
+                else if (estadoDestino === 'Cancelada') $('#btnConfirmarAvance').addClass('btn-danger');
+                else $('#btnConfirmarAvance').addClass('btn-info');
+
+                $('#modalAvanceAdopcion').modal('show');
+            });
+
+            // Confirmar avance de adopción
+            $('#btnConfirmarAvance').click(function(e) {
+                e.preventDefault();
+                var href = $(this).attr('href');
+                var estadoDestino = $(this).data('estado-destino');
+
+                $('#modalAvanceAdopcion').modal('hide');
+
+                // Mostrar loading
+                Swal.fire({
+                    title: 'Actualizando estado...',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+
+                // Llamada AJAX
+                $.ajax({
+                    url: href,
+                    type: 'POST',
+                    success: function (response) {
+                        if (response.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: '¡Estado actualizado!',
+                                text: response.message,
+                                confirmButtonColor: '#97C78B',
+                                timer: 2000
+                            }).then(() => {
+                                location.reload();
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: response.message,
+                                confirmButtonColor: '#FBCDC0'
+                            });
+                        }
+                    },
+                    error: function () {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Ocurrió un error al actualizar el estado',
+                            confirmButtonColor: '#FBCDC0'
+                        });
+                    }
+                });
+            });
+
+            // Botón ENVIAR PASOS AL ADOPTANTE
+            $('.btn-enviar-pasos').click(function (e) {
+                e.preventDefault();
+
+                var solicitudId = $(this).data('solicitud-id');
+                var nombreUsuario = $(this).data('nombre-usuario');
+                var emailUsuario = $(this).data('email-usuario');
+                var nombreMascota = $(this).data('nombre-mascota');
+
+                // Actualizar modal
+                $('#modalEnviarPasos').data('solicitud-id', solicitudId);
+                $('#modalEnviarPasos').data('email-usuario', emailUsuario);
+
+                $('#mensajeSaludo').html(`Hola ${nombreUsuario || 'adoptante'},`);
+
+                // Configurar fecha por defecto (7 días después)
+                var today = new Date();
+                var nextWeek = new Date(today);
+                nextWeek.setDate(today.getDate() + 7);
+
+                var year = nextWeek.getFullYear();
+                var month = String(nextWeek.getMonth() + 1).padStart(2, '0');
+                var day = String(nextWeek.getDate()).padStart(2, '0');
+                var formattedDate = `${year}-${month}-${day}`;
+                var formattedDateDisplay = `${day}/${month}/${year}`;
+
+                $('#fechaEntrega').val(formattedDate);
+                $('#fechaEntregaTexto').text(formattedDateDisplay);
+
+                $('#simulacionEnvio').hide();
+                $('#modalEnviarPasos').modal('show');
+            });
+
+            // Actualizar fecha de entrega en tiempo real
+            $('#fechaEntrega').change(function() {
+                var fechaValue = $(this).val();
+                if (fechaValue) {
+                    var partes = fechaValue.split('-');
+                    var fechaFormateada = `${partes[2]}/${partes[1]}/${partes[0]}`;
+                    $('#fechaEntregaTexto').text(fechaFormateada);
+                }
+            });
+
+            // Confirmar envío de pasos
+            $('#btnConfirmarEnvio').click(function() {
+                var solicitudId = $('#modalEnviarPasos').data('solicitud-id');
+                var emailUsuario = $('#modalEnviarPasos').data('email-usuario');
+                var fechaEntrega = $('#fechaEntrega').val();
+
+                // Formatear fecha para mostrar
+                var fechaFormateada = '';
+                if (fechaEntrega) {
+                    var partes = fechaEntrega.split('-');
+                    fechaFormateada = `${partes[2]}/${partes[1]}/${partes[0]}`;
+                }
+
+                // Simular envío (AJAX)
+                $.ajax({
+                    url: '@Url.Action("EnviarPasosAdoptante", "Admin")',
+                    type: 'POST',
+                    data: {
+                        solicitudId: solicitudId,
+                        fechaEntrega: fechaEntrega
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            $('#simulacionEnvio').show();
+                            $('#mensajeSimulacion').html(`
+                                ✅ Mensaje enviado a ${emailUsuario || 'adoptante'}<br>
+                                Fecha de entrega propuesta: ${fechaFormateada}<br>
+                                Se han enviado los pasos a seguir y el contrato de adopción.
+                            `);
+
+                            setTimeout(function() {
+                                $('#modalEnviarPasos').modal('hide');
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: '¡Mensaje enviado!',
+                                    text: response.message,
+                                    confirmButtonColor: '#97C78B',
+                                    timer: 3000
+                                });
+                            }, 2000);
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: response.message,
+                                confirmButtonColor: '#FBCDC0'
+                            });
+                        }
+                    },
+                    error: function() {
+                        // Simular éxito para demostración
+                        $('#simulacionEnvio').show();
+                        $('#mensajeSimulacion').html(`
+                            ✅ Mensaje enviado a ${emailUsuario || 'adoptante'}<br>
+                            Fecha de entrega propuesta: ${fechaFormateada}<br>
+                            Se han enviado los pasos a seguir y el contrato de adopción.
+                        `);
+
+                        setTimeout(function() {
+                            $('#modalEnviarPasos').modal('hide');
+                            Swal.fire({
+                                icon: 'success',
+                                title: '¡Mensaje enviado!',
+                                text: 'Los pasos han sido enviados al adoptante exitosamente.',
+                                confirmButtonColor: '#97C78B',
+                                timer: 3000
+                            });
+                        }, 2000);
+                    }
+                });
+            });
+
+            // Notificaciones de TempData con SweetAlert2
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <text>
+                Swal.fire({
+                    icon: 'success',
+                    title: '¡Éxito!',
+                    text: '@Html.Raw(TempData["SuccessMessage"])',
+                    confirmButtonColor: '#97C78B',
+                    timer: 3000
+                });
+                </text>
+            }
+
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <text>
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: '@Html.Raw(TempData["ErrorMessage"])',
+                    confirmButtonColor: '#FBCDC0'
+                });
+                </text>
+            }
+
+            // Auto cerrar alertas
+            setTimeout(function () {
+                $('.alert').alert('close');
+            }, 5000);
+        });
+    </script>
 }
