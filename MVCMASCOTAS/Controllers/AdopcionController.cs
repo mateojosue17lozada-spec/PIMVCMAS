@@ -276,6 +276,80 @@ namespace MVCMASCOTAS.Controllers
             return View(solicitudes);
         }
 
+        // POST: Adopcion/CancelarSolicitud
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize]
+        public ActionResult CancelarSolicitud(int solicitudId, string motivoCancelacion)
+        {
+            try
+            {
+                System.Diagnostics.Debug.WriteLine($"========== CANCELAR SOLICITUD ==========");
+                System.Diagnostics.Debug.WriteLine($"SolicitudId: {solicitudId}, Motivo: {motivoCancelacion}");
+
+                var usuario = db.Usuarios.FirstOrDefault(u => u.Email == User.Identity.Name);
+                if (usuario == null)
+                {
+                    TempData["ErrorMessage"] = "Usuario no encontrado.";
+                    return RedirectToAction("MisSolicitudes");
+                }
+
+                var solicitud = db.SolicitudAdopcion
+                    .Include(s => s.Mascotas)
+                    .FirstOrDefault(s => s.SolicitudId == solicitudId);
+
+                if (solicitud == null)
+                {
+                    TempData["ErrorMessage"] = "Solicitud no encontrada.";
+                    return RedirectToAction("MisSolicitudes");
+                }
+
+                // Verificar que la solicitud pertenezca al usuario
+                if (solicitud.UsuarioId != usuario.UsuarioId)
+                {
+                    TempData["ErrorMessage"] = "No tienes permiso para cancelar esta solicitud.";
+                    return RedirectToAction("MisSolicitudes");
+                }
+
+                // Verificar que la solicitud esté en estado Pendiente o En evaluación
+                if (solicitud.Estado != "Pendiente" && solicitud.Estado != "En evaluación")
+                {
+                    TempData["ErrorMessage"] = "Solo se pueden cancelar solicitudes en estado Pendiente o En evaluación.";
+                    return RedirectToAction("MisSolicitudes");
+                }
+
+                // ✅ SANITIZAR MOTIVO
+                if (string.IsNullOrWhiteSpace(motivoCancelacion))
+                    motivoCancelacion = "Cancelada por el usuario";
+                else
+                    motivoCancelacion = SanitizarString(motivoCancelacion, 500);
+
+                // Actualizar estado
+                string estadoAnterior = solicitud.Estado;
+                solicitud.Estado = "Cancelada";
+                solicitud.EstadoAdopcion = "Cancelada";
+                solicitud.MotivoRechazo = motivoCancelacion;
+                solicitud.FechaRespuesta = DateTime.Now;
+                solicitud.Observaciones = $"Cancelada por el usuario el {DateTime.Now:dd/MM/yyyy HH:mm}. Motivo: {motivoCancelacion}";
+
+                db.SaveChanges();
+
+                // Auditoría
+                AuditoriaHelper.RegistrarAccion("Cancelar Solicitud", "Adopcion",
+                    $"Solicitud #{solicitud.SolicitudId} cancelada por el usuario. Mascota: {solicitud.MascotaId}, Motivo: {motivoCancelacion}",
+                    usuario.UsuarioId);
+
+                TempData["SuccessMessage"] = "Solicitud cancelada exitosamente.";
+                return RedirectToAction("MisSolicitudes");
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"❌ ERROR en CancelarSolicitud: {ex.Message}");
+                TempData["ErrorMessage"] = "Error al cancelar la solicitud. Intente nuevamente.";
+                return RedirectToAction("MisSolicitudes");
+            }
+        }
+
         // GET: Adopcion/Evaluar/{id}
         [Authorize(Roles = "Administrador,Veterinario")]
         public ActionResult Evaluar(int? id)
