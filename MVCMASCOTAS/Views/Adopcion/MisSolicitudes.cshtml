@@ -18,6 +18,7 @@
     <div class="card mb-4 shadow-hover border-green">
         <div class="card-body bg-light-mint">
             <form method="get" action="@Url.Action("MisSolicitudes", "Adopcion")" class="form-inline justify-content-center">
+                @Html.AntiForgeryToken()
                 <div class="form-group mx-2 mb-2">
                     <label class="mr-2 text-brown">Filtrar por:</label>
                     <select name="estado" class="form-control border-green" onchange="this.form.submit()">
@@ -303,6 +304,14 @@ else
     </nav>
 }
 
+<!-- Formulario oculto para cancelación - CORREGIDO -->
+@using (Html.BeginForm("CancelarSolicitud", "Adopcion", FormMethod.Post, new { id = "formCancelarSolicitud", style = "display:none;" }))
+{
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="solicitudId" id="cancelSolicitudId" value="" />
+    <input type="hidden" name="motivoCancelacion" id="cancelMotivo" value="" />
+}
+
 @section Styles {
     <style>
         .page-header {
@@ -457,6 +466,7 @@ else
 }
 
 @section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         $(document).ready(function () {
             console.log('Vista Mis Solicitudes cargada');
@@ -478,7 +488,7 @@ else
                 mesInput.val(now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0'));
             }
 
-            // Confirmación para cancelar solicitud con SweetAlert2
+            // Confirmación para cancelar solicitud con SweetAlert2 - CORREGIDO
             $('.btn-cancelar').click(function (e) {
                 e.preventDefault();
 
@@ -496,7 +506,7 @@ else
                     confirmButtonColor: '#FBCDC0',
                     cancelButtonColor: '#97C78B',
                     confirmButtonText: '<i class="fa fa-times"></i> Sí, cancelar',
-                    cancelButtonText: '<i class="fa fa-times"></i> No cancelar',
+                    cancelButtonText: '<i class="fa fa-check"></i> No, mantener',
                     showClass: {
                         popup: 'animate__animated animate__fadeInDown'
                     },
@@ -505,38 +515,17 @@ else
                     },
                     preConfirm: () => {
                         const motivo = document.getElementById('motivoCancelacion').value;
-                        if (!motivo.trim()) {
+                        if (!motivo || !motivo.trim()) {
                             Swal.showValidationMessage('Debe ingresar el motivo de la cancelación');
                             return false;
                         }
-                        return { motivo: motivo };
+                        return { motivo: motivo.trim() };
                     }
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        // Crear formulario dinámico para enviar
-                        var form = document.createElement('form');
-                        form.method = 'POST';
-                        form.action = '@Url.Action("CancelarSolicitud", "Adopcion")';
-
-                        var token = document.createElement('input');
-                        token.type = 'hidden';
-                        token.name = '__RequestVerificationToken';
-                        token.value = $('input[name="__RequestVerificationToken"]').val();
-
-                        var idInput = document.createElement('input');
-                        idInput.type = 'hidden';
-                        idInput.name = 'solicitudId';
-                        idInput.value = solicitudId;
-
-                        var motivoInput = document.createElement('input');
-                        motivoInput.type = 'hidden';
-                        motivoInput.name = 'motivoCancelacion';
-                        motivoInput.value = result.value.motivo;
-
-                        form.appendChild(token);
-                        form.appendChild(idInput);
-                        form.appendChild(motivoInput);
-                        document.body.appendChild(form);
+                        // Asignar valores al formulario oculto y enviar - FORMA CORRECTA
+                        $('#cancelSolicitudId').val(solicitudId);
+                        $('#cancelMotivo').val(result.value.motivo);
 
                         // Mostrar loader
                         Swal.fire({
@@ -551,10 +540,8 @@ else
                             }
                         });
 
-                        // Enviar formulario después de un breve delay
-                        setTimeout(() => {
-                            form.submit();
-                        }, 1000);
+                        // Enviar el formulario
+                        $('#formCancelarSolicitud').submit();
                     }
                 });
             });
@@ -586,6 +573,18 @@ else
                     title: 'Error',
                     text: '@Html.Raw(TempData["ErrorMessage"])',
                     confirmButtonColor: '#FBCDC0'
+                });
+                </text>
+            }
+
+            @if (TempData["InfoMessage"] != null)
+            {
+                <text>
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Información',
+                    text: '@Html.Raw(TempData["InfoMessage"])',
+                    confirmButtonColor: '#97C78B'
                 });
                 </text>
             }

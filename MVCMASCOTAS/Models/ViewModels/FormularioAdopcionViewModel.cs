@@ -2,6 +2,77 @@
 
 namespace MVCMASCOTAS.Models.ViewModels
 {
+    // Enums para opciones predefinidas
+    public enum MotivoAdopcionEnum
+    {
+        [Display(Name = "Compañía para mí o mi familia")]
+        Compania,
+        [Display(Name = "Darle un hogar a un animal necesitado")]
+        Hogar,
+        [Display(Name = "Protección del hogar")]
+        Proteccion,
+        [Display(Name = "Para mis hijos")]
+        ParaHijos,
+        [Display(Name = "Rescatar al animal")]
+        Rescate,
+        [Display(Name = "Otro motivo")]
+        Otro
+    }
+
+    public enum PlanCambioResidenciaEnum
+    {
+        [Display(Name = "Me llevaría la mascota conmigo")]
+        LlevarConmigo,
+        [Display(Name = "Buscaría un lugar que acepte mascotas")]
+        BuscarLugar,
+        [Display(Name = "La dejaría con familiares/amigos")]
+        Familiares,
+        [Display(Name = "La devolvería al refugio")]
+        Devolver,
+        [Display(Name = "No lo he considerado")]
+        NoConsiderado
+    }
+
+    public enum PlanProblemasComportamientoEnum
+    {
+        [Display(Name = "Consultaría con un veterinario")]
+        Veterinario,
+        [Display(Name = "Buscaría un entrenador profesional")]
+        Entrenador,
+        [Display(Name = "Buscaría información en internet/libros")]
+        Autoaprendizaje,
+        [Display(Name = "Consultaría con el refugio")]
+        Refugio,
+        [Display(Name = "No sé qué haría")]
+        NoSabe
+    }
+
+    public enum QuienCuidaraEnum
+    {
+        [Display(Name = "Yo trabajo desde casa / soy independiente")]
+        TrabajoCasa,
+        [Display(Name = "Mi cónyuge/pareja")]
+        Conyuge,
+        [Display(Name = "Mis hijos/adultos en casa")]
+        Hijos,
+        [Display(Name = "Un familiar/amigo")]
+        Familiar,
+        [Display(Name = "La mascota estará sola")]
+        Sola,
+        [Display(Name = "Otro")]
+        Otro
+    }
+
+    public enum VeterinarioReferenciaEnum
+    {
+        [Display(Name = "Sí, tengo veterinario de confianza")]
+        Si,
+        [Display(Name = "No, pero conozco clínicas cercanas")]
+        Conozco,
+        [Display(Name = "No, buscaré uno cuando lo necesite")]
+        No
+    }
+
     public class FormularioAdopcionViewModel
     {
         // Propiedad para identificar la mascota a adoptar
@@ -66,28 +137,30 @@ namespace MVCMASCOTAS.Models.ViewModels
 
         [Required(ErrorMessage = "Especifique quién cuidará a la mascota")]
         [Display(Name = "¿Quién cuidará de la mascota durante el día?")]
-        [DataType(DataType.MultilineText)]
-        public string QuienCuidaraMascota { get; set; }
+        public QuienCuidaraEnum? QuienCuidaraMascota { get; set; }
 
-        // Motivación
+        [Display(Name = "Especifique otro cuidador")]
+        public string OtroQuienCuidaraMascota { get; set; }
+
+        // Motivación - AHORA CON OPCIONES PREDEFINIDAS
         [Required(ErrorMessage = "El motivo de adopción es requerido")]
         [Display(Name = "¿Por qué deseas adoptar esta mascota?")]
-        [DataType(DataType.MultilineText)]
-        public string MotivoAdopcion { get; set; }
+        public MotivoAdopcionEnum? MotivoAdopcion { get; set; }
+
+        [Display(Name = "Especifique otro motivo")]
+        public string OtroMotivoAdopcion { get; set; }
 
         [Required(ErrorMessage = "Debe especificar sus planes si cambia de residencia")]
         [Display(Name = "¿Qué harías si cambias de residencia?")]
-        [DataType(DataType.MultilineText)]
-        public string QuePasaSiCambiaResidencia { get; set; }
+        public PlanCambioResidenciaEnum? QuePasaSiCambiaResidencia { get; set; }
 
         [Required(ErrorMessage = "Debe especificar cómo manejaría problemas de comportamiento")]
         [Display(Name = "¿Qué harías ante problemas de comportamiento?")]
-        [DataType(DataType.MultilineText)]
-        public string QuePasaSiProblemasComportamiento { get; set; }
+        public PlanProblemasComportamientoEnum? QuePasaSiProblemasComportamiento { get; set; }
 
-        // Referencias
-        [Display(Name = "Veterinario de referencia")]
-        public string VeterinarioReferencia { get; set; }
+        // Referencias - MEJORADAS
+        [Display(Name = "¿Tiene veterinario de referencia?")]
+        public VeterinarioReferenciaEnum? VeterinarioReferencia { get; set; }
 
         [Display(Name = "Referencia personal 1")]
         public string ReferenciaPersonal1 { get; set; }

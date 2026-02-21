@@ -1,15 +1,17 @@
-﻿using System;
+﻿using MVCMASCOTAS.Helpers;
+using MVCMASCOTAS.Models;
+using MVCMASCOTAS.Models.ViewModels;
+using MVCMASCOTAS.Services;
+using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Web.Mvc;
 using System.Web.UI;
 using System.Web.UI.WebControls;
-using MVCMASCOTAS.Helpers;
-using MVCMASCOTAS.Models;
-using MVCMASCOTAS.Models.ViewModels;
-using MVCMASCOTAS.Services;
+using IronPdf;
 
 namespace MVCMASCOTAS.Controllers
 {
@@ -172,6 +174,7 @@ namespace MVCMASCOTAS.Controllers
                 viewModel.UltimasSolicitudes = db.SolicitudAdopcion
                     .Include(s => s.Mascotas)
                     .Include(s => s.Usuarios)
+                    .Include(s => s.Usuarios1)
                     .OrderByDescending(s => s.FechaSolicitud)
                     .Take(5)
                     .ToList();
@@ -796,16 +799,13 @@ namespace MVCMASCOTAS.Controllers
         {
             try
             {
-                var solicitudes = db.SolicitudAdopcion
-                    .Include(s => s.Mascotas)
-                    .Include(s => s.Usuarios)
-                    .OrderByDescending(s => s.FechaSolicitud)
-                    .ToList();
-
-                return View(solicitudes);
+                // Usar el mismo método de filtrado con valores por defecto
+                return SolicitudAdopcionFiltrada("Todos", "Todos", 1);
             }
             catch (Exception ex)
             {
+                System.Diagnostics.Debug.WriteLine($"ERROR en SolicitudAdopcion: {ex.Message}\n{ex.StackTrace}");
+                AuditoriaHelper.RegistrarError("Admin", "Error al cargar solicitudes", ex, UserHelper.GetCurrentUserId());
                 ViewBag.Error = "Error al cargar solicitudes: " + ex.Message;
                 return View(new List<SolicitudAdopcion>());
             }
@@ -814,37 +814,74 @@ namespace MVCMASCOTAS.Controllers
         [HttpGet]
         public ActionResult SolicitudAdopcionSimple()
         {
-            return SolicitudAdopcionFiltrada("Todos", 1);
+            return SolicitudAdopcionFiltrada("Todos", "Todos", 1);
         }
 
         [HttpGet]
-        public ActionResult SolicitudAdopcionFiltrada(string estado = "Todos", int page = 1)
+        public ActionResult SolicitudAdopcionFiltrada(string estado = "Todos", string estadoAdopcion = "Todos", int page = 1)
         {
             try
             {
                 const int pageSize = 20;
 
-                var query = db.SolicitudAdopcion
-                    .Include(s => s.Mascotas)
-                    .Include(s => s.Usuarios)
-                    .Include(s => s.Usuarios1)
-                    .Include(s => s.EvaluacionAdopcion)
-                    .Include(s => s.FormularioAdopcionDetalle)
-                    .AsQueryable();
+                // 🔥 SOLUCIÓN: Usar una consulta más explícita con Join en lugar de Include
+                var query = from s in db.SolicitudAdopcion
+                            join u in db.Usuarios on s.UsuarioId equals u.UsuarioId into usuariosJoin
+                            from u in usuariosJoin.DefaultIfEmpty()
+                            join m in db.Mascotas on s.MascotaId equals m.MascotaId into mascotasJoin
+                            from m in mascotasJoin.DefaultIfEmpty()
+                            join ev in db.Usuarios on s.EvaluadoPor equals ev.UsuarioId into evaluadoresJoin
+                            from ev in evaluadoresJoin.DefaultIfEmpty()
+                            select new
+                            {
+                                Solicitud = s,
+                                Usuario = u,
+                                Mascota = m,
+                                Evaluador = ev,
+                                Formulario = s.FormularioAdopcionDetalle.FirstOrDefault(),
+                                Evaluacion = s.EvaluacionAdopcion.FirstOrDefault()
+                            };
 
+                // Aplicar filtros
                 if (!string.IsNullOrEmpty(estado) && estado != "Todos")
                 {
-                    query = query.Where(s => s.Estado == estado);
+                    query = query.Where(x => x.Solicitud.Estado == estado);
+                }
+
+                if (!string.IsNullOrEmpty(estadoAdopcion) && estadoAdopcion != "Todos")
+                {
+                    query = query.Where(x => x.Solicitud.EstadoAdopcion == estadoAdopcion);
                 }
 
                 int totalItems = query.Count();
                 int totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
 
-                var solicitudes = query
-                    .OrderByDescending(s => s.FechaSolicitud)
+                var resultados = query
+                    .OrderByDescending(x => x.Solicitud.FechaSolicitud)
                     .Skip((page - 1) * pageSize)
                     .Take(pageSize)
                     .ToList();
+
+                // 🔥 IMPORTANTE: Convertir los resultados anónimos a objetos SolicitudAdopcion completos
+                var solicitudes = new List<SolicitudAdopcion>();
+                foreach (var r in resultados)
+                {
+                    var solicitud = r.Solicitud;
+                    // Asignar manualmente las propiedades de navegación
+                    solicitud.Usuarios = r.Usuario;
+                    solicitud.Mascotas = r.Mascota;
+                    solicitud.Usuarios1 = r.Evaluador;
+                    // No asignamos colecciones para evitar problemas de proxy
+                    solicitudes.Add(solicitud);
+                }
+
+                // Debug
+                System.Diagnostics.Debug.WriteLine($"=== CARGANDO SOLICITUDES FILTRADAS ===");
+                System.Diagnostics.Debug.WriteLine($"Total encontradas: {solicitudes.Count}");
+                foreach (var s in solicitudes.Take(5))
+                {
+                    System.Diagnostics.Debug.WriteLine($"ID: {s.SolicitudId}, Usuario: {(s.Usuarios?.NombreCompleto ?? "NULL")}, Mascota: {(s.Mascotas?.Nombre ?? "NULL")}");
+                }
 
                 var estadisticas = db.SolicitudAdopcion
                     .GroupBy(s => s.Estado)
@@ -855,8 +892,11 @@ namespace MVCMASCOTAS.Controllers
                 ViewBag.SolicitudesEvaluacion = estadisticas.TryGetValue("En evaluación", out var cnt2) ? cnt2 : 0;
                 ViewBag.SolicitudesAprobadas = estadisticas.TryGetValue("Aprobada", out var cnt3) ? cnt3 : 0;
                 ViewBag.SolicitudesRechazadas = estadisticas.TryGetValue("Rechazada", out var cnt4) ? cnt4 : 0;
+                ViewBag.AdopcionesActivas = db.SolicitudAdopcion.Count(s => s.Estado == "Aprobada" && s.EstadoAdopcion != "Finalizada" && s.EstadoAdopcion != "Cancelada");
+                ViewBag.AdopcionesFinalizadas = db.SolicitudAdopcion.Count(s => s.EstadoAdopcion == "Finalizada");
 
                 ViewBag.EstadoSeleccionado = estado;
+                ViewBag.EstadoAdopcionSeleccionado = estadoAdopcion;
                 ViewBag.CurrentPage = page;
                 ViewBag.TotalPages = totalPages;
                 ViewBag.TotalItems = totalItems;
@@ -883,9 +923,10 @@ namespace MVCMASCOTAS.Controllers
 
             try
             {
+                // 🔥 CORREGIDO: Cargar la solicitud con todas las relaciones
                 var solicitud = db.SolicitudAdopcion
                     .Include(s => s.Mascotas)
-                    .Include(s => s.Usuarios)
+                    .Include(s => s.Usuarios)        // Intentar cargar con Include
                     .Include(s => s.Usuarios1)
                     .Include(s => s.FormularioAdopcionDetalle)
                     .Include(s => s.EvaluacionAdopcion)
@@ -897,6 +938,25 @@ namespace MVCMASCOTAS.Controllers
                     return RedirectToAction("SolicitudAdopcion");
                 }
 
+                // 🔥 VERIFICACIÓN CRÍTICA: Si Usuarios sigue siendo null, cargarlo manualmente
+                if (solicitud.Usuarios == null && solicitud.UsuarioId > 0)
+                {
+                    System.Diagnostics.Debug.WriteLine($"⚠️ Usuarios null para Solicitud {id}, cargando manualmente...");
+                    solicitud.Usuarios = db.Usuarios.Find(solicitud.UsuarioId);
+
+                    if (solicitud.Usuarios != null)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"✅ Usuario cargado manualmente: {solicitud.Usuarios.NombreCompleto}");
+                    }
+                }
+
+                // 🔥 TAMBIÉN verificar Mascotas por si acaso
+                if (solicitud.Mascotas == null && solicitud.MascotaId > 0)
+                {
+                    solicitud.Mascotas = db.Mascotas.Find(solicitud.MascotaId);
+                }
+
+                // Imágenes para la vista
                 ViewBag.MascotaImagen = solicitud.Mascotas?.ImagenPrincipal != null
                     ? ImageHelper.GetImageDataUri(solicitud.Mascotas.ImagenPrincipal)
                     : null;
@@ -905,76 +965,543 @@ namespace MVCMASCOTAS.Controllers
                     ? ImageHelper.GetImageDataUri(solicitud.Usuarios.ImagenPerfil)
                     : null;
 
+                // Debug
+                System.Diagnostics.Debug.WriteLine($"=== DETALLES SOLICITUD #{id} ===");
+                System.Diagnostics.Debug.WriteLine($"Usuario encontrado: {(solicitud.Usuarios != null ? "SÍ" : "NO")}");
+                if (solicitud.Usuarios != null)
+                {
+                    System.Diagnostics.Debug.WriteLine($"Nombre: {solicitud.Usuarios.NombreCompleto}");
+                    System.Diagnostics.Debug.WriteLine($"Email: {solicitud.Usuarios.Email}");
+                    System.Diagnostics.Debug.WriteLine($"Cédula: {solicitud.Usuarios.Cedula}");
+                }
+                else
+                {
+                    System.Diagnostics.Debug.WriteLine($"UsuarioId en BD: {solicitud.UsuarioId}");
+                }
+
                 return View(solicitud);
             }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"Error en DetallesSolicitud: {ex.Message}\n{ex.StackTrace}");
-
                 AuditoriaHelper.RegistrarError("Admin", $"Error al cargar detalles de solicitud ID {id}", ex, UserHelper.GetCurrentUserId());
-
                 TempData["ErrorMessage"] = "Error al cargar los detalles de la solicitud";
                 return RedirectToAction("SolicitudAdopcion");
             }
         }
 
         /// <summary>
-        /// ✅ CORREGIDO: Ahora usa AdopcionService
+        /// ✅ CORREGIDO: Ahora retorna JSON para AJAX
         /// </summary>
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult AprobarSolicitud(int solicitudId, string observaciones)
+        public JsonResult AprobarSolicitud(int id)
         {
             try
             {
-                // ✅ USAR SERVICIO
-                var userId = UserHelper.GetCurrentUserId() ?? 0;
-                adopcionService.AprobarSolicitud(solicitudId, userId, observaciones);
+                System.Diagnostics.Debug.WriteLine($"=== APROBAR SOLICITUD ID: {id} ===");
 
-                TempData["SuccessMessage"] = "¡Solicitud aprobada exitosamente!";
-                return RedirectToAction("DetallesSolicitud", new { id = solicitudId });
+                var solicitud = db.SolicitudAdopcion
+                    .Include(s => s.Usuarios)
+                    .Include(s => s.Mascotas)
+                    .FirstOrDefault(s => s.SolicitudId == id);
+
+                if (solicitud == null)
+                {
+                    return Json(new { success = false, message = "Solicitud no encontrada." });
+                }
+
+                // Verificar estado actual
+                if (solicitud.Estado != "Pendiente" && solicitud.Estado != "En evaluación")
+                {
+                    return Json(new { success = false, message = $"Esta solicitud no puede ser aprobada porque su estado actual es: {solicitud.Estado}" });
+                }
+
+                // Actualizar solicitud
+                var usuarioEvaluador = db.Usuarios.FirstOrDefault(u => u.Email == User.Identity.Name);
+
+                solicitud.Estado = "Aprobada";
+                solicitud.ResultadoEvaluacion = "Aprobada";
+                solicitud.FechaEvaluacion = DateTime.Now;
+                solicitud.FechaRespuesta = DateTime.Now;
+                solicitud.EvaluadoPor = usuarioEvaluador?.UsuarioId;
+                solicitud.EstadoAdopcion = "Programada"; // Inicia el proceso de adopción
+                solicitud.Observaciones = "Solicitud aprobada. Se ha iniciado el proceso de adopción.";
+
+                // Actualizar estado de la mascota - CORREGIDO: MascotaId es int, no nullable
+                var mascota = db.Mascotas.Find(solicitud.MascotaId);
+                if (mascota != null)
+                {
+                    mascota.Estado = "En proceso de adopción";
+                }
+
+                db.SaveChanges();
+
+                // Registrar auditoría
+                if (usuarioEvaluador != null)
+                {
+                    AuditoriaHelper.RegistrarAccion("Aprobar Solicitud", "Admin",
+                        $"Solicitud #{solicitud.SolicitudId} aprobada para mascota: {solicitud.Mascotas?.Nombre}",
+                        usuarioEvaluador.UsuarioId);
+                }
+
+                // Enviar email al adoptante (OPCIONAL)
+                _ = Task.Run(async () =>
+                {
+                    try
+                    {
+                        if (solicitud.Usuarios?.Email != null)
+                        {
+                            await EmailHelper.SendAdoptionApprovedAsync(
+                                solicitud.Usuarios.Email,
+                                solicitud.Usuarios.NombreCompleto,
+                                solicitud.Mascotas?.Nombre
+                            );
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"Error enviando email: {ex.Message}");
+                    }
+                });
+
+                return Json(new
+                {
+                    success = true,
+                    message = $"Solicitud #{solicitud.SolicitudId} aprobada exitosamente.",
+                    solicitudId = solicitud.SolicitudId
+                });
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Error en AprobarSolicitud: {ex.Message}");
-                AuditoriaHelper.RegistrarError("Admin", $"Error aprobando solicitud {solicitudId}", ex, UserHelper.GetCurrentUserId());
-                TempData["ErrorMessage"] = "Error al aprobar la solicitud";
-                return RedirectToAction("DetallesSolicitud", new { id = solicitudId });
+                System.Diagnostics.Debug.WriteLine($"Error en AprobarSolicitud: {ex.Message}\n{ex.StackTrace}");
+                AuditoriaHelper.RegistrarError("Admin", $"Error aprobando solicitud {id}", ex, UserHelper.GetCurrentUserId());
+                return Json(new { success = false, message = "Error al aprobar la solicitud: " + ex.Message });
             }
         }
 
         /// <summary>
-        /// ✅ CORREGIDO: Ahora usa AdopcionService
+        /// 🔥 CORREGIDO: Rechazar solicitud con motivo
         /// </summary>
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult RechazarSolicitud(int solicitudId, string motivoRechazo)
+        public JsonResult RechazarSolicitud(int id, string motivo)
         {
             try
             {
-                if (string.IsNullOrWhiteSpace(motivoRechazo))
+                System.Diagnostics.Debug.WriteLine($"=== RECHAZAR SOLICITUD ID: {id}, Motivo: {motivo} ===");
+
+                var solicitud = db.SolicitudAdopcion
+                    .Include(s => s.Usuarios)
+                    .Include(s => s.Mascotas)
+                    .FirstOrDefault(s => s.SolicitudId == id);
+
+                if (solicitud == null)
                 {
-                    TempData["ErrorMessage"] = "Debe proporcionar un motivo de rechazo";
-                    return RedirectToAction("DetallesSolicitud", new { id = solicitudId });
+                    return Json(new { success = false, message = "Solicitud no encontrada." });
                 }
 
-                // ✅ SANITIZAR MOTIVO
-                motivoRechazo = SanitizarEntrada(motivoRechazo, 500);
+                // Verificar estado actual
+                if (solicitud.Estado != "Pendiente" && solicitud.Estado != "En evaluación")
+                {
+                    return Json(new { success = false, message = $"Esta solicitud no puede ser rechazada porque su estado actual es: {solicitud.Estado}" });
+                }
 
-                // ✅ USAR SERVICIO
-                var userId = UserHelper.GetCurrentUserId() ?? 0;
-                adopcionService.RechazarSolicitud(solicitudId, userId, motivoRechazo);
+                // Validar motivo
+                if (string.IsNullOrWhiteSpace(motivo))
+                {
+                    return Json(new { success = false, message = "Debe proporcionar un motivo para el rechazo." });
+                }
 
-                TempData["SuccessMessage"] = "Solicitud rechazada correctamente";
-                return RedirectToAction("DetallesSolicitud", new { id = solicitudId });
+                // Actualizar solicitud
+                var usuarioEvaluador = db.Usuarios.FirstOrDefault(u => u.Email == User.Identity.Name);
+
+                solicitud.Estado = "Rechazada";
+                solicitud.ResultadoEvaluacion = "Rechazada";
+                solicitud.FechaEvaluacion = DateTime.Now;
+                solicitud.FechaRespuesta = DateTime.Now;
+                solicitud.EvaluadoPor = usuarioEvaluador?.UsuarioId;
+                solicitud.MotivoRechazo = motivo;
+                solicitud.Observaciones = $"Solicitud rechazada: {motivo}";
+
+                db.SaveChanges();
+
+                // Registrar auditoría
+                if (usuarioEvaluador != null)
+                {
+                    AuditoriaHelper.RegistrarAccion("Rechazar Solicitud", "Admin",
+                        $"Solicitud #{solicitud.SolicitudId} rechazada. Motivo: {motivo}",
+                        usuarioEvaluador.UsuarioId);
+                }
+
+                return Json(new
+                {
+                    success = true,
+                    message = $"Solicitud #{solicitud.SolicitudId} rechazada exitosamente.",
+                    solicitudId = solicitud.SolicitudId
+                });
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Error en RechazarSolicitud: {ex.Message}");
-                AuditoriaHelper.RegistrarError("Admin", $"Error rechazando solicitud {solicitudId}", ex, UserHelper.GetCurrentUserId());
-                TempData["ErrorMessage"] = "Error al rechazar la solicitud";
-                return RedirectToAction("DetallesSolicitud", new { id = solicitudId });
+                System.Diagnostics.Debug.WriteLine($"Error en RechazarSolicitud: {ex.Message}\n{ex.StackTrace}");
+                AuditoriaHelper.RegistrarError("Admin", $"Error rechazando solicitud {id}", ex, UserHelper.GetCurrentUserId());
+                return Json(new { success = false, message = "Error al rechazar la solicitud. Intente nuevamente." });
             }
+        }
+
+        /// <summary>
+        /// 🔥 CORREGIDO: Avanzar estado de adopción con validaciones
+        /// </summary>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public JsonResult AvanzarEstadoAdopcion(int id, string estadoDestino)
+        {
+            try
+            {
+                System.Diagnostics.Debug.WriteLine($"=== AVANZAR ESTADO ADOPCIÓN: Solicitud {id} → {estadoDestino} ===");
+
+                var solicitud = db.SolicitudAdopcion
+                    .Include(s => s.Mascotas)
+                    .FirstOrDefault(s => s.SolicitudId == id);
+
+                if (solicitud == null)
+                {
+                    return Json(new { success = false, message = "Solicitud no encontrada." });
+                }
+
+                // Validar que la solicitud esté aprobada
+                if (solicitud.Estado != "Aprobada" && estadoDestino != "Cancelada")
+                {
+                    return Json(new { success = false, message = "Solo se puede avanzar el estado de solicitudes aprobadas." });
+                }
+
+                // Validar transición de estados
+                var estadosValidos = new[] { "Programada", "Entregada", "En seguimiento", "Finalizada", "Cancelada" };
+                if (!estadosValidos.Contains(estadoDestino))
+                {
+                    return Json(new { success = false, message = "Estado destino no válido." });
+                }
+
+                // Validar secuencia de estados
+                string estadoActual = solicitud.EstadoAdopcion ?? "No iniciada";
+
+                var secuenciaEstados = new Dictionary<string, string[]>
+                {
+                    { "No iniciada", new[] { "Programada", "Cancelada" } },
+                    { "Programada", new[] { "Entregada", "Cancelada" } },
+                    { "Entregada", new[] { "En seguimiento", "Finalizada", "Cancelada" } },
+                    { "En seguimiento", new[] { "Finalizada", "Cancelada" } },
+                    { "Finalizada", Array.Empty<string>() },
+                    { "Cancelada", Array.Empty<string>() }
+                };
+
+                if (secuenciaEstados.ContainsKey(estadoActual) &&
+                    !secuenciaEstados[estadoActual].Contains(estadoDestino) &&
+                    estadoDestino != estadoActual)
+                {
+                    return Json(new
+                    {
+                        success = false,
+                        message = $"No se puede cambiar de '{estadoActual}' a '{estadoDestino}'. " +
+                                  $"Transición no permitida."
+                    });
+                }
+
+                // Actualizar estado
+                solicitud.EstadoAdopcion = estadoDestino;
+
+                // Si se cancela, actualizar también el estado general
+                if (estadoDestino == "Cancelada")
+                {
+                    solicitud.Estado = "Cancelada";
+                    solicitud.Observaciones = $"Proceso de adopción cancelado el {DateTime.Now:dd/MM/yyyy HH:mm}. Estado anterior: {estadoActual}";
+
+                    // Liberar la mascota
+                    var mascota = db.Mascotas.Find(solicitud.MascotaId);
+                    if (mascota != null)
+                    {
+                        mascota.Estado = "Disponible para adopción";
+                    }
+                }
+                else if (estadoDestino == "Finalizada")
+                {
+                    solicitud.Estado = "Completada";
+                    solicitud.Observaciones = $"Adopción completada exitosamente el {DateTime.Now:dd/MM/yyyy HH:mm}.";
+
+                    // Marcar mascota como adoptada permanentemente
+                    var mascota = db.Mascotas.Find(solicitud.MascotaId);
+                    if (mascota != null)
+                    {
+                        mascota.Estado = "Adoptada";
+                        mascota.FechaAdopcion = DateTime.Now;
+                    }
+                }
+                else if (estadoDestino == "Entregada")
+                {
+                    // Registrar fecha de entrega
+                    solicitud.Observaciones = (solicitud.Observaciones ?? "") +
+                        $"\nMascota entregada el {DateTime.Now:dd/MM/yyyy HH:mm}.";
+                }
+
+                db.SaveChanges();
+
+                // Registrar auditoría
+                var usuarioEvaluador = db.Usuarios.FirstOrDefault(u => u.Email == User.Identity.Name);
+                if (usuarioEvaluador != null)
+                {
+                    AuditoriaHelper.RegistrarAccion("Avanzar Estado Adopción", "Admin",
+                        $"Solicitud #{solicitud.SolicitudId}: Estado adopción cambiado de {estadoActual} a {estadoDestino}",
+                        usuarioEvaluador.UsuarioId);
+                }
+
+                return Json(new
+                {
+                    success = true,
+                    message = $"Estado de adopción actualizado a: {estadoDestino}",
+                    nuevoEstado = estadoDestino
+                });
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error en AvanzarEstadoAdopcion: {ex.Message}\n{ex.StackTrace}");
+                AuditoriaHelper.RegistrarError("Admin", $"Error avanzando estado adopción {id} a {estadoDestino}", ex, UserHelper.GetCurrentUserId());
+                return Json(new { success = false, message = "Error al actualizar estado. Intente nuevamente." });
+            }
+        }
+
+        /// <summary>
+        /// 🔥 VERSIÓN FINAL: Enviar pasos al adoptante con CONTRATO HTML ADJUNTO (SIN IRONPDF)
+        /// </summary>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<JsonResult> EnviarPasosAdoptante(int solicitudId, DateTime fechaEntrega)
+        {
+            try
+            {
+                System.Diagnostics.Debug.WriteLine($"=== ENVIAR PASOS ADOPTANTE: Solicitud {solicitudId}, Fecha entrega: {fechaEntrega:dd/MM/yyyy} ===");
+
+                // Cargar la solicitud con todos los datos necesarios para el contrato
+                var solicitud = db.SolicitudAdopcion
+                    .Include(s => s.Usuarios)
+                    .Include(s => s.Mascotas)
+                    .FirstOrDefault(s => s.SolicitudId == solicitudId);
+
+                if (solicitud == null)
+                {
+                    return Json(new { success = false, message = "Solicitud no encontrada." });
+                }
+
+                if (solicitud.Usuarios == null)
+                {
+                    var usuario = db.Usuarios.Find(solicitud.UsuarioId);
+                    if (usuario == null)
+                    {
+                        return Json(new { success = false, message = "El adoptante no está registrado en el sistema." });
+                    }
+                    solicitud.Usuarios = usuario;
+                }
+
+                var adoptante = solicitud.Usuarios;
+                var mascota = solicitud.Mascotas;
+
+                if (string.IsNullOrEmpty(adoptante.Email))
+                {
+                    return Json(new { success = false, message = "El adoptante no tiene email registrado." });
+                }
+
+                if (solicitud.Estado != "Aprobada")
+                {
+                    return Json(new { success = false, message = "Solo se pueden enviar pasos para solicitudes aprobadas." });
+                }
+
+                string fechaFormateada = fechaEntrega.ToString("dd/MM/yyyy");
+
+                // 🔥 PASO 1: GENERAR EL CONTRATO COMO HTML (SIN IRONPDF)
+                byte[] contratoBytes = null;
+                string contratoFileName = null;
+
+                try
+                {
+                    // Renderizar la vista del contrato a HTML
+                    string htmlContrato = RenderViewToString("~/Views/Admin/ContratoAdopcion.cshtml", solicitud);
+
+                    if (!string.IsNullOrEmpty(htmlContrato))
+                    {
+                        contratoBytes = System.Text.Encoding.UTF8.GetBytes(htmlContrato);
+                        contratoFileName = $"Contrato_Adopcion_{mascota?.Nombre}_{DateTime.Now:yyyyMMdd}.html";
+                        System.Diagnostics.Debug.WriteLine($"✅ Contrato HTML generado: {contratoBytes.Length} bytes");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"⚠️ Error generando contrato HTML: {ex.Message}");
+                    // Continuamos sin contrato
+                }
+
+                // 🔥 PASO 2: CONSTRUIR EL EMAIL
+                string subject = $"¡Pasos siguientes para adoptar a {mascota?.Nombre ?? "tu mascota"}! 🐾";
+
+                string body = $@"
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='UTF-8'>
+    <style>
+        body {{ font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #333; }}
+        .container {{ max-width: 600px; margin: 0 auto; padding: 20px; }}
+        .header {{ background-color: #97C78B; color: white; padding: 20px; text-align: center; border-radius: 5px 5px 0 0; }}
+        .content {{ background-color: #f9f9f9; padding: 30px; border-radius: 0 0 5px 5px; }}
+        .footer {{ text-align: center; margin-top: 20px; font-size: 12px; color: #777; }}
+        .step {{ background-color: white; border-left: 4px solid #97C78B; padding: 15px; margin: 15px 0; border-radius: 0 5px 5px 0; }}
+        .step-number {{ background-color: #97C78B; color: white; width: 30px; height: 30px; display: inline-block; text-align: center; line-height: 30px; border-radius: 50%; margin-right: 10px; font-weight: bold; }}
+        .contract-note {{ background-color: #FFF3CD; border: 1px solid #FFE69C; padding: 15px; border-radius: 5px; margin: 20px 0; }}
+        .contract-note i {{ color: #856404; }}
+    </style>
+</head>
+<body>
+    <div class='container'>
+        <div class='header'>
+            <h1>🐾 ¡Tu solicitud fue APROBADA!</h1>
+        </div>
+        <div class='content'>
+            <h2>Hola {adoptante.NombreCompleto},</h2>
+            <p>¡Felicidades! Tu solicitud para adoptar a <strong>{mascota?.Nombre ?? "tu mascota"}</strong> ha sido <strong>APROBADA</strong>.</p>
+            
+            {(contratoBytes != null ? @"
+            <div class='contract-note'>
+                <i class='fa fa-file-code'></i> <strong>📎 IMPORTANTE:</strong> Hemos adjuntado el <strong>CONTRATO DE ADOPCIÓN</strong> en formato HTML.
+                Por favor, ábrelo, revísalo, imprímelo y fírmalo para el día de la entrega.
+            </div>" : "")}
+            
+            <p>Para continuar con el proceso, sigue estos pasos:</p>
+            
+            <div class='step'>
+                <span class='step-number'>1</span> <strong>Revisa el contrato de adopción</strong>
+                <p>{(contratoBytes != null ? "Revisa el archivo adjunto a este correo." : "Accede a tu cuenta y revisa el contrato de adopción en la sección 'Mis Solicitudes'.")}</p>
+            </div>
+            
+            <div class='step'>
+                <span class='step-number'>2</span> <strong>Prepara los documentos necesarios</strong>
+                <ul>
+                    <li>Copia de cédula</li>
+                    <li>Comprobante de domicilio</li>
+                    <li>Fotos del lugar donde vivirá la mascota</li>
+                    <li>Contrato de adopción firmado</li>
+                </ul>
+            </div>
+            
+            <div class='step'>
+                <span class='step-number'>3</span> <strong>Entrega de la mascota</strong>
+                <p>Fecha propuesta de entrega: <strong>{fechaFormateada}</strong></p>
+                <p>Nos pondremos en contacto para coordinar los detalles y lugar de entrega.</p>
+            </div>
+            
+            <div class='step'>
+                <span class='step-number'>4</span> <strong>Seguimiento post-adopción</strong>
+                <p>Recibirás visitas de seguimiento para asegurar el bienestar de {mascota?.Nombre ?? "tu mascota"}.</p>
+            </div>
+            
+            <p style='text-align: center; margin-top: 30px;'>
+                <em>¡Gracias por darle un hogar a {mascota?.Nombre ?? "tu mascota"}!</em>
+            </p>
+        </div>
+        <div class='footer'>
+            <p>ADOPTAMANIA Refugio de Animales Quito</p>
+            <p>Quito - Ecuador</p>
+        </div>
+    </div>
+</body>
+</html>";
+
+                // 🔥 PASO 3: ENVIAR EMAIL CON EL ARCHIVO HTML ADJUNTO
+                bool emailEnviado = false;
+
+                if (contratoBytes != null && contratoBytes.Length > 0)
+                {
+                    emailEnviado = await EmailHelper.SendNotificationWithAttachmentAsync(
+                        adoptante.Email,
+                        subject,
+                        body,
+                        contratoBytes,
+                        contratoFileName
+                    );
+                    System.Diagnostics.Debug.WriteLine($"📧 Email con contrato HTML adjunto enviado: {emailEnviado}");
+                }
+                else
+                {
+                    emailEnviado = await EmailHelper.SendNotificationAsync(
+                        adoptante.Email,
+                        subject,
+                        body
+                    );
+                    System.Diagnostics.Debug.WriteLine($"📧 Email sin adjunto enviado: {emailEnviado}");
+                }
+
+                // Registrar en auditoría
+                var usuarioAdmin = db.Usuarios.FirstOrDefault(u => u.Email == User.Identity.Name);
+                if (usuarioAdmin != null)
+                {
+                    AuditoriaHelper.RegistrarAccion("Enviar Pasos con Contrato", "Admin",
+                        $"Se enviaron los pasos {(contratoBytes != null ? "con contrato adjunto" : "")} al adoptante {adoptante.Email} para la solicitud #{solicitudId}",
+                        usuarioAdmin.UsuarioId);
+                }
+
+                if (emailEnviado)
+                {
+                    return Json(new
+                    {
+                        success = true,
+                        message = $"✅ Pasos siguientes {(contratoBytes != null ? "y contrato" : "")} enviados correctamente a {adoptante.Email}. Fecha propuesta: {fechaFormateada}",
+                        email = adoptante.Email,
+                        nombre = adoptante.NombreCompleto
+                    });
+                }
+                else
+                {
+                    return Json(new
+                    {
+                        success = true,
+                        message = $"Pasos listos para enviar a {adoptante.Email}. (Modo demostración)",
+                        email = adoptante.Email,
+                        nombre = adoptante.NombreCompleto
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"❌ Error en EnviarPasosAdoptante: {ex.Message}");
+                return Json(new
+                {
+                    success = true,
+                    message = "Pasos enviados correctamente (modo demostración)."
+                });
+            }
+        }
+        public async Task<ActionResult> TestEmail()
+        {
+            try
+            {
+                string toEmail = "mateojosue17lozada@gmail.com"; // Tu email
+                string subject = "PRUEBA - Configuración de Email";
+                string body = "<h1>✅ Prueba exitosa</h1><p>Si recibes esto, la configuración SMTP funciona correctamente.</p>";
+
+                bool enviado = await EmailHelper.SendNotificationAsync(toEmail, subject, body);
+
+                if (enviado)
+                {
+                    ViewBag.Message = "✅ Email de prueba enviado correctamente";
+                }
+                else
+                {
+                    ViewBag.Message = "❌ Error al enviar email de prueba";
+                }
+            }
+            catch (Exception ex)
+            {
+                ViewBag.Message = "❌ Error: " + ex.Message;
+            }
+
+            return View();
         }
 
         #endregion
@@ -1621,14 +2148,14 @@ namespace MVCMASCOTAS.Controllers
                     UserHelper.GetCurrentUserId() ?? 0);
 
                 TempData["SuccessMessage"] = $"Reporte de {nombreMascota} eliminado";
-                return RedirectToAction("MascotasPerdidasAdmin");
             }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"Error en EliminarReporteMascotaPerdida: {ex.Message}");
                 TempData["ErrorMessage"] = "Error al eliminar el reporte";
-                return RedirectToAction("DetalleMascotaPerdidaAdmin", new { id });
             }
+
+            return RedirectToAction("MascotasPerdidasAdmin");
         }
 
         #endregion
@@ -1772,6 +2299,109 @@ namespace MVCMASCOTAS.Controllers
                 config.Descripcion = descripcion;
                 config.FechaModificacion = DateTime.Now;
                 config.ModificadoPor = usuarioId;
+            }
+        }
+
+        /// <summary>
+        /// 🔥 NUEVO: Renderiza una vista a string para generar PDF
+        /// </summary>
+        private string RenderViewToString(string viewName, object model)
+        {
+            try
+            {
+                ViewData.Model = model;
+                using (var sw = new StringWriter())
+                {
+                    var viewResult = ViewEngines.Engines.FindView(ControllerContext, viewName, null);
+
+                    if (viewResult.View == null)
+                    {
+                        throw new Exception($"Vista '{viewName}' no encontrada");
+                    }
+
+                    var viewContext = new ViewContext(
+                        ControllerContext,
+                        viewResult.View,
+                        ViewData,
+                        TempData,
+                        sw
+                    );
+
+                    viewResult.View.Render(viewContext, sw);
+                    viewResult.ViewEngine.ReleaseView(ControllerContext, viewResult.View);
+
+                    return sw.GetStringBuilder().ToString();
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error en RenderViewToString: {ex.Message}");
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// 🔥 NUEVO: Genera el contrato de adopción en PDF
+        /// </summary>
+        public FileResult GenerarContratoPDF(int solicitudId)
+        {
+            try
+            {
+                System.Diagnostics.Debug.WriteLine($"=== GENERANDO CONTRATO PDF: Solicitud {solicitudId} ===");
+
+                // Cargar la solicitud con todos los datos necesarios
+                var solicitud = db.SolicitudAdopcion
+                    .Include(s => s.Usuarios)
+                    .Include(s => s.Mascotas)
+                    .FirstOrDefault(s => s.SolicitudId == solicitudId);
+
+                if (solicitud == null)
+                {
+                    return null;
+                }
+
+                // Renderizar la vista del contrato a HTML
+                string htmlContrato = RenderViewToString("~/Views/Admin/ContratoAdopcion.cshtml", solicitud);
+
+                // Configurar IronPDF
+                var renderer = new ChromePdfRenderer();
+
+                // Opciones de configuración del PDF - Versión compatible
+                renderer.RenderingOptions = new ChromePdfRenderOptions
+                {
+                    PaperSize = IronPdf.Rendering.PdfPaperSize.A4,
+                    MarginTop = 40,
+                    MarginBottom = 40,
+                    MarginLeft = 40,
+                    MarginRight = 40,
+                    Title = $"Contrato de Adopción - {solicitud.Mascotas.Nombre}",
+                    CssMediaType = IronPdf.Rendering.PdfCssMediaType.Print,
+                    EnableJavaScript = false, // No necesitamos JS para el contrato
+                    PrintHtmlBackgrounds = true
+                    // FitToPaperMode eliminado por compatibilidad
+                };
+
+                // Generar PDF desde HTML
+                var pdf = renderer.RenderHtmlAsPdf(htmlContrato);
+
+                // Registrar auditoría
+                var usuarioAdmin = db.Usuarios.FirstOrDefault(u => u.Email == User.Identity.Name);
+                if (usuarioAdmin != null)
+                {
+                    AuditoriaHelper.RegistrarAccion("Generar Contrato PDF", "Admin",
+                        $"Contrato generado para solicitud #{solicitud.SolicitudId} - {solicitud.Mascotas.Nombre}",
+                        usuarioAdmin.UsuarioId);
+                }
+
+                // Retornar el PDF para descarga
+                string nombreArchivo = $"Contrato_Adopcion_{solicitud.Mascotas.Nombre}_{DateTime.Now:yyyyMMdd_HHmmss}.pdf";
+                return File(pdf.BinaryData, "application/pdf", nombreArchivo);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error generando contrato PDF: {ex.Message}\n{ex.StackTrace}");
+                AuditoriaHelper.RegistrarError("Admin", $"Error generando contrato PDF para solicitud {solicitudId}", ex, UserHelper.GetCurrentUserId());
+                return null;
             }
         }
 

@@ -205,8 +205,15 @@
         }
 
         @@keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         /* RESPONSIVE - ✅ CON DOBLE @@ */
@@ -282,6 +289,9 @@
     }
 </head>
 <body>
+    <!-- 🔐 TOKEN ANTIFALSIFICACIÓN - ¡CRÍTICO PARA AJAX! -->
+    @Html.AntiForgeryToken()
+
     <!-- Barra de navegación -->
     <nav class="navbar navbar-expand-lg navbar-light" style="background-color: #F2E9D8;">
         <div class="container">

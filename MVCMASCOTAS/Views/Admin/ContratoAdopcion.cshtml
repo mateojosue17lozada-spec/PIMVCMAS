@@ -1,0 +1,226 @@
+﻿@model MVCMASCOTAS.Models.SolicitudAdopcion
+
+@{
+    Layout = null; // Importante: sin layout para PDF limpio
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Contrato de Adopción</title>
+    <style>
+        /* Estilo profesional para el contrato */
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            border-bottom: 2px solid #97C78B;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+            .header h1 {
+                color: #6B4F47;
+                margin-bottom: 5px;
+            }
+
+            .header h2 {
+                color: #97C78B;
+                font-size: 18px;
+                font-weight: normal;
+            }
+
+        .fecha-lugar {
+            text-align: right;
+            margin-bottom: 30px;
+            font-style: italic;
+        }
+
+        .partes {
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-left: 4px solid #97C78B;
+            margin-bottom: 30px;
+        }
+
+            .partes p {
+                margin: 5px 0;
+            }
+
+        .clausulas {
+            margin: 30px 0;
+        }
+
+        .clausula {
+            margin-bottom: 20px;
+        }
+
+            .clausula h3 {
+                color: #6B4F47;
+                border-bottom: 1px solid #FBCDC0;
+                padding-bottom: 5px;
+            }
+
+        .firmas {
+            margin-top: 50px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .firma {
+            text-align: center;
+            width: 45%;
+        }
+
+        .linea-firma {
+            border-top: 1px solid #333;
+            margin-top: 40px;
+            padding-top: 10px;
+        }
+
+        .footer {
+            margin-top: 50px;
+            text-align: center;
+            font-size: 12px;
+            color: #777;
+            border-top: 1px solid #97C78B;
+            padding-top: 20px;
+        }
+
+        .datos-mascota {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+            .datos-mascota div {
+                background-color: #f0f0f0;
+                padding: 10px;
+                border-radius: 5px;
+            }
+
+            .datos-mascota strong {
+                color: #6B4F47;
+            }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>CONTRATO DE ADOPCIÓN RESPONSABLE</h1>
+        <h2>@System.Configuration.ConfigurationManager.AppSettings["NombreRefugio"]</h2>
+        <p>RUC: 123456789001 | Tel: @System.Configuration.ConfigurationManager.AppSettings["TelefonoContacto"]</p>
+    </div>
+
+    <div class="fecha-lugar">
+        <p>Quito, @DateTime.Now.ToString("dd 'de' MMMM 'de' yyyy")</p>
+    </div>
+
+    <div class="partes">
+        <p><strong>COMPARECEN:</strong></p>
+        <p><strong>EL REFUGIO:</strong> @System.Configuration.ConfigurationManager.AppSettings["NombreRefugio"], representado legalmente por [Nombre del Representante], con domicilio en @System.Configuration.ConfigurationManager.AppSettings["DireccionRefugio"].</p>
+        <p><strong>EL/LA ADOPTANTE:</strong> @Model.Usuarios.NombreCompleto, con cédula de identidad No. @Model.Usuarios.Cedula, estado civil [ESTADO CIVIL], de nacionalidad ecuatoriana, con domicilio en @Model.Usuarios.Direccion, @Model.Usuarios.Ciudad, teléfono @Model.Usuarios.Telefono, correo electrónico @Model.Usuarios.Email.</p>
+    </div>
+
+    <div class="clausulas">
+        <h3 style="text-align:center; color:#6B4F47;">DATOS DE LA MASCOTA</h3>
+        <div class="datos-mascota">
+            <div><strong>Nombre:</strong> @Model.Mascotas.Nombre</div>
+            <div><strong>Especie:</strong> @Model.Mascotas.Especie</div>
+            <div><strong>Raza:</strong> @Model.Mascotas.Raza</div>
+            <div><strong>Sexo:</strong> @(Model.Mascotas.Sexo == "M" ? "Macho" : "Hembra")</div>
+            <div><strong>Color:</strong> @Model.Mascotas.Color</div>
+            <div><strong>Edad:</strong> @Model.Mascotas.EdadAproximada</div>
+            <div><strong>Esterilizado:</strong> @(Model.Mascotas.Esterilizado == true ? "Sí" : "No")</div>
+            <div><strong>Microchip:</strong> @(Model.Mascotas.Microchip ?? "No registra")</div>
+        </div>
+
+        <h3 style="text-align:center; color:#6B4F47; margin-top:30px;">CLÁUSULAS</h3>
+
+        <div class="clausula">
+            <h3>PRIMERA.- ANTECEDENTES</h3>
+            <p>EL REFUGIO es una organización sin fines de lucro dedicada al rescate, rehabilitación y adopción de animales en situación de abandono. LA MASCOTA descrita anteriormente ha sido rescatada, rehabilitada y se encuentra en óptimas condiciones de salud para ser adoptada.</p>
+        </div>
+
+        <div class="clausula">
+            <h3>SEGUNDA.- OBJETO DEL CONTRATO</h3>
+            <p>EL REFUGIO entrega en adopción a EL/LA ADOPTANTE la mascota antes descrita, quien la recibe en las condiciones físicas y de salud en que se encuentra, comprometiéndose a brindarle los cuidados necesarios para garantizar su bienestar.</p>
+        </div>
+
+        <div class="clausula">
+            <h3>TERCERA.- OBLIGACIONES DEL ADOPTANTE</h3>
+            <p>EL/LA ADOPTANTE se obliga a:</p>
+            <ul>
+                <li>Proporcionar alimentación adecuada, agua limpia y un espacio digno para la mascota.</li>
+                <li>Mantener al día el calendario de vacunación y desparasitación.</li>
+                <li>Acudir al veterinario ante cualquier eventualidad de salud.</li>
+                <li>No someter al animal a maltratos físicos o psicológicos.</li>
+                <li>Mantener al animal en el hogar, sin dejarlo deambular por la calle.</li>
+                <li>Permitir las visitas de seguimiento por parte del personal del refugio.</li>
+                <li>Notificar inmediatamente cualquier cambio de domicilio o teléfono.</li>
+                <li>En caso de no poder continuar con el cuidado del animal, devolverlo al refugio, nunca abandonarlo ni darlo en adopción por cuenta propia.</li>
+            </ul>
+        </div>
+
+        <div class="clausula">
+            <h3>CUARTA.- OBLIGACIONES DEL REFUGIO</h3>
+            <p>EL REFUGIO se obliga a:</p>
+            <ul>
+                <li>Entregar a la mascota con sus vacunas al día y desparasitada.</li>
+                <li>Entregar la historia clínica completa del animal.</li>
+                <li>Brindar asesoría permanente sobre el cuidado de la mascota.</li>
+                <li>Realizar visitas de seguimiento para verificar el bienestar del animal.</li>
+                <li>Recibir de vuelta al animal en caso de que el adoptante no pueda continuar con su cuidado.</li>
+            </ul>
+        </div>
+
+        <div class="clausula">
+            <h3>QUINTA.- SEGUIMIENTO POST-ADOPCIÓN</h3>
+            <p>EL REFUGIO realizará visitas de seguimiento durante los primeros 6 meses posteriores a la adopción. Estas visitas serán coordinadas previamente con EL/LA ADOPTANTE y tendrán como único fin verificar el bienestar de la mascota. La negativa injustificada a recibir las visitas de seguimiento podrá ser causal de reversión de la adopción.</p>
+        </div>
+
+        <div class="clausula">
+            <h3>SEXTA.- REVERSIÓN DE LA ADOPCIÓN</h3>
+            <p>EL REFUGIO se reserva el derecho de recuperar al animal en los siguientes casos:</p>
+            <ul>
+                <li>Maltrato evidente o negligencia en el cuidado.</li>
+                <li>Incumplimiento de las obligaciones establecidas en este contrato.</li>
+                <li>Cuando el animal sea utilizado para fines de reproducción sin autorización.</li>
+                <li>Falsedad en la información proporcionada por el adoptante.</li>
+            </ul>
+        </div>
+
+        <div class="clausula">
+            <h3>SÉPTIMA.- JURISDICCIÓN Y COMPETENCIA</h3>
+            <p>Las partes se someten a la jurisdicción y competencia de los jueces y tribunales de la ciudad de Quito, Ecuador, para la resolución de cualquier controversia que pudiera derivarse del presente contrato.</p>
+        </div>
+    </div>
+
+    <div class="firmas">
+        <div class="firma">
+            <p>____________________________</p>
+            <p><strong>EL/LA ADOPTANTE</strong></p>
+            <p>@Model.Usuarios.NombreCompleto</p>
+            <p>C.I. @Model.Usuarios.Cedula</p>
+        </div>
+        <div class="firma">
+            <p>____________________________</p>
+            <p><strong>EL REFUGIO</strong></p>
+            <p>@System.Configuration.ConfigurationManager.AppSettings["NombreRefugio"]</p>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>Este contrato se firma en unidad de acto, en original y copia, en la ciudad de Quito, a los @DateTime.Now.ToString("dd 'días del mes de' MMMM 'del año' yyyy").</p>
+        <p>Documento generado electrónicamente - @System.Configuration.ConfigurationManager.AppSettings["NombreRefugio"]</p>
+    </div>
+</body>
+</html>

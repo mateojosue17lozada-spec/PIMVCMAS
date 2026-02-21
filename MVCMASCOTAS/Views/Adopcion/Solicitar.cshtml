@@ -5,7 +5,7 @@
     ViewData["Title"] = "Solicitar Adopción";
 }
 
-<!-- Contenido principal -->
+<!-- Contenido principal (el mismo hasta la sección de disponibilidad) -->
 <div class="container body-content mt-4">
     <div class="row justify-content-center">
         <div class="col-md-10">
@@ -162,32 +162,85 @@
                             @Html.ValidationMessageFor(m => m.TiempoDisponibleDiario, "", new { @class = "text-danger" })
                         </div>
 
+                        <!-- 🔥 NUEVO: Quién cuidará con opciones -->
                         <div class="form-group">
                             <label class="text-brown">¿Quién cuidará de la mascota durante el día? *</label>
-                            @Html.TextAreaFor(m => m.QuienCuidaraMascota, new { @class = "form-control border-green", rows = "2", required = "required", placeholder = "Ej: Yo trabajo desde casa, mi esposa/o, etc." })
+                            @Html.DropDownListFor(m => m.QuienCuidaraMascota,
+                                new SelectList(Enum.GetValues(typeof(QuienCuidaraEnum))
+                                    .Cast<QuienCuidaraEnum>()
+                                    .Select(e => new SelectListItem
+                                    {
+                                        Value = e.ToString(),
+                                        Text = e.GetDisplayName()
+                                    }), "Value", "Text"),
+                                "Seleccionar...",
+                                new { @class = "form-control border-green", required = "required" })
                             @Html.ValidationMessageFor(m => m.QuienCuidaraMascota, "", new { @class = "text-danger" })
+                        </div>
+
+                        <div id="otro-cuidador" style="display: none;">
+                            <div class="form-group">
+                                <label class="text-brown">Especifique quién cuidará la mascota</label>
+                                @Html.TextBoxFor(m => m.OtroQuienCuidaraMascota, new { @class = "form-control border-green", placeholder = "Ej: Vecino, empleada doméstica, etc." })
+                            </div>
                         </div>
 
                         <h5 class="border-bottom pb-2 mb-3 mt-4 border-green">
                             <i class="fa fa-question-circle text-green"></i> <span class="text-brown">Preguntas Importantes</span>
                         </h5>
 
+                        <!-- 🔥 NUEVO: Motivo de adopción con opciones -->
                         <div class="form-group">
                             <label class="text-brown">¿Por qué deseas adoptar esta mascota? *</label>
-                            @Html.TextAreaFor(m => m.MotivoAdopcion, new { @class = "form-control border-green", rows = "3", maxlength = "500", required = "required", placeholder = "Explícanos por qué quieres adoptar a esta mascota en particular..." })
+                            @Html.DropDownListFor(m => m.MotivoAdopcion,
+                                new SelectList(Enum.GetValues(typeof(MotivoAdopcionEnum))
+                                    .Cast<MotivoAdopcionEnum>()
+                                    .Select(e => new SelectListItem
+                                    {
+                                        Value = e.ToString(),
+                                        Text = e.GetDisplayName()
+                                    }), "Value", "Text"),
+                                "Seleccionar...",
+                                new { @class = "form-control border-green", required = "required" })
                             @Html.ValidationMessageFor(m => m.MotivoAdopcion, "", new { @class = "text-danger" })
-                            <small class="form-text text-secondary">Mínimo 50 caracteres</small>
                         </div>
 
+                        <div id="otro-motivo" style="display: none;">
+                            <div class="form-group">
+                                <label class="text-brown">Especifique otro motivo</label>
+                                @Html.TextBoxFor(m => m.OtroMotivoAdopcion, new { @class = "form-control border-green", placeholder = "Describa su motivo..." })
+                            </div>
+                        </div>
+
+                        <!-- 🔥 NUEVO: Plan si cambia de residencia -->
                         <div class="form-group">
                             <label class="text-brown">¿Qué harías si cambias de residencia? *</label>
-                            @Html.TextAreaFor(m => m.QuePasaSiCambiaResidencia, new { @class = "form-control border-green", rows = "2", required = "required", placeholder = "Describe tus planes si te mudas..." })
+                            @Html.DropDownListFor(m => m.QuePasaSiCambiaResidencia,
+                                new SelectList(Enum.GetValues(typeof(PlanCambioResidenciaEnum))
+                                    .Cast<PlanCambioResidenciaEnum>()
+                                    .Select(e => new SelectListItem
+                                    {
+                                        Value = e.ToString(),
+                                        Text = e.GetDisplayName()
+                                    }), "Value", "Text"),
+                                "Seleccionar...",
+                                new { @class = "form-control border-green", required = "required" })
                             @Html.ValidationMessageFor(m => m.QuePasaSiCambiaResidencia, "", new { @class = "text-danger" })
                         </div>
 
+                        <!-- 🔥 NUEVO: Plan ante problemas de comportamiento -->
                         <div class="form-group">
                             <label class="text-brown">¿Qué harías ante problemas de comportamiento? *</label>
-                            @Html.TextAreaFor(m => m.QuePasaSiProblemasComportamiento, new { @class = "form-control border-green", rows = "2", required = "required", placeholder = "Ej: Consultaría con un veterinario, buscaría entrenamiento..." })
+                            @Html.DropDownListFor(m => m.QuePasaSiProblemasComportamiento,
+                                new SelectList(Enum.GetValues(typeof(PlanProblemasComportamientoEnum))
+                                    .Cast<PlanProblemasComportamientoEnum>()
+                                    .Select(e => new SelectListItem
+                                    {
+                                        Value = e.ToString(),
+                                        Text = e.GetDisplayName()
+                                    }), "Value", "Text"),
+                                "Seleccionar...",
+                                new { @class = "form-control border-green", required = "required" })
                             @Html.ValidationMessageFor(m => m.QuePasaSiProblemasComportamiento, "", new { @class = "text-danger" })
                         </div>
 
@@ -195,9 +248,19 @@
                             <i class="fa fa-user-md text-green"></i> <span class="text-brown">Referencias Veterinarias</span>
                         </h5>
 
+                        <!-- 🔥 NUEVO: Veterinario de referencia con opciones -->
                         <div class="form-group">
-                            <label class="text-brown">Veterinario de referencia (opcional)</label>
-                            @Html.TextBoxFor(m => m.VeterinarioReferencia, new { @class = "form-control border-green", placeholder = "Nombre del veterinario o clínica" })
+                            <label class="text-brown">¿Tiene veterinario de referencia?</label>
+                            @Html.DropDownListFor(m => m.VeterinarioReferencia,
+                                new SelectList(Enum.GetValues(typeof(VeterinarioReferenciaEnum))
+                                    .Cast<VeterinarioReferenciaEnum>()
+                                    .Select(e => new SelectListItem
+                                    {
+                                        Value = e.ToString(),
+                                        Text = e.GetDisplayName()
+                                    }), "Value", "Text"),
+                                "Seleccionar...",
+                                new { @class = "form-control border-green" })
                         </div>
 
                         <div class="row">
@@ -331,7 +394,6 @@
 }
 
 @section Scripts {
-    @* La ruta del bundle puede variar según tu configuración *@
     <script src="~/Scripts/jquery.validate.min.js"></script>
     <script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>
 
@@ -375,15 +437,63 @@
                 }
             });
 
-            // Validación antes de enviar
+            // Mostrar/ocultar campo "Otro" para QuienCuidara
+            $('#QuienCuidaraMascota').change(function () {
+                if ($(this).val() === 'Otro') {
+                    $('#otro-cuidador').slideDown();
+                } else {
+                    $('#otro-cuidador').slideUp();
+                }
+            });
+
+            // Mostrar/ocultar campo "Otro" para MotivoAdopcion
+            $('#MotivoAdopcion').change(function () {
+                if ($(this).val() === 'Otro') {
+                    $('#otro-motivo').slideDown();
+                } else {
+                    $('#otro-motivo').slideUp();
+                }
+            });
+
+            // Validación simplificada
             $('form').submit(function (e) {
                 var isValid = true;
                 var mensaje = '';
 
-                // Validar motivo de adopción (mínimo 50 caracteres)
+                // Validar que todas las opciones requeridas estén seleccionadas
                 var motivo = $('#MotivoAdopcion').val();
-                if (motivo.length < 50) {
-                    mensaje += 'El motivo de adopción debe tener al menos 50 caracteres.\n';
+                var cambioResidencia = $('#QuePasaSiCambiaResidencia').val();
+                var problemasComportamiento = $('#QuePasaSiProblemasComportamiento').val();
+                var quienCuidara = $('#QuienCuidaraMascota').val();
+
+                if (!motivo || motivo === '') {
+                    mensaje += 'Debe seleccionar un motivo de adopción.\n';
+                    isValid = false;
+                }
+
+                if (!cambioResidencia || cambioResidencia === '') {
+                    mensaje += 'Debe seleccionar qué haría si cambia de residencia.\n';
+                    isValid = false;
+                }
+
+                if (!problemasComportamiento || problemasComportamiento === '') {
+                    mensaje += 'Debe seleccionar cómo manejaría problemas de comportamiento.\n';
+                    isValid = false;
+                }
+
+                if (!quienCuidara || quienCuidara === '') {
+                    mensaje += 'Debe seleccionar quién cuidará a la mascota.\n';
+                    isValid = false;
+                }
+
+                // Validar campos "Otro"
+                if (motivo === 'Otro' && !$('#OtroMotivoAdopcion').val()) {
+                    mensaje += 'Debe especificar otro motivo de adopción.\n';
+                    isValid = false;
+                }
+
+                if (quienCuidara === 'Otro' && !$('#OtroQuienCuidaraMascota').val()) {
+                    mensaje += 'Debe especificar otro cuidador.\n';
                     isValid = false;
                 }
 

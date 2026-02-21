@@ -1,11 +1,12 @@
-﻿using System;
-using System.Linq;
-using System.Web.Mvc;
-using MVCMASCOTAS.Helpers;
+﻿using MVCMASCOTAS.Helpers;
 using MVCMASCOTAS.Models;
 using MVCMASCOTAS.Models.ViewModels;
-using System.Data.Entity;
+using System;
 using System.Collections.Generic;
+using System.Data.Entity;
+using System.Data.Entity.Validation;
+using System.Linq;
+using System.Web.Mvc;
 
 namespace MVCMASCOTAS.Controllers
 {
@@ -132,7 +133,7 @@ namespace MVCMASCOTAS.Controllers
             if (!ModelState.IsValid)
             {
                 var mascota = db.Mascotas.Find(mascotaId);
-                ViewBag.NombreMascota = mascota.Nombre;
+                ViewBag.NombreMascota = mascota?.Nombre ?? "Mascota";
                 ViewBag.MascotaId = mascotaId;
                 ViewBag.ImagenBase64 = mascota?.ImagenPrincipal != null
                     ? Convert.ToBase64String(mascota.ImagenPrincipal)
@@ -141,84 +142,172 @@ namespace MVCMASCOTAS.Controllers
             }
 
             var usuario = db.Usuarios.FirstOrDefault(u => u.Email == User.Identity.Name);
+            if (usuario == null)
+            {
+                TempData["ErrorMessage"] = "Usuario no encontrado.";
+                return RedirectToAction("Login", "Account");
+            }
+
+            // Verificar que la mascota existe
+            var mascotaVerificacion = db.Mascotas.Find(mascotaId);
+            if (mascotaVerificacion == null)
+            {
+                TempData["ErrorMessage"] = "La mascota no existe.";
+                return RedirectToAction("Index", "Mascotas");
+            }
 
             // Crear solicitud
+            // Crear solicitud - CORREGIDO
             var solicitud = new SolicitudAdopcion
             {
                 MascotaId = mascotaId,
                 UsuarioId = usuario.UsuarioId,
                 FechaSolicitud = DateTime.Now,
-                Estado = "Pendiente"
+                Estado = "Pendiente",
+                // CAMPO OBLIGATORIO QUE FALTABA
+                EstadoAdopcion = "No iniciada",
+                // OTROS CAMPOS PARA EVITAR NULL
+                PuntajeEvaluacion = 0,
+                ResultadoEvaluacion = "Pendiente"
             };
 
             db.SolicitudAdopcion.Add(solicitud);
             db.SaveChanges();
 
-            // CORRECCIÓN: Como CantidadPerros y CantidadGatos son int (no nullable) en tu ViewModel,
-            // simplemente los asignamos directamente
+            // 🔥 CREAR FORMULARIO CON VALORES EXPLÍCITOS
+            // 🔥 CREAR FORMULARIO CON VALORES EXPLÍCITOS - VERSIÓN ACTUALIZADA CON ENUMS
+            // CREAR FORMULARIO CON VALORES EXPLÍCITOS - VERSIÓN CORREGIDA
             var formulario = new FormularioAdopcionDetalle
             {
                 SolicitudId = solicitud.SolicitudId,
-                TipoVivienda = model.TipoVivienda,
+
+                // Campos de vivienda
+                TipoVivienda = model.TipoVivienda ?? "",
                 ViviendaPropia = model.ViviendaPropia,
                 TieneJardin = model.TieneJardin,
-                TamanioJardin = model.TamanioJardin,
+                TamanioJardin = model.TamanioJardin ?? "",
                 PermisoMascotas = model.PermisoMascotas,
-                PersonasEnCasa = model.PersonasEnCasa,
+
+                // Composición del hogar
+                PersonasEnCasa = model.PersonasEnCasa > 0 ? (int?)model.PersonasEnCasa : null,
                 HayNinios = model.HayNinios,
-                EdadesNinios = model.EdadesNinios,
+                EdadesNinios = model.EdadesNinios ?? "",
+
+                // Experiencia con mascotas
                 ExperienciaPreviaConMascotas = model.ExperienciaPreviaConMascotas,
-                DetalleExperiencia = model.DetalleExperiencia,
+                DetalleExperiencia = model.DetalleExperiencia ?? "",
                 TieneMascotasActualmente = model.TieneMascotasActualmente,
-                CantidadPerros = model.CantidadPerros,  // Directamente, son int
-                CantidadGatos = model.CantidadGatos,    // Directamente, son int
-                OtrasMascotas = model.OtrasMascotas,
+
+                // Mascotas actuales
+                CantidadPerros = model.CantidadPerros > 0 ? (int?)model.CantidadPerros : null,
+                CantidadGatos = model.CantidadGatos > 0 ? (int?)model.CantidadGatos : null,
+                OtrasMascotas = model.OtrasMascotas ?? "",
                 MascotasEsterilizadas = model.MascotasEsterilizadas,
-                TiempoDisponibleDiario = model.TiempoDisponibleDiario,
-                QuienCuidaraMascota = model.QuienCuidaraMascota,
-                MotivoAdopcion = model.MotivoAdopcion,
-                QuePasaSiCambiaResidencia = model.QuePasaSiCambiaResidencia,
-                QuePasaSiProblemasComportamiento = model.QuePasaSiProblemasComportamiento,
-                VeterinarioReferencia = model.VeterinarioReferencia,
-                ReferenciaPersonal1 = model.ReferenciaPersonal1,
-                TelefonoReferencia1 = model.TelefonoReferencia1,
-                ReferenciaPersonal2 = model.ReferenciaPersonal2,
-                TelefonoReferencia2 = model.TelefonoReferencia2,
-                AceptaEsterilizacion = model.AceptaEsterilizacion,
-                AceptaVisitasSeguimiento = model.AceptaVisitasSeguimiento,
-                AceptaCondicionesLOBA = model.AceptaCondicionesLOBA,
-                AceptaDevolucionSiNoPuedeAtender = model.AceptaDevolucionSiNoPuedeAtender,
+
+                // Disponibilidad
+                TiempoDisponibleDiario = model.TiempoDisponibleDiario ?? "",
+                QuienCuidaraMascota = model.QuienCuidaraMascota?.ToString() ?? "",
+
+                // Preguntas
+                MotivoAdopcion = model.MotivoAdopcion?.ToString() ?? "",
+                QuePasaSiCambiaResidencia = model.QuePasaSiCambiaResidencia?.ToString() ?? "",
+                QuePasaSiProblemasComportamiento = model.QuePasaSiProblemasComportamiento?.ToString() ?? "",
+
+                // Referencias
+                VeterinarioReferencia = model.VeterinarioReferencia?.ToString() ?? "",
+                ReferenciaPersonal1 = model.ReferenciaPersonal1 ?? "",
+                TelefonoReferencia1 = model.TelefonoReferencia1 ?? "",
+                ReferenciaPersonal2 = model.ReferenciaPersonal2 ?? "",
+                TelefonoReferencia2 = model.TelefonoReferencia2 ?? "",
+
+                // ⚠️ CAMPOS BOOLEANOS OBLIGATORIOS (NOT NULL en BD)
+                AceptaEsterilizacion = model.AceptaEsterilizacion,  // Debe venir true/false del formulario
+                AceptaVisitasSeguimiento = model.AceptaVisitasSeguimiento,  // Debe venir true/false
+                AceptaCondicionesLOBA = model.AceptaCondicionesLOBA,  // Debe venir true/false
+                AceptaDevolucionSiNoPuedeAtender = model.AceptaDevolucionSiNoPuedeAtender,  // Debe venir true/false
+
                 FechaLlenado = DateTime.Now
             };
 
-            db.FormularioAdopcionDetalle.Add(formulario);
-            db.SaveChanges();
-
-            // Evaluar automáticamente
-            int puntaje = EvaluarSolicitud(formulario);
-            string resultado = puntaje >= 80 ? "Apto" : puntaje >= 60 ? "Revisión Manual" : "No Apto";
-
-            // Actualizar solicitud
-            solicitud.PuntajeEvaluacion = puntaje;
-            solicitud.ResultadoEvaluacion = resultado;
-            solicitud.FechaEvaluacion = DateTime.Now;
-            solicitud.Estado = resultado == "Apto" ? "Aprobada" : "En evaluación";
-            db.SaveChanges();
-
-            // Auditoría
-            AuditoriaHelper.RegistrarAccion("Solicitud Adopción", "Adopcion",
-                $"Solicitud creada para mascota ID: {mascotaId}, Resultado: {resultado}", usuario.UsuarioId);
-
-            if (resultado == "Apto")
+            try
             {
-                TempData["SuccessMessage"] = "¡Felicitaciones! Tu solicitud ha sido aprobada automáticamente.";
-            }
-            else
-            {
-                TempData["SuccessMessage"] = "Tu solicitud ha sido recibida y será evaluada pronto.";
-            }
+                // 🔥 DESACTIVAR VALIDACIÓN TEMPORALMENTE PARA VER EL ERROR
+                db.Configuration.ValidateOnSaveEnabled = false;
 
-            return RedirectToAction("MisSolicitudes");
+                db.FormularioAdopcionDetalle.Add(formulario);
+                db.SaveChanges();
+
+                // Volver a activar
+                db.Configuration.ValidateOnSaveEnabled = true;
+
+                // Evaluar automáticamente
+                int puntaje = EvaluarSolicitud(formulario);
+                string resultado = puntaje >= 80 ? "Apto" : puntaje >= 60 ? "Revisión Manual" : "No Apto";
+
+                solicitud.PuntajeEvaluacion = puntaje;
+                solicitud.ResultadoEvaluacion = resultado;
+                solicitud.FechaEvaluacion = DateTime.Now;
+                solicitud.Estado = resultado == "Apto" ? "Aprobada" : "En evaluación";
+                db.SaveChanges();
+
+                AuditoriaHelper.RegistrarAccion("Solicitud Adopción", "Adopcion",
+                    $"Solicitud creada para mascota ID: {mascotaId}, Resultado: {resultado}", usuario.UsuarioId);
+
+                if (resultado == "Apto")
+                {
+                    TempData["SuccessMessage"] = "¡Felicitaciones! Tu solicitud ha sido aprobada automáticamente.";
+                }
+                else
+                {
+                    TempData["SuccessMessage"] = "Tu solicitud ha sido recibida y será evaluada pronto.";
+                }
+
+                return RedirectToAction("MisSolicitudes");
+            }
+            catch (Exception ex)
+            {
+                // 🔥 CAPTURAR EL ERROR REAL
+                System.Diagnostics.Debug.WriteLine("=== ERROR DETALLADO ===");
+                System.Diagnostics.Debug.WriteLine($"Mensaje: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"StackTrace: {ex.StackTrace}");
+
+                if (ex.InnerException != null)
+                {
+                    System.Diagnostics.Debug.WriteLine($"InnerException: {ex.InnerException.Message}");
+                }
+
+                // Si es DbEntityValidationException, mostrar todos los errores
+                if (ex is DbEntityValidationException dbEx)
+                {
+                    var errors = new List<string>();
+                    foreach (var validationErrors in dbEx.EntityValidationErrors)
+                    {
+                        foreach (var validationError in validationErrors.ValidationErrors)
+                        {
+                            string error = $"Propiedad: {validationError.PropertyName} - Error: {validationError.ErrorMessage}";
+                            errors.Add(error);
+                            System.Diagnostics.Debug.WriteLine(error);
+                        }
+                    }
+
+                    // Mostrar en la interfaz
+                    TempData["ErrorMessage"] = "Error de validación: " + string.Join(" | ", errors);
+                }
+                else
+                {
+                    TempData["ErrorMessage"] = $"Error: {ex.Message}";
+                }
+
+                // Recargar la vista
+                var mascota = db.Mascotas.Find(mascotaId);
+                ViewBag.NombreMascota = mascota?.Nombre ?? "Mascota";
+                ViewBag.MascotaId = mascotaId;
+                ViewBag.ImagenBase64 = mascota?.ImagenPrincipal != null
+                    ? Convert.ToBase64String(mascota.ImagenPrincipal)
+                    : null;
+
+                return View(model);
+            }
         }
 
         // Método privado de evaluación
@@ -318,7 +407,7 @@ namespace MVCMASCOTAS.Controllers
                     return RedirectToAction("MisSolicitudes");
                 }
 
-                // ✅ SANITIZAR MOTIVO
+                // ✅ SANITIZAR MOTIVO - CORREGIDO
                 if (string.IsNullOrWhiteSpace(motivoCancelacion))
                     motivoCancelacion = "Cancelada por el usuario";
                 else
@@ -712,6 +801,32 @@ namespace MVCMASCOTAS.Controllers
 
             TempData["InfoMessage"] = "Para descargar el contrato, use la opción 'Imprimir' en su navegador y seleccione 'Guardar como PDF'.";
             return RedirectToAction("Contrato", new { id = id });
+        }
+
+        // ============================================================================
+        // MÉTODOS AUXILIARES PRIVADOS
+        // ============================================================================
+
+        /// <summary>
+        /// Método auxiliar para sanitizar strings y prevenir XSS
+        /// </summary>
+        private string SanitizarString(string input, int maxLength = 0)
+        {
+            if (string.IsNullOrEmpty(input))
+                return input;
+
+            // Eliminar caracteres peligrosos para prevenir XSS
+            string sanitized = input.Replace("<", "&lt;")
+                                    .Replace(">", "&gt;")
+                                    .Replace("\"", "&quot;")
+                                    .Replace("'", "&#39;")
+                                    .Replace("&", "&amp;");
+
+            // Truncar si excede la longitud máxima
+            if (maxLength > 0 && sanitized.Length > maxLength)
+                sanitized = sanitized.Substring(0, maxLength);
+
+            return sanitized;
         }
 
         protected override void Dispose(bool disposing)

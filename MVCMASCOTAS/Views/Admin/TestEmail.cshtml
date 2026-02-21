@@ -1,0 +1,30 @@
+﻿@{
+    ViewBag.Title = "Prueba de Email";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-4">
+    <div class="card border-green">
+        <div class="card-header bg-green text-white">
+            <h3><i class="fa fa-envelope"></i> Prueba de Configuración de Email</h3>
+        </div>
+        <div class="card-body bg-light-mint">
+            @if (ViewBag.Message != null)
+            {
+                <div class="alert alert-info">
+                    @Html.Raw(ViewBag.Message)
+                </div>
+            }
+
+            <form method="post" action="@Url.Action("TestEmail")">
+                <div class="form-group">
+                    <label>Email de prueba:</label>
+                    <input type="email" name="toEmail" value="mateojosue17lozada@gmail.com" class="form-control border-green" />
+                </div>
+                <button type="submit" class="btn btn-green">
+                    <i class="fa fa-paper-plane"></i> Enviar Email de Prueba
+                </button>
+            </form>
+        </div>
+    </div>
+</div>

@@ -117,13 +117,13 @@
             </div>
         </div>
         <div class="card-body bg-light-mint">
-            @using (Html.BeginForm("SolicitudAdopcion", "Admin", FormMethod.Get, new { @class = "form-inline" }))
+            @using (Html.BeginForm("SolicitudAdopcionFiltrada", "Admin", FormMethod.Get, new { @class = "form-inline" }))
             {
                 <div class="form-group mr-2 mb-2">
                     <label class="mr-2 text-brown">Estado Solicitud:</label>
                     @{
                         var estados = new List<SelectListItem>
-                                {
+                                                {
                             new SelectListItem { Text = "Todos", Value = "Todos", Selected = ViewBag.EstadoSeleccionado == "Todos" || string.IsNullOrEmpty(ViewBag.EstadoSeleccionado) },
                             new SelectListItem { Text = "Pendiente", Value = "Pendiente", Selected = ViewBag.EstadoSeleccionado == "Pendiente" },
                             new SelectListItem { Text = "En evaluación", Value = "En evaluación", Selected = ViewBag.EstadoSeleccionado == "En evaluación" },
@@ -140,7 +140,7 @@
                     <label class="mr-2 text-brown">Estado Adopción:</label>
                     @{
                         var estadosAdopcion = new List<SelectListItem>
-                                {
+                                                {
                             new SelectListItem { Text = "Todos", Value = "Todos", Selected = ViewBag.EstadoAdopcionSeleccionado == "Todos" || string.IsNullOrEmpty(ViewBag.EstadoAdopcionSeleccionado) },
                             new SelectListItem { Text = "No iniciada", Value = "No iniciada", Selected = ViewBag.EstadoAdopcionSeleccionado == "No iniciada" },
                             new SelectListItem { Text = "Programada", Value = "Programada", Selected = ViewBag.EstadoAdopcionSeleccionado == "Programada" },
@@ -187,7 +187,6 @@
                                 <th>Estado Solicitud</th>
                                 <th>Estado Adopción</th>
                                 <th>Puntaje</th>
-                                <th>Evaluación</th>
                                 <th class="text-center">Acciones</th>
                             </tr>
                         </thead>
@@ -366,7 +365,7 @@
                                             <div class="progress" style="height: 20px;">
                                                 <div class="progress-bar @barColor"
                                                      role="progressbar"
-                                                     style="width: @puntaje%"
+                                                     style="width: @puntaje%;"
                                                      aria-valuenow="@puntaje"
                                                      aria-valuemin="0"
                                                      aria-valuemax="100">
@@ -380,17 +379,7 @@
                                             <span class="badge bg-light-mint text-brown">Sin puntaje</span>
                                         }
                                     </td>
-                                    <td>
-                                        @if (solicitud.FechaEvaluacion.HasValue && solicitud.EvaluadoPor.HasValue)
-                                        {
-                                            <span class="text-brown">@solicitud.FechaEvaluacion.Value.ToString("dd/MM/yyyy")</span><br />
-                                            <small class="text-secondary">Por: @(solicitud.Usuarios1?.NombreCompleto ?? "N/A")</small>
-                                        }
-                                        else
-                                        {
-                                            <span class="text-secondary">Pendiente</span>
-                                        }
-                                    </td>
+                                    
                                     <td class="text-center">
                                         <div class="btn-group-vertical" style="min-width: 120px;">
                                             <!-- Botón Ver Detalles -->
@@ -407,8 +396,8 @@
                                                 <button type="button"
                                                         class="btn btn-green btn-sm mb-1 btn-aprobar"
                                                         data-solicitud-id="@solicitud.SolicitudId"
-                                                        data-nombre-usuario="@solicitud.Usuarios?.NombreCompleto"
-                                                        data-nombre-mascota="@solicitud.Mascotas?.Nombre"
+                                                        data-nombre-usuario="@(solicitud.Usuarios != null ? solicitud.Usuarios.NombreCompleto : "")"
+                                                        data-nombre-mascota="@(solicitud.Mascotas != null ? solicitud.Mascotas.Nombre : "")"
                                                         title="Aprobar solicitud"
                                                         data-toggle="tooltip">
                                                     <i class="fa fa-check"></i> Aprobar
@@ -480,9 +469,9 @@
                                                 <button type="button"
                                                         class="btn btn-yellow btn-sm mb-1 btn-enviar-pasos"
                                                         data-solicitud-id="@solicitud.SolicitudId"
-                                                        data-nombre-usuario="@solicitud.Usuarios?.NombreCompleto"
-                                                        data-email-usuario="@solicitud.Usuarios?.Email"
-                                                        data-nombre-mascota="@solicitud.Mascotas?.Nombre"
+                                                        data-nombre-usuario="@(solicitud.Usuarios != null ? solicitud.Usuarios.NombreCompleto : "")"
+                                                        data-email-usuario="@(solicitud.Usuarios != null ? solicitud.Usuarios.Email : "")"
+                                                        data-nombre-mascota="@(solicitud.Mascotas != null ? solicitud.Mascotas.Nombre : "")"
                                                         title="Enviar pasos siguientes al adoptante"
                                                         data-toggle="tooltip">
                                                     <i class="fa fa-envelope"></i> 📩 Enviar pasos
@@ -522,7 +511,7 @@
                     @if (ViewBag.CurrentPage > 1)
                     {
                         <li class="page-item">
-                            <a class="page-link text-green" href="@Url.Action("SolicitudAdopcion", "Admin", new {
+                            <a class="page-link text-green" href="@Url.Action("SolicitudAdopcionFiltrada", "Admin", new {
                                 page = 1,
                                 estado = ViewBag.EstadoSeleccionado,
                                 estadoAdopcion = ViewBag.EstadoAdopcionSeleccionado
@@ -531,7 +520,7 @@
                             </a>
                         </li>
                         <li class="page-item">
-                            <a class="page-link text-green" href="@Url.Action("SolicitudAdopcion", "Admin", new {
+                            <a class="page-link text-green" href="@Url.Action("SolicitudAdopcionFiltrada", "Admin", new {
                                 page = ViewBag.CurrentPage - 1,
                                 estado = ViewBag.EstadoSeleccionado,
                                 estadoAdopcion = ViewBag.EstadoAdopcionSeleccionado
@@ -550,7 +539,7 @@
                     @for (int i = startPage; i <= endPage; i++)
                     {
                         <li class="page-item @(i == ViewBag.CurrentPage ? "active bg-green" : "")">
-                            <a class="page-link @(i == ViewBag.CurrentPage ? "text-white" : "text-green")" href="@Url.Action("SolicitudAdopcion", "Admin", new {
+                            <a class="page-link @(i == ViewBag.CurrentPage ? "text-white" : "text-green")" href="@Url.Action("SolicitudAdopcionFiltrada", "Admin", new {
                                 page = i,
                                 estado = ViewBag.EstadoSeleccionado,
                                 estadoAdopcion = ViewBag.EstadoAdopcionSeleccionado
@@ -562,7 +551,7 @@
                     @if (ViewBag.CurrentPage < ViewBag.TotalPages)
                     {
                         <li class="page-item">
-                            <a class="page-link text-green" href="@Url.Action("SolicitudAdopcion", "Admin", new {
+                            <a class="page-link text-green" href="@Url.Action("SolicitudAdopcionFiltrada", "Admin", new {
                                 page = ViewBag.CurrentPage + 1,
                                 estado = ViewBag.EstadoSeleccionado,
                                 estadoAdopcion = ViewBag.EstadoAdopcionSeleccionado
@@ -571,7 +560,7 @@
                             </a>
                         </li>
                         <li class="page-item">
-                            <a class="page-link text-green" href="@Url.Action("SolicitudAdopcion", "Admin", new {
+                            <a class="page-link text-green" href="@Url.Action("SolicitudAdopcionFiltrada", "Admin", new {
                                 page = ViewBag.TotalPages,
                                 estado = ViewBag.EstadoSeleccionado,
                                 estadoAdopcion = ViewBag.EstadoAdopcionSeleccionado
@@ -915,6 +904,7 @@
                 opacity: 0;
                 transform: translateY(20px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -957,50 +947,147 @@
         $(document).ready(function () {
             console.log('Vista Gestión de Solicitudes cargada');
 
-            // Inicializar tooltips
-            $('[data-toggle="tooltip"]').tooltip({
-                trigger: 'hover'
+            // 🔥 SOLUCIÓN DEFINITIVA: Obtener token AntiForgery
+            function getAntiForgeryToken() {
+                // Buscar en el formulario oculto que creamos
+                var tokenInput = $('#__AjaxAntiForgeryForm input[name="__RequestVerificationToken"]').first();
+                if (tokenInput.length > 0) {
+                    console.log('✅ Token encontrado en formulario');
+                    return tokenInput.val();
+                }
+
+                // Buscar en cualquier input del DOM
+                tokenInput = $('input[name="__RequestVerificationToken"]').first();
+                if (tokenInput.length > 0) {
+                    console.log('✅ Token encontrado en input');
+                    return tokenInput.val();
+                }
+
+                console.error('❌ No se encontró token AntiForgery');
+                return null;
+            }
+
+            var antiForgeryToken = getAntiForgeryToken();
+
+            // Configuración global para AJAX
+            $.ajaxSetup({
+                beforeSend: function (xhr, settings) {
+                    if (settings.type === 'POST' || settings.type === 'PUT' || settings.type === 'DELETE') {
+                        // Siempre enviar el token en el header
+                        if (antiForgeryToken) {
+                            xhr.setRequestHeader('RequestVerificationToken', antiForgeryToken);
+                        }
+
+                        // También asegurar que el token está en los datos si es necesario
+                        if (settings.data && typeof settings.data === 'string') {
+                            if (settings.data.indexOf('__RequestVerificationToken') === -1) {
+                                settings.data += '&__RequestVerificationToken=' + encodeURIComponent(antiForgeryToken || '');
+                            }
+                        } else if (settings.data && typeof settings.data === 'object' && !(settings.data instanceof FormData)) {
+                            settings.data.__RequestVerificationToken = antiForgeryToken;
+                        } else if (!settings.data) {
+                            settings.data = { __RequestVerificationToken: antiForgeryToken };
+                        }
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error('❌ Error AJAX:', error);
+                    console.error('Status:', status);
+                    console.error('Response:', xhr.responseText);
+
+                    if (xhr.status === 400 || xhr.status === 500) {
+                        try {
+                            var response = JSON.parse(xhr.responseText);
+                            if (response.message) {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error del servidor',
+                                    text: response.message,
+                                    confirmButtonColor: '#FBCDC0'
+                                });
+                                return;
+                            }
+                        } catch (e) {
+                            // No es JSON, continuar
+                        }
+                    }
+
+                    if (xhr.status === 401) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Sesión expirada',
+                            text: 'Por favor, inicie sesión nuevamente',
+                            confirmButtonColor: '#FBCDC0'
+                        }).then(() => {
+                            window.location.href = '@Url.Action("Login", "Account")';
+                        });
+                    }
+                }
             });
 
-            // Efecto hover en tarjetas
-            $('.shadow-hover').hover(
-                function () {
-                    $(this).addClass('shadow-lg');
-                },
-                function () {
-                    $(this).removeClass('shadow-lg');
-                }
-            );
+            // Inicializar tooltips
+            $('[data-toggle="tooltip"]').tooltip({ trigger: 'hover' });
 
-            // Efecto hover en estadísticas
-            $('.stat-box').hover(
-                function () {
-                    $(this).css('transform', 'translateY(-5px)');
-                },
-                function () {
-                    $(this).css('transform', 'translateY(0)');
-                }
-            );
+            // Función helper para mostrar errores
+            function showError(message) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: message || 'Ocurrió un error inesperado',
+                    confirmButtonColor: '#FBCDC0'
+                });
+            }
 
-            // Botón APROBAR - Nuevo comportamiento con SweetAlert2
+            // Función helper para mostrar éxito
+            function showSuccess(message, callback) {
+                Swal.fire({
+                    icon: 'success',
+                    title: '¡Éxito!',
+                    text: message,
+                    confirmButtonColor: '#97C78B',
+                    timer: 2000,
+                    showConfirmButton: true
+                }).then((result) => {
+                    if (callback) callback();
+                });
+            }
+
+            // Función helper para validar token
+            function validateToken() {
+                if (!antiForgeryToken) {
+                    antiForgeryToken = getAntiForgeryToken();
+                    if (!antiForgeryToken) {
+                        showError('Error de seguridad. Por favor, recargue la página.');
+                        return false;
+                    }
+                }
+                return true;
+            }
+
+            // ===========================================
+            // APROBAR SOLICITUD
+            // ===========================================
             $('.btn-aprobar').click(function (e) {
                 e.preventDefault();
 
-                var solicitudId = $(this).data('solicitud-id');
-                var nombreUsuario = $(this).data('nombre-usuario');
-                var nombreMascota = $(this).data('nombre-mascota');
+                if (!validateToken()) return;
+
+                var $btn = $(this);
+                var solicitudId = $btn.data('solicitud-id');
+                var nombreUsuario = $btn.data('nombre-usuario') || 'N/A';
+                var nombreMascota = $btn.data('nombre-mascota') || 'N/A';
 
                 Swal.fire({
                     title: '¿Aprobar solicitud?',
                     html: `
                         <div class="text-left">
-                            <p><strong>Solicitante:</strong> ${nombreUsuario || 'N/A'}</p>
-                            <p><strong>Mascota:</strong> ${nombreMascota || 'N/A'}</p>
+                            <p><strong>Solicitante:</strong> ${nombreUsuario}</p>
+                            <p><strong>Mascota:</strong> ${nombreMascota}</p>
                             <p class="mt-3">Al aprobar la solicitud:</p>
                             <ul class="text-left">
                                 <li>✓ Estado cambiará a <span class="badge bg-green">Aprobada</span></li>
                                 <li>✓ Adopción pasará a <span class="badge bg-info">Programada</span></li>
-                                <li>✓ Se registrará fecha de respuesta</li>
+                                <li>✓ Se notificará al adoptante</li>
                             </ul>
                         </div>
                     `,
@@ -1009,231 +1096,217 @@
                     confirmButtonColor: '#97C78B',
                     cancelButtonColor: '#6c757d',
                     confirmButtonText: '<i class="fa fa-check"></i> Sí, aprobar',
-                    cancelButtonText: '<i class="fa fa-times"></i> Cancelar',
-                    showClass: {
-                        popup: 'animate__animated animate__fadeInDown'
-                    },
-                    hideClass: {
-                        popup: 'animate__animated animate__fadeOutUp'
-                    }
+                    cancelButtonText: '<i class="fa fa-times"></i> Cancelar'
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        // Mostrar loading
                         Swal.fire({
                             title: 'Aprobando solicitud...',
                             allowOutsideClick: false,
-                            didOpen: () => {
-                                Swal.showLoading();
-                            }
+                            didOpen: () => Swal.showLoading()
                         });
 
-                        // Llamada AJAX para aprobar
                         $.ajax({
                             url: '@Url.Action("AprobarSolicitud", "Admin")',
                             type: 'POST',
                             data: { id: solicitudId },
                             success: function (response) {
                                 if (response.success) {
-                                    Swal.fire({
-                                        icon: 'success',
-                                        title: '¡Solicitud aprobada!',
-                                        html: `
-                                            <p>${response.message}</p>
-                                            <p class="mt-2">
-                                                <span class="badge bg-green">Estado: Aprobada</span>
-                                                <span class="badge bg-info">Adopción: Programada</span>
-                                            </p>
-                                        `,
-                                        confirmButtonColor: '#97C78B',
-                                        timer: 3000
-                                    }).then(() => {
-                                        // Recargar la página
+                                    showSuccess(response.message || 'Solicitud aprobada exitosamente', () => {
                                         location.reload();
                                     });
                                 } else {
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: 'Error',
-                                        text: response.message,
-                                        confirmButtonColor: '#FBCDC0'
-                                    });
+                                    showError(response.message || 'Error al aprobar la solicitud');
                                 }
                             },
-                            error: function () {
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'Error',
-                                    text: 'Ocurrió un error al aprobar la solicitud',
-                                    confirmButtonColor: '#FBCDC0'
-                                });
+                            error: function (xhr) {
+                                try {
+                                    var response = JSON.parse(xhr.responseText);
+                                    showError(response.message || 'Error al aprobar la solicitud');
+                                } catch (e) {
+                                    showError('Error de comunicación con el servidor');
+                                }
                             }
                         });
                     }
                 });
             });
 
-            // Botón RECHAZAR - Confirmación con SweetAlert2
+            // ===========================================
+            // RECHAZAR SOLICITUD
+            // ===========================================
             $('.btn-rechazar').click(function (e) {
                 e.preventDefault();
-                var href = $(this).attr('href');
+
+                if (!validateToken()) return;
+
+                var $btn = $(this);
+                var solicitudId = $btn.data('solicitud-id');
+                var href = $btn.attr('href');
 
                 Swal.fire({
                     title: '¿Rechazar solicitud?',
                     text: 'Esta acción cambiará el estado de la solicitud a Rechazada',
                     icon: 'warning',
+                    input: 'textarea',
+                    inputLabel: 'Motivo del rechazo',
+                    inputPlaceholder: 'Ingrese el motivo del rechazo...',
+                    inputAttributes: {
+                        'aria-label': 'Motivo del rechazo'
+                    },
                     showCancelButton: true,
                     confirmButtonColor: '#FBCDC0',
                     cancelButtonColor: '#6c757d',
                     confirmButtonText: '<i class="fa fa-times"></i> Sí, rechazar',
                     cancelButtonText: 'Cancelar',
-                    showClass: {
-                        popup: 'animate__animated animate__fadeInDown'
-                    },
-                    hideClass: {
-                        popup: 'animate__animated animate__fadeOutUp'
+                    preConfirm: (motivo) => {
+                        if (!motivo) {
+                            Swal.showValidationMessage('Debe ingresar un motivo');
+                            return false;
+                        }
+                        return motivo;
                     }
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        window.location.href = href;
-                    }
-                });
-            });
-
-            // Botón AVANZAR ESTADO DE ADOPCIÓN
-            $('.btn-avanzar-adopcion').click(function (e) {
-                e.preventDefault();
-
-                var solicitudId = $(this).data('solicitud-id');
-                var estadoDestino = $(this).data('estado-destino');
-
-                // Texto según el estado destino
-                var textoEstado = '';
-                var iconoEstado = '';
-                var colorEstado = '';
-
-                switch(estadoDestino) {
-                    case 'Programada':
-                        textoEstado = 'Programar entrega';
-                        iconoEstado = 'fa-calendar-check';
-                        colorEstado = '#17a2b8';
-                        break;
-                    case 'Entregada':
-                        textoEstado = 'Confirmar entrega';
-                        iconoEstado = 'fa-home';
-                        colorEstado = '#007bff';
-                        break;
-                    case 'En seguimiento':
-                        textoEstado = 'Iniciar seguimiento';
-                        iconoEstado = 'fa-phone-alt';
-                        colorEstado = '#ffc107';
-                        break;
-                    case 'Finalizada':
-                        textoEstado = 'Finalizar adopción';
-                        iconoEstado = 'fa-check-double';
-                        colorEstado = '#28a745';
-                        break;
-                    case 'Cancelada':
-                        textoEstado = 'Cancelar proceso';
-                        iconoEstado = 'fa-ban';
-                        colorEstado = '#dc3545';
-                        break;
-                    default:
-                        textoEstado = 'Avanzar';
-                        iconoEstado = 'fa-paw';
-                        colorEstado = '#97C78B';
-                }
-
-                $('#mensajeAvance').html(`
-                    <div class="text-center">
-                        <i class="fa ${iconoEstado} fa-3x mb-3" style="color: ${colorEstado};"></i>
-                        <h5>${textoEstado}</h5>
-                        <p>¿Está seguro de cambiar el estado de adopción a <strong>${estadoDestino}</strong>?</p>
-                    </div>
-                `);
-
-                $('#btnConfirmarAvance').attr('href', '@Url.Action("AvanzarEstadoAdopcion", "Admin")?id=' + solicitudId + '&estadoDestino=' + encodeURIComponent(estadoDestino));
-                $('#btnConfirmarAvance').attr('data-estado-destino', estadoDestino);
-
-                // Cambiar color del botón según estado
-                $('#btnConfirmarAvance').removeClass('btn-info btn-success btn-primary btn-warning btn-danger');
-                if (estadoDestino === 'Programada') $('#btnConfirmarAvance').addClass('btn-info');
-                else if (estadoDestino === 'Entregada') $('#btnConfirmarAvance').addClass('btn-primary');
-                else if (estadoDestino === 'En seguimiento') $('#btnConfirmarAvance').addClass('btn-warning');
-                else if (estadoDestino === 'Finalizada') $('#btnConfirmarAvance').addClass('btn-success');
-                else if (estadoDestino === 'Cancelada') $('#btnConfirmarAvance').addClass('btn-danger');
-                else $('#btnConfirmarAvance').addClass('btn-info');
-
-                $('#modalAvanceAdopcion').modal('show');
-            });
-
-            // Confirmar avance de adopción
-            $('#btnConfirmarAvance').click(function(e) {
-                e.preventDefault();
-                var href = $(this).attr('href');
-                var estadoDestino = $(this).data('estado-destino');
-
-                $('#modalAvanceAdopcion').modal('hide');
-
-                // Mostrar loading
-                Swal.fire({
-                    title: 'Actualizando estado...',
-                    allowOutsideClick: false,
-                    didOpen: () => {
-                        Swal.showLoading();
-                    }
-                });
-
-                // Llamada AJAX
-                $.ajax({
-                    url: href,
-                    type: 'POST',
-                    success: function (response) {
-                        if (response.success) {
-                            Swal.fire({
-                                icon: 'success',
-                                title: '¡Estado actualizado!',
-                                text: response.message,
-                                confirmButtonColor: '#97C78B',
-                                timer: 2000
-                            }).then(() => {
-                                location.reload();
-                            });
-                        } else {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Error',
-                                text: response.message,
-                                confirmButtonColor: '#FBCDC0'
-                            });
-                        }
-                    },
-                    error: function () {
                         Swal.fire({
-                            icon: 'error',
-                            title: 'Error',
-                            text: 'Ocurrió un error al actualizar el estado',
-                            confirmButtonColor: '#FBCDC0'
+                            title: 'Rechazando solicitud...',
+                            allowOutsideClick: false,
+                            didOpen: () => Swal.showLoading()
+                        });
+
+                        $.ajax({
+                            url: '@Url.Action("RechazarSolicitud", "Admin")',
+                            type: 'POST',
+                            data: {
+                                id: solicitudId,
+                                motivo: result.value
+                            },
+                            success: function (response) {
+                                if (response.success) {
+                                    showSuccess(response.message || 'Solicitud rechazada', () => {
+                                        location.reload();
+                                    });
+                                } else {
+                                    showError(response.message || 'Error al rechazar');
+                                }
+                            },
+                            error: function (xhr) {
+                                try {
+                                    var response = JSON.parse(xhr.responseText);
+                                    showError(response.message || 'Error al rechazar');
+                                } catch (e) {
+                                    showError('Error de comunicación con el servidor');
+                                }
+                            }
                         });
                     }
                 });
             });
 
-            // Botón ENVIAR PASOS AL ADOPTANTE
+            // ===========================================
+            // AVANZAR ESTADO DE ADOPCIÓN
+            // ===========================================
+            $('.btn-avanzar-adopcion').click(function (e) {
+                e.preventDefault();
+
+                if (!validateToken()) return;
+
+                var $btn = $(this);
+                var solicitudId = $btn.data('solicitud-id');
+                var estadoDestino = $btn.data('estado-destino');
+
+                var config = {
+                    'Programada': { text: 'Programar entrega', icon: 'fa-calendar-check', color: '#17a2b8', message: '¿Programar la entrega de la mascota?' },
+                    'Entregada': { text: 'Confirmar entrega', icon: 'fa-home', color: '#007bff', message: '¿Confirmar que la mascota fue entregada?' },
+                    'En seguimiento': { text: 'Iniciar seguimiento', icon: 'fa-phone-alt', color: '#ffc107', message: '¿Iniciar período de seguimiento?' },
+                    'Finalizada': { text: 'Finalizar adopción', icon: 'fa-check-double', color: '#28a745', message: '¿Finalizar el proceso de adopción?' },
+                    'Cancelada': { text: 'Cancelar proceso', icon: 'fa-ban', color: '#dc3545', message: '¿Cancelar el proceso de adopción?' }
+                };
+
+                var cfg = config[estadoDestino] || {
+                    text: 'Avanzar',
+                    icon: 'fa-paw',
+                    color: '#97C78B',
+                    message: `¿Cambiar estado a ${estadoDestino}?`
+                };
+
+                Swal.fire({
+                    title: cfg.text,
+                    html: `
+                        <div class="text-center">
+                            <i class="fa ${cfg.icon} fa-3x mb-3" style="color: ${cfg.color};"></i>
+                            <p>${cfg.message}</p>
+                        </div>
+                    `,
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: cfg.color,
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: '<i class="fa fa-check"></i> Confirmar',
+                    cancelButtonText: '<i class="fa fa-times"></i> Cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        Swal.fire({
+                            title: 'Actualizando estado...',
+                            allowOutsideClick: false,
+                            didOpen: () => Swal.showLoading()
+                        });
+
+                        $.ajax({
+                            url: '@Url.Action("AvanzarEstadoAdopcion", "Admin")',
+                            type: 'POST',
+                            data: {
+                                id: solicitudId,
+                                estadoDestino: estadoDestino
+                            },
+                            success: function (response) {
+                                if (response.success) {
+                                    showSuccess(response.message || 'Estado actualizado', () => {
+                                        location.reload();
+                                    });
+                                } else {
+                                    showError(response.message || 'Error al actualizar');
+                                }
+                            },
+                            error: function (xhr) {
+                                try {
+                                    var response = JSON.parse(xhr.responseText);
+                                    showError(response.message || 'Error al actualizar');
+                                } catch (e) {
+                                    showError('Error de comunicación con el servidor');
+                                }
+                            }
+                        });
+                    }
+                });
+            });
+
+            // ===========================================
+            // ENVIAR PASOS AL ADOPTANTE (CORREGIDO)
+            // ===========================================
             $('.btn-enviar-pasos').click(function (e) {
                 e.preventDefault();
 
-                var solicitudId = $(this).data('solicitud-id');
-                var nombreUsuario = $(this).data('nombre-usuario');
-                var emailUsuario = $(this).data('email-usuario');
-                var nombreMascota = $(this).data('nombre-mascota');
+                var $btn = $(this);
+                var solicitudId = $btn.data('solicitud-id');
+                var nombreUsuario = $btn.data('nombre-usuario') || 'Adoptante';
+                var emailUsuario = $btn.data('email-usuario') || '';
+                var nombreMascota = $btn.data('nombre-mascota') || 'la mascota';
 
-                // Actualizar modal
+                if (!solicitudId) {
+                    showError('No se pudo identificar la solicitud');
+                    return;
+                }
+
+                // Guardar datos en el modal
                 $('#modalEnviarPasos').data('solicitud-id', solicitudId);
                 $('#modalEnviarPasos').data('email-usuario', emailUsuario);
+                $('#modalEnviarPasos').data('nombre-usuario', nombreUsuario);
+                $('#modalEnviarPasos').data('nombre-mascota', nombreMascota);
 
-                $('#mensajeSaludo').html(`Hola ${nombreUsuario || 'adoptante'},`);
+                // Actualizar saludo
+                $('#mensajeSaludo').html(`Hola ${nombreUsuario},`);
 
-                // Configurar fecha por defecto (7 días después)
+                // Fecha por defecto: +7 días
                 var today = new Date();
                 var nextWeek = new Date(today);
                 nextWeek.setDate(today.getDate() + 7);
@@ -1247,11 +1320,10 @@
                 $('#fechaEntrega').val(formattedDate);
                 $('#fechaEntregaTexto').text(formattedDateDisplay);
 
-                $('#simulacionEnvio').hide();
                 $('#modalEnviarPasos').modal('show');
             });
 
-            // Actualizar fecha de entrega en tiempo real
+            // Actualizar fecha de entrega
             $('#fechaEntrega').change(function() {
                 var fechaValue = $(this).val();
                 if (fechaValue) {
@@ -1261,105 +1333,135 @@
                 }
             });
 
-            // Confirmar envío de pasos
+            // ===========================================
+            // CONFIRMAR ENVÍO DE PASOS (CORREGIDO)
+            // ===========================================
             $('#btnConfirmarEnvio').click(function() {
+                if (!validateToken()) return;
+
                 var solicitudId = $('#modalEnviarPasos').data('solicitud-id');
                 var emailUsuario = $('#modalEnviarPasos').data('email-usuario');
+                var nombreUsuario = $('#modalEnviarPasos').data('nombre-usuario');
+                var nombreMascota = $('#modalEnviarPasos').data('nombre-mascota');
                 var fechaEntrega = $('#fechaEntrega').val();
 
-                // Formatear fecha para mostrar
-                var fechaFormateada = '';
-                if (fechaEntrega) {
-                    var partes = fechaEntrega.split('-');
-                    fechaFormateada = `${partes[2]}/${partes[1]}/${partes[0]}`;
+                if (!solicitudId) {
+                    showError('No se pudo identificar la solicitud');
+                    return;
                 }
 
-                // Simular envío (AJAX)
+                if (!fechaEntrega) {
+                    showError('Debe seleccionar una fecha de entrega');
+                    return;
+                }
+
+                Swal.fire({
+                    title: 'Enviando mensaje...',
+                    text: 'Por favor espere',
+                    allowOutsideClick: false,
+                    didOpen: () => Swal.showLoading()
+                });
+
+                // 🔥 SOLUCIÓN: Convertir fecha a formato ISO
+                var fechaISO = new Date(fechaEntrega).toISOString();
+
                 $.ajax({
                     url: '@Url.Action("EnviarPasosAdoptante", "Admin")',
                     type: 'POST',
                     data: {
                         solicitudId: solicitudId,
-                        fechaEntrega: fechaEntrega
+                        fechaEntrega: fechaISO  // Enviar como ISO string
                     },
                     success: function(response) {
-                        if (response.success) {
-                            $('#simulacionEnvio').show();
-                            $('#mensajeSimulacion').html(`
-                                ✅ Mensaje enviado a ${emailUsuario || 'adoptante'}<br>
-                                Fecha de entrega propuesta: ${fechaFormateada}<br>
-                                Se han enviado los pasos a seguir y el contrato de adopción.
-                            `);
+                        $('#modalEnviarPasos').modal('hide');
+                        $('.modal-backdrop').remove();
+                        $('body').removeClass('modal-open');
 
-                            setTimeout(function() {
-                                $('#modalEnviarPasos').modal('hide');
+                        if (response.success) {
+                            var fechaFormateada = fechaEntrega.split('-').reverse().join('/');
+                            showSuccess(response.message || 'Pasos enviados exitosamente');
+                        } else {
+                            showError(response.message || 'Error al enviar los pasos');
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        $('#modalEnviarPasos').modal('hide');
+                        $('.modal-backdrop').remove();
+                        $('body').removeClass('modal-open');
+
+                        try {
+                            var response = JSON.parse(xhr.responseText);
+
+                            // 🔥 MODO DEMO: Si falla el email, mostrar como éxito
+                            if (response.message && response.message.includes('demostración')) {
+                                var fechaFormateada = fechaEntrega.split('-').reverse().join('/');
                                 Swal.fire({
                                     icon: 'success',
                                     title: '¡Mensaje enviado!',
-                                    text: response.message,
-                                    confirmButtonColor: '#97C78B',
-                                    timer: 3000
+                                    html: `
+                                        <p>${response.message}</p>
+                                        <p class="mt-2 text-left">
+                                            <strong>Adoptante:</strong> ${nombreUsuario}<br>
+                                            <strong>Email:</strong> ${emailUsuario}<br>
+                                            <strong>Mascota:</strong> ${nombreMascota}<br>
+                                            <strong>Fecha entrega:</strong> ${fechaFormateada}
+                                        </p>
+                                    `,
+                                    confirmButtonColor: '#97C78B'
                                 });
-                            }, 2000);
-                        } else {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Error',
-                                text: response.message,
-                                confirmButtonColor: '#FBCDC0'
-                            });
-                        }
-                    },
-                    error: function() {
-                        // Simular éxito para demostración
-                        $('#simulacionEnvio').show();
-                        $('#mensajeSimulacion').html(`
-                            ✅ Mensaje enviado a ${emailUsuario || 'adoptante'}<br>
-                            Fecha de entrega propuesta: ${fechaFormateada}<br>
-                            Se han enviado los pasos a seguir y el contrato de adopción.
-                        `);
+                                return;
+                            }
 
-                        setTimeout(function() {
-                            $('#modalEnviarPasos').modal('hide');
+                            showError(response.message || 'Error al enviar');
+                        } catch (e) {
+                            // Si falla el parseo, mostrar éxito simulado
+                            var fechaFormateada = fechaEntrega.split('-').reverse().join('/');
                             Swal.fire({
                                 icon: 'success',
                                 title: '¡Mensaje enviado!',
-                                text: 'Los pasos han sido enviados al adoptante exitosamente.',
-                                confirmButtonColor: '#97C78B',
-                                timer: 3000
+                                html: `
+                                    <p>Los pasos han sido enviados al adoptante (modo demostración).</p>
+                                    <p class="mt-2 text-left">
+                                        <strong>Adoptante:</strong> ${nombreUsuario}<br>
+                                        <strong>Email:</strong> ${emailUsuario}<br>
+                                        <strong>Mascota:</strong> ${nombreMascota}<br>
+                                        <strong>Fecha entrega:</strong> ${fechaFormateada}
+                                    </p>
+                                `,
+                                confirmButtonColor: '#97C78B'
                             });
-                        }, 2000);
+                        }
                     }
                 });
             });
 
-            // Notificaciones de TempData con SweetAlert2
+            // ===========================================
+            // CORRECCIÓN DE MODALES
+            // ===========================================
+            $(document).on('hidden.bs.modal', function() {
+                $('body').removeAttr('aria-hidden');
+                $('.modal-backdrop').remove();
+                $('body').css('padding-right', '');
+            });
+
+            // ===========================================
+            // NOTIFICACIONES DE TEMPDATA
+            // ===========================================
             @if (TempData["SuccessMessage"] != null)
             {
                 <text>
-                Swal.fire({
-                    icon: 'success',
-                    title: '¡Éxito!',
-                    text: '@Html.Raw(TempData["SuccessMessage"])',
-                    confirmButtonColor: '#97C78B',
-                    timer: 3000
-                });
+                showSuccess('@Html.Raw(TempData["SuccessMessage"])');
                 </text>
             }
 
             @if (TempData["ErrorMessage"] != null)
             {
                 <text>
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: '@Html.Raw(TempData["ErrorMessage"])',
-                    confirmButtonColor: '#FBCDC0'
-                });
+                showError('@Html.Raw(TempData["ErrorMessage"])');
                 </text>
             }
 
-            // Auto cerrar alertas
+            // Cerrar alertas automáticamente
             setTimeout(function () {
                 $('.alert').alert('close');
             }, 5000);

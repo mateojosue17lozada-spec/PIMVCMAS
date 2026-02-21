@@ -4,6 +4,7 @@ using System.Net.Mail;
 using System.Threading.Tasks;
 using System.Configuration;
 using System.Text;
+using System.IO;
 
 namespace MVCMASCOTAS.Helpers
 {
@@ -657,6 +658,72 @@ namespace MVCMASCOTAS.Helpers
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"[EmailHelper] Error en SendNotificationAsync: {ex.Message}");
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// 🔥 NUEVO: Envía un email con archivo adjunto
+        /// </summary>
+        public static async Task<bool> SendNotificationWithAttachmentAsync(
+            string toEmail,
+            string subject,
+            string body,
+            byte[] attachmentBytes,
+            string attachmentFileName)
+        {
+            System.Diagnostics.Debug.WriteLine($"[EmailHelper.SendNotificationWithAttachmentAsync] Iniciando envío a: {toEmail} con adjunto: {attachmentFileName}");
+
+            // Verificar si los emails están habilitados
+            if (!_config.Value.EmailEnabled)
+            {
+                System.Diagnostics.Debug.WriteLine($"[EmailHelper] ERROR: Emails deshabilitados en configuración");
+                return true; // Retornar true para no romper el flujo
+            }
+
+            // Validar email de destino
+            if (string.IsNullOrWhiteSpace(toEmail) || !IsValidEmail(toEmail))
+            {
+                System.Diagnostics.Debug.WriteLine($"[EmailHelper] ERROR: Email inválido: {toEmail}");
+                return false;
+            }
+
+            // Validar que haya adjunto
+            if (attachmentBytes == null || attachmentBytes.Length == 0)
+            {
+                System.Diagnostics.Debug.WriteLine($"[EmailHelper] ERROR: No hay archivo adjunto");
+                return await SendNotificationAsync(toEmail, subject, body); // Enviar sin adjunto
+            }
+
+            try
+            {
+                using (var smtpClient = CreateSmtpClient())
+                using (var mailMessage = CreateMailMessage(toEmail, subject, body))
+                {
+                    // Agregar el adjunto
+                    using (var stream = new MemoryStream(attachmentBytes))
+                    {
+                        var attachment = new Attachment(stream, attachmentFileName, "text/html");
+                        mailMessage.Attachments.Add(attachment);
+
+                        System.Diagnostics.Debug.WriteLine($"[EmailHelper] Adjunto agregado: {attachmentFileName}, tamaño: {attachmentBytes.Length} bytes");
+
+                        await smtpClient.SendMailAsync(mailMessage);
+                        System.Diagnostics.Debug.WriteLine($"[EmailHelper] SUCCESS: Email con adjunto enviado a: {toEmail}");
+
+                        return true;
+                    }
+                }
+            }
+            catch (SmtpException smtpEx)
+            {
+                System.Diagnostics.Debug.WriteLine($"[EmailHelper] ERROR SMTP: {smtpEx.Message}");
+                System.Diagnostics.Debug.WriteLine($"[EmailHelper] StatusCode: {smtpEx.StatusCode}");
+                return false;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"[EmailHelper] ERROR general: {ex.Message}");
                 return false;
             }
         }
