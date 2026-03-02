@@ -1,0 +1,264 @@
+﻿@{
+    ViewBag.Title = "Sistema de Reportes";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    .dashboard-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+
+    .report-card {
+        transition: transform 0.3s, box-shadow 0.3s;
+        border: none;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        margin-bottom: 20px;
+        height: 100%;
+    }
+
+        .report-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 24px rgba(0,0,0,0.15);
+        }
+
+    .card-header-adopciones {
+        background: linear-gradient(45deg, #FF6B6B, #FF8E53);
+        color: white;
+    }
+
+    .card-header-mascotas {
+        background: linear-gradient(45deg, #4CAF50, #8BC34A);
+        color: white;
+    }
+
+    .card-header-solicitudes {
+        background: linear-gradient(45deg, #FF9800, #F57C00);
+        color: white;
+    }
+
+    .card-header-seguimientos {
+        background: linear-gradient(45deg, #00BCD4, #0097A7);
+        color: white;
+    }
+
+    .card-header-estadisticas {
+        background: linear-gradient(45deg, #9C27B0, #673AB7);
+        color: white;
+    }
+
+    .stat-number {
+        font-size: 2.5em;
+        font-weight: bold;
+        margin: 0;
+        line-height: 1.2;
+    }
+
+    .stat-label {
+        font-size: 0.9em;
+        opacity: 0.9;
+        margin: 0;
+    }
+
+    .filter-section {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 10px;
+        margin-top: 15px;
+    }
+</style>
+
+<div class="container-fluid">
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible">
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+            <strong>Error:</strong> @TempData["ErrorMessage"]
+        </div>
+    }
+    @if (TempData["InfoMessage"] != null)
+    {
+        <div class="alert alert-info alert-dismissible">
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+            @TempData["InfoMessage"]
+        </div>
+    }
+
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="dashboard-card">
+                <h6 class="stat-label">Total Adopciones</h6>
+                <p class="stat-number">@ViewBag.TotalAdopciones</p>
+                <small>Contratos firmados</small>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="dashboard-card" style="background: linear-gradient(135deg, #4CAF50, #45B649);">
+                <h6 class="stat-label">Mascotas Activas</h6>
+                <p class="stat-number">@ViewBag.TotalMascotas</p>
+                <small>En el sistema</small>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="dashboard-card" style="background: linear-gradient(135deg, #FF9800, #FF5722);">
+                <h6 class="stat-label">Solicitudes Pendientes</h6>
+                <p class="stat-number">@ViewBag.SolicitudesPendientes</p>
+                <small>Por evaluar</small>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="dashboard-card" style="background: linear-gradient(135deg, #2196F3, #03A9F4);">
+                <h6 class="stat-label">Seguimientos Pendientes</h6>
+                <p class="stat-number">@ViewBag.SeguimientosPendientes</p>
+                <small>Próximos a realizar</small>
+            </div>
+        </div>
+    </div>
+
+    <h2 class="mb-4">📊 Generar Reportes</h2>
+
+    <div class="row">
+        <!-- REPORTE 1: ADOPCIONES -->
+        <div class="col-lg-6 col-xl-4">
+            <div class="card report-card">
+                <div class="card-header card-header-adopciones">
+                    <h5 class="mb-0"><i class="fas fa-heart"></i> Adopciones Realizadas</h5>
+                </div>
+                <div class="card-body">
+                    <p>Reporte detallado de todas las adopciones completadas.</p>
+                    <div class="filter-section">
+                        @using (Html.BeginForm("VerAdopciones", "Reportes", FormMethod.Get))
+                        {
+                            <div class="form-group">
+                                <label>Fecha Inicio:</label>
+                                <input type="date" name="fechaInicio" class="form-control" />
+                            </div>
+                            <div class="form-group">
+                                <label>Fecha Fin:</label>
+                                <input type="date" name="fechaFin" class="form-control" />
+                            </div>
+                            <button type="submit" class="btn btn-danger btn-block">
+                                <i class="fas fa-chart-bar"></i> Ver Reporte
+                            </button>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- REPORTE 2: MASCOTAS -->
+        <div class="col-lg-6 col-xl-4">
+            <div class="card report-card">
+                <div class="card-header card-header-mascotas">
+                    <h5 class="mb-0"><i class="fas fa-paw"></i> Mascotas Registradas</h5>
+                </div>
+                <div class="card-body">
+                    <p>Inventario completo de mascotas con filtros.</p>
+                    <div class="filter-section">
+                        @using (Html.BeginForm("VerMascotas", "Reportes", FormMethod.Get))
+                        {
+                            <div class="form-group">
+                                <label>Estado:</label>
+                                <select name="estado" class="form-control">
+                                    <option value="">Todos</option>
+                                    <option value="Disponible para adopción">Disponibles</option>
+                                    <option value="Adoptada">Adoptadas</option>
+                                    <option value="En tratamiento">En tratamiento</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Especie:</label>
+                                <select name="especie" class="form-control">
+                                    <option value="">Todas</option>
+                                    <option value="Perro">Perros</option>
+                                    <option value="Gato">Gatos</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-success btn-block">
+                                <i class="fas fa-chart-bar"></i> Ver Reporte
+                            </button>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- REPORTE 3: SOLICITUDES -->
+        <div class="col-lg-6 col-xl-4">
+            <div class="card report-card">
+                <div class="card-header card-header-solicitudes">
+                    <h5 class="mb-0"><i class="fas fa-clipboard-list"></i> Solicitudes de Adopción</h5>
+                </div>
+                <div class="card-body">
+                    <p>Seguimiento de solicitudes por estado y evaluaciones.</p>
+                    <div class="filter-section">
+                        @using (Html.BeginForm("VerSolicitudes", "Reportes", FormMethod.Get))
+                        {
+                            <div class="form-group">
+                                <label>Estado:</label>
+                                <select name="estado" class="form-control">
+                                    <option value="">Todos</option>
+                                    <option value="Pendiente">Pendientes</option>
+                                    <option value="Aprobada">Aprobadas</option>
+                                    <option value="Rechazada">Rechazadas</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-warning btn-block">
+                                <i class="fas fa-chart-bar"></i> Ver Reporte
+                            </button>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- REPORTE 4: SEGUIMIENTOS -->
+        <div class="col-lg-6 col-xl-4">
+            <div class="card report-card">
+                <div class="card-header card-header-seguimientos">
+                    <h5 class="mb-0"><i class="fas fa-chart-line"></i> Post-Seguimiento</h5>
+                </div>
+                <div class="card-body">
+                    <p>Seguimientos realizados a mascotas adoptadas.</p>
+                    <div class="filter-section">
+                        @using (Html.BeginForm("VerSeguimientos", "Reportes", FormMethod.Get))
+                        {
+                            <div class="form-group">
+                                <label>Mostrar:</label>
+                                <select name="tipo" class="form-control">
+                                    <option value="todos">Todos</option>
+                                    <option value="pendientes">Pendientes</option>
+                                    <option value="realizados">Realizados</option>
+                                    <option value="vencidos">Vencidos</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-info btn-block">
+                                <i class="fas fa-chart-bar"></i> Ver Reporte
+                            </button>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- REPORTE 5: ESTADÍSTICAS -->
+        <div class="col-lg-6 col-xl-4">
+            <div class="card report-card">
+                <div class="card-header card-header-estadisticas">
+                    <h5 class="mb-0"><i class="fas fa-chart-pie"></i> Estadísticas Generales</h5>
+                </div>
+                <div class="card-body">
+                    <p>Dashboard completo con métricas del refugio.</p>
+                    <a href="@Url.Action("VerEstadisticas", "Reportes")" class="btn btn-primary btn-block mt-3">
+                        <i class="fas fa-chart-pie"></i> Ver Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

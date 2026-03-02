@@ -1,0 +1,161 @@
+﻿<!-- Views/Reportes/VerReporte.cshtml -->
+@{
+    ViewBag.Title = ViewBag.TipoReporte ?? "Visor de Reportes";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    .reporte-container {
+        width: 100%;
+        height: 700px;
+        margin-top: 20px;
+        border: 1px solid #dee2e6;
+        border-radius: 5px;
+        overflow: auto;
+        background: white;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    .toolbar-reporte {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 15px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        color: white;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    .btn-toolbar {
+        margin-right: 10px;
+        border-radius: 20px;
+        padding: 8px 20px;
+        transition: all 0.3s;
+        background: white;
+        color: #333;
+        border: none;
+    }
+
+        .btn-toolbar:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            background: #f8f9fa;
+        }
+
+    .info-panel {
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 15px;
+        margin-bottom: 20px;
+        border-left: 4px solid #667eea;
+    }
+
+    .badge-info {
+        background: #e3f2fd;
+        color: #0d47a1;
+        padding: 5px 10px;
+        border-radius: 5px;
+        font-size: 0.9em;
+    }
+</style>
+
+<div class="container-fluid">
+    <!-- Toolbar -->
+    <div class="toolbar-reporte">
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <h4 class="mb-0">
+                    <i class="fas fa-file-alt"></i> @ViewBag.TipoReporte
+                </h4>
+                <small>
+                    <i class="fas fa-calendar"></i> Generado: @DateTime.Now.ToString("dd/MM/yyyy HH:mm")
+                </small>
+            </div>
+            <div class="col-md-6 text-right">
+                <div class="btn-group" role="group">
+                    <button type="button" class="btn-toolbar" onclick="exportarPDF()">
+                        <i class="fas fa-file-pdf"></i> PDF
+                    </button>
+                    <button type="button" class="btn-toolbar" onclick="exportarExcel()">
+                        <i class="fas fa-file-excel"></i> Excel
+                    </button>
+                    <button type="button" class="btn-toolbar" onclick="window.print()">
+                        <i class="fas fa-print"></i> Imprimir
+                    </button>
+                    <a href="@Url.Action("Index", "Reportes")" class="btn-toolbar">
+                        <i class="fas fa-arrow-left"></i> Volver
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Panel de información -->
+    <div class="info-panel">
+        <div class="row">
+            <div class="col-md-3">
+                <span class="badge-info">
+                    <i class="fas fa-calendar-alt"></i> Período: @ViewBag.FechaInicio - @ViewBag.FechaFin
+                </span>
+            </div>
+            <div class="col-md-3">
+                <span class="badge-info">
+                    <i class="fas fa-chart-bar"></i> Total registros: @ViewBag.TotalRegistros
+                </span>
+            </div>
+            <div class="col-md-3">
+                <span class="badge-info">
+                    <i class="fas fa-user"></i> Generado por: @User.Identity.Name
+                </span>
+            </div>
+            <div class="col-md-3">
+                <span class="badge-info">
+                    <i class="fas fa-file"></i> Formato: RDLC
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Visor del reporte -->
+    <div class="row">
+        <div class="col-md-12">
+            <div class="reporte-container" id="reporteContainer">
+                @if (ViewBag.ReportViewer != null)
+                {
+                    @Html.Raw(ViewBag.ReportViewer)
+                }
+                else if (ViewBag.Error != null)
+                {
+                    <div class="alert alert-danger m-3">
+                        <h5><i class="fas fa-exclamation-triangle"></i> Error al cargar el reporte</h5>
+                        <p>@ViewBag.Error</p>
+                        <hr />
+                        <p class="mb-0">
+                            <small>Verifica que el archivo .rdlc exista en la carpeta Reports.</small>
+                        </p>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <script>
+        function exportarPDF() {
+            var urlParams = new URLSearchParams(window.location.search);
+            var fechaInicio = urlParams.get('fechaInicio') || '';
+            var fechaFin = urlParams.get('fechaFin') || '';
+
+            var url = '';
+            if ('@ViewBag.TipoReporte' === 'Adopciones Realizadas') {
+                url = '@Url.Action("ExportarAdopcionesPDF", "Reportes")';
+            }
+
+            window.location.href = url + '?fechaInicio=' + fechaInicio + '&fechaFin=' + fechaFin;
+        }
+
+        function exportarExcel() {
+            alert('La exportación a Excel estará disponible próximamente');
+        }
+    </script>
+}

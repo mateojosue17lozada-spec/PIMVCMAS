@@ -19,8 +19,8 @@ $(document).ready(function () {
         $('.alert').fadeOut('slow');
     }, 5000);
 
-    // Validación de formularios
-    $('form').on('submit', function () {
+    // ✅ CORREGIDO: Solo aplicar spinner a forms POST, no a GET (reportes)
+    $('form[method="post"], form[method="POST"]').on('submit', function () {
         var $submitBtn = $(this).find('button[type="submit"]');
         $submitBtn.prop('disabled', true);
         $submitBtn.html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Procesando...');
@@ -82,7 +82,6 @@ $(document).ready(function () {
             success: function (response) {
                 if (response.success) {
                     alert(response.message);
-                    // Actualizar contador del carrito si existe
                     var $cartCount = $('#cart-count');
                     if ($cartCount.length) {
                         var currentCount = parseInt($cartCount.text()) || 0;
@@ -149,7 +148,6 @@ $(document).ready(function () {
         }
     });
 
-    // Función de validación de cédula ecuatoriana
     function validarCedulaEcuatoriana(cedula) {
         if (cedula.length !== 10) return false;
 
@@ -185,7 +183,6 @@ $(document).ready(function () {
             },
             success: function (response) {
                 if (response.success) {
-                    // Actualizar subtotal
                     var $row = $input.closest('tr');
                     $row.find('.subtotal').text('$' + response.nuevoSubtotal.toFixed(2));
                     $('#total-carrito').text('$' + response.nuevoTotal.toFixed(2));

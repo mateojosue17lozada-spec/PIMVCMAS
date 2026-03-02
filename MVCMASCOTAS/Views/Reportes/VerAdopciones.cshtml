@@ -1,0 +1,154 @@
+﻿@model List<MVCMASCOTAS.Models.CustomModels.Reportes.AdopcionRealizadaReporteModel>
+@{ ViewBag.Title = "Reporte de Adopciones"; Layout = "~/Views/Shared/_Layout.cshtml"; }
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="fas fa-heart text-danger"></i> Reporte de Adopciones</h2>
+        <div>
+            <a href="@Url.Action("ReporteAdopciones", "Reportes", new { fechaInicio = ViewBag.FechaInicioParm, fechaFin = ViewBag.FechaFinParm })"
+               class="btn btn-danger mr-2">
+                <i class="fas fa-file-pdf"></i> Exportar PDF
+            </a>
+            <a href="@Url.Action("Index", "Reportes")" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Volver
+            </a>
+        </div>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info">No hay adopciones para el período seleccionado.</div>
+    }
+    else
+    {
+        <!-- Cards resumen -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card text-white bg-danger">
+                    <div class="card-body text-center">
+                        <h3>@Model.Count</h3>
+                        <p class="mb-0">Total Adopciones</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-white bg-success">
+                    <div class="card-body text-center">
+                        <h3>@Model.Count(m => m.EspecieMascota == "Perro")</h3>
+                        <p class="mb-0">Perros Adoptados</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-white bg-info">
+                    <div class="card-body text-center">
+                        <h3>@Model.Count(m => m.EspecieMascota == "Gato")</h3>
+                        <p class="mb-0">Gatos Adoptados</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-white bg-warning">
+                    <div class="card-body text-center">
+                        <h3>@Model.Select(m => m.CiudadAdoptante).Distinct().Count()</h3>
+                        <p class="mb-0">Ciudades</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gráficas -->
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-danger text-white">Adopciones por Especie</div>
+                    <div class="card-body"><canvas id="graficaEspecie" height="200"></canvas></div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-danger text-white">Adopciones por Mes</div>
+                    <div class="card-body"><canvas id="graficaMes" height="200"></canvas></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabla -->
+        <div class="card shadow-sm">
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0">Detalle de Adopciones (@Model.Count registros)</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped mb-0">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th>Contrato</th>
+                                <th>Fecha</th>
+                                <th>Mascota</th>
+                                <th>Especie</th>
+                                <th>Adoptante</th>
+                                <th>Ciudad</th>
+                                <th>Evaluación</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td><strong>@item.NumeroContrato</strong></td>
+                                    <td>@item.FechaAdopcion.ToString("dd/MM/yyyy")</td>
+                                    <td>@item.NombreMascota</td>
+                                    <td><span class="badge badge-info">@item.EspecieMascota</span></td>
+                                    <td>@item.NombreAdoptante</td>
+                                    <td>@item.CiudadAdoptante</td>
+                                    <td>
+                                        @if (item.PuntajeEvaluacion.HasValue)
+                                        {
+                                            <span class="badge badge-success">@item.PuntajeEvaluacion pts</span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@section scripts {
+    <script>
+    var especies = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(
+        Model.GroupBy(m => m.EspecieMascota)
+             .Select(g => new { label = g.Key, count = g.Count() })
+             .ToList()
+    ));
+    var meses = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(
+        Model.GroupBy(m => m.FechaAdopcion.ToString("MMM yyyy"))
+             .Select(g => new { label = g.Key, count = g.Count() })
+             .OrderBy(x => x.label)
+             .ToList()
+    ));
+
+    new Chart(document.getElementById('graficaEspecie'), {
+        type: 'doughnut',
+        data: {
+            labels: especies.map(e => e.label),
+            datasets: [{ data: especies.map(e => e.count), backgroundColor: ['#FF6B6B','#4CAF50','#2196F3','#FF9800'] }]
+        }
+    });
+
+    new Chart(document.getElementById('graficaMes'), {
+        type: 'bar',
+        data: {
+            labels: meses.map(m => m.label),
+            datasets: [{ label: 'Adopciones', data: meses.map(m => m.count), backgroundColor: '#FF6B6B' }]
+        },
+        options: { scales: { y: { beginAtZero: true } } }
+    });
+    </script>
+}
