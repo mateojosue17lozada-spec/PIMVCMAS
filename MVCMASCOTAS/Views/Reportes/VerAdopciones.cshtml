@@ -1,66 +1,117 @@
 ﻿@model List<MVCMASCOTAS.Models.CustomModels.Reportes.AdopcionRealizadaReporteModel>
-@{ ViewBag.Title = "Reporte de Adopciones"; Layout = "~/Views/Shared/_Layout.cshtml"; }
+@{
+    ViewBag.Title = "Reporte de Adopciones";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+@section Styles {
+    <style>
+        @@media print {
+            nav, .navbar, footer, .no-print, hr {
+                display: none !important;
+            }
+
+            .container-fluid {
+                width: 100% !important;
+                padding: 0 !important;
+            }
+
+            .table {
+                font-size: 9px;
+            }
+
+            .card {
+                border: none !important;
+                box-shadow: none !important;
+            }
+
+            .card-header {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            body {
+                margin: 0;
+                background: white !important;
+            }
+        }
+
+        #titulo-impresion {
+            display: none;
+        }
+    </style>
+}
 
 <div class="container-fluid">
-    <div class="d-flex justify-content-between align-items-center mb-4">
+
+    <!-- Título visible SOLO al imprimir -->
+    <div id="titulo-impresion" class="text-center mb-3">
+        <h3>ADOPTAMANÍA — Reporte de Adopciones</h3>
+        <p>Período: @ViewBag.FechaInicio — @ViewBag.FechaFin &nbsp;|&nbsp; Generado el @DateTime.Now.ToString("dd/MM/yyyy HH:mm")</p>
+        <hr />
+    </div>
+
+    <!-- Cabecera de pantalla -->
+    <div class="d-flex justify-content-between align-items-center mb-4 no-print">
         <h2><i class="fas fa-heart text-danger"></i> Reporte de Adopciones</h2>
         <div>
-            <a href="@Url.Action("ReporteAdopciones", "Reportes", new { fechaInicio = ViewBag.FechaInicioParm, fechaFin = ViewBag.FechaFinParm })"
-               class="btn btn-danger mr-2">
-                <i class="fas fa-file-pdf"></i> Exportar PDF
+            <a href="@Url.Action("ExportarExcelAdopciones", "Reportes", new { fechaInicio = ViewBag.FechaInicioParm, fechaFin = ViewBag.FechaFinParm })"
+               class="btn btn-success mr-2">
+                <i class="fas fa-file-excel"></i> Exportar Excel
             </a>
+            <button onclick="window.print()" class="btn btn-danger mr-2">
+                <i class="fas fa-file-pdf"></i> Exportar PDF
+            </button>
             <a href="@Url.Action("Index", "Reportes")" class="btn btn-secondary">
                 <i class="fas fa-arrow-left"></i> Volver
             </a>
         </div>
     </div>
 
-    @if (!Model.Any())
+    <div class="alert alert-info no-print">
+        <strong>Filtros aplicados:</strong> Desde @ViewBag.FechaInicio hasta @ViewBag.FechaFin
+    </div>
+
+    @if (Model == null || !Model.Any())
     {
-        <div class="alert alert-info">No hay adopciones para el período seleccionado.</div>
+        <div class="alert alert-warning">No hay adopciones para el período seleccionado.</div>
     }
     else
     {
-        <!-- Cards resumen -->
-        <div class="row mb-4">
+        <!-- Cards resumen (solo pantalla) -->
+        <div class="row mb-4 no-print">
             <div class="col-md-3">
                 <div class="card text-white bg-danger">
                     <div class="card-body text-center">
-                        <h3>@Model.Count</h3>
-                        <p class="mb-0">Total Adopciones</p>
+                        <h3>@Model.Count</h3><p class="mb-0">Total Adopciones</p>
                     </div>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="card text-white bg-success">
                     <div class="card-body text-center">
-                        <h3>@Model.Count(m => m.EspecieMascota == "Perro")</h3>
-                        <p class="mb-0">Perros Adoptados</p>
+                        <h3>@Model.Count(m => m.EspecieMascota == "Perro")</h3><p class="mb-0">Perros Adoptados</p>
                     </div>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="card text-white bg-info">
                     <div class="card-body text-center">
-                        <h3>@Model.Count(m => m.EspecieMascota == "Gato")</h3>
-                        <p class="mb-0">Gatos Adoptados</p>
+                        <h3>@Model.Count(m => m.EspecieMascota == "Gato")</h3><p class="mb-0">Gatos Adoptados</p>
                     </div>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="card text-white bg-warning">
                     <div class="card-body text-center">
-                        <h3>@Model.Select(m => m.CiudadAdoptante).Distinct().Count()</h3>
-                        <p class="mb-0">Ciudades</p>
+                        <h3>@Model.Select(m => m.CiudadAdoptante).Distinct().Count()</h3><p class="mb-0">Ciudades</p>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Gráficas -->
-        <div class="row mb-4">
+        <!-- Gráficas (solo pantalla) -->
+        <div class="row mb-4 no-print">
             <div class="col-md-6">
                 <div class="card shadow-sm">
                     <div class="card-header bg-danger text-white">Adopciones por Especie</div>
@@ -75,23 +126,31 @@
             </div>
         </div>
 
-        <!-- Tabla -->
+        <!-- Tabla (visible en pantalla y al imprimir) -->
         <div class="card shadow-sm">
             <div class="card-header bg-danger text-white">
                 <h5 class="mb-0">Detalle de Adopciones (@Model.Count registros)</h5>
             </div>
             <div class="card-body p-0">
                 <div class="table-responsive">
-                    <table class="table table-hover table-striped mb-0">
+                    <table class="table table-hover table-striped table-bordered mb-0">
                         <thead class="thead-dark">
                             <tr>
-                                <th>Contrato</th>
+                                <th>N° Contrato</th>
                                 <th>Fecha</th>
                                 <th>Mascota</th>
                                 <th>Especie</th>
+                                <th>Raza</th>
+                                <th>Sexo</th>
                                 <th>Adoptante</th>
+                                <th>Cédula</th>
+                                <th>Teléfono</th>
                                 <th>Ciudad</th>
-                                <th>Evaluación</th>
+                                <th>Estado</th>
+                                <th>Puntaje</th>
+                                <th>Resultado</th>
+                                <th>Evaluador</th>
+                                <th>Veterinario</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -101,15 +160,18 @@
                                     <td><strong>@item.NumeroContrato</strong></td>
                                     <td>@item.FechaAdopcion.ToString("dd/MM/yyyy")</td>
                                     <td>@item.NombreMascota</td>
-                                    <td><span class="badge badge-info">@item.EspecieMascota</span></td>
+                                    <td>@item.EspecieMascota</td>
+                                    <td>@item.RazaMascota</td>
+                                    <td>@item.SexoMascota</td>
                                     <td>@item.NombreAdoptante</td>
+                                    <td>@item.CedulaAdoptante</td>
+                                    <td>@item.TelefonoAdoptante</td>
                                     <td>@item.CiudadAdoptante</td>
-                                    <td>
-                                        @if (item.PuntajeEvaluacion.HasValue)
-                                        {
-                                            <span class="badge badge-success">@item.PuntajeEvaluacion pts</span>
-                                        }
-                                    </td>
+                                    <td>@item.EstadoSolicitud</td>
+                                    <td>@(item.PuntajeEvaluacion.HasValue ? item.PuntajeEvaluacion + " pts" : "-")</td>
+                                    <td>@item.ResultadoEvaluacion</td>
+                                    <td>@item.EvaluadoPor</td>
+                                    <td>@item.VeterinarioAsignado</td>
                                 </tr>
                             }
                         </tbody>
@@ -117,38 +179,34 @@
                 </div>
             </div>
         </div>
+        <small class="text-muted no-print">Generado el @DateTime.Now.ToString("dd/MM/yyyy HH:mm")</small>
     }
 </div>
 
-@section scripts {
+@section Scripts {
     <script>
-    var especies = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(
-        Model.GroupBy(m => m.EspecieMascota)
-             .Select(g => new { label = g.Key, count = g.Count() })
-             .ToList()
-    ));
-    var meses = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(
-        Model.GroupBy(m => m.FechaAdopcion.ToString("MMM yyyy"))
-             .Select(g => new { label = g.Key, count = g.Count() })
-             .OrderBy(x => x.label)
-             .ToList()
-    ));
+    window.onbeforeprint = function () { document.getElementById('titulo-impresion').style.display = 'block'; };
+    window.onafterprint  = function () { document.getElementById('titulo-impresion').style.display = 'none'; };
 
-    new Chart(document.getElementById('graficaEspecie'), {
-        type: 'doughnut',
-        data: {
-            labels: especies.map(e => e.label),
-            datasets: [{ data: especies.map(e => e.count), backgroundColor: ['#FF6B6B','#4CAF50','#2196F3','#FF9800'] }]
-        }
-    });
-
-    new Chart(document.getElementById('graficaMes'), {
-        type: 'bar',
-        data: {
-            labels: meses.map(m => m.label),
-            datasets: [{ label: 'Adopciones', data: meses.map(m => m.count), backgroundColor: '#FF6B6B' }]
-        },
-        options: { scales: { y: { beginAtZero: true } } }
-    });
+    @if (Model != null && Model.Any())
+    {
+        <text>
+        var especies = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(
+            Model.GroupBy(m => m.EspecieMascota).Select(g => new { label = g.Key, count = g.Count() }).ToList()
+        ));
+        var meses = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(
+            Model.GroupBy(m => m.FechaAdopcion.ToString("MMM yyyy")).Select(g => new { label = g.Key, count = g.Count() }).ToList()
+        ));
+        new Chart(document.getElementById('graficaEspecie'), {
+            type: 'doughnut',
+            data: { labels: especies.map(e => e.label), datasets: [{ data: especies.map(e => e.count), backgroundColor: ['#FF6B6B','#4CAF50','#2196F3','#FF9800'] }] }
+        });
+        new Chart(document.getElementById('graficaMes'), {
+            type: 'bar',
+            data: { labels: meses.map(m => m.label), datasets: [{ label: 'Adopciones', data: meses.map(m => m.count), backgroundColor: '#FF6B6B' }] },
+            options: { scales: { y: { beginAtZero: true } } }
+        });
+        </text>
+    }
     </script>
 }

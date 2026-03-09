@@ -610,6 +610,118 @@ namespace MVCMASCOTAS.Controllers
                 try { ViewBag.TotalReportes = db.ReportesRescate.Count(r => r.UsuarioReportante == userId); }
                 catch { ViewBag.TotalReportes = 0; }
 
+                // Pega este bloque en MiPerfil(), DESPUÉS de los ViewBag.Total... y ANTES de return View(usuario)
+
+                // ── Solicitudes ──────────────────────────────────────────────────────────
+                try
+                {
+                    ViewBag.MisSolicitudes = db.SolicitudAdopcion
+                        .Where(s => s.UsuarioId == userId)
+                        .OrderByDescending(s => s.FechaSolicitud)
+                        .Take(10)
+                        .Select(s => new
+                        {
+                            SolicitudId = s.SolicitudId,
+                            NombreMascota = s.Mascotas.Nombre,
+                            Especie = s.Mascotas.Especie,
+                            FechaSolicitud = s.FechaSolicitud.ToString(),   // string para evitar ?. en vista
+                            Estado = s.Estado
+                        })
+                        .ToList<dynamic>();
+                }
+                catch { ViewBag.MisSolicitudes = null; }
+
+                // ── Donaciones ───────────────────────────────────────────────────────────
+                try
+                {
+                    ViewBag.MisDonaciones = db.Donaciones
+                        .Where(d => d.UsuarioId == userId)
+                        .OrderByDescending(d => d.FechaDonacion)
+                        .Take(10)
+                        .Select(d => new
+                        {
+                            TipoDonacion = d.TipoDonacion,
+                            Monto = d.Monto,
+                            FechaDonacion = d.FechaDonacion.ToString(),
+                            Estado = d.Estado
+                        })
+                        .ToList<dynamic>();
+                }
+                catch { ViewBag.MisDonaciones = null; }
+
+                // ── Apadrinamientos ──────────────────────────────────────────────────────
+                try
+                {
+                    ViewBag.MisApadrinamientos = db.Apadrinamientos
+                        .Where(a => a.UsuarioId == userId)
+                        .OrderByDescending(a => a.FechaInicio)
+                        .Take(10)
+                        .Select(a => new
+                        {
+                            NombreMascota = a.Mascotas.Nombre,
+                            Especie = a.Mascotas.Especie,
+                            MontoMensual = a.MontoMensual,
+                            FechaInicio = a.FechaInicio.ToString(),
+                            Estado = a.Estado
+                        })
+                        .ToList<dynamic>();
+                }
+                catch { ViewBag.MisApadrinamientos = null; }
+
+                // ── Voluntariado ─────────────────────────────────────────────────────────
+                try
+                {
+                    ViewBag.MisActividades = db.InscripcionesActividades
+                        .Where(i => i.UsuarioId == userId)
+                        .OrderByDescending(i => i.Actividades.FechaActividad)
+                        .Take(10)
+                        .Select(i => new
+                        {
+                            NombreActividad = i.Actividades.NombreActividad,
+                            TipoActividad = i.Actividades.TipoActividad,
+                            FechaActividad = i.Actividades.FechaActividad.ToString(),
+                            Estado = i.Estado
+                        })
+                        .ToList<dynamic>();
+                }
+                catch { ViewBag.MisActividades = null; }
+
+                // ── Pedidos ───────────────────────────────────────────────────────────────
+                try
+                {
+                    ViewBag.MisPedidos = db.Pedidos
+                        .Where(p => p.UsuarioId == userId)
+                        .OrderByDescending(p => p.FechaPedido)
+                        .Take(10)
+                        .Select(p => new
+                        {
+                            NumeroPedido = p.NumeroPedido,
+                            FechaPedido = p.FechaPedido.ToString(),
+                            Total = p.Total,
+                            Estado = p.Estado
+                        })
+                        .ToList<dynamic>();
+                }
+                catch { ViewBag.MisPedidos = null; }
+
+                // ── Reportes ──────────────────────────────────────────────────────────────
+                try
+                {
+                    ViewBag.MisReportes = db.ReportesRescate
+                        .Where(r => r.UsuarioReportante == userId)
+                        .OrderByDescending(r => r.FechaReporte)
+                        .Take(5)
+                        .Select(r => new
+                        {
+                            TipoAnimal = r.TipoAnimal,
+                            UbicacionReporte = r.UbicacionReporte,
+                            FechaReporte = r.FechaReporte.ToString(),
+                            Estado = r.Estado
+                        })
+                        .ToList<dynamic>();
+                }
+                catch { ViewBag.MisReportes = null; }
+
                 // ⚡ NUEVO: Mostrar estado de seguridad
                 ViewBag.IntentosFallidos = usuario.IntentosFallidos ?? 0;
                 ViewBag.BloqueadoPermanentemente = usuario.BloqueadoPermanentemente ?? false;

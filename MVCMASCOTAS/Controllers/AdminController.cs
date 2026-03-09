@@ -38,6 +38,11 @@ namespace MVCMASCOTAS.Controllers
         /// <summary>
         /// GET: Admin/Dashboard - Panel principal con estadísticas y alertas
         /// </summary>
+        // =====================================================================
+        // REEMPLAZA SOLO el método Dashboard() completo en AdminController.cs
+        // El resto del controller NO se toca
+        // =====================================================================
+
         public ActionResult Dashboard()
         {
             try
@@ -45,6 +50,12 @@ namespace MVCMASCOTAS.Controllers
                 var currentDate = DateTime.Now;
                 var currentMonth = currentDate.Month;
                 var currentYear = currentDate.Year;
+
+                // ✅ FIX: Pre-calcular fechas FUERA de las queries para EF
+                var hace30Dias = currentDate.AddDays(-30);
+                var hace7Dias = currentDate.AddDays(-7);
+                var hace1Hora = currentDate.AddHours(-1);
+                var proximaSemana = currentDate.AddDays(7);
 
                 var viewModel = new DashboardViewModel
                 {
@@ -61,60 +72,70 @@ namespace MVCMASCOTAS.Controllers
                     SolicitudesRechazadas = db.SolicitudAdopcion.Count(s => s.Estado == "Rechazada"),
                     AdopcionesEsteMes = adopcionService.ObtenerAdopcionesDelMes(currentMonth, currentYear),
                     AdopcionesEsteAnio = db.Mascotas.Count(m =>
-                        m.Estado == "Adoptada" &&
-                        m.FechaAdopcion.HasValue &&
-                        m.FechaAdopcion.Value.Year == currentYear),
+                                                m.Estado == "Adoptada" &&
+                                                m.FechaAdopcion.HasValue &&
+                                                m.FechaAdopcion.Value.Year == currentYear),
 
                     // === DONACIONES ===
                     TotalDonacionesMes = db.Donaciones
                         .Where(d => d.FechaDonacion.HasValue &&
-                                   d.FechaDonacion.Value.Month == currentMonth &&
-                                   d.FechaDonacion.Value.Year == currentYear &&
-                                   d.Estado == "Completada")
+                                    d.FechaDonacion.Value.Month == currentMonth &&
+                                    d.FechaDonacion.Value.Year == currentYear &&
+                                    d.Estado == "Completada")
                         .Sum(d => (decimal?)d.Monto) ?? 0,
+
                     TotalDonacionesAnio = db.Donaciones
                         .Where(d => d.FechaDonacion.HasValue &&
-                                   d.FechaDonacion.Value.Year == currentYear &&
-                                   d.Estado == "Completada")
+                                    d.FechaDonacion.Value.Year == currentYear &&
+                                    d.Estado == "Completada")
                         .Sum(d => (decimal?)d.Monto) ?? 0,
+
                     NumeroDonantesMes = db.Donaciones
                         .Where(d => d.FechaDonacion.HasValue &&
-                                   d.FechaDonacion.Value.Month == currentMonth &&
-                                   d.FechaDonacion.Value.Year == currentYear &&
-                                   d.Estado == "Completada")
+                                    d.FechaDonacion.Value.Month == currentMonth &&
+                                    d.FechaDonacion.Value.Year == currentYear &&
+                                    d.Estado == "Completada")
                         .Select(d => d.UsuarioId)
                         .Distinct()
                         .Count(),
+
                     ApadrinamientosActivos = db.Apadrinamientos.Count(a => a.Estado == "Activo"),
 
                     // === VOLUNTARIADO ===
                     VoluntariosActivos = db.UsuariosRoles
                         .Count(ur => ur.Roles.NombreRol == "Voluntario" &&
-                                   (ur.Usuarios.Activo == null || ur.Usuarios.Activo == true)),
+                                     (ur.Usuarios.Activo == null || ur.Usuarios.Activo == true)),
+
                     ActividadesProgramadas = db.Actividades
                         .Count(a => a.FechaActividad > currentDate && a.Estado == "Programada"),
+
                     HorasVoluntariadoMes = (decimal)(db.HorasVoluntariado
                         .Where(h => h.FechaActividad.Month == currentMonth &&
-                                   h.FechaActividad.Year == currentYear)
+                                    h.FechaActividad.Year == currentYear)
                         .Sum(h => (decimal?)h.HorasTrabajadas) ?? 0),
 
                     // === VETERINARIA ===
                     ConsultasPendientes = db.HistorialMedico
                         .Count(h => h.TipoConsulta == "Pendiente" || h.TipoConsulta == "Urgente"),
+
                     TratamientosActivos = db.Tratamientos
                         .Count(t => t.Estado == "En curso" || t.Estado == "Activo"),
+
+                    // ✅ FIX: proximaSemana en lugar de currentDate.AddDays(7)
                     VacunacionesPendientes = db.MascotaVacunas
-                        .Count(mv => mv.ProximaDosis.HasValue && mv.ProximaDosis.Value <= currentDate.AddDays(7)),
+                        .Count(mv => mv.ProximaDosis.HasValue &&
+                                     mv.ProximaDosis.Value <= proximaSemana),
 
                     // === TIENDA ===
                     ProductosDisponibles = db.Productos.Count(p => p.Stock > 0 && p.Activo == true),
                     ProductosBajoStock = db.Productos.Count(p => p.Stock > 0 && p.Stock <= p.StockMinimo),
                     PedidosPendientes = db.Pedidos.Count(p => p.Estado == "Pendiente" || p.Estado == "Confirmado"),
+
                     VentasMes = db.Pedidos
                         .Where(p => p.Estado == "Entregado" &&
-                                   p.FechaPedido.HasValue &&
-                                   p.FechaPedido.Value.Month == currentMonth &&
-                                   p.FechaPedido.Value.Year == currentYear)
+                                    p.FechaPedido.HasValue &&
+                                    p.FechaPedido.Value.Month == currentMonth &&
+                                    p.FechaPedido.Value.Year == currentYear)
                         .Sum(p => (decimal?)p.Total) ?? 0,
 
                     // === RESCATE ===
@@ -124,45 +145,68 @@ namespace MVCMASCOTAS.Controllers
                     // === CONTABILIDAD ===
                     IngresosMes = db.MovimientosContables
                         .Where(m => m.TipoMovimiento == "Ingreso" &&
-                                   m.FechaMovimiento.HasValue &&
-                                   m.FechaMovimiento.Value.Month == currentMonth &&
-                                   m.FechaMovimiento.Value.Year == currentYear)
+                                    m.FechaMovimiento.HasValue &&
+                                    m.FechaMovimiento.Value.Month == currentMonth &&
+                                    m.FechaMovimiento.Value.Year == currentYear)
                         .Sum(m => (decimal?)m.Monto) ?? 0,
+
                     EgresosMes = db.MovimientosContables
                         .Where(m => m.TipoMovimiento == "Egreso" &&
-                                   m.FechaMovimiento.HasValue &&
-                                   m.FechaMovimiento.Value.Month == currentMonth &&
-                                   m.FechaMovimiento.Value.Year == currentYear)
+                                    m.FechaMovimiento.HasValue &&
+                                    m.FechaMovimiento.Value.Month == currentMonth &&
+                                    m.FechaMovimiento.Value.Year == currentYear)
                         .Sum(m => (decimal?)m.Monto) ?? 0,
 
                     // === AUDITORÍA ===
                     RegistrosAuditoriaDia = db.AuditoriaAcciones
-                        .Count(a => DbFunctions.TruncateTime(a.FechaAccion) == DbFunctions.TruncateTime(currentDate)),
+                        .Count(a => DbFunctions.TruncateTime(a.FechaAccion) ==
+                                    DbFunctions.TruncateTime(currentDate)),
+
+                    // ✅ FIX: hace1Hora en lugar de currentDate.AddHours(-1) dentro del lambda
                     UsuariosConectados = db.Usuarios
                         .Count(u => u.UltimoAcceso.HasValue &&
-                                   DbFunctions.DiffHours(u.UltimoAcceso.Value, currentDate) <= 1),
+                                    u.UltimoAcceso.Value >= hace1Hora),
 
                     // === MASCOTAS PERDIDAS ===
+                    // ✅ FIX: hace30Dias en lugar de DateTime.Now.AddDays(-30)
                     MascotasPerdidasActivas = db.MascotasPerdidas
                         .Count(m => m.Estado == "Perdida" &&
-                                   m.FechaPublicacion >= DateTime.Now.AddDays(-30)),
+                                    m.FechaPublicacion >= hace30Dias),
+
                     MascotasEncontradas = db.MascotasPerdidas
                         .Count(m => m.Estado == "Encontrada" &&
-                                   m.FechaEncontrada.HasValue &&
-                                   m.FechaEncontrada.Value.Month == currentMonth &&
-                                   m.FechaEncontrada.Value.Year == currentYear),
+                                    m.FechaEncontrada.HasValue &&
+                                    m.FechaEncontrada.Value.Month == currentMonth &&
+                                    m.FechaEncontrada.Value.Year == currentYear),
+
                     MascotasPerdidasMes = db.MascotasPerdidas
                         .Count(m => m.FechaPerdida.Month == currentMonth &&
-                                   m.FechaPerdida.Year == currentYear),
+                                    m.FechaPerdida.Year == currentYear),
+
+                    // === SEGUIMIENTO ===
+                    SeguimientosPendientes = db.SeguimientoAdopcion
+                        .Count(s => s.FechaSeguimiento == null),
+
+                    ContratosActivos = db.ContratoAdopcion
+                        .Count(c => c.Estado == "Activo"),
+
+                    HistorialEstados = db.HistorialEstadosMascota
+                        .Count(h => DbFunctions.TruncateTime(h.FechaCambio) ==
+                                    DbFunctions.TruncateTime(currentDate)),
+
+                    MascotasArchivadas = db.Mascotas
+                        .Count(m => m.Estado == "Archivada" || m.Activo == false),
 
                     // Inicializar listas
                     Alertas = new List<string>(),
+                    AlertasMascotasPerdidas = new List<string>(),
                     UltimasSolicitudes = new List<SolicitudAdopcion>(),
                     UltimasDonaciones = new List<Donaciones>(),
                     MascotasRecientes = new List<Mascotas>(),
                     UltimosMovimientos = new List<MovimientosContables>(),
                     UltimasMascotasPerdidas = new List<MascotasPerdidas>(),
                     MascotasPorEspecie = new Dictionary<string, int>(),
+                    MascotasPerdidasPorEspecie = new Dictionary<string, int>(),
                     SolicitudesPorEstado = new Dictionary<string, int>(),
                     AuditoriaPorUsuario = new Dictionary<string, int>(),
                     AuditoriaPorAccion = new Dictionary<string, int>()
@@ -170,7 +214,8 @@ namespace MVCMASCOTAS.Controllers
 
                 viewModel.BalanceMes = viewModel.IngresosMes - viewModel.EgresosMes;
 
-                // Cargar listas de datos recientes
+                // ─── Listas de datos recientes ─────────────────────────────────────
+
                 viewModel.UltimasSolicitudes = db.SolicitudAdopcion
                     .Include(s => s.Mascotas)
                     .Include(s => s.Usuarios)
@@ -200,32 +245,57 @@ namespace MVCMASCOTAS.Controllers
                     .Take(5)
                     .ToList();
 
-                // Datos para gráficos
+                // ─── Datos para gráficos ───────────────────────────────────────────
+
                 viewModel.MascotasPorEspecie = db.Mascotas
                     .Where(m => m.Activo == true && !string.IsNullOrEmpty(m.Especie))
                     .GroupBy(m => m.Especie)
                     .ToDictionary(g => g.Key, g => g.Count());
+
+                // ✅ FIX: hace30Dias pre-calculado
+                viewModel.MascotasPerdidasPorEspecie = db.MascotasPerdidas
+                    .Where(m => m.Estado == "Perdida" && m.FechaPublicacion >= hace30Dias)
+                    .GroupBy(m => m.Especie)
+                    .ToDictionary(g => g.Key ?? "Sin especie", g => g.Count());
 
                 viewModel.SolicitudesPorEstado = db.SolicitudAdopcion
                     .Where(s => !string.IsNullOrEmpty(s.Estado))
                     .GroupBy(s => s.Estado)
                     .ToDictionary(g => g.Key, g => g.Count());
 
+                // ✅ FIX: hace7Dias pre-calculado
                 viewModel.AuditoriaPorUsuario = db.AuditoriaAcciones
-                    .Where(a => a.Usuarios != null && a.FechaAccion >= currentDate.AddDays(-7))
+                    .Where(a => a.Usuarios != null && a.FechaAccion >= hace7Dias)
                     .GroupBy(a => a.Usuarios.NombreCompleto)
                     .OrderByDescending(g => g.Count())
                     .Take(10)
                     .ToDictionary(g => g.Key, g => g.Count());
 
                 viewModel.AuditoriaPorAccion = db.AuditoriaAcciones
-                    .Where(a => !string.IsNullOrEmpty(a.Accion) && a.FechaAccion >= currentDate.AddDays(-7))
+                    .Where(a => !string.IsNullOrEmpty(a.Accion) && a.FechaAccion >= hace7Dias)
                     .GroupBy(a => a.Accion)
                     .OrderByDescending(g => g.Count())
                     .Take(10)
                     .ToDictionary(g => g.Key, g => g.Count());
 
+                // ─── Alertas ───────────────────────────────────────────────────────
+
                 GenerarAlertas(viewModel);
+
+                // Alertas específicas de mascotas perdidas
+                if (viewModel.MascotasPerdidasActivas > 0)
+                {
+                    var alertasPerdidas = viewModel.AlertasMascotasPerdidas as List<string>
+                                          ?? new List<string>();
+
+                    if (viewModel.MascotasPerdidasActivas > 20)
+                        alertasPerdidas.Add($"🔍 ALTA PRIORIDAD: {viewModel.MascotasPerdidasActivas} mascotas perdidas activas");
+                    else if (viewModel.MascotasPerdidasActivas > 10)
+                        alertasPerdidas.Add($"🔍 {viewModel.MascotasPerdidasActivas} mascotas perdidas requieren atención");
+
+                    viewModel.AlertasMascotasPerdidas = alertasPerdidas;
+                    
+                }
 
                 return View(viewModel);
             }
@@ -234,12 +304,23 @@ namespace MVCMASCOTAS.Controllers
                 System.Diagnostics.Debug.WriteLine($"ERROR en Dashboard: {ex.Message}\n{ex.StackTrace}");
                 AuditoriaHelper.RegistrarError("Admin", "Error al cargar dashboard", ex, UserHelper.GetCurrentUserId());
 
-                var viewModel = new DashboardViewModel
+                var viewModelError = new DashboardViewModel
                 {
-                    Alertas = new List<string> { "Error al cargar el dashboard. Intente nuevamente." }
+                    Alertas = new List<string> { "Error al cargar el dashboard. Intente nuevamente." },
+                    AlertasMascotasPerdidas = new List<string>(),
+                    UltimasSolicitudes = new List<SolicitudAdopcion>(),
+                    UltimasDonaciones = new List<Donaciones>(),
+                    MascotasRecientes = new List<Mascotas>(),
+                    UltimosMovimientos = new List<MovimientosContables>(),
+                    UltimasMascotasPerdidas = new List<MascotasPerdidas>(),
+                    MascotasPorEspecie = new Dictionary<string, int>(),
+                    MascotasPerdidasPorEspecie = new Dictionary<string, int>(),
+                    SolicitudesPorEstado = new Dictionary<string, int>(),
+                    AuditoriaPorUsuario = new Dictionary<string, int>(),
+                    AuditoriaPorAccion = new Dictionary<string, int>()
                 };
 
-                return View(viewModel);
+                return View(viewModelError);
             }
         }
 
@@ -1928,26 +2009,38 @@ namespace MVCMASCOTAS.Controllers
         #endregion
 
         #region AUDITORÍA
-
-        public ActionResult Auditoria(string accion = "", DateTime? fechaDesde = null, DateTime? fechaHasta = null, int page = 1)
+        public ActionResult Auditoria(string modulo = "", string accion = "", DateTime? fechaDesde = null, DateTime? fechaHasta = null, int page = 1)
         {
             try
             {
                 int pageSize = 50;
+
+                // ✅ FIX: Pre-calcular fechas FUERA de las queries
+                var hoy = DateTime.Today;
+                var manana = hoy.AddDays(1);
+                var hace7Dias = DateTime.Now.AddDays(-7);
+
                 var query = db.AuditoriaAcciones
                     .Include(a => a.Usuarios)
                     .AsQueryable();
+
+                if (!string.IsNullOrEmpty(modulo))
+                    query = query.Where(a => a.Modulo.Contains(modulo));
 
                 if (!string.IsNullOrEmpty(accion))
                     query = query.Where(a => a.Accion.Contains(accion));
 
                 if (fechaDesde.HasValue)
-                    query = query.Where(a => a.FechaAccion >= fechaDesde.Value);
+                {
+                    var desde = fechaDesde.Value.Date;
+                    query = query.Where(a => a.FechaAccion >= desde);
+                }
 
                 if (fechaHasta.HasValue)
                 {
-                    var fechaHastaFin = fechaHasta.Value.Date.AddDays(1).AddSeconds(-1);
-                    query = query.Where(a => a.FechaAccion <= fechaHastaFin);
+                    DateTime hasta = fechaHasta.Value.Date.AddDays(1);
+                    var hastaFinal = hasta; // variable local separada
+                    query = query.Where(a => a.FechaAccion <= hastaFinal);
                 }
 
                 int totalItems = query.Count();
@@ -1959,18 +2052,28 @@ namespace MVCMASCOTAS.Controllers
                     .Take(pageSize)
                     .ToList();
 
+                // ✅ FIX: variables pre-calculadas, sin AddDays dentro de lambda
                 ViewBag.TotalRegistros = db.AuditoriaAcciones.Count();
-                ViewBag.RegistrosHoy = db.AuditoriaAcciones.Count(a =>
-                    DbFunctions.TruncateTime(a.FechaAccion) == DbFunctions.TruncateTime(DateTime.Now));
+
+                ViewBag.AccionesHoy = db.AuditoriaAcciones
+                    .Count(a => a.FechaAccion >= hoy && a.FechaAccion < manana);
+
                 ViewBag.UsuariosActivos = db.AuditoriaAcciones
-                    .Where(a => a.FechaAccion >= DateTime.Now.AddDays(-7))
+                    .Where(a => a.FechaAccion >= hace7Dias)
                     .Select(a => a.UsuarioId)
                     .Distinct()
                     .Count();
 
-                ViewBag.Accion = accion;
-                ViewBag.FechaDesde = fechaDesde;
-                ViewBag.FechaHasta = fechaHasta;
+                ViewBag.UltimaAccion = db.AuditoriaAcciones
+                    .OrderByDescending(a => a.FechaAccion)
+                    .Select(a => a.FechaAccion)
+                    .FirstOrDefault();
+
+                // ViewBag para filtros
+                ViewBag.FiltroModulo = modulo;
+                ViewBag.FiltroAccion = accion;
+                ViewBag.FechaDesde = fechaDesde.HasValue ? fechaDesde.Value.ToString("yyyy-MM-dd") : "";
+                ViewBag.FechaHasta = fechaHasta.HasValue ? fechaHasta.Value.ToString("yyyy-MM-dd") : "";
                 ViewBag.CurrentPage = page;
                 ViewBag.TotalPages = totalPages;
                 ViewBag.TotalItems = totalItems;
@@ -1979,12 +2082,80 @@ namespace MVCMASCOTAS.Controllers
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Error en Auditoria: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine("=== FULL STACKTRACE ===");
+                System.Diagnostics.Debug.WriteLine(ex.ToString());
                 TempData["ErrorMessage"] = "Error al cargar la auditoría";
                 return View(new List<AuditoriaAcciones>());
             }
         }
 
+        public JsonResult DetalleAuditoria(int id)
+        {
+            try
+            {
+                var registro = db.AuditoriaAcciones
+                    .Include(a => a.Usuarios)
+                    .FirstOrDefault(a => a.AuditoriaId == id);
+
+                if (registro == null)
+                    return Json(null, JsonRequestBehavior.AllowGet);
+
+                return Json(new
+                {
+                    AuditoriaId = registro.AuditoriaId,
+                    FechaAccion = registro.FechaAccion,
+                    Modulo = registro.Modulo,
+                    Accion = registro.Accion,
+                    Descripcion = registro.Descripcion,
+                    Detalles = registro.Detalles,
+                    DireccionIP = registro.DireccionIP,
+                    UsuarioId = registro.UsuarioId,
+                    Usuarios = registro.Usuarios != null ? new
+                    {
+                        NombreCompleto = registro.Usuarios.NombreCompleto,
+                        Email = registro.Usuarios.Email
+                    } : null
+                }, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error en DetalleAuditoria: {ex.Message}");
+                return Json(null, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public JsonResult LimpiarAuditoria()
+        {
+            try
+            {
+                var hace90Dias = DateTime.Now.AddDays(-90); // ✅ pre-calculado
+
+                var registrosAntiguos = db.AuditoriaAcciones
+                    .Where(a => a.FechaAccion < hace90Dias)
+                    .ToList();
+
+                int cantidad = registrosAntiguos.Count;
+
+                if (cantidad == 0)
+                    return Json(new { success = true, message = "No hay registros antiguos para limpiar." });
+
+                db.AuditoriaAcciones.RemoveRange(registrosAntiguos);
+                db.SaveChanges();
+
+                AuditoriaHelper.RegistrarAccion("Limpiar Auditoría", "Admin",
+                    $"Se eliminaron {cantidad} registros con más de 90 días.",
+                    UserHelper.GetCurrentUserId() ?? 0);
+
+                return Json(new { success = true, message = $"Se eliminaron {cantidad} registros correctamente." });
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error en LimpiarAuditoria: {ex.Message}");
+                return Json(new { success = false, message = "Error: " + ex.Message });
+            }
+        }
         #endregion
 
         #region MASCOTAS PERDIDAS
@@ -2002,7 +2173,8 @@ namespace MVCMASCOTAS.Controllers
                 if (!string.IsNullOrEmpty(especie) && especie != "Todos")
                     query = query.Where(m => m.Especie == especie);
 
-                var fechaLimite = DateTime.Now.AddDays(-90);
+                DateTime fechaLimite = DateTime.Now;
+                fechaLimite = fechaLimite.AddDays(-90);
                 query = query.Where(m => m.FechaPublicacion >= fechaLimite);
 
                 int totalItems = query.Count();

@@ -1,72 +1,62 @@
 ﻿@model IEnumerable<MVCMASCOTAS.Models.Mascotas>
 
 @{
-    ViewBag.Title = "Adoptar una Mascota";
+    ViewBag.Title = "Adoptar una Mascota - ADOPTAMANÍA";
 }
 
-<div class="adopcion-section fade-in">
+<!-- Hero Section -->
+<section class="adopcion-hero py-5">
+    <div class="container text-center">
+        <i class="fas fa-dog fa-4x text-white mb-4"></i>
+        <h1 class="display-4 fw-bold mb-3 text-white">Adopta una Mascota</h1>
+        <p class="lead mb-0 text-white">Encuentra a tu nuevo mejor amigo y cambia una vida para siempre</p>
+    </div>
+</section>
+
+<!-- Main Content -->
+<section class="py-5 bg-beige">
     <div class="container">
-        <div class="page-header text-center mb-4">
-            <h1 class="display-5 text-brown">
-                <i class="fas fa-dog header-icon"></i> Mascotas Disponibles para Adopción
-            </h1>
-            <p class="text-secondary mt-2 fs-5">Encuentra a tu nuevo mejor amigo y cambia una vida para siempre</p>
-        </div>
-
-        <div class="filtros-card fade-in">
-            <div class="filtros-body">
-                <form method="get" action="@Url.Action("Index", "Mascotas")" class="row g-3 justify-content-center">
-
-                    <div class="col-lg-4 col-md-12">
-                        <label class="form-label">
-                            <i class="fas fa-search me-2 text-green"></i>Buscar
-                        </label>
-                        <input type="text"
-                               name="buscar"
-                               class="form-control"
-                               placeholder="Nombre, raza o características..."
-                               value="@ViewBag.FiltroBuscar" />
+        <!-- Filtros -->
+        <div class="filter-card mb-4">
+            <div class="filter-header bg-green text-white">
+                <i class="fas fa-filter me-2"></i> Filtros de Búsqueda
+            </div>
+            <div class="filter-body">
+                <form method="get" action="@Url.Action("Index", "Mascotas")" class="row g-3 align-items-end">
+                    <div class="col-lg-4">
+                        <label class="form-label text-brown fw-medium"><i class="fas fa-search text-green me-2"></i>Buscar</label>
+                        <input type="text" name="buscar" class="form-control border-green" placeholder="Nombre, raza o características..." value="@ViewBag.FiltroBuscar" />
                     </div>
-
-                    <div class="col-lg-2 col-md-4">
-                        <label class="form-label">
-                            <i class="fas fa-paw me-2 text-green"></i>Especie
-                        </label>
-                        <select name="especie" class="form-select">
+                    <div class="col-lg-2">
+                        <label class="form-label text-brown fw-medium"><i class="fas fa-paw text-green me-2"></i>Especie</label>
+                        <select name="especie" class="form-select border-green">
                             <option value="Todos" selected="@(ViewBag.FiltroEspecie == "Todos" || string.IsNullOrEmpty(ViewBag.FiltroEspecie))">Todas</option>
-                            <option value="Perro" selected="@(ViewBag.FiltroEspecie == "Perro")">🐶 Perros</option>
-                            <option value="Gato" selected="@(ViewBag.FiltroEspecie == "Gato")">🐱 Gatos</option>
+                            <option value="Perro" selected="@(ViewBag.FiltroEspecie == "Perro")">Perros</option>
+                            <option value="Gato" selected="@(ViewBag.FiltroEspecie == "Gato")">Gatos</option>
                         </select>
                     </div>
-
-                    <div class="col-lg-2 col-md-4">
-                        <label class="form-label">
-                            <i class="fas fa-ruler-combined me-2 text-green"></i>Tamaño
-                        </label>
-                        <select name="tamanio" class="form-select">
+                    <div class="col-lg-2">
+                        <label class="form-label text-brown fw-medium"><i class="fas fa-ruler-combined text-green me-2"></i>Tamaño</label>
+                        <select name="tamanio" class="form-select border-green">
                             <option value="Todos" selected="@(ViewBag.FiltroTamanio == "Todos" || string.IsNullOrEmpty(ViewBag.FiltroTamanio))">Todos</option>
                             <option value="Pequeño" selected="@(ViewBag.FiltroTamanio == "Pequeño")">Pequeño</option>
                             <option value="Mediano" selected="@(ViewBag.FiltroTamanio == "Mediano")">Mediano</option>
                             <option value="Grande" selected="@(ViewBag.FiltroTamanio == "Grande")">Grande</option>
                         </select>
                     </div>
-
-                    <div class="col-lg-2 col-md-4">
-                        <label class="form-label">
-                            <i class="fas fa-venus-mars me-2 text-green"></i>Sexo
-                        </label>
-                        <select name="sexo" class="form-select">
+                    <div class="col-lg-2">
+                        <label class="form-label text-brown fw-medium"><i class="fas fa-venus-mars text-green me-2"></i>Sexo</label>
+                        <select name="sexo" class="form-select border-green">
                             <option value="Todos" selected="@(ViewBag.FiltroSexo == "Todos" || string.IsNullOrEmpty(ViewBag.FiltroSexo))">Ambos</option>
                             <option value="Macho" selected="@(ViewBag.FiltroSexo == "Macho")">Macho</option>
                             <option value="Hembra" selected="@(ViewBag.FiltroSexo == "Hembra")">Hembra</option>
                         </select>
                     </div>
-
-                    <div class="col-lg-2 col-md-12 d-flex align-items-end gap-2">
-                        <button type="submit" class="btn btn-green flex-fill">
-                            <i class="fas fa-search me-2"></i> Buscar
+                    <div class="col-lg-2 d-flex gap-2">
+                        <button type="submit" class="btn btn-green flex-grow-1">
+                            <i class="fas fa-search me-2"></i>Buscar
                         </button>
-                        <a href="@Url.Action("Index", "Mascotas")" class="btn btn-outline-secondary" title="Limpiar filtros">
+                        <a href="@Url.Action("Index", "Mascotas")" class="btn btn-outline-green" title="Limpiar filtros">
                             <i class="fas fa-times"></i>
                         </a>
                     </div>
@@ -74,57 +64,60 @@
             </div>
         </div>
 
+        <!-- Filtros activos -->
         @if (!string.IsNullOrEmpty(ViewBag.FiltroBuscar) ||
              (ViewBag.FiltroEspecie != "Todos" && !string.IsNullOrEmpty(ViewBag.FiltroEspecie)) ||
              (ViewBag.FiltroTamanio != "Todos" && !string.IsNullOrEmpty(ViewBag.FiltroTamanio)) ||
              (ViewBag.FiltroSexo != "Todos" && !string.IsNullOrEmpty(ViewBag.FiltroSexo)))
         {
-            <div class="alert alert-info mt-3">
-                <i class="fas fa-filter me-2"></i>
-                <strong>Filtros activos:</strong>
+            <div class="alert alert-beige border-green d-flex flex-wrap align-items-center gap-2 mb-4">
+                <i class="fas fa-filter text-green me-2"></i>
+                <strong class="text-brown">Filtros activos:</strong>
                 @if (!string.IsNullOrEmpty(ViewBag.FiltroBuscar))
                 {
-                    <span class="badge bg-primary me-2">Búsqueda: "@ViewBag.FiltroBuscar"</span>
+                    <span class="badge bg-pink text-brown px-3 py-2">Búsqueda: "@ViewBag.FiltroBuscar"</span>
                 }
                 @if (ViewBag.FiltroEspecie != "Todos" && !string.IsNullOrEmpty(ViewBag.FiltroEspecie))
                 {
-                    <span class="badge bg-primary me-2">Especie: @ViewBag.FiltroEspecie</span>
+                    <span class="badge bg-pink text-brown px-3 py-2">Especie: @ViewBag.FiltroEspecie</span>
                 }
                 @if (ViewBag.FiltroTamanio != "Todos" && !string.IsNullOrEmpty(ViewBag.FiltroTamanio))
                 {
-                    <span class="badge bg-primary me-2">Tamaño: @ViewBag.FiltroTamanio</span>
+                    <span class="badge bg-pink text-brown px-3 py-2">Tamaño: @ViewBag.FiltroTamanio</span>
                 }
                 @if (ViewBag.FiltroSexo != "Todos" && !string.IsNullOrEmpty(ViewBag.FiltroSexo))
                 {
-                    <span class="badge bg-primary me-2">Sexo: @ViewBag.FiltroSexo</span>
+                    <span class="badge bg-pink text-brown px-3 py-2">Sexo: @ViewBag.FiltroSexo</span>
                 }
-                <a href="@Url.Action("Index", "Mascotas")" class="btn btn-sm btn-outline-secondary ms-2">
+                <a href="@Url.Action("Index", "Mascotas")" class="btn btn-sm btn-outline-green ms-auto">
                     <i class="fas fa-times me-1"></i> Limpiar
                 </a>
             </div>
         }
 
+        <!-- Estadísticas rápidas -->
         @if (ViewBag.TotalPerros != null || ViewBag.TotalGatos != null)
         {
-            <div class="row mb-4 mt-4">
-                <div class="col-md-6 text-center">
-                    <div class="stat-badge">
-                        <i class="fas fa-dog fa-2x text-primary mb-2"></i>
-                        <h4 class="mb-0">@(ViewBag.TotalPerros ?? 0)</h4>
-                        <p class="text-muted mb-0">Perros disponibles</p>
+            <div class="row g-3 mb-5">
+                <div class="col-md-6">
+                    <div class="stat-card text-center">
+                        <i class="fas fa-dog fa-3x text-green mb-2"></i>
+                        <div class="display-6 fw-bold text-brown">@(ViewBag.TotalPerros ?? 0)</div>
+                        <p class="text-secondary mb-0">Perros disponibles</p>
                     </div>
                 </div>
-                <div class="col-md-6 text-center">
-                    <div class="stat-badge">
-                        <i class="fas fa-cat fa-2x text-pink mb-2"></i>
-                        <h4 class="mb-0">@(ViewBag.TotalGatos ?? 0)</h4>
-                        <p class="text-muted mb-0">Gatos disponibles</p>
+                <div class="col-md-6">
+                    <div class="stat-card text-center">
+                        <i class="fas fa-cat fa-3x text-pink mb-2"></i>
+                        <div class="display-6 fw-bold text-brown">@(ViewBag.TotalGatos ?? 0)</div>
+                        <p class="text-secondary mb-0">Gatos disponibles</p>
                     </div>
                 </div>
             </div>
         }
 
-        <div class="row">
+        <!-- Tarjetas de mascotas -->
+        <div class="row g-4">
             @if (Model != null && Model.Any())
             {
                 foreach (var mascota in Model)
@@ -137,75 +130,52 @@
                         imagenUrl = MVCMASCOTAS.Helpers.ImageHelper.GetImageDataUri(mascota.ImagenPrincipal);
                     }
 
-                    <div class="col-xl-4 col-lg-6 mb-4">
-                        <div class="mascota-card stagger-fade">
-                            <div class="mascota-imagen">
+                    <div class="col-xl-4 col-lg-6">
+                        <div class="pet-card h-100">
+                            <div class="pet-card-img">
                                 <img src="@imagenUrl" alt="@mascota.Nombre" onerror="this.src='/Content/images/no-image.png'">
-
                                 @if (mascota.Categoria == "Especial")
                                 {
-                                    <span class="mascota-badge badge-especial">
+                                    <span class="badge bg-yellow text-brown position-absolute top-0 end-0 m-3">
                                         <i class="fas fa-star me-1"></i> Especial
                                     </span>
                                 }
-
                                 @if (mascota.Esterilizado == true)
                                 {
-                                    <span class="badge-esterilizado">
-                                        <i class="fas fa-check me-1"></i> Esterilizado
+                                    <span class="badge bg-green text-white position-absolute top-0 start-0 m-3">
+                                        <i class="fas fa-check-circle me-1"></i> Esterilizado
                                     </span>
                                 }
                             </div>
-
-                            <div class="mascota-info">
-                                <h5 class="mascota-nombre">@mascota.Nombre</h5>
-
-                                <div class="mascota-detalle">
+                            <div class="pet-card-body">
+                                <h5 class="pet-card-title">@mascota.Nombre</h5>
+                                <div class="pet-card-info">
                                     <p>
-                                        <i class="fas fa-paw icon-especie"></i>
+                                        <i class="fas fa-paw text-green me-2"></i>
                                         <strong>Especie:</strong>
-                                        <span class="ms-2 badge @(mascota.Especie == "Perro" ? "bg-info" : "bg-pink")">
+                                        <span class="badge @(mascota.Especie == "Perro" ? "bg-green text-white" : "bg-pink text-brown") ms-2">
                                             @mascota.Especie
                                         </span>
                                     </p>
-
-                                    <p>
-                                        <i class="fas fa-venus-mars @(sexoTexto == "Macho" ? "icon-sexo-macho" : "icon-sexo-hembra")"></i>
-                                        <strong>Sexo:</strong> @sexoTexto
-                                    </p>
-
-                                    <p>
-                                        <i class="fas fa-ruler-combined icon-tamanio"></i>
-                                        <strong>Tamaño:</strong>
-                                        <span class="badge @(mascota.Tamanio == "Pequeño" ? "bg-success" : mascota.Tamanio == "Mediano" ? "bg-warning" : "bg-secondary")">
-                                            @mascota.Tamanio
-                                        </span>
-                                    </p>
-
-                                    <p>
-                                        <i class="fas fa-birthday-cake icon-edad"></i>
-                                        <strong>Edad:</strong> @mascota.EdadAproximada
-                                    </p>
+                                    <p><i class="fas fa-venus-mars @(sexoTexto == "Macho" ? "text-green" : "text-pink") me-2"></i> <strong>Sexo:</strong> @sexoTexto</p>
+                                    <p><i class="fas fa-ruler-combined text-green me-2"></i> <strong>Tamaño:</strong> @mascota.Tamanio</p>
+                                    <p><i class="fas fa-birthday-cake text-green me-2"></i> <strong>Edad:</strong> @mascota.EdadAproximada</p>
                                 </div>
-
                                 @if (!string.IsNullOrEmpty(mascota.DescripcionGeneral))
                                 {
-                                    <div class="mascota-descripcion">
-                                        <p class="mb-0">
-                                            @{
-                                                var descripcion = mascota.DescripcionGeneral.Length > 100
-                                                    ? mascota.DescripcionGeneral.Substring(0, 100) + "..."
-                                                    : mascota.DescripcionGeneral;
-                                            }
-                                            @descripcion
-                                        </p>
-                                    </div>
+                                    <p class="pet-card-descripcion">
+                                        @{
+                                            var descripcion = mascota.DescripcionGeneral.Length > 100
+                                                ? mascota.DescripcionGeneral.Substring(0, 100) + "..."
+                                                : mascota.DescripcionGeneral;
+                                        }
+                                        @descripcion
+                                    </p>
                                 }
                             </div>
-
-                            <div class="mascota-footer">
-                                <a href="@Url.Action("Detalle", "Mascotas", new { id = mascota.MascotaId })" class="btn-detalle">
-                                    <i class="fas fa-info-circle"></i> Conocer a @mascota.Nombre
+                            <div class="pet-card-footer">
+                                <a href="@Url.Action("Detalle", "Mascotas", new { id = mascota.MascotaId })" class="btn btn-green w-100">
+                                    <i class="fas fa-info-circle me-2"></i> Conocer a @mascota.Nombre
                                 </a>
                             </div>
                         </div>
@@ -215,28 +185,23 @@
             else
             {
                 <div class="col-12">
-                    <div class="empty-state">
-                        <i class="fas fa-heart-broken fa-4x text-muted mb-3"></i>
-
+                    <div class="empty-state text-center">
+                        <i class="fas fa-heart-broken fa-4x text-secondary mb-3"></i>
                         @if (!string.IsNullOrEmpty(ViewBag.FiltroBuscar) ||
                              (ViewBag.FiltroEspecie != "Todos" && !string.IsNullOrEmpty(ViewBag.FiltroEspecie)) ||
                              (ViewBag.FiltroTamanio != "Todos" && !string.IsNullOrEmpty(ViewBag.FiltroTamanio)) ||
                              (ViewBag.FiltroSexo != "Todos" && !string.IsNullOrEmpty(ViewBag.FiltroSexo)))
                         {
                             <h4 class="text-brown mb-3">No se encontraron mascotas con los filtros seleccionados</h4>
-                            <p class="text-secondary mb-4">
-                                ¡Intenta con otros criterios de búsqueda o visita pronto para ver nuevas llegadas!
-                            </p>
+                            <p class="text-secondary mb-4">¡Intenta con otros criterios de búsqueda o visita pronto para ver nuevas llegadas!</p>
                             <a href="@Url.Action("Index", "Mascotas")" class="btn btn-green px-4">
-                                <i class="fas fa-redo me-2"></i> Ver Todas las Mascotas
+                                <i class="fas fa-redo-alt me-2"></i> Ver Todas las Mascotas
                             </a>
                         }
                         else
                         {
                             <h4 class="text-brown mb-3">No hay mascotas disponibles para adopción en este momento</h4>
-                            <p class="text-secondary mb-4">
-                                ¡Visita pronto! Regularmente recibimos nuevas mascotas que necesitan un hogar.
-                            </p>
+                            <p class="text-secondary mb-4">¡Visita pronto! Regularmente recibimos nuevas mascotas que necesitan un hogar.</p>
                             <a href="@Url.Action("Index", "Home")" class="btn btn-green px-4">
                                 <i class="fas fa-home me-2"></i> Volver al Inicio
                             </a>
@@ -246,21 +211,21 @@
             }
         </div>
 
+        <!-- Paginación -->
         @if (ViewBag.TotalPages > 1)
         {
-            <nav aria-label="Paginación" class="pagination-custom mt-4">
+            <nav aria-label="Paginación" class="mt-5">
                 <ul class="pagination justify-content-center">
                     @if (ViewBag.CurrentPage > 1)
                     {
                         <li class="page-item">
-                            <a class="page-link page-link-custom"
-                               href="@Url.Action("Index", new {
-                                   page = ViewBag.CurrentPage - 1,
-                                   especie = ViewBag.FiltroEspecie,
-                                   tamanio = ViewBag.FiltroTamanio,
-                                   sexo = ViewBag.FiltroSexo,
-                                   buscar = ViewBag.FiltroBuscar
-                               })">
+                            <a class="page-link" href="@Url.Action("Index", new {
+                                page = ViewBag.CurrentPage - 1,
+                                especie = ViewBag.FiltroEspecie,
+                                tamanio = ViewBag.FiltroTamanio,
+                                sexo = ViewBag.FiltroSexo,
+                                buscar = ViewBag.FiltroBuscar
+                            })">
                                 <i class="fas fa-chevron-left me-1"></i> Anterior
                             </a>
                         </li>
@@ -269,61 +234,281 @@
                     @for (int i = 1; i <= ViewBag.TotalPages; i++)
                     {
                         <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
-                            <a class="page-link page-link-custom"
-                               href="@Url.Action("Index", new {
-                                   page = i,
-                                   especie = ViewBag.FiltroEspecie,
-                                   tamanio = ViewBag.FiltroTamanio,
-                                   sexo = ViewBag.FiltroSexo,
-                                   buscar = ViewBag.FiltroBuscar
-                               })">
-                                @i
-                            </a>
+                            <a class="page-link" href="@Url.Action("Index", new {
+                                page = i,
+                                especie = ViewBag.FiltroEspecie,
+                                tamanio = ViewBag.FiltroTamanio,
+                                sexo = ViewBag.FiltroSexo,
+                                buscar = ViewBag.FiltroBuscar
+                            })">@i</a>
                         </li>
                     }
 
                     @if (ViewBag.CurrentPage < ViewBag.TotalPages)
                     {
                         <li class="page-item">
-                            <a class="page-link page-link-custom"
-                               href="@Url.Action("Index", new {
-                                   page = ViewBag.CurrentPage + 1,
-                                   especie = ViewBag.FiltroEspecie,
-                                   tamanio = ViewBag.FiltroTamanio,
-                                   sexo = ViewBag.FiltroSexo,
-                                   buscar = ViewBag.FiltroBuscar
-                               })">
+                            <a class="page-link" href="@Url.Action("Index", new {
+                                page = ViewBag.CurrentPage + 1,
+                                especie = ViewBag.FiltroEspecie,
+                                tamanio = ViewBag.FiltroTamanio,
+                                sexo = ViewBag.FiltroSexo,
+                                buscar = ViewBag.FiltroBuscar
+                            })">
                                 Siguiente <i class="fas fa-chevron-right ms-1"></i>
                             </a>
                         </li>
                     }
                 </ul>
-
-                <div class="text-center mt-3 text-muted">
-                    Mostrando página @ViewBag.CurrentPage de @ViewBag.TotalPages
-                    (@ViewBag.TotalItems mascotas en total)
+                <div class="text-center mt-3 text-secondary">
+                    Mostrando página @ViewBag.CurrentPage de @ViewBag.TotalPages (@ViewBag.TotalItems mascotas en total)
                 </div>
             </nav>
         }
     </div>
-</div>
+</section>
 
-<style>
-    .stat-badge {
-        padding: 20px;
-        background: white;
-        border-radius: 10px;
-        border: 2px solid var(--green);
-        transition: transform 0.3s ease;
-    }
-
-        .stat-badge:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+@section Styles {
+    <style>
+        :root {
+            --green: #97C78B;
+            --yellow: #F2C66D;
+            --pink: #FBCDC0;
+            --brown: #2F2F2F;
+            --bg-light: #F2E9D8;
+            --beige: #F5E6D3;
+            --text-secondary: #555555;
         }
 
-    .empty-state {
-        padding: 60px 20px;
-        text-align: center;
-    }
-</style>
+        body {
+            background-color: var(--beige);
+        }
+
+        /* Hero */
+        .adopcion-hero {
+            background: linear-gradient(135deg, rgba(151,199,139,0.9), rgba(242,198,109,0.8)), url('https://images.unsplash.com/photo-1548199973-03cce0bbc87b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');
+            background-size: cover;
+            background-position: center;
+            border-radius: 0 0 30px 30px;
+            margin-bottom: 1rem;
+        }
+
+        /* Filtros */
+        .filter-card {
+            background: white;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 15px 35px rgba(151,199,139,0.15);
+            border: none;
+        }
+
+        .filter-header {
+            padding: 1rem 1.5rem;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .filter-body {
+            padding: 1.5rem;
+        }
+
+        /* Estadísticas */
+        .stat-card {
+            background: white;
+            border-radius: 24px;
+            padding: 1.5rem;
+            box-shadow: 0 8px 20px rgba(151,199,139,0.15);
+            transition: transform 0.3s, box-shadow 0.3s;
+            border: none;
+        }
+
+            .stat-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 15px 30px rgba(151,199,139,0.25);
+            }
+
+        /* Tarjetas de mascotas */
+        .pet-card {
+            background: white;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 15px 35px rgba(151,199,139,0.15);
+            transition: transform 0.3s, box-shadow 0.3s;
+            border: none;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+            .pet-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 20px 40px rgba(151,199,139,0.25);
+            }
+
+        .pet-card-img {
+            height: 250px;
+            overflow: hidden;
+            position: relative;
+        }
+
+            .pet-card-img img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                transition: transform 0.5s;
+            }
+
+            .pet-card-img:hover img {
+                transform: scale(1.05);
+            }
+
+        .pet-card-body {
+            padding: 1.5rem;
+            flex: 1;
+        }
+
+        .pet-card-title {
+            font-size: 1.4rem;
+            color: var(--brown);
+            margin-bottom: 0.8rem;
+            font-weight: 600;
+        }
+
+        .pet-card-info p {
+            margin-bottom: 0.4rem;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+        }
+
+        .pet-card-info i {
+            width: 1.5rem;
+        }
+
+        .pet-card-descripcion {
+            margin-top: 0.8rem;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            border-top: 1px dashed var(--green);
+            padding-top: 0.8rem;
+        }
+
+        .pet-card-footer {
+            padding: 1rem 1.5rem;
+            border-top: 2px solid var(--green);
+            background-color: var(--bg-light);
+        }
+
+        /* Badges */
+        .badge.bg-green {
+            background-color: var(--green) !important;
+            color: white !important;
+        }
+
+        .badge.bg-yellow {
+            background-color: var(--yellow) !important;
+            color: var(--brown) !important;
+        }
+
+        .badge.bg-pink {
+            background-color: var(--pink) !important;
+            color: var(--brown) !important;
+        }
+
+        /* Alertas */
+        .alert-beige {
+            background-color: var(--bg-light);
+            border: 1px solid var(--green);
+            color: var(--brown);
+            border-radius: 16px;
+        }
+
+        /* Botones */
+        .btn-green {
+            background-color: var(--green);
+            border: none;
+            border-radius: 50px;
+            padding: 0.6rem 1.8rem;
+            font-weight: 500;
+            transition: all 0.3s;
+            color: white;
+        }
+
+            .btn-green:hover {
+                background-color: #86b57a;
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(151,199,139,0.4);
+            }
+
+        .btn-outline-green {
+            border: 2px solid var(--green);
+            background: transparent;
+            color: var(--green);
+            border-radius: 50px;
+            padding: 0.6rem 1.8rem;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+            .btn-outline-green:hover {
+                background-color: var(--green);
+                color: white;
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(151,199,139,0.3);
+            }
+
+        /* Paginación */
+        .pagination .page-link {
+            color: var(--brown);
+            border: 1px solid var(--green);
+            border-radius: 30px;
+            margin: 0 3px;
+            transition: all 0.2s;
+        }
+
+            .pagination .page-link:hover {
+                background-color: var(--green);
+                color: white;
+                border-color: var(--green);
+            }
+
+        .pagination .active .page-link {
+            background-color: var(--green);
+            border-color: var(--green);
+            color: white;
+        }
+
+        /* Empty state */
+        .empty-state {
+            background: white;
+            border-radius: 24px;
+            padding: 4rem 2rem;
+            box-shadow: 0 15px 35px rgba(151,199,139,0.15);
+            border: 2px dashed var(--green);
+        }
+
+        /* Formularios */
+        .form-control, .form-select {
+            border: 2px solid var(--green);
+            border-radius: 16px;
+            padding: 0.6rem 1rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+            .form-control:focus, .form-select:focus {
+                border-color: var(--green);
+                box-shadow: 0 0 0 0.2rem rgba(151,199,139,0.25);
+                outline: none;
+            }
+
+        /* Responsive */
+        @@media (max-width: 768px) {
+            .filter-body .row {
+                flex-direction: column;
+            }
+
+            .filter-body .col-lg-2.d-flex {
+                margin-top: 0.5rem;
+            }
+        }
+    </style>
+}

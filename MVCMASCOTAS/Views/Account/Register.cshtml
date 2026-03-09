@@ -1,33 +1,31 @@
 ﻿@model MVCMASCOTAS.Models.ViewModels.RegisterViewModel
 
 @{
-    ViewBag.Title = "Registrarse";
+    ViewBag.Title = "Registrarse - ADOPTAMANÍA";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 <!-- Hero Section -->
-<section class="py-4">
-    <div class="container">
-        <div class="text-center">
-            <h1 class="display-5 fw-bold mb-2 text-brown">
-                <i class="fa fa-user-plus text-green"></i> Crear Cuenta Nueva
-            </h1>
-            <p class="lead mb-3 text-secondary">Únete a nuestra comunidad solidaria</p>
-        </div>
+<section class="register-hero py-4">
+    <div class="container text-center">
+        <i class="fas fa-paw fa-4x text-green mb-3"></i>
+        <h1 class="display-5 fw-bold mb-2 text-brown">Crear Cuenta Nueva</h1>
+        <p class="lead mb-3 text-secondary">Únete a nuestra comunidad solidaria</p>
     </div>
 </section>
 
 <!-- Main Content -->
-<section class="py-5 bg-light-mint">
+<section class="py-5 bg-beige">
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-lg-10">
-                <div class="card border-green shadow-hover">
-                    <div class="card-header bg-green text-white text-center py-4">
-                        <h3 class="mb-2"><i class="fa fa-user-plus"></i> Crear Cuenta Nueva</h3>
+                <div class="register-card">
+                    <div class="register-card-header bg-green text-white text-center py-4">
+                        <i class="fas fa-user-plus fa-3x mb-3"></i>
+                        <h3 class="mb-2">Crear Cuenta Nueva</h3>
                         <p class="mb-0">Regístrate para acceder a todas las funciones del refugio</p>
                     </div>
-                    <div class="card-body p-4 p-md-5">
+                    <div class="register-card-body p-4 p-md-5">
                         @using (Html.BeginForm("Register", "Account", FormMethod.Post,
                                new
                                {
@@ -39,64 +37,73 @@
                         {
                             @Html.AntiForgeryToken()
 
+                            <!-- Mensajes de TempData -->
                             if (TempData["SuccessMessage"] != null)
                             {
-                                <div class="alert alert-green border-green alert-dismissible fade show" role="alert">
-                                    <i class="fa fa-check-circle text-green"></i>
+                                <div class="alert alert-beige border-green alert-dismissible fade show" role="alert">
+                                    <i class="fas fa-check-circle text-green me-2"></i>
                                     <strong class="text-brown">@TempData["SuccessMessage"]</strong>
                                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                                 </div>
                             }
-
                             if (TempData["ErrorMessage"] != null)
                             {
-                                <div class="alert alert-danger border-danger alert-dismissible fade show" role="alert">
-                                    <i class="fa fa-exclamation-circle"></i>
-                                    <strong>@TempData["ErrorMessage"]</strong>
+                                <div class="alert alert-beige border-green alert-dismissible fade show" role="alert">
+                                    <i class="fas fa-exclamation-circle text-green me-2"></i>
+                                    <strong class="text-brown">@TempData["ErrorMessage"]</strong>
                                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                                 </div>
                             }
 
-                            @Html.ValidationSummary(true, "", new { @class = "alert alert-green border-green" })
+                            @Html.ValidationSummary(true, "", new { @class = "alert alert-beige border-green" })
 
                             <!-- Información Personal -->
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group mb-4">
                                         <label class="form-label text-brown fw-medium">
-                                            <i class="fa fa-user text-green"></i> Nombre Completo *
+                                            <i class="fas fa-user text-green me-2"></i> Nombre Completo *
                                         </label>
-                                        @Html.TextBoxFor(m => m.NombreCompleto, new
-                                        {
-                                            @class = "form-control border-green",
-                                            placeholder = "Ej: Juan Pérez",
-                                            required = "required",
-                                            maxlength = "150",
-                                            autocomplete = "name"
-                                        })
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-white border-green">
+                                                <i class="fas fa-user text-green"></i>
+                                            </span>
+                                            @Html.TextBoxFor(m => m.NombreCompleto, new
+                                            {
+                                                @class = "form-control border-green",
+                                                placeholder = "Ej: Juan Pérez",
+                                                required = "required",
+                                                maxlength = "150",
+                                                autocomplete = "name"
+                                            })
+                                        </div>
                                         @Html.ValidationMessageFor(m => m.NombreCompleto, "", new { @class = "text-danger small mt-1" })
                                     </div>
                                 </div>
-
                                 <div class="col-md-6">
                                     <div class="form-group mb-4">
                                         <label class="form-label text-brown fw-medium">
-                                            <i class="fa fa-id-card text-green"></i> Cédula *
+                                            <i class="fas fa-id-card text-green me-2"></i> Cédula *
                                         </label>
-                                        @Html.TextBoxFor(m => m.Cedula, new
-                                        {
-                                            @class = "form-control border-green",
-                                            id = "Cedula",
-                                            placeholder = "Ej: 1712345678",
-                                            maxlength = "10",
-                                            required = "required",
-                                            autocomplete = "off",
-                                            pattern = "[0-9]{10}",
-                                            title = "10 dígitos numéricos"
-                                        })
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-white border-green">
+                                                <i class="fas fa-id-card text-green"></i>
+                                            </span>
+                                            @Html.TextBoxFor(m => m.Cedula, new
+                                            {
+                                                @class = "form-control border-green",
+                                                id = "Cedula",
+                                                placeholder = "10 dígitos",
+                                                maxlength = "10",
+                                                required = "required",
+                                                autocomplete = "off",
+                                                pattern = "[0-9]{10}",
+                                                title = "10 dígitos numéricos"
+                                            })
+                                        </div>
                                         @Html.ValidationMessageFor(m => m.Cedula, "", new { @class = "text-danger small mt-1" })
                                         <small class="form-text text-secondary mt-2">
-                                            <i class="fa fa-info-circle text-green"></i> 10 dígitos sin guiones
+                                            <i class="fas fa-info-circle text-green me-1"></i> 10 dígitos sin guiones
                                         </small>
                                     </div>
                                 </div>
@@ -107,40 +114,49 @@
                                 <div class="col-md-6">
                                     <div class="form-group mb-4">
                                         <label class="form-label text-brown fw-medium">
-                                            <i class="fa fa-envelope text-green"></i> Email *
+                                            <i class="fas fa-envelope text-green me-2"></i> Email *
                                         </label>
-                                        @Html.TextBoxFor(m => m.Email, new
-                                        {
-                                            @class = "form-control border-green",
-                                            type = "email",
-                                            placeholder = "Ej: juan@email.com",
-                                            required = "required",
-                                            maxlength = "150",
-                                            autocomplete = "email"
-                                        })
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-white border-green">
+                                                <i class="fas fa-envelope text-green"></i>
+                                            </span>
+                                            @Html.TextBoxFor(m => m.Email, new
+                                            {
+                                                @class = "form-control border-green",
+                                                type = "email",
+                                                placeholder = "ejemplo@correo.com",
+                                                required = "required",
+                                                maxlength = "150",
+                                                autocomplete = "email"
+                                            })
+                                        </div>
                                         @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger small mt-1" })
                                     </div>
                                 </div>
-
                                 <div class="col-md-6">
                                     <div class="form-group mb-4">
                                         <label class="form-label text-brown fw-medium">
-                                            <i class="fa fa-phone text-green"></i> Teléfono *
+                                            <i class="fas fa-phone text-green me-2"></i> Teléfono *
                                         </label>
-                                        @Html.TextBoxFor(m => m.Telefono, new
-                                        {
-                                            @class = "form-control border-green",
-                                            id = "Telefono",
-                                            placeholder = "Ej: 0987654321",
-                                            required = "required",
-                                            maxlength = "10",
-                                            autocomplete = "tel",
-                                            pattern = "[0-9]{10}",
-                                            title = "10 dígitos numéricos"
-                                        })
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-white border-green">
+                                                <i class="fas fa-phone text-green"></i>
+                                            </span>
+                                            @Html.TextBoxFor(m => m.Telefono, new
+                                            {
+                                                @class = "form-control border-green",
+                                                id = "Telefono",
+                                                placeholder = "10 dígitos",
+                                                required = "required",
+                                                maxlength = "10",
+                                                autocomplete = "tel",
+                                                pattern = "[0-9]{10}",
+                                                title = "10 dígitos numéricos"
+                                            })
+                                        </div>
                                         @Html.ValidationMessageFor(m => m.Telefono, "", new { @class = "text-danger small mt-1" })
                                         <small class="form-text text-secondary mt-2">
-                                            <i class="fa fa-info-circle text-green"></i> 10 dígitos sin guiones
+                                            <i class="fas fa-info-circle text-green me-1"></i> 10 dígitos sin guiones
                                         </small>
                                     </div>
                                 </div>
@@ -149,17 +165,22 @@
                             <!-- Dirección -->
                             <div class="form-group mb-4">
                                 <label class="form-label text-brown fw-medium">
-                                    <i class="fa fa-map-marker-alt text-green"></i> Dirección *
+                                    <i class="fas fa-map-marker-alt text-green me-2"></i> Dirección *
                                 </label>
-                                @Html.TextAreaFor(m => m.Direccion, new
-                                {
-                                    @class = "form-control border-green",
-                                    rows = "2",
-                                    placeholder = "Dirección completa incluyendo calles, sector...",
-                                    required = "required",
-                                    maxlength = "255",
-                                    autocomplete = "street-address"
-                                })
+                                <div class="input-group">
+                                    <span class="input-group-text bg-white border-green">
+                                        <i class="fas fa-map-marker-alt text-green"></i>
+                                    </span>
+                                    @Html.TextAreaFor(m => m.Direccion, new
+                                    {
+                                        @class = "form-control border-green",
+                                        rows = "2",
+                                        placeholder = "Dirección completa incluyendo calles, sector...",
+                                        required = "required",
+                                        maxlength = "255",
+                                        autocomplete = "street-address"
+                                    })
+                                </div>
                                 @Html.ValidationMessageFor(m => m.Direccion, "", new { @class = "text-danger small mt-1" })
                             </div>
 
@@ -168,30 +189,40 @@
                                 <div class="col-md-6">
                                     <div class="form-group mb-4">
                                         <label class="form-label text-brown fw-medium">
-                                            <i class="fa fa-city text-green"></i> Ciudad
+                                            <i class="fas fa-city text-green me-2"></i> Ciudad
                                         </label>
-                                        @Html.TextBoxFor(m => m.Ciudad, new
-                                        {
-                                            @class = "form-control border-green",
-                                            placeholder = "Ej: Quito",
-                                            maxlength = "100",
-                                            autocomplete = "address-level2"
-                                        })
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-white border-green">
+                                                <i class="fas fa-city text-green"></i>
+                                            </span>
+                                            @Html.TextBoxFor(m => m.Ciudad, new
+                                            {
+                                                @class = "form-control border-green",
+                                                placeholder = "Ej: Quito",
+                                                maxlength = "100",
+                                                autocomplete = "address-level2"
+                                            })
+                                        </div>
                                         @Html.ValidationMessageFor(m => m.Ciudad, "", new { @class = "text-danger small mt-1" })
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group mb-4">
                                         <label class="form-label text-brown fw-medium">
-                                            <i class="fa fa-map text-green"></i> Provincia
+                                            <i class="fas fa-map text-green me-2"></i> Provincia
                                         </label>
-                                        @Html.TextBoxFor(m => m.Provincia, new
-                                        {
-                                            @class = "form-control border-green",
-                                            placeholder = "Ej: Pichincha",
-                                            maxlength = "100",
-                                            autocomplete = "address-level1"
-                                        })
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-white border-green">
+                                                <i class="fas fa-map text-green"></i>
+                                            </span>
+                                            @Html.TextBoxFor(m => m.Provincia, new
+                                            {
+                                                @class = "form-control border-green",
+                                                placeholder = "Ej: Pichincha",
+                                                maxlength = "100",
+                                                autocomplete = "address-level1"
+                                            })
+                                        </div>
                                         @Html.ValidationMessageFor(m => m.Provincia, "", new { @class = "text-danger small mt-1" })
                                     </div>
                                 </div>
@@ -202,27 +233,32 @@
                                 <div class="col-md-6">
                                     <div class="form-group mb-4">
                                         <label class="form-label text-brown fw-medium">
-                                            <i class="fa fa-lock text-green"></i> Contraseña *
+                                            <i class="fas fa-lock text-green me-2"></i> Contraseña *
                                         </label>
                                         <div class="input-group">
+                                            <span class="input-group-text bg-white border-green">
+                                                <i class="fas fa-lock text-green"></i>
+                                            </span>
                                             @Html.PasswordFor(m => m.Password, new
                                             {
                                                 @class = "form-control border-green",
                                                 id = "Password",
-                                                placeholder = "Mínimo 8 caracteres con letras y números",
+                                                placeholder = "Mínimo 8 caracteres",
                                                 required = "required",
                                                 minlength = "8",
                                                 maxlength = "100",
                                                 autocomplete = "new-password"
                                             })
                                             <button type="button" class="btn btn-outline-green toggle-password" data-target="#Password">
-                                                <i class="fa fa-eye"></i>
+                                                <i class="fas fa-eye"></i>
                                             </button>
                                         </div>
                                         @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger small mt-1" })
-                                        <div class="password-requirements small text-secondary mt-2">
-                                            <i class="fa fa-info-circle text-green"></i> Requisitos de contraseña:
-                                            <ul class="mb-0 ps-3">
+                                        <div class="requirements-box mt-2 p-2">
+                                            <small class="text-secondary">
+                                                <i class="fas fa-info-circle text-green me-1"></i> Requisitos:
+                                            </small>
+                                            <ul class="small text-secondary mb-0 ps-3 mt-1">
                                                 <li>Mínimo 8 caracteres</li>
                                                 <li>Al menos una letra</li>
                                                 <li>Al menos un número</li>
@@ -230,13 +266,15 @@
                                         </div>
                                     </div>
                                 </div>
-
                                 <div class="col-md-6">
                                     <div class="form-group mb-4">
                                         <label class="form-label text-brown fw-medium">
-                                            <i class="fa fa-lock text-green"></i> Confirmar Contraseña *
+                                            <i class="fas fa-check-circle text-green me-2"></i> Confirmar Contraseña *
                                         </label>
                                         <div class="input-group">
+                                            <span class="input-group-text bg-white border-green">
+                                                <i class="fas fa-check-circle text-green"></i>
+                                            </span>
                                             @Html.PasswordFor(m => m.ConfirmPassword, new
                                             {
                                                 @class = "form-control border-green",
@@ -246,18 +284,18 @@
                                                 autocomplete = "new-password"
                                             })
                                             <button type="button" class="btn btn-outline-green toggle-password" data-target="#ConfirmPassword">
-                                                <i class="fa fa-eye"></i>
+                                                <i class="fas fa-eye"></i>
                                             </button>
                                         </div>
                                         @Html.ValidationMessageFor(m => m.ConfirmPassword, "", new { @class = "text-danger small mt-1" })
                                         <div id="passwordMatch" class="mt-2 d-none">
                                             <small class="text-success">
-                                                <i class="fa fa-check-circle"></i> Las contraseñas coinciden
+                                                <i class="fas fa-check-circle me-1"></i> Las contraseñas coinciden
                                             </small>
                                         </div>
                                         <div id="passwordMismatch" class="mt-2 d-none">
                                             <small class="text-danger">
-                                                <i class="fa fa-times-circle"></i> Las contraseñas no coinciden
+                                                <i class="fas fa-times-circle me-1"></i> Las contraseñas no coinciden
                                             </small>
                                         </div>
                                     </div>
@@ -267,22 +305,20 @@
                             <!-- Foto de Perfil -->
                             <div class="form-group mb-4">
                                 <label class="form-label text-brown fw-medium">
-                                    <i class="fa fa-camera text-green"></i> Foto de Perfil (Opcional)
+                                    <i class="fas fa-camera text-green me-2"></i> Foto de Perfil (Opcional)
                                 </label>
                                 <div class="input-group">
                                     <input type="file" class="form-control border-green" id="ImagenPerfil" name="ImagenPerfil" accept="image/*" />
                                     <label class="input-group-text btn-outline-green" for="ImagenPerfil">
-                                        <i class="fa fa-cloud-upload-alt"></i> Examinar
+                                        <i class="fas fa-cloud-upload-alt me-1"></i> Examinar
                                     </label>
                                 </div>
                                 <small class="form-text text-secondary mt-2">
-                                    <i class="fa fa-info-circle text-green"></i> Formatos: JPG, PNG, GIF. Tamaño máximo: 5MB
+                                    <i class="fas fa-info-circle text-green me-1"></i> Formatos: JPG, PNG, GIF. Tamaño máximo: 5MB
                                 </small>
-
-                                <!-- Vista previa de imagen -->
                                 <div id="imagePreview" class="text-center mt-3" style="display: none;">
                                     <p class="mb-2 text-brown">
-                                        <i class="fa fa-eye text-green"></i> Vista Previa:
+                                        <i class="fas fa-eye text-green me-2"></i> Vista Previa:
                                     </p>
                                     <img id="previewImage" class="img-thumbnail rounded-circle border-green"
                                          style="width: 150px; height: 150px; object-fit: cover;" />
@@ -292,11 +328,14 @@
                             <!-- Pregunta de Seguridad -->
                             <div class="form-group mb-4">
                                 <label class="form-label text-brown fw-medium">
-                                    <i class="fa fa-shield-alt text-green"></i> Pregunta de Seguridad *
+                                    <i class="fas fa-shield-alt text-green me-2"></i> Pregunta de Seguridad *
                                 </label>
-                                <div class="card border-green">
-                                    <div class="card-body">
-                                        <p class="mb-2 text-secondary">¿Cuánto es 2 + 2?</p>
+                                <div class="security-question p-3">
+                                    <p class="mb-2 text-brown">¿Cuánto es 2 + 2?</p>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-white border-green">
+                                            <i class="fas fa-question text-green"></i>
+                                        </span>
                                         @Html.TextBoxFor(m => m.PreguntaSeguridad, new
                                         {
                                             @class = "form-control border-green",
@@ -304,16 +343,16 @@
                                             placeholder = "Ingresa la respuesta",
                                             required = "required"
                                         })
-                                        @Html.ValidationMessageFor(m => m.PreguntaSeguridad, "", new { @class = "text-danger small mt-1" })
-                                        <small class="form-text text-secondary mt-2">
-                                            <i class="fa fa-info-circle text-green"></i> Esta pregunta ayuda a verificar que no eres un bot
-                                        </small>
                                     </div>
+                                    @Html.ValidationMessageFor(m => m.PreguntaSeguridad, "", new { @class = "text-danger small mt-1" })
+                                    <small class="form-text text-secondary mt-2">
+                                        <i class="fas fa-info-circle text-green me-1"></i> Esta pregunta ayuda a verificar que no eres un bot
+                                    </small>
                                 </div>
                             </div>
 
                             <!-- Términos y Condiciones -->
-                            <div class="form-group form-check mt-4">
+                            <div class="form-check mt-4">
                                 @Html.CheckBoxFor(m => m.AceptaTerminos, new
                                 {
                                     @class = "form-check-input",
@@ -329,7 +368,7 @@
                             <!-- Botón de Registro -->
                             <div class="d-grid mt-4">
                                 <button type="submit" class="btn btn-green btn-lg text-white py-3" id="btnRegistrar">
-                                    <i class="fa fa-user-plus"></i> Crear Cuenta
+                                    <i class="fas fa-user-plus me-2"></i> Crear Cuenta
                                 </button>
                             </div>
                         }
@@ -337,7 +376,7 @@
                         <div class="text-center mt-4 pt-4 border-top border-green">
                             <p class="text-brown mb-3">¿Ya tienes una cuenta?</p>
                             <a href="@Url.Action("Login", "Account")" class="btn btn-outline-green btn-lg">
-                                <i class="fa fa-sign-in-alt"></i> Iniciar Sesión
+                                <i class="fas fa-sign-in-alt me-2"></i> Iniciar Sesión
                             </a>
                         </div>
                     </div>
@@ -349,46 +388,129 @@
 
 @section Styles {
     <style>
-        /* Estilos específicos para Registrarse */
-        .password-requirements {
-            background-color: rgba(151, 199, 139, 0.1);
-            padding: 10px 15px;
-            border-radius: 8px;
-            border-left: 4px solid var(--green);
+        /* Hero */
+        .register-hero {
+            background-color: var(--fondo-beige);
+            border-radius: 0 0 30px 30px;
+            margin-bottom: 1rem;
         }
 
+        /* Tarjeta principal */
+        .register-card {
+            background: white;
+            border-radius: 30px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(151, 199, 139, 0.15);
+            border: none;
+        }
+
+        .register-card-header {
+            padding: 2rem 1.5rem;
+        }
+
+        .register-card-body {
+            padding: 2rem;
+        }
+
+        /* Alertas personalizadas */
+        .alert-beige {
+            background-color: var(--fondo-beige);
+            border: 1px solid var(--verde-menta);
+            color: var(--texto-oscuro);
+            border-radius: 16px;
+        }
+
+        /* Input group */
+        .input-group-text {
+            border-radius: 12px 0 0 12px;
+            border-right: none;
+            background-color: white;
+        }
+
+        .form-control {
+            border-radius: 0 12px 12px 0;
+            border-left: none;
+            padding: 0.75rem 1rem;
+            font-size: 1rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+            .form-control:focus {
+                border-color: var(--verde-menta);
+                box-shadow: 0 0 0 0.2rem rgba(151, 199, 139, 0.25);
+                outline: none;
+            }
+
+        .input-group:focus-within .input-group-text {
+            border-color: var(--verde-menta);
+            box-shadow: 0 0 0 0.2rem rgba(151, 199, 139, 0.25);
+        }
+
+        /* Botón toggle contraseña */
+        .btn-outline-green {
+            border: 2px solid var(--verde-menta);
+            background: transparent;
+            color: var(--verde-menta);
+            border-radius: 0 12px 12px 0;
+            border-left: none;
+            transition: all 0.2s;
+        }
+
+            .btn-outline-green:hover {
+                background-color: var(--verde-menta);
+                color: white;
+            }
+
+        /* Checkbox personalizado */
         .form-check-input:checked {
-            background-color: var(--green);
-            border-color: var(--green);
+            background-color: var(--verde-menta);
+            border-color: var(--verde-menta);
         }
 
         .form-check-input:focus {
-            border-color: var(--green);
-            box-shadow: 0 0 0 0.25rem rgba(151, 199, 139, 0.25);
+            border-color: var(--verde-menta);
+            box-shadow: 0 0 0 0.2rem rgba(151, 199, 139, 0.25);
         }
 
-        .form-control:focus {
-            border-color: var(--green) !important;
-            box-shadow: 0 0 0 0.25rem rgba(151, 199, 139, 0.25) !important;
+        /* Requisitos de contraseña */
+        .requirements-box {
+            background-color: rgba(151, 199, 139, 0.1);
+            border-radius: 12px;
+            border-left: 4px solid var(--verde-menta);
         }
 
-        .input-group .btn-outline-green {
-            border-left: none;
+        /* Pregunta de seguridad */
+        .security-question {
+            background-color: var(--fondo-beige);
+            border-radius: 16px;
+            border: 1px solid var(--verde-menta);
         }
 
-        .input-group-text.btn-outline-green {
-            cursor: pointer;
+        /* Botón principal */
+        .btn-green {
+            background-color: var(--verde-menta);
+            border: none;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: all 0.3s;
         }
 
-        .img-thumbnail.rounded-circle {
-            border: 2px solid var(--green);
-            transition: all 0.3s ease;
-        }
-
-            .img-thumbnail.rounded-circle:hover {
-                transform: scale(1.05);
-                box-shadow: 0 5px 15px rgba(151, 199, 139, 0.3);
+            .btn-green:hover {
+                background-color: #86b57a;
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(151, 199, 139, 0.4);
             }
+
+        /* Responsive */
+        @@media (max-width: 768px) {
+            .register-card-header {
+                padding: 1.5rem 1rem;
+            }
+
+            .register-card-body {
+                padding: 1.5rem;
+            }
+        }
     </style>
 }
 
@@ -396,9 +518,7 @@
     @Scripts.Render("~/bundles/jqueryval")
     <script>
         $(document).ready(function () {
-            console.log("Formulario de registro cargado");
-
-            // Toggle password visibility
+            // Toggle contraseña
             $('.toggle-password').click(function () {
                 var target = $(this).data('target');
                 var input = $(target);
@@ -415,13 +535,10 @@
 
             // Vista previa de imagen
             $('#ImagenPerfil').on('change', function () {
-                var fileName = $(this).val().split('\\').pop();
-
-                // Vista previa de imagen
                 var input = this;
                 if (input.files && input.files[0]) {
                     var file = input.files[0];
-                    var fileSize = file.size / 1024 / 1024; // en MB
+                    var fileSize = file.size / 1024 / 1024;
 
                     if (fileSize > 5) {
                         Swal.fire({
@@ -458,10 +575,7 @@
                     $(this).removeClass('is-valid').addClass('is-invalid');
                 }
 
-                // Actualizar confirmación si ya hay valor
-                if ($('#ConfirmPassword').val()) {
-                    checkPasswordMatch();
-                }
+                if ($('#ConfirmPassword').val()) checkPasswordMatch();
             });
 
             // Validación en tiempo real de confirmación
@@ -469,16 +583,15 @@
 
             function checkPasswordMatch() {
                 var password = $('#Password').val();
-                var confirmPassword = $('#ConfirmPassword').val();
+                var confirm = $('#ConfirmPassword').val();
 
-                if (confirmPassword === '') {
+                if (confirm === '') {
                     $('#ConfirmPassword').removeClass('is-invalid is-valid');
-                    $('#passwordMatch').addClass('d-none');
-                    $('#passwordMismatch').addClass('d-none');
+                    $('#passwordMatch, #passwordMismatch').addClass('d-none');
                     return;
                 }
 
-                if (password === confirmPassword) {
+                if (password === confirm) {
                     $('#ConfirmPassword').removeClass('is-invalid').addClass('is-valid');
                     $('#passwordMatch').removeClass('d-none');
                     $('#passwordMismatch').addClass('d-none');
@@ -489,39 +602,37 @@
                 }
             }
 
-            // Validación del formulario al enviar
+            // Validación al enviar
             $('#registerForm').on('submit', function (e) {
-                console.log("Validando formulario...");
-
-                // Validar cédula
+                // Cédula
                 var cedula = $('#Cedula').val();
                 if (cedula.length !== 10 || !/^\d+$/.test(cedula)) {
                     e.preventDefault();
                     Swal.fire({
                         icon: 'error',
                         title: 'Cédula inválida',
-                        text: 'La cédula debe tener exactamente 10 dígitos numéricos.',
+                        text: 'Debe tener exactamente 10 dígitos numéricos.',
                         confirmButtonColor: '#97C78B'
                     });
                     $('#Cedula').focus();
                     return false;
                 }
 
-                // Validar teléfono
+                // Teléfono
                 var telefono = $('#Telefono').val();
                 if (telefono.length !== 10 || !/^\d+$/.test(telefono)) {
                     e.preventDefault();
                     Swal.fire({
                         icon: 'error',
                         title: 'Teléfono inválido',
-                        text: 'El teléfono debe tener exactamente 10 dígitos numéricos.',
+                        text: 'Debe tener exactamente 10 dígitos numéricos.',
                         confirmButtonColor: '#97C78B'
                     });
                     $('#Telefono').focus();
                     return false;
                 }
 
-                // Validar contraseña
+                // Contraseña
                 var password = $('#Password').val();
                 var hasLetter = /[a-zA-Z]/.test(password);
                 var hasDigit = /\d/.test(password);
@@ -531,7 +642,7 @@
                     Swal.fire({
                         icon: 'error',
                         title: 'Contraseña muy corta',
-                        text: 'La contraseña debe tener al menos 8 caracteres.',
+                        text: 'Mínimo 8 caracteres.',
                         confirmButtonColor: '#97C78B'
                     });
                     $('#Password').focus();
@@ -543,16 +654,15 @@
                     Swal.fire({
                         icon: 'error',
                         title: 'Contraseña inválida',
-                        text: 'La contraseña debe incluir letras y números.',
+                        text: 'Debe incluir letras y números.',
                         confirmButtonColor: '#97C78B'
                     });
                     $('#Password').focus();
                     return false;
                 }
 
-                // Validar que las contraseñas coincidan
-                var confirmPassword = $('#ConfirmPassword').val();
-                if (password !== confirmPassword) {
+                // Coincidencia
+                if (password !== $('#ConfirmPassword').val()) {
                     e.preventDefault();
                     Swal.fire({
                         icon: 'error',
@@ -564,9 +674,8 @@
                     return false;
                 }
 
-                // Validar pregunta de seguridad
-                var pregunta = $('#PreguntaSeguridad').val();
-                if (pregunta !== "4") {
+                // Pregunta de seguridad
+                if ($('#PreguntaSeguridad').val() !== "4") {
                     e.preventDefault();
                     Swal.fire({
                         icon: 'error',
@@ -578,25 +687,24 @@
                     return false;
                 }
 
-                // Validar términos
+                // Términos
                 if (!$('#AceptaTerminos').is(':checked')) {
                     e.preventDefault();
                     Swal.fire({
                         icon: 'error',
                         title: 'Términos no aceptados',
-                        text: 'Debe aceptar los términos y condiciones para continuar.',
+                        text: 'Debe aceptar los términos y condiciones.',
                         confirmButtonColor: '#97C78B'
                     });
                     $('#AceptaTerminos').focus();
                     return false;
                 }
 
-                console.log("Formulario válido, enviando...");
-                $('#btnRegistrar').prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Procesando...');
+                $('#btnRegistrar').prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-2"></i> Procesando...');
                 return true;
             });
 
-            // Auto-focus en el primer campo
+            // Auto-focus
             $('#NombreCompleto').focus();
         });
     </script>

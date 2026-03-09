@@ -1,31 +1,113 @@
 ﻿@model List<MVCMASCOTAS.Models.CustomModels.Reportes.SolicitudAdopcionReporteModel>
-@{ ViewBag.Title = "Reporte de Solicitudes"; Layout = "~/Views/Shared/_Layout.cshtml"; }
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+@{
+    ViewBag.Title = "Reporte de Solicitudes";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Styles {
+    <style>
+        @@media print {
+            nav, .navbar, footer, .no-print, hr {
+                display: none !important;
+            }
+
+            .container-fluid {
+                width: 100% !important;
+                padding: 0 !important;
+            }
+
+            .table {
+                font-size: 9px;
+            }
+
+            .card {
+                border: none !important;
+                box-shadow: none !important;
+            }
+
+            .card-header {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            body {
+                margin: 0;
+                background: white !important;
+            }
+        }
+
+        #titulo-impresion {
+            display: none;
+        }
+    </style>
+}
 
 <div class="container-fluid">
-    <div class="d-flex justify-content-between align-items-center mb-4">
+
+    <!-- Título visible SOLO al imprimir -->
+    <div id="titulo-impresion" class="text-center mb-3">
+        <h3>ADOPTAMANÍA — Reporte de Solicitudes de Adopción</h3>
+        <p>Generado el @DateTime.Now.ToString("dd/MM/yyyy HH:mm")</p>
+        <hr />
+    </div>
+
+    <!-- Cabecera de pantalla -->
+    <div class="d-flex justify-content-between align-items-center mb-4 no-print">
         <h2><i class="fas fa-clipboard-list text-warning"></i> Reporte de Solicitudes</h2>
         <div>
-            <a href="@Url.Action("ReporteSolicitudes", "Reportes", new { estado = ViewBag.Estado, fechaInicio = ViewBag.FechaInicioParm, fechaFin = ViewBag.FechaFinParm })"
-               class="btn btn-warning mr-2">
-                <i class="fas fa-file-pdf"></i> Exportar PDF
+            <a href="@Url.Action("ExportarExcelSolicitudes", "Reportes", new { estado = ViewBag.Estado, fechaInicio = ViewBag.FechaInicioParm, fechaFin = ViewBag.FechaFinParm })"
+               class="btn btn-success mr-2">
+                <i class="fas fa-file-excel"></i> Exportar Excel
             </a>
-            <a href="@Url.Action("Index", "Reportes")" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Volver</a>
+            <button onclick="window.print()" class="btn btn-danger mr-2">
+                <i class="fas fa-file-pdf"></i> Exportar PDF
+            </button>
+            <a href="@Url.Action("Index", "Reportes")" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Volver
+            </a>
         </div>
     </div>
 
-    @if (!Model.Any())
-    {<div class="alert alert-info">No hay solicitudes para los filtros.</div> }
+    @if (Model == null || !Model.Any())
+    {
+        <div class="alert alert-warning">No hay solicitudes para los filtros seleccionados.</div>
+    }
     else
     {
-        <div class="row mb-4">
-            <div class="col-md-3"><div class="card text-white bg-warning"><div class="card-body text-center"><h3>@Model.Count</h3><p class="mb-0">Total</p></div></div></div>
-            <div class="col-md-3"><div class="card text-white bg-secondary"><div class="card-body text-center"><h3>@Model.Count(s => s.Estado == "Pendiente")</h3><p class="mb-0">Pendientes</p></div></div></div>
-            <div class="col-md-3"><div class="card text-white bg-success"><div class="card-body text-center"><h3>@Model.Count(s => s.Estado == "Aprobada")</h3><p class="mb-0">Aprobadas</p></div></div></div>
-            <div class="col-md-3"><div class="card text-white bg-danger"><div class="card-body text-center"><h3>@Model.Count(s => s.Estado == "Rechazada")</h3><p class="mb-0">Rechazadas</p></div></div></div>
+        <!-- Cards resumen (solo pantalla) -->
+        <div class="row mb-4 no-print">
+            <div class="col-md-3">
+                <div class="card text-white bg-warning">
+                    <div class="card-body text-center">
+                        <h3>@Model.Count</h3><p class="mb-0">Total</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-white bg-secondary">
+                    <div class="card-body text-center">
+                        <h3>@Model.Count(s => s.Estado == "Pendiente")</h3><p class="mb-0">Pendientes</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-white bg-success">
+                    <div class="card-body text-center">
+                        <h3>@Model.Count(s => s.Estado == "Aprobada")</h3><p class="mb-0">Aprobadas</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-white bg-danger">
+                    <div class="card-body text-center">
+                        <h3>@Model.Count(s => s.Estado == "Rechazada")</h3><p class="mb-0">Rechazadas</p>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <div class="row mb-4">
+        <!-- Gráficas (solo pantalla) -->
+        <div class="row mb-4 no-print">
             <div class="col-md-6">
                 <div class="card shadow-sm">
                     <div class="card-header bg-warning text-white">Por Estado</div>
@@ -40,13 +122,30 @@
             </div>
         </div>
 
+        <!-- Tabla -->
         <div class="card shadow-sm">
-            <div class="card-header bg-warning text-white"><h5 class="mb-0">Detalle (@Model.Count registros)</h5></div>
+            <div class="card-header bg-warning text-white">
+                <h5 class="mb-0">Detalle de Solicitudes (@Model.Count registros)</h5>
+            </div>
             <div class="card-body p-0">
                 <div class="table-responsive">
-                    <table class="table table-hover table-striped mb-0">
+                    <table class="table table-hover table-striped table-bordered mb-0">
                         <thead class="thead-dark">
-                            <tr><th>ID</th><th>Fecha</th><th>Solicitante</th><th>Mascota</th><th>Especie</th><th>Estado</th><th>Días Proceso</th><th>Puntaje</th></tr>
+                            <tr>
+                                <th>ID</th>
+                                <th>Fecha</th>
+                                <th>Solicitante</th>
+                                <th>Cédula</th>
+                                <th>Teléfono</th>
+                                <th>Ciudad</th>
+                                <th>Mascota</th>
+                                <th>Especie</th>
+                                <th>Estado</th>
+                                <th>Días Proceso</th>
+                                <th>Puntaje</th>
+                                <th>Resultado</th>
+                                <th>Evaluador</th>
+                            </tr>
                         </thead>
                         <tbody>
                             @foreach (var item in Model)
@@ -55,11 +154,20 @@
                                     <td>@item.SolicitudId</td>
                                     <td>@item.FechaSolicitud.ToString("dd/MM/yyyy")</td>
                                     <td>@item.NombreSolicitante</td>
+                                    <td>@item.CedulaSolicitante</td>
+                                    <td>@item.TelefonoSolicitante</td>
+                                    <td>@item.CiudadSolicitante</td>
                                     <td>@item.NombreMascota</td>
-                                    <td><span class="badge badge-info">@item.EspecieMascota</span></td>
-                                    <td><span class="badge @(item.Estado=="Aprobada"?"badge-success":item.Estado=="Rechazada"?"badge-danger":"badge-warning")">@item.Estado</span></td>
+                                    <td>@item.EspecieMascota</td>
+                                    <td>
+                                        <span class="badge @(item.Estado == "Aprobada" ? "badge-success" : item.Estado == "Rechazada" ? "badge-danger" : "badge-warning")">
+                                            @item.Estado
+                                        </span>
+                                    </td>
                                     <td>@item.DiasEnProceso días</td>
                                     <td>@(item.PuntajeEvaluacion.HasValue ? item.PuntajeEvaluacion + " pts" : "-")</td>
+                                    <td>@item.ResultadoEvaluacion</td>
+                                    <td>@item.EvaluadorNombre</td>
                                 </tr>
                             }
                         </tbody>
@@ -67,14 +175,23 @@
                 </div>
             </div>
         </div>
+        <small class="text-muted no-print">Generado el @DateTime.Now.ToString("dd/MM/yyyy HH:mm")</small>
     }
 </div>
 
-@section scripts {
+@section Scripts {
     <script>
-    var estados = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.GroupBy(m=>m.Estado).Select(g=>new{label=g.Key,count=g.Count()}).ToList()));
-    var especies = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.GroupBy(m=>m.EspecieMascota).Select(g=>new{label=g.Key,count=g.Count()}).ToList()));
-    new Chart(document.getElementById('graficaEstado'),{type:'doughnut',data:{labels:estados.map(e=>e.label),datasets:[{data:estados.map(e=>e.count),backgroundColor:['#FF9800','#4CAF50','#F44336','#2196F3']}]}});
-    new Chart(document.getElementById('graficaEspecie'),{type:'bar',data:{labels:especies.map(e=>e.label),datasets:[{label:'Solicitudes',data:especies.map(e=>e.count),backgroundColor:'#FF9800'}]},options:{scales:{y:{beginAtZero:true}}}});
+    window.onbeforeprint = function () { document.getElementById('titulo-impresion').style.display = 'block'; };
+    window.onafterprint  = function () { document.getElementById('titulo-impresion').style.display = 'none'; };
+
+    @if (Model != null && Model.Any())
+    {
+        <text>
+        var estados  = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.GroupBy(m=>m.Estado).Select(g=>new{label=g.Key,count=g.Count()}).ToList()));
+        var especies = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.GroupBy(m=>m.EspecieMascota).Select(g=>new{label=g.Key,count=g.Count()}).ToList()));
+        new Chart(document.getElementById('graficaEstado'),  { type: 'doughnut', data: { labels: estados.map(e=>e.label),  datasets: [{ data: estados.map(e=>e.count),  backgroundColor: ['#FF9800','#4CAF50','#F44336','#2196F3'] }] } });
+        new Chart(document.getElementById('graficaEspecie'), { type: 'bar',      data: { labels: especies.map(e=>e.label), datasets: [{ label: 'Solicitudes', data: especies.map(e=>e.count), backgroundColor: '#FF9800' }] }, options: { scales: { y: { beginAtZero: true } } } });
+        </text>
+    }
     </script>
 }

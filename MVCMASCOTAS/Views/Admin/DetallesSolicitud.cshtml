@@ -1,24 +1,21 @@
 ﻿@model MVCMASCOTAS.Models.SolicitudAdopcion
 
 @{
-    ViewData["Title"] = "Detalles de Solicitud";
+    ViewData["Title"] = "Detalles de Solicitud - ADOPTAMANÍA";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 <!-- Hero Section -->
-<section class="py-4">
-    <div class="container">
-        <div class="text-center">
-            <h1 class="display-5 fw-bold mb-2 text-brown">
-                <i class="fa fa-file-alt text-green"></i> Detalles de Solicitud #@Model.SolicitudId
-            </h1>
-            <p class="lead mb-3 text-secondary">Información completa de la solicitud de adopción</p>
-        </div>
+<section class="details-hero py-4">
+    <div class="container text-center">
+        <i class="fas fa-file-alt fa-3x text-green mb-3"></i>
+        <h1 class="display-5 fw-bold mb-2 text-brown">Detalles de Solicitud #@Model.SolicitudId</h1>
+        <p class="lead mb-3 text-secondary">Información completa de la solicitud de adopción</p>
     </div>
 </section>
 
 <!-- Main Content -->
-<section class="py-5 bg-light-mint">
+<section class="py-5 bg-beige">
     <div class="container">
         <!-- Mensajes de éxito/error -->
         @{
@@ -28,65 +25,52 @@
 
         @if (!string.IsNullOrEmpty(successMessage))
         {
-            <div class="alert alert-green border-green alert-dismissible fade show mb-4" role="alert">
-                <i class="fa fa-check-circle text-green"></i>
+            <div class="alert alert-beige border-green alert-dismissible fade show mb-4" role="alert">
+                <i class="fas fa-check-circle text-green me-2"></i>
                 <strong class="text-brown">@successMessage</strong>
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
         }
 
         @if (!string.IsNullOrEmpty(errorMessage))
         {
-            <div class="alert alert-green border-green alert-dismissible fade show mb-4" role="alert">
-                <i class="fa fa-exclamation-circle text-green"></i>
+            <div class="alert alert-beige border-green alert-dismissible fade show mb-4" role="alert">
+                <i class="fas fa-exclamation-circle text-green me-2"></i>
                 <strong class="text-brown">@errorMessage</strong>
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
         }
 
-        <div class="row">
+        <div class="row g-4">
             <!-- Información de la Mascota -->
             <div class="col-md-4">
-                <div class="card mb-4 border-green shadow-hover">
-                    <div class="card-header bg-green text-white">
-                        <h5 class="mb-0"><i class="fa fa-paw"></i> Mascota</h5>
+                <div class="detail-card">
+                    <div class="detail-card-header bg-green text-white">
+                        <i class="fas fa-paw me-2"></i> Mascota
                     </div>
-                    <div class="card-body text-center">
+                    <div class="detail-card-body text-center">
                         @if (Model.Mascotas?.ImagenPrincipal != null && Model.Mascotas.ImagenPrincipal.Length > 0)
                         {
                             string imagenBase64 = Convert.ToBase64String(Model.Mascotas.ImagenPrincipal);
-                            <img src="data:image/jpeg;base64,@imagenBase64" class="img-fluid rounded mb-3"
-                                 style="max-height: 200px; object-fit: cover;" alt="@Model.Mascotas?.Nombre" />
+                            <img src="data:image/jpeg;base64,@imagenBase64" class="img-fluid rounded-circle mb-3 pet-image"
+                                 style="width: 150px; height: 150px; object-fit: cover;" alt="@Model.Mascotas?.Nombre" />
                         }
                         else
                         {
-                            <div class="text-center mb-3 py-4 bg-light-mint border-green rounded">
-                                <i class="fa fa-paw fa-3x text-secondary"></i>
+                            <div class="pet-image-placeholder mx-auto mb-3">
+                                <i class="fas fa-paw fa-3x text-green"></i>
                             </div>
                         }
 
                         <h4 class="text-brown">@(Model.Mascotas?.Nombre ?? "N/A")</h4>
-                        <p class="mb-1">
-                            <i class="fa fa-dna text-secondary"></i>
-                            @(Model.Mascotas?.Especie ?? "N/A") - @(Model.Mascotas?.Raza ?? "N/A")
-                        </p>
-                        <p class="mb-1">
-                            <i class="fa fa-venus-mars text-secondary"></i>
-                            @(Model.Mascotas?.Sexo ?? "N/A") - @(Model.Mascotas?.EdadAproximada ?? "N/A")
-                        </p>
-                        <p class="mb-3">
-                            <i class="fa fa-home text-secondary"></i>
-                            @(Model.Mascotas?.Estado ?? "N/A")
-                        </p>
+                        <p class="mb-1"><i class="fas fa-dna text-secondary me-1"></i> @(Model.Mascotas?.Especie ?? "N/A") - @(Model.Mascotas?.Raza ?? "N/A")</p>
+                        <p class="mb-1"><i class="fas fa-venus-mars text-secondary me-1"></i> @(Model.Mascotas?.Sexo ?? "N/A") - @(Model.Mascotas?.EdadAproximada ?? "N/A")</p>
+                        <p class="mb-3"><i class="fas fa-home text-secondary me-1"></i> @(Model.Mascotas?.Estado ?? "N/A")</p>
 
                         @if (Model.MascotaId > 0)
                         {
-                            <a href="/Mascotas/Detalle/@Model.MascotaId" class="btn btn-green text-white btn-sm">
-                                <i class="fa fa-eye"></i> Ver Perfil Completo
+                            <a href="/Mascotas/Detalle/@Model.MascotaId" class="btn btn-outline-green btn-sm">
+                                <i class="fas fa-eye me-2"></i> Ver Perfil Completo
                             </a>
                         }
                     </div>
@@ -95,114 +79,94 @@
 
             <!-- Información del Solicitante -->
             <div class="col-md-4">
-                <div class="card mb-4 border-green shadow-hover">
-                    <div class="card-header bg-green text-white">
-                        <h5 class="mb-0"><i class="fa fa-user"></i> Solicitante</h5>
+                <div class="detail-card">
+                    <div class="detail-card-header bg-green text-white">
+                        <i class="fas fa-user me-2"></i> Solicitante
                     </div>
-                    <div class="card-body">
+                    <div class="detail-card-body text-center">
                         @if (Model.Usuarios?.ImagenPerfil != null && Model.Usuarios.ImagenPerfil.Length > 0)
                         {
                             string imagenBase64 = Convert.ToBase64String(Model.Usuarios.ImagenPerfil);
-                            <div class="text-center mb-3">
-                                <img src="data:image/jpeg;base64,@imagenBase64" class="rounded-circle shadow"
-                                     style="width: 120px; height: 120px; object-fit: cover; border: 3px solid var(--green);"
-                                     alt="@Model.Usuarios?.NombreCompleto" />
-                            </div>
+                            <img src="data:image/jpeg;base64,@imagenBase64" class="rounded-circle mb-3 user-image"
+                                 style="width: 120px; height: 120px; object-fit: cover;" alt="@Model.Usuarios?.NombreCompleto" />
                         }
                         else
                         {
-                            <div class="text-center mb-3">
-                                <div class="rounded-circle shadow d-inline-flex align-items-center justify-content-center"
-                                     style="width: 120px; height: 120px; background-color: var(--bg-light); border: 3px solid var(--green);">
-                                    <i class="fa fa-user fa-3x text-secondary"></i>
-                                </div>
+                            <div class="user-image-placeholder mx-auto mb-3">
+                                <i class="fas fa-user fa-3x text-green"></i>
                             </div>
                         }
 
-                        <div class="mb-3">
-                            <h5 class="mb-2 text-brown">@(Model.Usuarios?.NombreCompleto ?? "N/A")</h5>
-                            <p class="mb-1">
-                                <strong><i class="fa fa-id-card text-secondary"></i> Cédula:</strong>
-                                <span class="text-brown">@(Model.Usuarios?.Cedula ?? "N/A")</span>
-                            </p>
-                            <p class="mb-1">
-                                <strong><i class="fa fa-envelope text-secondary"></i> Email:</strong>
-                                <span class="text-brown">@(Model.Usuarios?.Email ?? "N/A")</span>
-                            </p>
-                            <p class="mb-1">
-                                <strong><i class="fa fa-phone text-secondary"></i> Teléfono:</strong>
-                                <span class="text-brown">@(Model.Usuarios?.Telefono ?? "N/A")</span>
-                            </p>
-                            <p class="mb-0">
-                                <strong><i class="fa fa-map-marker-alt text-secondary"></i> Dirección:</strong>
-                                <span class="text-brown">@(Model.Usuarios?.Direccion ?? "N/A")</span>
-                            </p>
-                        </div>
+                        <h5 class="mb-2 text-brown">@(Model.Usuarios?.NombreCompleto ?? "N/A")</h5>
+                        <p class="mb-1"><i class="fas fa-id-card text-secondary me-1"></i> <strong>Cédula:</strong> <span class="text-brown">@(Model.Usuarios?.Cedula ?? "N/A")</span></p>
+                        <p class="mb-1"><i class="fas fa-envelope text-secondary me-1"></i> <strong>Email:</strong> <span class="text-brown">@(Model.Usuarios?.Email ?? "N/A")</span></p>
+                        <p class="mb-1"><i class="fas fa-phone text-secondary me-1"></i> <strong>Teléfono:</strong> <span class="text-brown">@(Model.Usuarios?.Telefono ?? "N/A")</span></p>
+                        <p class="mb-0"><i class="fas fa-map-marker-alt text-secondary me-1"></i> <strong>Dirección:</strong> <span class="text-brown">@(Model.Usuarios?.Direccion ?? "N/A")</span></p>
                     </div>
                 </div>
             </div>
 
             <!-- Estado de la Solicitud -->
             <div class="col-md-4">
-                <div class="card mb-4 border-green shadow-hover">
-                    <div class="card-header bg-green text-white">
-                        <h5 class="mb-0"><i class="fa fa-info-circle"></i> Estado de la Solicitud</h5>
+                <div class="detail-card">
+                    <div class="detail-card-header bg-green text-white">
+                        <i class="fas fa-info-circle me-2"></i> Estado de la Solicitud
                     </div>
-                    <div class="card-body">
+                    <div class="detail-card-body">
                         <div class="mb-3">
-                            <strong><i class="fa fa-calendar text-secondary"></i> Fecha de Solicitud:</strong><br />
-                            <span class="text-brown">@(Model.FechaSolicitud?.ToString("dd/MM/yyyy HH:mm") ?? "No registrada")</span>
+                            <i class="fas fa-calendar text-secondary me-2"></i> <strong class="text-brown">Fecha de Solicitud:</strong><br />
+                            <span class="text-secondary ms-4">@(Model.FechaSolicitud?.ToString("dd/MM/yyyy HH:mm") ?? "No registrada")</span>
                         </div>
 
                         <div class="mb-3">
-                            <strong><i class="fa fa-tag text-secondary"></i> Estado Actual:</strong><br />
-                            @if (!string.IsNullOrEmpty(Model.Estado))
-                            {
-                                if (Model.Estado == "Pendiente")
+                            <i class="fas fa-tag text-secondary me-2"></i> <strong class="text-brown">Estado Actual:</strong><br />
+                            <div class="ms-4 mt-1">
+                                @if (!string.IsNullOrEmpty(Model.Estado))
                                 {
-                                    <span class="badge bg-yellow text-brown p-2"><i class="fa fa-clock"></i> Pendiente</span>
-                                }
-                                else if (Model.Estado == "En evaluación")
-                                {
-                                    <span class="badge bg-light-mint text-brown p-2"><i class="fa fa-search"></i> En Evaluación</span>
-                                }
-                                else if (Model.Estado == "Aprobada")
-                                {
-                                    <span class="badge bg-green text-white p-2"><i class="fa fa-check"></i> Aprobada</span>
-                                }
-                                else if (Model.Estado == "Rechazada")
-                                {
-                                    <span class="badge bg-pink text-brown p-2"><i class="fa fa-times"></i> Rechazada</span>
-                                }
-                                else if (Model.Estado == "Cancelada")
-                                {
-                                    <span class="badge bg-light-mint text-brown p-2"><i class="fa fa-ban"></i> Cancelada</span>
-                                }
-                                else if (Model.Estado == "Completada")
-                                {
-                                    <span class="badge bg-green text-white p-2"><i class="fa fa-flag-checkered"></i> Completada</span>
+                                    if (Model.Estado == "Pendiente")
+                                    {
+                                        <span class="badge bg-yellow text-brown px-3 py-2"><i class="fas fa-clock me-1"></i> Pendiente</span>
+                                    }
+                                    else if (Model.Estado == "En evaluación")
+                                    {
+                                        <span class="badge bg-light-mint text-brown px-3 py-2"><i class="fas fa-search me-1"></i> En Evaluación</span>
+                                    }
+                                    else if (Model.Estado == "Aprobada")
+                                    {
+                                        <span class="badge bg-green text-white px-3 py-2"><i class="fas fa-check me-1"></i> Aprobada</span>
+                                    }
+                                    else if (Model.Estado == "Rechazada")
+                                    {
+                                        <span class="badge bg-pink text-brown px-3 py-2"><i class="fas fa-times me-1"></i> Rechazada</span>
+                                    }
+                                    else if (Model.Estado == "Cancelada")
+                                    {
+                                        <span class="badge bg-light-mint text-brown px-3 py-2"><i class="fas fa-ban me-1"></i> Cancelada</span>
+                                    }
+                                    else if (Model.Estado == "Completada")
+                                    {
+                                        <span class="badge bg-green text-white px-3 py-2"><i class="fas fa-flag-checkered me-1"></i> Completada</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-light-mint text-brown px-3 py-2">@Model.Estado</span>
+                                    }
                                 }
                                 else
                                 {
-                                    <span class="badge bg-light-mint text-brown p-2">@Model.Estado</span>
+                                    <span class="text-secondary">No definido</span>
                                 }
-                            }
-                            else
-                            {
-                                <span class="text-brown">No definido</span>
-                            }
+                            </div>
                         </div>
 
                         @if (Model.PuntajeEvaluacion.HasValue)
                         {
                             <div class="mb-3">
-                                <strong><i class="fa fa-star text-secondary"></i> Puntaje de Evaluación:</strong><br />
-                                <div class="progress mt-1" style="height: 20px;">
+                                <i class="fas fa-star text-secondary me-2"></i> <strong class="text-brown">Puntaje de Evaluación:</strong><br />
+                                <div class="ms-4 mt-1 progress" style="height: 20px;">
                                     <div class="progress-bar bg-green" role="progressbar"
                                          style="width: @(Model.PuntajeEvaluacion.Value)%"
-                                         aria-valuenow="@Model.PuntajeEvaluacion.Value"
-                                         aria-valuemin="0"
-                                         aria-valuemax="100">
+                                         aria-valuenow="@Model.PuntajeEvaluacion.Value" aria-valuemin="0" aria-valuemax="100">
                                         @Model.PuntajeEvaluacion.Value / 100
                                     </div>
                                 </div>
@@ -212,24 +176,24 @@
                         @if (Model.FechaRespuesta.HasValue)
                         {
                             <div class="mb-3">
-                                <strong><i class="fa fa-calendar-check text-secondary"></i> Fecha de Respuesta:</strong><br />
-                                <span class="text-brown">@Model.FechaRespuesta.Value.ToString("dd/MM/yyyy HH:mm")</span>
+                                <i class="fas fa-calendar-check text-secondary me-2"></i> <strong class="text-brown">Fecha de Respuesta:</strong><br />
+                                <span class="text-secondary ms-4">@Model.FechaRespuesta.Value.ToString("dd/MM/yyyy HH:mm")</span>
                             </div>
                         }
 
                         @if (!string.IsNullOrEmpty(Model.Observaciones))
                         {
-                            <div class="alert alert-green border-green small">
-                                <strong><i class="fa fa-comment text-green"></i> Observaciones:</strong><br />
-                                <span class="text-brown">@Model.Observaciones</span>
+                            <div class="alert alert-beige border-green small">
+                                <i class="fas fa-comment text-green me-2"></i> <strong class="text-brown">Observaciones:</strong><br />
+                                <span class="text-secondary ms-4">@Model.Observaciones</span>
                             </div>
                         }
 
                         @if (!string.IsNullOrEmpty(Model.MotivoRechazo))
                         {
-                            <div class="alert alert-green border-green small">
-                                <strong><i class="fa fa-exclamation-triangle text-green"></i> Motivo de Rechazo:</strong><br />
-                                <span class="text-brown">@Model.MotivoRechazo</span>
+                            <div class="alert alert-beige border-green small">
+                                <i class="fas fa-exclamation-triangle text-green me-2"></i> <strong class="text-brown">Motivo de Rechazo:</strong><br />
+                                <span class="text-secondary ms-4">@Model.MotivoRechazo</span>
                             </div>
                         }
                     </div>
@@ -242,204 +206,138 @@
         {
             var formulario = Model.FormularioAdopcionDetalle.FirstOrDefault();
 
-            <div class="card mb-4 border-green shadow-hover">
-                <div class="card-header bg-green text-white">
-                    <h5 class="mb-0"><i class="fa fa-clipboard-list"></i> Formulario de Adopción</h5>
+            <div class="form-card mt-4">
+                <div class="form-card-header bg-green text-white d-flex justify-content-between align-items-center">
+                    <span><i class="fas fa-clipboard-list me-2"></i> Formulario de Adopción</span>
                     <small>Completado el: @(formulario.FechaLlenado?.ToString("dd/MM/yyyy HH:mm") ?? "No registrado")</small>
                 </div>
-                <div class="card-body">
+                <div class="form-card-body">
                     <!-- Información de Vivienda -->
-                    <h6 class="border-bottom pb-2 mb-3 text-brown">
-                        <i class="fa fa-home text-green"></i> Información de Vivienda
-                    </h6>
+                    <h6 class="section-title"><i class="fas fa-home text-green me-2"></i> Información de Vivienda</h6>
                     <div class="row mb-4">
                         <div class="col-md-4">
-                            <p>
-                                <strong class="text-brown">Tipo de Vivienda:</strong><br />
-                                <span class="text-secondary">@(formulario.TipoVivienda ?? "No especificado")</span>
-                            </p>
+                            <p><strong class="text-brown">Tipo de Vivienda:</strong><br /><span class="text-secondary">@(formulario.TipoVivienda ?? "No especificado")</span></p>
                         </div>
                         <div class="col-md-4">
-                            <p>
-                                <strong class="text-brown">Vivienda Propia:</strong><br />
-                                <span class="text-secondary">@(formulario.ViviendaPropia == true ? "Sí" : formulario.ViviendaPropia == false ? "No" : "No especificado")</span>
-                            </p>
+                            <p><strong class="text-brown">Vivienda Propia:</strong><br /><span class="text-secondary">@(formulario.ViviendaPropia == true ? "Sí" : formulario.ViviendaPropia == false ? "No" : "No especificado")</span></p>
                         </div>
                         <div class="col-md-4">
-                            <p>
-                                <strong class="text-brown">Tiene Jardín:</strong><br />
-                                <span class="text-secondary">@(formulario.TieneJardin == true ? "Sí" : formulario.TieneJardin == false ? "No" : "No especificado")</span>
-                            </p>
+                            <p><strong class="text-brown">Tiene Jardín:</strong><br /><span class="text-secondary">@(formulario.TieneJardin == true ? "Sí" : formulario.TieneJardin == false ? "No" : "No especificado")</span></p>
                         </div>
                     </div>
 
                     <!-- Composición del Hogar -->
-                    <h6 class="border-bottom pb-2 mb-3 text-brown">
-                        <i class="fa fa-users text-green"></i> Composición del Hogar
-                    </h6>
+                    <h6 class="section-title"><i class="fas fa-users text-green me-2"></i> Composición del Hogar</h6>
                     <div class="row mb-4">
                         <div class="col-md-4">
-                            <p>
-                                <strong class="text-brown">Personas en el Hogar:</strong><br />
-                                <span class="text-secondary">@(formulario.PersonasEnCasa?.ToString() ?? "No especificado")</span>
-                            </p>
+                            <p><strong class="text-brown">Personas en el Hogar:</strong><br /><span class="text-secondary">@(formulario.PersonasEnCasa?.ToString() ?? "No especificado")</span></p>
                         </div>
                         <div class="col-md-4">
-                            <p>
-                                <strong class="text-brown">Hay Niños:</strong><br />
-                                <span class="text-secondary">@(formulario.HayNinios == true ? "Sí" : formulario.HayNinios == false ? "No" : "No especificado")</span>
-                            </p>
+                            <p><strong class="text-brown">Hay Niños:</strong><br /><span class="text-secondary">@(formulario.HayNinios == true ? "Sí" : formulario.HayNinios == false ? "No" : "No especificado")</span></p>
                             @if (!string.IsNullOrEmpty(formulario.EdadesNinios))
                             {
-                                <p>
-                                    <strong class="text-brown">Edades:</strong><br />
-                                    <span class="text-secondary">@formulario.EdadesNinios</span>
-                                </p>
+                                <p><strong class="text-brown">Edades:</strong><br /><span class="text-secondary">@formulario.EdadesNinios</span></p>
                             }
                         </div>
                         <div class="col-md-4">
-                            <p>
-                                <strong class="text-brown">Permiso para Mascotas:</strong><br />
-                                <span class="text-secondary">@(formulario.PermisoMascotas == true ? "Sí" : formulario.PermisoMascotas == false ? "No" : "No especificado")</span>
-                            </p>
+                            <p><strong class="text-brown">Permiso para Mascotas:</strong><br /><span class="text-secondary">@(formulario.PermisoMascotas == true ? "Sí" : formulario.PermisoMascotas == false ? "No" : "No especificado")</span></p>
                         </div>
                     </div>
 
                     <!-- Experiencia con Mascotas -->
-                    <h6 class="border-bottom pb-2 mb-3 text-brown">
-                        <i class="fa fa-paw text-green"></i> Experiencia con Mascotas
-                    </h6>
+                    <h6 class="section-title"><i class="fas fa-paw text-green me-2"></i> Experiencia con Mascotas</h6>
                     <div class="row mb-4">
                         <div class="col-md-6">
-                            <p>
-                                <strong class="text-brown">Experiencia Previa:</strong><br />
-                                <span class="text-secondary">@(formulario.ExperienciaPreviaConMascotas == true ? "Sí" : formulario.ExperienciaPreviaConMascotas == false ? "No" : "No especificado")</span>
-                            </p>
+                            <p><strong class="text-brown">Experiencia Previa:</strong><br /><span class="text-secondary">@(formulario.ExperienciaPreviaConMascotas == true ? "Sí" : formulario.ExperienciaPreviaConMascotas == false ? "No" : "No especificado")</span></p>
                             @if (!string.IsNullOrEmpty(formulario.DetalleExperiencia))
                             {
-                                <p>
-                                    <strong class="text-brown">Detalle de Experiencia:</strong><br />
-                                    <span class="text-secondary">@formulario.DetalleExperiencia</span>
-                                </p>
+                                <p><strong class="text-brown">Detalle de Experiencia:</strong><br /><span class="text-secondary">@formulario.DetalleExperiencia</span></p>
                             }
                         </div>
                         <div class="col-md-6">
-                            <p>
-                                <strong class="text-brown">Tiene Mascotas Actualmente:</strong><br />
-                                <span class="text-secondary">@(formulario.TieneMascotasActualmente == true ? "Sí" : formulario.TieneMascotasActualmente == false ? "No" : "No especificado")</span>
-                            </p>
+                            <p><strong class="text-brown">Tiene Mascotas Actualmente:</strong><br /><span class="text-secondary">@(formulario.TieneMascotasActualmente == true ? "Sí" : formulario.TieneMascotasActualmente == false ? "No" : "No especificado")</span></p>
 
                             @if (formulario.TieneMascotasActualmente == true)
                             {
                                 <div class="mt-2">
                                     @if (formulario.CantidadPerros > 0)
                                     {
-                                        <span class="badge bg-light-mint text-brown me-1">
-                                            <i class="fa fa-dog"></i> @formulario.CantidadPerros perro(s)
-                                        </span>
+                                        <span class="badge bg-light-mint text-brown me-1"><i class="fas fa-dog me-1"></i> @formulario.CantidadPerros perro(s)</span>
                                     }
                                     @if (formulario.CantidadGatos > 0)
                                     {
-                                        <span class="badge bg-light-mint text-brown me-1">
-                                            <i class="fa fa-cat"></i> @formulario.CantidadGatos gato(s)
-                                        </span>
+                                        <span class="badge bg-light-mint text-brown me-1"><i class="fas fa-cat me-1"></i> @formulario.CantidadGatos gato(s)</span>
                                     }
                                     @if (!string.IsNullOrEmpty(formulario.OtrasMascotas))
                                     {
-                                        <span class="badge bg-light-mint text-brown">
-                                            <i class="fa fa-paw"></i> @formulario.OtrasMascotas
-                                        </span>
+                                        <span class="badge bg-light-mint text-brown"><i class="fas fa-paw me-1"></i> @formulario.OtrasMascotas</span>
                                     }
                                 </div>
 
-                                <p class="mt-2">
-                                    <strong class="text-brown">Mascotas Esterilizadas:</strong><br />
-                                    <span class="text-secondary">@(formulario.MascotasEsterilizadas == true ? "Sí" : formulario.MascotasEsterilizadas == false ? "No" : "No especificado")</span>
-                                </p>
+                                <p class="mt-2"><strong class="text-brown">Mascotas Esterilizadas:</strong><br /><span class="text-secondary">@(formulario.MascotasEsterilizadas == true ? "Sí" : formulario.MascotasEsterilizadas == false ? "No" : "No especificado")</span></p>
                             }
                         </div>
                     </div>
 
                     <!-- Disponibilidad -->
-                    <h6 class="border-bottom pb-2 mb-3 text-brown">
-                        <i class="fa fa-clock text-green"></i> Disponibilidad
-                    </h6>
+                    <h6 class="section-title"><i class="fas fa-clock text-green me-2"></i> Disponibilidad</h6>
                     <div class="row mb-4">
                         <div class="col-md-6">
-                            <p>
-                                <strong class="text-brown">Tiempo Disponible Diario:</strong><br />
-                                <span class="text-secondary">@(formulario.TiempoDisponibleDiario ?? "No especificado")</span>
-                            </p>
+                            <p><strong class="text-brown">Tiempo Disponible Diario:</strong><br /><span class="text-secondary">@(formulario.TiempoDisponibleDiario ?? "No especificado")</span></p>
                         </div>
                         <div class="col-md-6">
-                            <p>
-                                <strong class="text-brown">Quién Cuidará:</strong><br />
-                                <span class="text-secondary">@(formulario.QuienCuidaraMascota ?? "No especificado")</span>
-                            </p>
+                            <p><strong class="text-brown">Quién Cuidará:</strong><br /><span class="text-secondary">@(formulario.QuienCuidaraMascota ?? "No especificado")</span></p>
                         </div>
                     </div>
 
                     <!-- Motivación -->
-                    <h6 class="border-bottom pb-2 mb-3 text-brown">
-                        <i class="fa fa-heart text-green"></i> Motivación
-                    </h6>
+                    <h6 class="section-title"><i class="fas fa-heart text-green me-2"></i> Motivación</h6>
                     <div class="row mb-4">
                         <div class="col-md-12">
                             @if (!string.IsNullOrEmpty(formulario.MotivoAdopcion))
                             {
-                                <p>
-                                    <strong class="text-brown">Motivo de Adopción:</strong><br />
-                                    <span class="text-secondary">@formulario.MotivoAdopcion</span>
-                                </p>
+                                <p><strong class="text-brown">Motivo de Adopción:</strong><br /><span class="text-secondary">@formulario.MotivoAdopcion</span></p>
                             }
                             @if (!string.IsNullOrEmpty(formulario.QuePasaSiCambiaResidencia))
                             {
-                                <p>
-                                    <strong class="text-brown">Si Cambia de Residencia:</strong><br />
-                                    <span class="text-secondary">@formulario.QuePasaSiCambiaResidencia</span>
-                                </p>
+                                <p><strong class="text-brown">Si Cambia de Residencia:</strong><br /><span class="text-secondary">@formulario.QuePasaSiCambiaResidencia</span></p>
                             }
                             @if (!string.IsNullOrEmpty(formulario.QuePasaSiProblemasComportamiento))
                             {
-                                <p>
-                                    <strong class="text-brown">Ante Problemas de Comportamiento:</strong><br />
-                                    <span class="text-secondary">@formulario.QuePasaSiProblemasComportamiento</span>
-                                </p>
+                                <p><strong class="text-brown">Ante Problemas de Comportamiento:</strong><br /><span class="text-secondary">@formulario.QuePasaSiProblemasComportamiento</span></p>
                             }
                         </div>
                     </div>
 
                     <!-- Compromisos -->
-                    <h6 class="border-bottom pb-2 mb-3 text-brown">
-                        <i class="fa fa-handshake text-green"></i> Compromisos
-                    </h6>
-                    <div class="row">
+                    <h6 class="section-title"><i class="fas fa-handshake text-green me-2"></i> Compromisos</h6>
+                    <div class="row g-2 mb-4">
                         <div class="col-md-3">
-                            <div class="text-center p-3 @(formulario.AceptaEsterilizacion ? "bg-green text-white" : "bg-pink text-brown") rounded">
-                                <i class="fa fa-stethoscope fa-2x mb-2"></i><br />
-                                <strong>Esterilización</strong><br />
-                                @(formulario.AceptaEsterilizacion ? "✓ Acepta" : "✗ No acepta")
+                            <div class="commitment-card @(formulario.AceptaEsterilizacion ? "bg-green text-white" : "bg-pink text-brown")">
+                                <i class="fas fa-stethoscope fa-2x mb-2"></i>
+                                <strong>Esterilización</strong>
+                                <span class="small">@(formulario.AceptaEsterilizacion ? "✓ Acepta" : "✗ No acepta")</span>
                             </div>
                         </div>
                         <div class="col-md-3">
-                            <div class="text-center p-3 @(formulario.AceptaVisitasSeguimiento ? "bg-green text-white" : "bg-pink text-brown") rounded">
-                                <i class="fa fa-home fa-2x mb-2"></i><br />
-                                <strong>Visitas</strong><br />
-                                @(formulario.AceptaVisitasSeguimiento ? "✓ Acepta" : "✗ No acepta")
+                            <div class="commitment-card @(formulario.AceptaVisitasSeguimiento ? "bg-green text-white" : "bg-pink text-brown")">
+                                <i class="fas fa-home fa-2x mb-2"></i>
+                                <strong>Visitas</strong>
+                                <span class="small">@(formulario.AceptaVisitasSeguimiento ? "✓ Acepta" : "✗ No acepta")</span>
                             </div>
                         </div>
                         <div class="col-md-3">
-                            <div class="text-center p-3 @(formulario.AceptaCondicionesLOBA ? "bg-green text-white" : "bg-pink text-brown") rounded">
-                                <i class="fa fa-file-contract fa-2x mb-2"></i><br />
-                                <strong>LOBA</strong><br />
-                                @(formulario.AceptaCondicionesLOBA ? "✓ Acepta" : "✗ No acepta")
+                            <div class="commitment-card @(formulario.AceptaCondicionesLOBA ? "bg-green text-white" : "bg-pink text-brown")">
+                                <i class="fas fa-file-contract fa-2x mb-2"></i>
+                                <strong>LOBA</strong>
+                                <span class="small">@(formulario.AceptaCondicionesLOBA ? "✓ Acepta" : "✗ No acepta")</span>
                             </div>
                         </div>
                         <div class="col-md-3">
-                            <div class="text-center p-3 @(formulario.AceptaDevolucionSiNoPuedeAtender ? "bg-green text-white" : "bg-pink text-brown") rounded">
-                                <i class="fa fa-undo fa-2x mb-2"></i><br />
-                                <strong>Devolución</strong><br />
-                                @(formulario.AceptaDevolucionSiNoPuedeAtender ? "✓ Acepta" : "✗ No acepta")
+                            <div class="commitment-card @(formulario.AceptaDevolucionSiNoPuedeAtender ? "bg-green text-white" : "bg-pink text-brown")">
+                                <i class="fas fa-undo fa-2x mb-2"></i>
+                                <strong>Devolución</strong>
+                                <span class="small">@(formulario.AceptaDevolucionSiNoPuedeAtender ? "✓ Acepta" : "✗ No acepta")</span>
                             </div>
                         </div>
                     </div>
@@ -449,18 +347,14 @@
                          !string.IsNullOrEmpty(formulario.ReferenciaPersonal1) ||
                          !string.IsNullOrEmpty(formulario.ReferenciaPersonal2))
                     {
-                        <h6 class="border-bottom pb-2 mb-3 mt-4 text-brown">
-                            <i class="fa fa-address-book text-green"></i> Referencias
-                        </h6>
-                        <div class="row">
+                        <h6 class="section-title"><i class="fas fa-address-book text-green me-2"></i> Referencias</h6>
+                        <div class="row g-3">
                             @if (!string.IsNullOrEmpty(formulario.VeterinarioReferencia))
                             {
                                 <div class="col-md-6">
-                                    <div class="card bg-light-mint border-green">
-                                        <div class="card-body">
-                                            <h6 class="text-brown"><i class="fa fa-user-md text-green"></i> Veterinario</h6>
-                                            <p class="mb-0 text-brown">@formulario.VeterinarioReferencia</p>
-                                        </div>
+                                    <div class="reference-card">
+                                        <h6 class="text-brown"><i class="fas fa-user-md text-green me-2"></i> Veterinario</h6>
+                                        <p class="mb-0 text-secondary">@formulario.VeterinarioReferencia</p>
                                     </div>
                                 </div>
                             }
@@ -468,31 +362,27 @@
                             @if (!string.IsNullOrEmpty(formulario.ReferenciaPersonal1))
                             {
                                 <div class="col-md-6">
-                                    <div class="card bg-light-mint border-green">
-                                        <div class="card-body">
-                                            <h6 class="text-brown"><i class="fa fa-user text-green"></i> Referencia Personal 1</h6>
-                                            <p class="mb-0 text-brown">@formulario.ReferenciaPersonal1</p>
-                                            @if (!string.IsNullOrEmpty(formulario.TelefonoReferencia1))
-                                            {
-                                                <p class="mb-0 text-secondary"><small>Tel: @formulario.TelefonoReferencia1</small></p>
-                                            }
-                                        </div>
+                                    <div class="reference-card">
+                                        <h6 class="text-brown"><i class="fas fa-user text-green me-2"></i> Referencia Personal 1</h6>
+                                        <p class="mb-0 text-secondary">@formulario.ReferenciaPersonal1</p>
+                                        @if (!string.IsNullOrEmpty(formulario.TelefonoReferencia1))
+                                        {
+                                            <small class="text-secondary">Tel: @formulario.TelefonoReferencia1</small>
+                                        }
                                     </div>
                                 </div>
                             }
 
                             @if (!string.IsNullOrEmpty(formulario.ReferenciaPersonal2))
                             {
-                                <div class="col-md-6 mt-3">
-                                    <div class="card bg-light-mint border-green">
-                                        <div class="card-body">
-                                            <h6 class="text-brown"><i class="fa fa-user text-green"></i> Referencia Personal 2</h6>
-                                            <p class="mb-0 text-brown">@formulario.ReferenciaPersonal2</p>
-                                            @if (!string.IsNullOrEmpty(formulario.TelefonoReferencia2))
-                                            {
-                                                <p class="mb-0 text-secondary"><small>Tel: @formulario.TelefonoReferencia2</small></p>
-                                            }
-                                        </div>
+                                <div class="col-md-6">
+                                    <div class="reference-card">
+                                        <h6 class="text-brown"><i class="fas fa-user text-green me-2"></i> Referencia Personal 2</h6>
+                                        <p class="mb-0 text-secondary">@formulario.ReferenciaPersonal2</p>
+                                        @if (!string.IsNullOrEmpty(formulario.TelefonoReferencia2))
+                                        {
+                                            <small class="text-secondary">Tel: @formulario.TelefonoReferencia2</small>
+                                        }
                                     </div>
                                 </div>
                             }
@@ -503,48 +393,43 @@
         }
         else
         {
-            <div class="alert alert-green border-green">
-                <i class="fa fa-exclamation-triangle text-green"></i> No se encontró formulario de adopción para esta solicitud.
+            <div class="alert alert-beige border-green mt-4">
+                <i class="fas fa-exclamation-triangle text-green me-2"></i> No se encontró formulario de adopción para esta solicitud.
             </div>
         }
 
         <!-- Acciones -->
         @if (Model.Estado == "Pendiente" || Model.Estado == "En evaluación")
         {
-            <div class="card border-green shadow-hover">
-                <div class="card-header bg-green text-white">
-                    <h5 class="mb-0"><i class="fa fa-gavel"></i> Evaluar Solicitud</h5>
+            <div class="action-card mt-4">
+                <div class="action-card-header bg-green text-white">
+                    <i class="fas fa-gavel me-2"></i> Evaluar Solicitud
                 </div>
-                <div class="card-body">
-                    <div class="row">
+                <div class="action-card-body">
+                    <div class="row g-3">
                         <div class="col-md-6">
                             <form action="/Admin/AprobarSolicitud" method="post">
                                 <input type="hidden" name="solicitudId" value="@Model.SolicitudId" />
-
-                                <div class="form-group">
-                                    <label class="text-brown">Observaciones</label>
+                                <div class="form-group mb-3">
+                                    <label class="text-brown fw-medium"><i class="fas fa-comment text-green me-2"></i> Observaciones</label>
                                     <textarea name="observaciones" class="form-control border-green" rows="3"
                                               placeholder="Observaciones para el adoptante..."></textarea>
                                 </div>
-
-                                <button type="submit" class="btn btn-green text-white btn-lg w-100">
-                                    <i class="fa fa-check"></i> Aprobar Solicitud
+                                <button type="submit" class="btn btn-green w-100">
+                                    <i class="fas fa-check me-2"></i> Aprobar Solicitud
                                 </button>
                             </form>
                         </div>
-
                         <div class="col-md-6">
                             <form action="/Admin/RechazarSolicitud" method="post">
                                 <input type="hidden" name="solicitudId" value="@Model.SolicitudId" />
-
-                                <div class="form-group">
-                                    <label class="text-brown">Motivo de Rechazo *</label>
+                                <div class="form-group mb-3">
+                                    <label class="text-brown fw-medium"><i class="fas fa-exclamation-triangle text-green me-2"></i> Motivo de Rechazo *</label>
                                     <textarea name="motivoRechazo" class="form-control border-green" rows="3" required
                                               placeholder="Especifique el motivo del rechazo..."></textarea>
                                 </div>
-
-                                <button type="submit" class="btn btn-pink text-brown btn-lg w-100">
-                                    <i class="fa fa-times"></i> Rechazar Solicitud
+                                <button type="submit" class="btn btn-pink w-100">
+                                    <i class="fas fa-times me-2"></i> Rechazar Solicitud
                                 </button>
                             </form>
                         </div>
@@ -554,93 +439,258 @@
         }
 
         <!-- Botón para volver -->
-        <div class="mt-4 text-center">
+        <div class="text-center mt-4">
             <a href="/Admin/SolicitudAdopcion" class="btn btn-outline-green">
-                <i class="fa fa-arrow-left"></i> Volver a Solicitudes
+                <i class="fas fa-arrow-left me-2"></i> Volver a Solicitudes
             </a>
         </div>
     </div>
 </section>
 
-<script>
-    $(document).ready(function () {
-        console.log('Detalles de Solicitud loaded');
-
-        // Auto cerrar alertas después de 5 segundos
-        setTimeout(function () {
-            $('.alert').fadeOut('slow');
-        }, 5000);
-
-        // Animación para los badges de estado
-        $('.badge').hover(
-            function () {
-                $(this).addClass('shadow');
-            },
-            function () {
-                $(this).removeClass('shadow');
-            }
-        );
-
-        // Confirmación para rechazar solicitud
-        $('form').on('submit', function () {
-            var formAction = $(this).attr('action');
-            if (formAction.includes('RechazarSolicitud')) {
-                return confirm('¿Está seguro de rechazar esta solicitud de adopción?');
-            }
-            if (formAction.includes('AprobarSolicitud')) {
-                return confirm('¿Está seguro de aprobar esta solicitud de adopción?');
-            }
-            return true;
-        });
-
-        // Hover effect para cards
-        $('.shadow-hover').hover(
-            function () {
-                $(this).addClass('shadow-lg');
-            },
-            function () {
-                $(this).removeClass('shadow-lg');
-            }
-        );
-    });
-</script>
-
-<style>
-    .progress {
-        background-color: #F2E9D8;
-        border-radius: 10px;
-        overflow: hidden;
-    }
-
-    .progress-bar {
-        background-color: var(--green);
-    }
-
-    .badge {
-        font-weight: 600;
-    }
-
-    .card-header {
-        border-bottom: 2px solid var(--green);
-    }
-
-    .border-bottom {
-        border-bottom: 2px solid var(--green) !important;
-    }
-
-    .shadow-lg {
-        box-shadow: 0 10px 25px rgba(151, 199, 139, 0.3) !important;
-    }
-
-    /* Responsive */
-    @@media (max-width: 768px) {
-        .card-body {
-            padding: 1rem;
-        }
-
-        .text-center p-3 {
-            padding: 1rem !important;
+@section Styles {
+    <style>
+        /* Hero */
+        .details-hero {
+            background-color: var(--fondo-beige);
+            border-radius: 0 0 30px 30px;
             margin-bottom: 1rem;
         }
-    }
-</style>
+
+        /* Tarjetas de detalles */
+        .detail-card {
+            background: white;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 8px 20px rgba(151,199,139,0.15);
+            border: none;
+            height: 100%;
+        }
+
+        .detail-card-header {
+            padding: 1rem 1.5rem;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .detail-card-body {
+            padding: 1.5rem;
+        }
+
+        /* Imágenes */
+        .pet-image, .user-image {
+            border: 4px solid var(--verde-menta);
+            box-shadow: 0 8px 20px rgba(151,199,139,0.2);
+        }
+
+        .pet-image-placeholder, .user-image-placeholder {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background-color: var(--fondo-beige);
+            border: 4px solid var(--verde-menta);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Tarjeta de formulario */
+        .form-card {
+            background: white;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 8px 20px rgba(151,199,139,0.15);
+            border: none;
+        }
+
+        .form-card-header {
+            padding: 1rem 1.5rem;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .form-card-body {
+            padding: 1.5rem;
+        }
+
+        .section-title {
+            border-bottom: 2px solid var(--verde-menta);
+            padding-bottom: 0.5rem;
+            margin-bottom: 1rem;
+            color: var(--texto-oscuro);
+        }
+
+        /* Tarjetas de compromiso */
+        .commitment-card {
+            border-radius: 16px;
+            padding: 1rem;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+
+        /* Tarjetas de referencia */
+        .reference-card {
+            background-color: var(--fondo-beige);
+            border-radius: 16px;
+            padding: 1rem;
+            border: 1px solid var(--verde-menta);
+            height: 100%;
+        }
+
+        /* Tarjeta de acciones */
+        .action-card {
+            background: white;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 8px 20px rgba(151,199,139,0.15);
+            border: none;
+        }
+
+        .action-card-header {
+            padding: 1rem 1.5rem;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .action-card-body {
+            padding: 1.5rem;
+        }
+
+        /* Alertas */
+        .alert-beige {
+            background-color: var(--fondo-beige);
+            border: 1px solid var(--verde-menta);
+            color: var(--texto-oscuro);
+            border-radius: 16px;
+        }
+
+        /* Badges */
+        .badge {
+            font-size: 0.9rem;
+            font-weight: 500;
+            border-radius: 30px;
+        }
+
+        /* Botones */
+        .btn-green {
+            background-color: var(--verde-menta);
+            border: none;
+            border-radius: 50px;
+            padding: 0.6rem 1.5rem;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+            .btn-green:hover {
+                background-color: #86b57a;
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(151,199,139,0.4);
+            }
+
+        .btn-pink {
+            background-color: var(--rosado-claro);
+            border: none;
+            border-radius: 50px;
+            padding: 0.6rem 1.5rem;
+            font-weight: 600;
+            transition: all 0.3s;
+            color: var(--texto-oscuro);
+        }
+
+            .btn-pink:hover {
+                background-color: #f9c2b0;
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(249,194,176,0.4);
+            }
+
+        .btn-outline-green {
+            border: 2px solid var(--verde-menta);
+            background: transparent;
+            color: var(--verde-menta);
+            border-radius: 50px;
+            padding: 0.6rem 1.5rem;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+            .btn-outline-green:hover {
+                background-color: var(--verde-menta);
+                color: white;
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(151,199,139,0.3);
+            }
+
+        /* Inputs */
+        .form-control {
+            border-radius: 12px;
+            padding: 0.75rem 1rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+            .form-control:focus {
+                border-color: var(--verde-menta);
+                box-shadow: 0 0 0 0.2rem rgba(151,199,139,0.25);
+                outline: none;
+            }
+
+        /* Progress */
+        .progress {
+            background-color: var(--plomo-calido);
+            border-radius: 30px;
+        }
+
+        .progress-bar {
+            background-color: var(--verde-menta);
+        }
+
+        /* Responsive */
+        @@media (max-width: 768px) {
+            .detail-card-body, .form-card-body, .action-card-body {
+                padding: 1rem;
+            }
+
+            .commitment-card {
+                padding: 0.8rem;
+            }
+        }
+    </style>
+}
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            console.log('Detalles de Solicitud loaded');
+
+            // Auto cerrar alertas después de 5 segundos
+            setTimeout(function () {
+                $('.alert').fadeOut('slow');
+            }, 5000);
+
+            // Animación para los badges de estado
+            $('.badge').hover(
+                function () {
+                    $(this).addClass('shadow');
+                },
+                function () {
+                    $(this).removeClass('shadow');
+                }
+            );
+
+            // Confirmación para rechazar solicitud
+            $('form').on('submit', function () {
+                var formAction = $(this).attr('action');
+                if (formAction.includes('RechazarSolicitud')) {
+                    return confirm('¿Está seguro de rechazar esta solicitud de adopción?');
+                }
+                if (formAction.includes('AprobarSolicitud')) {
+                    return confirm('¿Está seguro de aprobar esta solicitud de adopción?');
+                }
+                return true;
+            });
+        });
+    </script>
+}

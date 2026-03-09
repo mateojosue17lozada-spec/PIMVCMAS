@@ -1,4 +1,4 @@
-﻿@model IEnumerable<MVCMASCOTAS.Models.Usuarios>
+﻿﻿@model IEnumerable<MVCMASCOTAS.Models.Usuarios>
 
 @{
     ViewBag.Title = "Gestión de Usuarios";
@@ -40,7 +40,7 @@
                     <label class="mr-2 text-brown">Rol:</label>
                     @{
                         var roles = new List<SelectListItem>
-                                        {
+                                                {
                             new SelectListItem { Text = "Todos", Value = "Todos", Selected = (ViewBag.FiltroRol == null || ViewBag.FiltroRol == "Todos") },
                             new SelectListItem { Text = "Administrador", Value = "Administrador", Selected = (ViewBag.FiltroRol == "Administrador") },
                             new SelectListItem { Text = "Veterinario", Value = "Veterinario", Selected = (ViewBag.FiltroRol == "Veterinario") },
@@ -55,7 +55,7 @@
                     <label class="mr-2 text-brown">Estado:</label>
                     @{
                         var estados = new List<SelectListItem>
-                                        {
+                                                {
                             new SelectListItem { Text = "Todos", Value = "Todos", Selected = (ViewBag.FiltroActivo == null || ViewBag.FiltroActivo == "Todos") },
                             new SelectListItem { Text = "Activos", Value = "true", Selected = (ViewBag.FiltroActivo == "true") },
                             new SelectListItem { Text = "Inactivos", Value = "false", Selected = (ViewBag.FiltroActivo == "false") }

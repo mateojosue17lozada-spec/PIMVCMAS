@@ -1,271 +1,476 @@
 ﻿@model MVCMASCOTAS.Models.ContratoAdopcion
 
 @{
-    ViewBag.Title = "Detalle del Contrato";
+    ViewBag.Title = "Detalle del Contrato - ADOPTAMANIA";
+
+    // FIX: switch expression no soportado en Razor MVC5 — usar variables previas
+    var estadoBadgeClass = Model.Estado == "Activo" ? "bg-green text-white" :
+                          Model.Estado == "Cumplido" ? "bg-info text-white" :
+                          Model.Estado == "Incumplido" ? "bg-pink text-brown" :
+                                                         "bg-yellow text-brown";
+
+    var firmaAdoptanteHeader = Model.FechaFirmaAdoptante.HasValue ? "bg-green" : "bg-yellow";
+    var firmaRefugioHeader = Model.FechaFirmaRefugio.HasValue ? "bg-green" : "bg-yellow";
 }
 
-<div class="container-fluid">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>
-            <i class="fas fa-file-contract text-primary"></i>
-            Contrato: @Model.NumeroContrato
-        </h2>
-        <div>
-            <a href="@Url.Action("ContratosAdopcion", "Mascotas")" class="btn btn-outline-secondary">
-                <i class="fas fa-arrow-left"></i> Volver
-            </a>
-            <button onclick="window.print()" class="btn btn-info">
-                <i class="fas fa-print"></i> Imprimir
-            </button>
-            @if (!string.IsNullOrEmpty(Model.DocumentoPDF))
-            {
-                <a href="@Url.Content(Model.DocumentoPDF)" target="_blank" class="btn btn-warning">
-                    <i class="fas fa-download"></i> PDF Original
+<section class="detalle-contrato-hero py-4">
+    <div class="container">
+        <div class="d-flex flex-wrap justify-content-between align-items-center">
+            <div>
+                <h1 class="h2 text-brown mb-1">
+                    <i class="fas fa-file-contract text-green me-2"></i>Detalle del Contrato
+                </h1>
+                <p class="text-secondary mb-0">Contrato: @Model.NumeroContrato</p>
+            </div>
+            <div class="mt-2 mt-sm-0">
+                <a href="@Url.Action("ContratosAdopcion", "Mascotas")" class="btn btn-outline-green me-2">
+                    <i class="fas fa-arrow-left me-2"></i>Volver
                 </a>
-            }
-        </div>
-    </div>
-
-    <!-- Información del contrato -->
-    <div class="row mb-4">
-        <div class="col-md-6">
-            <div class="card shadow-sm">
-                <div class="card-header bg-info text-white">
-                    <h6 class="mb-0"><i class="fas fa-info-circle"></i> Información del Contrato</h6>
-                </div>
-                <div class="card-body">
-                    <p><strong>Número:</strong> @Model.NumeroContrato</p>
-                    <p>
-                        <strong>Estado:</strong>
-                        <span class="badge @(Model.Estado == "Activo" ? "bg-success" :
-                                           Model.Estado == "Cumplido" ? "bg-info" :
-                                           Model.Estado == "Incumplido" ? "bg-danger" : "bg-warning")">
-                            @Model.Estado
-                        </span>
-                    </p>
-                    <p><strong>Fecha:</strong> @Model.FechaContrato?.ToString("dd/MM/yyyy")</p>
-                    <p><strong>Representante Refugio:</strong> @Model.RepresentanteRefugioNombre</p>
-                    <p><strong>Cédula Representante:</strong> @Model.RepresentanteRefugioCedula</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-6">
-            <div class="card shadow-sm">
-                <div class="card-header bg-success text-white">
-                    <h6 class="mb-0"><i class="fas fa-paw"></i> Información de la Mascota</h6>
-                </div>
-                <div class="card-body">
-                    <p><strong>Nombre:</strong> @Model.MascotaNombre</p>
-                    <p><strong>Especie:</strong> @Model.MascotaEspecie</p>
-                    <p><strong>Microchip:</strong> @(Model.MascotaMicrochip ?? "No registrado")</p>
-                    <p>
-                        <strong>Solicitud asociada:</strong>
-                        <a href="@Url.Action("Detalle", "SolicitudAdopcion", new { id = Model.SolicitudId })"
-                           class="btn btn-sm btn-outline-primary">
-                            Ver solicitud #@Model.SolicitudId
-                        </a>
-                    </p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Información del adoptante -->
-    <div class="card shadow-sm mb-4">
-        <div class="card-header bg-primary text-white">
-            <h6 class="mb-0"><i class="fas fa-user"></i> Información del Adoptante</h6>
-        </div>
-        <div class="card-body">
-            <div class="row">
-                <div class="col-md-4">
-                    <p><strong>Nombre completo:</strong><br />@Model.AdoptanteNombre</p>
-                </div>
-                <div class="col-md-4">
-                    <p><strong>Cédula:</strong><br />@Model.AdoptanteCedula</p>
-                </div>
-                <div class="col-md-4">
-                    <p><strong>Teléfono:</strong><br />@Model.AdoptanteTelefono</p>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-12">
-                    <p><strong>Dirección:</strong><br />@Model.AdoptanteDireccion</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Firmas -->
-    <div class="row mb-4">
-        <div class="col-md-6">
-            <div class="card shadow-sm">
-                <div class="card-header @(Model.FechaFirmaAdoptante.HasValue ? "bg-success" : "bg-warning") text-white">
-                    <h6 class="mb-0"><i class="fas fa-signature"></i> Firma del Adoptante</h6>
-                </div>
-                <div class="card-body text-center">
-                    @if (Model.FechaFirmaAdoptante.HasValue)
-                    {
-                        <div class="mb-3">
-                            <i class="fas fa-check-circle fa-3x text-success"></i>
-                            <p class="mt-2 mb-0">Firmado el @Model.FechaFirmaAdoptante.Value.ToString("dd/MM/yyyy HH:mm")</p>
-                        </div>
-                        @if (!string.IsNullOrEmpty(Model.FirmaAdoptante))
-                        {
-                            <div class="border rounded p-3 bg-light">
-                                <p class="mb-1"><strong>Firma digital:</strong></p>
-                                <small class="text-muted">@Model.FirmaAdoptante</small>
-                            </div>
-                        }
-                    }
-                    else
-                    {
-                        <div class="mb-3">
-                            <i class="fas fa-clock fa-3x text-warning"></i>
-                            <p class="mt-2 mb-0">Pendiente de firma</p>
-                        </div>
-                    }
-                </div>
-            </div>
-        </div>
-        <div class="col-md-6">
-            <div class="card shadow-sm">
-                <div class="card-header @(Model.FechaFirmaRefugio.HasValue ? "bg-success" : "bg-warning") text-white">
-                    <h6 class="mb-0"><i class="fas fa-signature"></i> Firma del Refugio</h6>
-                </div>
-                <div class="card-body text-center">
-                    @if (Model.FechaFirmaRefugio.HasValue)
-                    {
-                        <div class="mb-3">
-                            <i class="fas fa-check-circle fa-3x text-success"></i>
-                            <p class="mt-2 mb-0">Firmado el @Model.FechaFirmaRefugio.Value.ToString("dd/MM/yyyy HH:mm")</p>
-                        </div>
-                        @if (!string.IsNullOrEmpty(Model.FirmaRefugio))
-                        {
-                            <div class="border rounded p-3 bg-light">
-                                <p class="mb-1"><strong>Firma digital:</strong></p>
-                                <small class="text-muted">@Model.FirmaRefugio</small>
-                            </div>
-                        }
-                    }
-                    else
-                    {
-                        <div class="mb-3">
-                            <i class="fas fa-clock fa-3x text-warning"></i>
-                            <p class="mt-2 mb-0">Pendiente de firma</p>
-                        </div>
-                    }
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Términos y condiciones -->
-    <div class="card shadow-sm mb-4">
-        <div class="card-header bg-dark text-white">
-            <h6 class="mb-0"><i class="fas fa-gavel"></i> Términos y Condiciones</h6>
-        </div>
-        <div class="card-body">
-            <div class="term-container">
-                @Html.Raw(Model.TerminosCondiciones)
-            </div>
-        </div>
-    </div>
-
-    <!-- Seguimientos asociados -->
-    @if (ViewBag.Seguimientos != null)
-    {
-        <div class="card shadow-sm">
-            <div class="card-header bg-info text-white">
-                <div class="d-flex justify-content-between align-items-center">
-                    <h6 class="mb-0">
-                        <i class="fas fa-clipboard-check"></i>
-                        Seguimientos Asociados (@ViewBag.TotalSeguimientos)
-                    </h6>
-                    <span class="badge bg-light text-dark">
-                        @ViewBag.SeguimientosCompletados completados
-                    </span>
-                </div>
-            </div>
-            <div class="card-body">
-                @if (ViewBag.Seguimientos is IEnumerable<MVCMASCOTAS.Models.SeguimientoAdopcion> seguimientos &&
-                     seguimientos.Any())
+                <button onclick="window.print()" class="btn btn-yellow me-2">
+                    <i class="fas fa-print me-2"></i>Imprimir
+                </button>
+                @if (!string.IsNullOrEmpty(Model.DocumentoPDF))
                 {
-                    <div class="table-responsive">
-                        <table class="table table-sm">
-                            <thead>
-                                <tr>
-                                    <th>#</th>
-                                    <th>Fecha</th>
-                                    <th>Tipo</th>
-                                    <th>Estado Mascota</th>
-                                    <th>Intervención</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var seguimiento in seguimientos.OrderByDescending(s => s.FechaSeguimiento))
-                                {
-                                    <tr>
-                                        <td>@seguimiento.SeguimientoId</td>
-                                        <td>@(seguimiento.FechaSeguimiento?.ToString("dd/MM/yyyy") ?? "Pendiente")</td>
-                                        <td>@seguimiento.TipoSeguimiento</td>
-                                        <td>@seguimiento.EstadoMascota</td>
-                                        <td>
-                                            @if (seguimiento.RequiereIntervencion)
-                                            {
-                                                <span class="badge bg-danger">Sí</span>
-                                            }
-                                            else
-                                            {
-                                                <span class="badge bg-success">No</span>
-                                            }
-                                        </td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
-                    </div>
+                    <a href="@Url.Content(Model.DocumentoPDF)" target="_blank" class="btn btn-green">
+                        <i class="fas fa-download me-2"></i>PDF Original
+                    </a>
                 }
                 else
                 {
-                    <p class="text-muted text-center mb-0">No hay seguimientos registrados para este contrato.</p>
+                    <button type="button" class="btn btn-green"
+                            onclick="descargarContrato('@Model.ContratoId')">
+                        <i class="fas fa-file-pdf me-2"></i>Generar PDF
+                    </button>
                 }
-                <div class="text-center mt-3">
-                    <a href="@Url.Action("CrearSeguimientosAutomaticos", "Mascotas", new { contratoId = Model.ContratoId })"
-                       class="btn btn-primary btn-sm">
-                        <i class="fas fa-plus"></i> Crear Seguimientos Automáticos
-                    </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="py-4 bg-beige">
+    <div class="container">
+
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success rounded-4 mb-4">
+                <i class="fas fa-check-circle me-2"></i>@TempData["SuccessMessage"]
+            </div>
+        }
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert alert-danger rounded-4 mb-4">
+                <i class="fas fa-exclamation-circle me-2"></i>@TempData["ErrorMessage"]
+            </div>
+        }
+
+        <div class="row g-4 mb-4">
+            <div class="col-md-6">
+                <div class="info-card">
+                    <div class="info-card-header bg-info text-white">
+                        <i class="fas fa-info-circle me-2"></i>Informacion del Contrato
+                    </div>
+                    <div class="info-card-body">
+                        <p><strong>Numero:</strong> <span class="text-brown">@Model.NumeroContrato</span></p>
+                        <p>
+                            <strong>Estado:</strong>
+                            <span class="badge @estadoBadgeClass px-3 py-2">@Model.Estado</span>
+                        </p>
+                        <p><strong>Fecha:</strong> <span class="text-brown">@(Model.FechaContrato.HasValue ? Model.FechaContrato.Value.ToString("dd/MM/yyyy") : "No especificada")</span></p>
+                        <p><strong>Representante Refugio:</strong> <span class="text-brown">@Model.RepresentanteRefugioNombre</span></p>
+                        <p><strong>Cedula Representante:</strong> <span class="text-brown">@Model.RepresentanteRefugioCedula</span></p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="info-card">
+                    <div class="info-card-header bg-green text-white">
+                        <i class="fas fa-paw me-2"></i>Informacion de la Mascota
+                    </div>
+                    <div class="info-card-body">
+                        <p><strong>Nombre:</strong> <span class="text-brown">@Model.MascotaNombre</span></p>
+                        <p><strong>Especie:</strong> <span class="text-brown">@Model.MascotaEspecie</span></p>
+                        <p><strong>Microchip:</strong> <span class="text-brown">@(Model.MascotaMicrochip ?? "No registrado")</span></p>
+                        <p>
+                            <strong>Solicitud asociada:</strong>
+                            <a href="@Url.Action("Detalle", "SolicitudAdopcion", new { id = Model.SolicitudId })"
+                               class="btn btn-sm btn-outline-green ms-2">
+                                Ver solicitud #@Model.SolicitudId
+                            </a>
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>
-    }
-</div>
+
+        <div class="info-card mb-4">
+            <div class="info-card-header bg-primary text-white">
+                <i class="fas fa-user me-2"></i>Informacion del Adoptante
+            </div>
+            <div class="info-card-body">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <p><strong>Nombre completo:</strong><br /><span class="text-brown">@Model.AdoptanteNombre</span></p>
+                    </div>
+                    <div class="col-md-4">
+                        <p><strong>Cedula:</strong><br /><span class="text-brown">@Model.AdoptanteCedula</span></p>
+                    </div>
+                    <div class="col-md-4">
+                        <p><strong>Telefono:</strong><br /><span class="text-brown">@Model.AdoptanteTelefono</span></p>
+                    </div>
+                    <div class="col-md-12">
+                        <p><strong>Direccion:</strong><br /><span class="text-brown">@Model.AdoptanteDireccion</span></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4 mb-4">
+            <div class="col-md-6">
+                <div class="info-card">
+                    <div class="info-card-header @firmaAdoptanteHeader text-white">
+                        <i class="fas fa-signature me-2"></i>Firma del Adoptante
+                    </div>
+                    <div class="info-card-body text-center">
+                        @if (Model.FechaFirmaAdoptante.HasValue)
+                        {
+                            <div class="mb-3">
+                                <i class="fas fa-check-circle fa-3x text-green"></i>
+                                <p class="mt-2 text-brown">Firmado el @Model.FechaFirmaAdoptante.Value.ToString("dd/MM/yyyy HH:mm")</p>
+                            </div>
+                            if (!string.IsNullOrEmpty(Model.FirmaAdoptante))
+                            {
+                                <div class="border border-green rounded-3 p-3 bg-light-mint">
+                                    <p class="mb-1 text-brown"><strong>Firma digital:</strong></p>
+                                    <small class="text-secondary">@Model.FirmaAdoptante</small>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <div class="mb-3">
+                                <i class="fas fa-clock fa-3x text-yellow"></i>
+                                <p class="mt-2 text-brown">Pendiente de firma</p>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="info-card">
+                    <div class="info-card-header @firmaRefugioHeader text-white">
+                        <i class="fas fa-signature me-2"></i>Firma del Refugio
+                    </div>
+                    <div class="info-card-body text-center">
+                        @if (Model.FechaFirmaRefugio.HasValue)
+                        {
+                            <div class="mb-3">
+                                <i class="fas fa-check-circle fa-3x text-green"></i>
+                                <p class="mt-2 text-brown">Firmado el @Model.FechaFirmaRefugio.Value.ToString("dd/MM/yyyy HH:mm")</p>
+                            </div>
+                            if (!string.IsNullOrEmpty(Model.FirmaRefugio))
+                            {
+                                <div class="border border-green rounded-3 p-3 bg-light-mint">
+                                    <p class="mb-1 text-brown"><strong>Firma digital:</strong></p>
+                                    <small class="text-secondary">@Model.FirmaRefugio</small>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <div class="mb-3">
+                                <i class="fas fa-clock fa-3x text-yellow"></i>
+                                <p class="mt-2 text-brown">Pendiente de firma</p>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="info-card mb-4">
+            <div class="info-card-header bg-dark text-white">
+                <i class="fas fa-gavel me-2"></i>Terminos y Condiciones
+            </div>
+            <div class="info-card-body">
+                <div class="terms-container">
+                    @Html.Raw(Model.TerminosCondiciones)
+                </div>
+            </div>
+        </div>
+
+        @if (ViewBag.Seguimientos != null)
+        {
+            var seguimientos = ViewBag.Seguimientos as IEnumerable<MVCMASCOTAS.Models.SeguimientoAdopcion>;
+            <div class="info-card">
+                <div class="info-card-header bg-info text-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span><i class="fas fa-clipboard-check me-2"></i>Seguimientos Asociados</span>
+                        <span class="badge bg-light text-brown px-3 py-2">@ViewBag.TotalSeguimientos total</span>
+                    </div>
+                </div>
+                <div class="info-card-body">
+                    @if (seguimientos != null && seguimientos.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Fecha</th>
+                                        <th>Tipo</th>
+                                        <th>Estado Mascota</th>
+                                        <th>Intervencion</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var seg in seguimientos.OrderByDescending(s => s.FechaSeguimiento))
+                                    {
+                                        <tr>
+                                            <td><span class="badge bg-light-mint text-brown px-3 py-2">@seg.SeguimientoId</span></td>
+                                            <td class="text-brown">@(seg.FechaSeguimiento.HasValue ? seg.FechaSeguimiento.Value.ToString("dd/MM/yyyy") : "Pendiente")</td>
+                                            <td class="text-secondary">@seg.TipoSeguimiento</td>
+                                            <td class="text-secondary">@seg.EstadoMascota</td>
+                                            <td>
+                                                @if (seg.RequiereIntervencion)
+                                                {
+                                                    <span class="badge bg-pink text-brown px-3 py-2">Si</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-green text-white px-3 py-2">No</span>
+                                                }
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <p class="text-secondary text-center mb-0">No hay seguimientos registrados para este contrato.</p>
+                    }
+                    <div class="text-center mt-3">
+                        <a href="@Url.Action("CrearSeguimientosAutomaticos", "Mascotas", new { contratoId = Model.ContratoId })"
+                           class="btn btn-green btn-sm"
+                           onclick="return confirm('Crear seguimientos automaticos para este contrato?')">
+                            <i class="fas fa-magic me-2"></i>Crear Seguimientos Automaticos
+                        </a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</section>
 
 @section Styles {
     <style>
-        .term-container {
-            max-height: 300px;
-            overflow-y: auto;
-            padding: 15px;
-            border: 1px solid #dee2e6;
-            border-radius: 5px;
-            background-color: #f8f9fa;
+        :root {
+            --green: #97C78B;
+            --yellow: #F2C66D;
+            --pink: #FBCDC0;
+            --brown: #2F2F2F;
+            --bg-light: #F2E9D8;
+            --beige: #F5E6D3;
         }
 
-        /* Estilos para impresión */
+        body {
+            background-color: var(--beige);
+        }
+
+        .detalle-contrato-hero {
+            background-color: var(--beige);
+            border-radius: 0 0 30px 30px;
+            margin-bottom: 1rem;
+        }
+
+        .info-card {
+            background: white;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 15px 35px rgba(151,199,139,0.15);
+            border: none;
+        }
+
+        .info-card-header {
+            padding: 1rem 1.5rem;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .info-card-body {
+            padding: 1.5rem;
+        }
+
+        .badge.bg-green {
+            background-color: var(--green) !important;
+            color: white !important;
+        }
+
+        .badge.bg-yellow {
+            background-color: var(--yellow) !important;
+            color: var(--brown) !important;
+        }
+
+        .badge.bg-pink {
+            background-color: var(--pink) !important;
+            color: var(--brown) !important;
+        }
+
+        .badge.bg-info {
+            background-color: #17a2b8 !important;
+            color: white !important;
+        }
+
+        .badge.bg-light-mint {
+            background-color: var(--bg-light) !important;
+            color: var(--brown) !important;
+            border: 1px solid var(--green);
+        }
+
+        .btn-green {
+            background-color: var(--green);
+            border: none;
+            border-radius: 50px;
+            padding: 0.6rem 1.8rem;
+            font-weight: 500;
+            transition: all 0.3s;
+            color: white;
+        }
+
+            .btn-green:hover {
+                background-color: #86b57a;
+                transform: translateY(-2px);
+                color: white;
+                box-shadow: 0 5px 15px rgba(151,199,139,0.4);
+            }
+
+            .btn-green.btn-sm {
+                padding: 0.35rem 0.9rem;
+            }
+
+        .btn-yellow {
+            background-color: var(--yellow);
+            border: none;
+            border-radius: 50px;
+            padding: 0.6rem 1.8rem;
+            font-weight: 500;
+            transition: all 0.3s;
+            color: var(--brown);
+        }
+
+            .btn-yellow:hover {
+                background-color: #e6b85c;
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(242,198,109,0.4);
+            }
+
+        .btn-outline-green {
+            border: 2px solid var(--green);
+            background: transparent;
+            color: var(--green);
+            border-radius: 50px;
+            padding: 0.4rem 1rem;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+            .btn-outline-green:hover {
+                background-color: var(--green);
+                color: white;
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(151,199,139,0.3);
+            }
+
+        .table th {
+            background-color: var(--bg-light);
+            color: var(--brown);
+            font-weight: 600;
+            border-bottom: 2px solid var(--green);
+            padding: 1rem 0.5rem;
+        }
+
+        .table td {
+            padding: 1rem 0.5rem;
+            border-bottom: 1px solid var(--bg-light);
+        }
+
+        .bg-light-mint {
+            background-color: var(--bg-light) !important;
+        }
+
+        .border-green {
+            border-color: var(--green) !important;
+        }
+
+        .text-green {
+            color: var(--green) !important;
+        }
+
+        .text-yellow {
+            color: var(--yellow) !important;
+        }
+
+        .text-brown {
+            color: var(--brown) !important;
+        }
+
+        .terms-container {
+            max-height: 300px;
+            overflow-y: auto;
+            padding: 1rem;
+            border: 1px solid var(--green);
+            border-radius: 16px;
+            background-color: var(--bg-light);
+        }
+
+        @@media (max-width: 768px) {
+            .info-card-body {
+                padding: 1rem;
+            }
+        }
+
         @@media print {
+            .detalle-contrato-hero {
+                background-color: white !important;
+            }
+
             .btn, .no-print {
                 display: none !important;
             }
 
-            .card {
+            .info-card {
+                box-shadow: none !important;
                 border: 1px solid #000 !important;
                 break-inside: avoid;
             }
 
-            .term-container {
+            .terms-container {
                 max-height: none !important;
                 overflow: visible !important;
             }
         }
     </style>
+}
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        window.descargarContrato = function (contratoId) {
+            Swal.fire({
+                title: 'Generar PDF',
+                text: 'Se generara el contrato en formato PDF.',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#97C78B',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: '<i class="fas fa-file-pdf me-2"></i>Generar',
+                cancelButtonText: 'Cancelar'
+            }).then(function (result) {
+                if (result.isConfirmed) {
+                    window.location.href = '@Url.Action("DescargarContrato", "Mascotas")?id=' + contratoId;
+                }
+            });
+        };
+    </script>
 }

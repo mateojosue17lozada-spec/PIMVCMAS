@@ -1,964 +1,830 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Report xmlns="http://schemas.microsoft.com/sqlserver/reporting/2016/01/reportdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
-  <AutoRefresh>0</AutoRefresh>
-  <DataSources>
-    <DataSource Name="DataSourceMascotas">
-      <ConnectionProperties>
-        <DataProvider>SQL</DataProvider>
-        <ConnectString>Data Source=localhost;Initial Catalog=RefugioMascotasDB</ConnectString>
-      </ConnectionProperties>
-      <rd:DataSourceID>3f1cda07-01c6-4267-8a81-f28da5992a4e</rd:DataSourceID>
-    </DataSource>
-  </DataSources>
-  <DataSets>
-    <DataSet Name="DataSetMascotas">
-      <Query>
-        <DataSourceName>DataSourceMascotas</DataSourceName>
-        <CommandText>SELECT * FROM Mascotas</CommandText>
-      </Query>
-      <Fields>
-        <Field Name="MascotaId">
-          <DataField>MascotaId</DataField>
-          <rd:TypeName>System.Int32</rd:TypeName>
-        </Field>
-        <Field Name="Nombre">
-          <DataField>Nombre</DataField>
-          <rd:TypeName>System.String</rd:TypeName>
-        </Field>
-        <Field Name="Especie">
-          <DataField>Especie</DataField>
-          <rd:TypeName>System.String</rd:TypeName>
-        </Field>
-        <Field Name="Raza">
-          <DataField>Raza</DataField>
-          <rd:TypeName>System.String</rd:TypeName>
-        </Field>
-        <Field Name="Sexo">
-          <DataField>Sexo</DataField>
-          <rd:TypeName>System.String</rd:TypeName>
-        </Field>
-        <Field Name="EdadAproximada">
-          <DataField>EdadAproximada</DataField>
-          <rd:TypeName>System.String</rd:TypeName>
-        </Field>
-        <Field Name="Tamanio">
-          <DataField>Tamanio</DataField>
-          <rd:TypeName>System.String</rd:TypeName>
-        </Field>
-        <Field Name="Color">
-          <DataField>Color</DataField>
-          <rd:TypeName>System.String</rd:TypeName>
-        </Field>
-        <Field Name="Categoria">
-          <DataField>Categoria</DataField>
-          <rd:TypeName>System.String</rd:TypeName>
-        </Field>
-        <Field Name="TipoEspecial">
-          <DataField>TipoEspecial</DataField>
-          <rd:TypeName>System.String</rd:TypeName>
-        </Field>
-        <Field Name="Estado">
-          <DataField>Estado</DataField>
-          <rd:TypeName>System.String</rd:TypeName>
-        </Field>
-        <Field Name="Esterilizado">
-          <DataField>Esterilizado</DataField>
-          <rd:TypeName>System.Boolean</rd:TypeName>
-        </Field>
-        <Field Name="Microchip">
-          <DataField>Microchip</DataField>
-          <rd:TypeName>System.String</rd:TypeName>
-        </Field>
-        <Field Name="FechaIngreso">
-          <DataField>FechaIngreso</DataField>
-          <rd:TypeName>System.DateTime</rd:TypeName>
-        </Field>
-        <Field Name="FechaDisponible">
-          <DataField>FechaDisponible</DataField>
-          <rd:TypeName>System.DateTime</rd:TypeName>
-        </Field>
-        <Field Name="FechaAdopcion">
-          <DataField>FechaAdopcion</DataField>
-          <rd:TypeName>System.DateTime</rd:TypeName>
-        </Field>
-        <Field Name="VeterinarioAsignado">
-          <DataField>VeterinarioAsignado</DataField>
-          <rd:TypeName>System.String</rd:TypeName>
-        </Field>
-        <Field Name="RescatistaNombre">
-          <DataField>RescatistaNombre</DataField>
-          <rd:TypeName>System.String</rd:TypeName>
-        </Field>
-        <Field Name="TotalCambiosEstado">
-          <DataField>TotalCambiosEstado</DataField>
-          <rd:TypeName>System.Int32</rd:TypeName>
-        </Field>
-        <Field Name="TotalTratamientos">
-          <DataField>TotalTratamientos</DataField>
-          <rd:TypeName>System.Int32</rd:TypeName>
-        </Field>
-        <Field Name="TotalVacunas">
-          <DataField>TotalVacunas</DataField>
-          <rd:TypeName>System.Int32</rd:TypeName>
-        </Field>
-        <Field Name="DiasEnRefugio">
-          <DataField>DiasEnRefugio</DataField>
-          <rd:TypeName>System.Int32</rd:TypeName>
-        </Field>
-      </Fields>
-    </DataSet>
-  </DataSets>
-  <ReportSections>
-    <ReportSection>
-      <Body>
-        <ReportItems>
-          <Rectangle Name="RectanguloEncabezado">
-            <ReportItems>
-              <Textbox Name="TextboxTitulo">
-                <CanGrow>true</CanGrow>
-                <Paragraphs>
-                  <Paragraph>
-                    <TextRuns>
-                      <TextRun>
-                        <Value>MASCOTAS REGISTRADAS EN EL REFUGIO</Value>
-                        <Style>
-                          <FontSize>20pt</FontSize>
-                          <FontWeight>Bold</FontWeight>
-                          <Color>White</Color>
-                        </Style>
-                      </TextRun>
-                    </TextRuns>
-                    <Style />
-                  </Paragraph>
-                </Paragraphs>
-                <Height>1.2cm</Height>
-                <Width>18.01133cm</Width>
-                <Style>
-                  <FontSize>20pt</FontSize>
-                  <FontWeight>Bold</FontWeight>
-                  <Color>White</Color>
-                  <PaddingLeft>5pt</PaddingLeft>
-                  <PaddingTop>5pt</PaddingTop>
-                </Style>
-              </Textbox>
-            </ReportItems>
-            <Height>1.5cm</Height>
-            <Width>19cm</Width>
-            <Style>
-              <Border>
-                <Style>Solid</Style>
-              </Border>
-              <BackgroundColor>#27ae60</BackgroundColor>
-            </Style>
-          </Rectangle>
-          <Rectangle Name="RectanguloFiltros">
-            <ReportItems>
-              <Textbox Name="TextboxFechaGeneracion">
-                <CanGrow>true</CanGrow>
-                <Paragraphs>
-                  <Paragraph>
-                    <TextRuns>
-                      <TextRun>
-                        <Value>=("Fecha: " &amp; Parameters!FechaGeneracion.Value)</Value>
-                        <Style />
-                      </TextRun>
-                    </TextRuns>
-                    <Style />
-                  </Paragraph>
-                </Paragraphs>
-                <Height>0.6cm</Height>
-                <Width>10cm</Width>
-                <Style>
-                  <Color>#2c3e50</Color>
-                  <PaddingLeft>5pt</PaddingLeft>
-                  <PaddingTop>5pt</PaddingTop>
-                </Style>
-              </Textbox>
-              <Textbox Name="TextboxUsuario">
-                <CanGrow>true</CanGrow>
-                <Paragraphs>
-                  <Paragraph>
-                    <TextRuns>
-                      <TextRun>
-                        <Value>=("Generado por: " &amp; Parameters!Usuario.Value)</Value>
-                        <Style />
-                      </TextRun>
-                    </TextRuns>
-                    <Style />
-                  </Paragraph>
-                </Paragraphs>
-                <Top>0.7cm</Top>
-                <Height>0.6cm</Height>
-                <Width>10cm</Width>
-                <ZIndex>1</ZIndex>
-                <Style>
-                  <Color>#2c3e50</Color>
-                  <PaddingLeft>5pt</PaddingLeft>
-                </Style>
-              </Textbox>
-              <Textbox Name="TextboxFiltros">
-                <CanGrow>true</CanGrow>
-                <Paragraphs>
-                  <Paragraph>
-                    <TextRuns>
-                      <TextRun>
-                        <Value>=("Especie: " &amp; Parameters!FiltroEspecie.Value &amp; " | Estado: " &amp; Parameters!FiltroEstado.Value &amp; " | Sexo: " &amp; Parameters!FiltroSexo.Value)</Value>
-                        <Style />
-                      </TextRun>
-                    </TextRuns>
-                    <Style />
-                  </Paragraph>
-                </Paragraphs>
-                <Left>12cm</Left>
-                <Height>1.2cm</Height>
-                <Width>7cm</Width>
-                <ZIndex>2</ZIndex>
-                <Style>
-                  <TextAlign>Right</TextAlign>
-                  <Color>#2c3e50</Color>
-                  <PaddingRight>5pt</PaddingRight>
-                  <PaddingTop>5pt</PaddingTop>
-                </Style>
-              </Textbox>
-            </ReportItems>
-            <Top>1.6cm</Top>
-            <Height>1.5cm</Height>
-            <Width>19cm</Width>
-            <ZIndex>1</ZIndex>
-            <Style>
-              <Border>
-                <Color>#bdc3c7</Color>
-                <Style>Solid</Style>
-              </Border>
-              <BackgroundColor>#ecf0f1</BackgroundColor>
-            </Style>
-          </Rectangle>
-          <Tablix Name="TablixMascotas">
-            <TablixBody>
-              <TablixColumns>
-                <TablixColumn>
-                  <Width>2cm</Width>
-                </TablixColumn>
-                <TablixColumn>
-                  <Width>2.5cm</Width>
-                </TablixColumn>
-                <TablixColumn>
-                  <Width>2.5cm</Width>
-                </TablixColumn>
-                <TablixColumn>
-                  <Width>1.5cm</Width>
-                </TablixColumn>
-                <TablixColumn>
-                  <Width>2cm</Width>
-                </TablixColumn>
-                <TablixColumn>
-                  <Width>2cm</Width>
-                </TablixColumn>
-                <TablixColumn>
-                  <Width>2cm</Width>
-                </TablixColumn>
-                <TablixColumn>
-                  <Width>2.5cm</Width>
-                </TablixColumn>
-                <TablixColumn>
-                  <Width>2cm</Width>
-                </TablixColumn>
-              </TablixColumns>
-              <TablixRows>
-                <TablixRow>
-                  <Height>0.8cm</Height>
-                  <TablixCells>
-                    <TablixCell>
-                      <CellContents>
-                        <Textbox Name="HeaderNombre">
-                          <CanGrow>true</CanGrow>
-                          <Paragraphs>
-                            <Paragraph>
-                              <TextRuns>
-                                <TextRun>
-                                  <Value>Nombre</Value>
-                                  <Style />
-                                </TextRun>
-                              </TextRuns>
-                              <Style />
-                            </Paragraph>
-                          </Paragraphs>
-                          <Style>
-                            <Border>
-                              <Color>White</Color>
-                              <Style>Solid</Style>
-                            </Border>
-                            <BackgroundColor>#27ae60</BackgroundColor>
-                            <FontWeight>Bold</FontWeight>
-                            <TextAlign>Center</TextAlign>
-                            <Color>White</Color>
-                          </Style>
-                        </Textbox>
-                      </CellContents>
-                    </TablixCell>
-                    <TablixCell>
-                      <CellContents>
-                        <Textbox Name="HeaderEspecie">
-                          <CanGrow>true</CanGrow>
-                          <Paragraphs>
-                            <Paragraph>
-                              <TextRuns>
-                                <TextRun>
-                                  <Value>Especie</Value>
-                                  <Style />
-                                </TextRun>
-                              </TextRuns>
-                              <Style />
-                            </Paragraph>
-                          </Paragraphs>
-                          <Style>
-                            <Border>
-                              <Color>White</Color>
-                              <Style>Solid</Style>
-                            </Border>
-                            <BackgroundColor>#27ae60</BackgroundColor>
-                            <FontWeight>Bold</FontWeight>
-                            <TextAlign>Center</TextAlign>
-                            <Color>White</Color>
-                          </Style>
-                        </Textbox>
-                      </CellContents>
-                    </TablixCell>
-                    <TablixCell>
-                      <CellContents>
-                        <Textbox Name="HeaderRaza">
-                          <CanGrow>true</CanGrow>
-                          <Paragraphs>
-                            <Paragraph>
-                              <TextRuns>
-                                <TextRun>
-                                  <Value>Raza</Value>
-                                  <Style />
-                                </TextRun>
-                              </TextRuns>
-                              <Style />
-                            </Paragraph>
-                          </Paragraphs>
-                          <Style>
-                            <Border>
-                              <Color>White</Color>
-                              <Style>Solid</Style>
-                            </Border>
-                            <BackgroundColor>#27ae60</BackgroundColor>
-                            <FontWeight>Bold</FontWeight>
-                            <TextAlign>Center</TextAlign>
-                            <Color>White</Color>
-                          </Style>
-                        </Textbox>
-                      </CellContents>
-                    </TablixCell>
-                    <TablixCell>
-                      <CellContents>
-                        <Textbox Name="HeaderSexo">
-                          <CanGrow>true</CanGrow>
-                          <Paragraphs>
-                            <Paragraph>
-                              <TextRuns>
-                                <TextRun>
-                                  <Value>Sexo</Value>
-                                  <Style />
-                                </TextRun>
-                              </TextRuns>
-                              <Style />
-                            </Paragraph>
-                          </Paragraphs>
-                          <Style>
-                            <Border>
-                              <Color>White</Color>
-                              <Style>Solid</Style>
-                            </Border>
-                            <BackgroundColor>#27ae60</BackgroundColor>
-                            <FontWeight>Bold</FontWeight>
-                            <TextAlign>Center</TextAlign>
-                            <Color>White</Color>
-                          </Style>
-                        </Textbox>
-                      </CellContents>
-                    </TablixCell>
-                    <TablixCell>
-                      <CellContents>
-                        <Textbox Name="HeaderEdad">
-                          <CanGrow>true</CanGrow>
-                          <Paragraphs>
-                            <Paragraph>
-                              <TextRuns>
-                                <TextRun>
-                                  <Value>Edad</Value>
-                                  <Style />
-                                </TextRun>
-                              </TextRuns>
-                              <Style />
-                            </Paragraph>
-                          </Paragraphs>
-                          <Style>
-                            <Border>
-                              <Color>White</Color>
-                              <Style>Solid</Style>
-                            </Border>
-                            <BackgroundColor>#27ae60</BackgroundColor>
-                            <FontWeight>Bold</FontWeight>
-                            <TextAlign>Center</TextAlign>
-                            <Color>White</Color>
-                          </Style>
-                        </Textbox>
-                      </CellContents>
-                    </TablixCell>
-                    <TablixCell>
-                      <CellContents>
-                        <Textbox Name="HeaderEstado">
-                          <CanGrow>true</CanGrow>
-                          <Paragraphs>
-                            <Paragraph>
-                              <TextRuns>
-                                <TextRun>
-                                  <Value>Estado</Value>
-                                  <Style />
-                                </TextRun>
-                              </TextRuns>
-                              <Style />
-                            </Paragraph>
-                          </Paragraphs>
-                          <Style>
-                            <Border>
-                              <Color>White</Color>
-                              <Style>Solid</Style>
-                            </Border>
-                            <BackgroundColor>#27ae60</BackgroundColor>
-                            <FontWeight>Bold</FontWeight>
-                            <TextAlign>Center</TextAlign>
-                            <Color>White</Color>
-                          </Style>
-                        </Textbox>
-                      </CellContents>
-                    </TablixCell>
-                    <TablixCell>
-                      <CellContents>
-                        <Textbox Name="HeaderIngreso">
-                          <CanGrow>true</CanGrow>
-                          <Paragraphs>
-                            <Paragraph>
-                              <TextRuns>
-                                <TextRun>
-                                  <Value>Ingreso</Value>
-                                  <Style />
-                                </TextRun>
-                              </TextRuns>
-                              <Style />
-                            </Paragraph>
-                          </Paragraphs>
-                          <Style>
-                            <Border>
-                              <Color>White</Color>
-                              <Style>Solid</Style>
-                            </Border>
-                            <BackgroundColor>#27ae60</BackgroundColor>
-                            <FontWeight>Bold</FontWeight>
-                            <TextAlign>Center</TextAlign>
-                            <Color>White</Color>
-                          </Style>
-                        </Textbox>
-                      </CellContents>
-                    </TablixCell>
-                    <TablixCell>
-                      <CellContents>
-                        <Textbox Name="HeaderVeterinario">
-                          <CanGrow>true</CanGrow>
-                          <Paragraphs>
-                            <Paragraph>
-                              <TextRuns>
-                                <TextRun>
-                                  <Value>Veterinario</Value>
-                                  <Style />
-                                </TextRun>
-                              </TextRuns>
-                              <Style />
-                            </Paragraph>
-                          </Paragraphs>
-                          <Style>
-                            <Border>
-                              <Color>White</Color>
-                              <Style>Solid</Style>
-                            </Border>
-                            <BackgroundColor>#27ae60</BackgroundColor>
-                            <FontWeight>Bold</FontWeight>
-                            <TextAlign>Center</TextAlign>
-                            <Color>White</Color>
-                          </Style>
-                        </Textbox>
-                      </CellContents>
-                    </TablixCell>
-                    <TablixCell>
-                      <CellContents>
-                        <Textbox Name="HeaderDias">
-                          <CanGrow>true</CanGrow>
-                          <Paragraphs>
-                            <Paragraph>
-                              <TextRuns>
-                                <TextRun>
-                                  <Value>Días</Value>
-                                  <Style />
-                                </TextRun>
-                              </TextRuns>
-                              <Style />
-                            </Paragraph>
-                          </Paragraphs>
-                          <Style>
-                            <Border>
-                              <Color>White</Color>
-                              <Style>Solid</Style>
-                            </Border>
-                            <BackgroundColor>#27ae60</BackgroundColor>
-                            <FontWeight>Bold</FontWeight>
-                            <TextAlign>Center</TextAlign>
-                            <Color>White</Color>
-                          </Style>
-                        </Textbox>
-                      </CellContents>
-                    </TablixCell>
-                  </TablixCells>
-                </TablixRow>
-                <TablixRow>
-                  <Height>0.7cm</Height>
-                  <TablixCells>
-                    <TablixCell>
-                      <CellContents>
-                        <Textbox Name="DataNombre">
-                          <CanGrow>true</CanGrow>
-                          <Paragraphs>
-                            <Paragraph>
-                              <TextRuns>
-                                <TextRun>
-                                  <Value>=Fields!Nombre.Value</Value>
-                                  <Style />
-                                </TextRun>
-                              </TextRuns>
-                              <Style />
-                            </Paragraph>
-                          </Paragraphs>
-                          <Style>
-                            <Border>
-                              <Color>#bdc3c7</Color>
-                              <Style>Solid</Style>
-                            </Border>
-                          </Style>
-                        </Textbox>
-                      </CellContents>
-                    </TablixCell>
-                    <TablixCell>
-                      <CellContents>
-                        <Textbox Name="DataEspecie">
-                          <CanGrow>true</CanGrow>
-                          <Paragraphs>
-                            <Paragraph>
-                              <TextRuns>
-                                <TextRun>
-                                  <Value>=Fields!Especie.Value</Value>
-                                  <Style />
-                                </TextRun>
-                              </TextRuns>
-                              <Style />
-                            </Paragraph>
-                          </Paragraphs>
-                          <Style>
-                            <Border>
-                              <Color>#bdc3c7</Color>
-                              <Style>Solid</Style>
-                            </Border>
-                            <TextAlign>Center</TextAlign>
-                          </Style>
-                        </Textbox>
-                      </CellContents>
-                    </TablixCell>
-                    <TablixCell>
-                      <CellContents>
-                        <Textbox Name="DataRaza">
-                          <CanGrow>true</CanGrow>
-                          <Paragraphs>
-                            <Paragraph>
-                              <TextRuns>
-                                <TextRun>
-                                  <Value>=Fields!Raza.Value</Value>
-                                  <Style />
-                                </TextRun>
-                              </TextRuns>
-                              <Style />
-                            </Paragraph>
-                          </Paragraphs>
-                          <Style>
-                            <Border>
-                              <Color>#bdc3c7</Color>
-                              <Style>Solid</Style>
-                            </Border>
-                          </Style>
-                        </Textbox>
-                      </CellContents>
-                    </TablixCell>
-                    <TablixCell>
-                      <CellContents>
-                        <Textbox Name="DataSexo">
-                          <CanGrow>true</CanGrow>
-                          <Paragraphs>
-                            <Paragraph>
-                              <TextRuns>
-                                <TextRun>
-                                  <Value>=Fields!Sexo.Value</Value>
-                                  <Style />
-                                </TextRun>
-                              </TextRuns>
-                              <Style />
-                            </Paragraph>
-                          </Paragraphs>
-                          <Style>
-                            <Border>
-                              <Color>#bdc3c7</Color>
-                              <Style>Solid</Style>
-                            </Border>
-                            <TextAlign>Center</TextAlign>
-                          </Style>
-                        </Textbox>
-                      </CellContents>
-                    </TablixCell>
-                    <TablixCell>
-                      <CellContents>
-                        <Textbox Name="DataEdad">
-                          <CanGrow>true</CanGrow>
-                          <Paragraphs>
-                            <Paragraph>
-                              <TextRuns>
-                                <TextRun>
-                                  <Value>=Fields!EdadAproximada.Value</Value>
-                                  <Style />
-                                </TextRun>
-                              </TextRuns>
-                              <Style />
-                            </Paragraph>
-                          </Paragraphs>
-                          <Style>
-                            <Border>
-                              <Color>#bdc3c7</Color>
-                              <Style>Solid</Style>
-                            </Border>
-                            <TextAlign>Center</TextAlign>
-                          </Style>
-                        </Textbox>
-                      </CellContents>
-                    </TablixCell>
-                    <TablixCell>
-                      <CellContents>
-                        <Textbox Name="DataEstado">
-                          <CanGrow>true</CanGrow>
-                          <Paragraphs>
-                            <Paragraph>
-                              <TextRuns>
-                                <TextRun>
-                                  <Value>=Fields!Estado.Value</Value>
-                                  <Style />
-                                </TextRun>
-                              </TextRuns>
-                              <Style />
-                            </Paragraph>
-                          </Paragraphs>
-                          <Style>
-                            <Border>
-                              <Color>#bdc3c7</Color>
-                              <Style>Solid</Style>
-                            </Border>
-                            <FontWeight>Bold</FontWeight>
-                            <TextAlign>Center</TextAlign>
-                            <Color>=IIF(Fields!Estado.Value = "Disponible para adopción", "#27AE60", IIF(Fields!Estado.Value = "Adoptada", "#3498DB", IIF(Fields!Estado.Value = "En tratamiento", "#E67E22", "Black")))</Color>
-                          </Style>
-                        </Textbox>
-                      </CellContents>
-                    </TablixCell>
-                    <TablixCell>
-                      <CellContents>
-                        <Textbox Name="DataIngreso">
-                          <CanGrow>true</CanGrow>
-                          <Paragraphs>
-                            <Paragraph>
-                              <TextRuns>
-                                <TextRun>
-                                  <Value>=Format(Fields!FechaIngreso.Value, "dd/MM/yyyy")</Value>
-                                  <Style />
-                                </TextRun>
-                              </TextRuns>
-                              <Style />
-                            </Paragraph>
-                          </Paragraphs>
-                          <Style>
-                            <Border>
-                              <Color>#bdc3c7</Color>
-                              <Style>Solid</Style>
-                            </Border>
-                            <TextAlign>Center</TextAlign>
-                          </Style>
-                        </Textbox>
-                      </CellContents>
-                    </TablixCell>
-                    <TablixCell>
-                      <CellContents>
-                        <Textbox Name="DataVeterinario">
-                          <CanGrow>true</CanGrow>
-                          <Paragraphs>
-                            <Paragraph>
-                              <TextRuns>
-                                <TextRun>
-                                  <Value>=Fields!VeterinarioAsignado.Value</Value>
-                                  <Style />
-                                </TextRun>
-                              </TextRuns>
-                              <Style />
-                            </Paragraph>
-                          </Paragraphs>
-                          <Style>
-                            <Border>
-                              <Color>#bdc3c7</Color>
-                              <Style>Solid</Style>
-                            </Border>
-                          </Style>
-                        </Textbox>
-                      </CellContents>
-                    </TablixCell>
-                    <TablixCell>
-                      <CellContents>
-                        <Textbox Name="DataDias">
-                          <CanGrow>true</CanGrow>
-                          <Paragraphs>
-                            <Paragraph>
-                              <TextRuns>
-                                <TextRun>
-                                  <Value>=Fields!DiasEnRefugio.Value</Value>
-                                  <Style />
-                                </TextRun>
-                              </TextRuns>
-                              <Style />
-                            </Paragraph>
-                          </Paragraphs>
-                          <Style>
-                            <Border>
-                              <Color>#bdc3c7</Color>
-                              <Style>Solid</Style>
-                            </Border>
-                            <FontWeight>Bold</FontWeight>
-                            <TextAlign>Center</TextAlign>
-                          </Style>
-                        </Textbox>
-                      </CellContents>
-                    </TablixCell>
-                  </TablixCells>
-                </TablixRow>
-              </TablixRows>
-            </TablixBody>
-            <TablixColumnHierarchy>
-              <TablixMembers>
-                <TablixMember />
-                <TablixMember />
-                <TablixMember />
-                <TablixMember />
-                <TablixMember />
-                <TablixMember />
-                <TablixMember />
-                <TablixMember />
-                <TablixMember />
-              </TablixMembers>
-            </TablixColumnHierarchy>
-            <TablixRowHierarchy>
-              <TablixMembers>
-                <TablixMember>
-                  <KeepWithGroup>After</KeepWithGroup>
-                </TablixMember>
-                <TablixMember>
-                  <Group Name="Detalle" />
-                </TablixMember>
-              </TablixMembers>
-            </TablixRowHierarchy>
-            <DataSetName>DataSetMascotas</DataSetName>
-            <Top>3.3cm</Top>
-            <Height>1.5cm</Height>
-            <Width>19cm</Width>
-            <ZIndex>2</ZIndex>
-            <Style>
-              <Border>
-                <Color>#34495e</Color>
-                <Style>Solid</Style>
-              </Border>
-            </Style>
-          </Tablix>
-          <Rectangle Name="RectanguloPie">
-            <ReportItems>
-              <Textbox Name="TextboxResumen">
-                <CanGrow>true</CanGrow>
-                <Paragraphs>
-                  <Paragraph>
-                    <TextRuns>
-                      <TextRun>
-                        <Value>=("Total: " &amp; Parameters!TotalRegistros.Value &amp; " | Perros: " &amp; Parameters!TotalPerros.Value &amp; " | Gatos: " &amp; Parameters!TotalGatos.Value &amp; " | Disponibles: " &amp; Parameters!TotalDisponibles.Value)</Value>
-                        <Style />
-                      </TextRun>
-                    </TextRuns>
-                    <Style />
-                  </Paragraph>
-                </Paragraphs>
-                <Height>1cm</Height>
-                <Width>14cm</Width>
-                <Style>
-                  <FontSize>11pt</FontSize>
-                  <FontWeight>Bold</FontWeight>
-                  <Color>#27ae60</Color>
-                  <PaddingLeft>5pt</PaddingLeft>
-                  <PaddingTop>5pt</PaddingTop>
-                </Style>
-              </Textbox>
-              <Textbox Name="TextboxPagina">
-                <CanGrow>true</CanGrow>
-                <Paragraphs>
-                  <Paragraph>
-                    <TextRuns>
-                      <TextRun>
-                        <Value>=("Página " &amp; Globals!PageNumber &amp; " de " &amp; Globals!TotalPages)</Value>
-                        <Style />
-                      </TextRun>
-                    </TextRuns>
-                    <Style />
-                  </Paragraph>
-                </Paragraphs>
-                <Left>14cm</Left>
-                <Height>1cm</Height>
-                <Width>5cm</Width>
-                <ZIndex>1</ZIndex>
-                <Style>
-                  <TextAlign>Right</TextAlign>
-                  <Color>#7f8c8d</Color>
-                  <PaddingRight>5pt</PaddingRight>
-                  <PaddingTop>5pt</PaddingTop>
-                </Style>
-              </Textbox>
-            </ReportItems>
-            <Top>25cm</Top>
-            <Height>1.5cm</Height>
-            <Width>19cm</Width>
-            <ZIndex>3</ZIndex>
-            <Style>
-              <Border>
-                <Color>#27ae60</Color>
-                <Style>Solid</Style>
-              </Border>
-              <BackgroundColor>#ecf0f1</BackgroundColor>
-            </Style>
-          </Rectangle>
-        </ReportItems>
-        <Height>27cm</Height>
-        <Style />
-      </Body>
-      <Width>21cm</Width>
-      <Page>
-        <PageHeight>29.7cm</PageHeight>
-        <PageWidth>21cm</PageWidth>
-        <LeftMargin>1cm</LeftMargin>
-        <RightMargin>1cm</RightMargin>
-        <TopMargin>1cm</TopMargin>
-        <BottomMargin>1cm</BottomMargin>
-        <Style />
-      </Page>
-    </ReportSection>
-  </ReportSections>
-  <ReportParameters>
-    <ReportParameter Name="FechaGeneracion">
-      <DataType>String</DataType>
-      <Prompt>FechaGeneracion</Prompt>
-    </ReportParameter>
-    <ReportParameter Name="Usuario">
-      <DataType>String</DataType>
-      <Prompt>Usuario</Prompt>
-    </ReportParameter>
-    <ReportParameter Name="FiltroEspecie">
-      <DataType>String</DataType>
-      <Prompt>FiltroEspecie</Prompt>
-    </ReportParameter>
-    <ReportParameter Name="FiltroEstado">
-      <DataType>String</DataType>
-      <Prompt>FiltroEstado</Prompt>
-    </ReportParameter>
-    <ReportParameter Name="FiltroSexo">
-      <DataType>String</DataType>
-      <Prompt>FiltroSexo</Prompt>
-    </ReportParameter>
-    <ReportParameter Name="TotalRegistros">
-      <DataType>String</DataType>
-      <Prompt>TotalRegistros</Prompt>
-    </ReportParameter>
-    <ReportParameter Name="TotalPerros">
-      <DataType>String</DataType>
-      <Prompt>TotalPerros</Prompt>
-    </ReportParameter>
-    <ReportParameter Name="TotalGatos">
-      <DataType>String</DataType>
-      <Prompt>TotalGatos</Prompt>
-    </ReportParameter>
-    <ReportParameter Name="TotalDisponibles">
-      <DataType>String</DataType>
-      <Prompt>TotalDisponibles</Prompt>
-    </ReportParameter>
-  </ReportParameters>
-  <ReportParametersLayout>
-    <GridLayoutDefinition>
-      <NumberOfColumns>2</NumberOfColumns>
-      <NumberOfRows>5</NumberOfRows>
-      <CellDefinitions>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>0</RowIndex>
-          <ParameterName>FechaGeneracion</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>1</ColumnIndex>
-          <RowIndex>0</RowIndex>
-          <ParameterName>Usuario</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>1</RowIndex>
-          <ParameterName>FiltroEspecie</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>1</ColumnIndex>
-          <RowIndex>1</RowIndex>
-          <ParameterName>FiltroEstado</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>2</RowIndex>
-          <ParameterName>FiltroSexo</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>1</ColumnIndex>
-          <RowIndex>2</RowIndex>
-          <ParameterName>TotalRegistros</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>3</RowIndex>
-          <ParameterName>TotalPerros</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>1</ColumnIndex>
-          <RowIndex>3</RowIndex>
-          <ParameterName>TotalGatos</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>4</RowIndex>
-          <ParameterName>TotalDisponibles</ParameterName>
-        </CellDefinition>
-      </CellDefinitions>
-    </GridLayoutDefinition>
-  </ReportParametersLayout>
-  <Language>es-ES</Language>
-  <rd:ReportUnitType>Cm</rd:ReportUnitType>
-  <rd:ReportID>3ab94ef9-4e9a-4d33-b580-a9537a198b48</rd:ReportID>
+<Report xmlns="http://schemas.microsoft.com/sqlserver/reporting/2008/01/reportdefinition"
+        xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
+	<ReportParameters>
+		<ReportParameter Name="FechaGeneracion">
+			<DataType>String</DataType>
+			<DefaultValue>
+				<Values>
+					<Value></Value>
+				</Values>
+			</DefaultValue>
+			<Prompt>FechaGeneracion</Prompt>
+		</ReportParameter>
+		<ReportParameter Name="Usuario">
+			<DataType>String</DataType>
+			<DefaultValue>
+				<Values>
+					<Value></Value>
+				</Values>
+			</DefaultValue>
+			<Prompt>Usuario</Prompt>
+		</ReportParameter>
+		<ReportParameter Name="FiltroEspecie">
+			<DataType>String</DataType>
+			<DefaultValue>
+				<Values>
+					<Value>Todas</Value>
+				</Values>
+			</DefaultValue>
+			<Prompt>FiltroEspecie</Prompt>
+		</ReportParameter>
+		<ReportParameter Name="FiltroEstado">
+			<DataType>String</DataType>
+			<DefaultValue>
+				<Values>
+					<Value>Todos</Value>
+				</Values>
+			</DefaultValue>
+			<Prompt>FiltroEstado</Prompt>
+		</ReportParameter>
+		<ReportParameter Name="FiltroSexo">
+			<DataType>String</DataType>
+			<DefaultValue>
+				<Values>
+					<Value>Todos</Value>
+				</Values>
+			</DefaultValue>
+			<Prompt>FiltroSexo</Prompt>
+		</ReportParameter>
+		<ReportParameter Name="TotalRegistros">
+			<DataType>String</DataType>
+			<DefaultValue>
+				<Values>
+					<Value>0</Value>
+				</Values>
+			</DefaultValue>
+			<Prompt>TotalRegistros</Prompt>
+		</ReportParameter>
+		<ReportParameter Name="TotalPerros">
+			<DataType>String</DataType>
+			<DefaultValue>
+				<Values>
+					<Value>0</Value>
+				</Values>
+			</DefaultValue>
+			<Prompt>TotalPerros</Prompt>
+		</ReportParameter>
+		<ReportParameter Name="TotalGatos">
+			<DataType>String</DataType>
+			<DefaultValue>
+				<Values>
+					<Value>0</Value>
+				</Values>
+			</DefaultValue>
+			<Prompt>TotalGatos</Prompt>
+		</ReportParameter>
+		<ReportParameter Name="TotalDisponibles">
+			<DataType>String</DataType>
+			<DefaultValue>
+				<Values>
+					<Value>0</Value>
+				</Values>
+			</DefaultValue>
+			<Prompt>TotalDisponibles</Prompt>
+		</ReportParameter>
+	</ReportParameters>
+	<DataSources>
+		<DataSource Name="DataSetMascotas">
+			<ConnectionProperties>
+				<DataProvider>System.Data.DataSet</DataProvider>
+				<ConnectString>/* Local Connection */</ConnectString>
+			</ConnectionProperties>
+			<rd:DataSourceID>00000000-0000-0000-0000-000000000002</rd:DataSourceID>
+		</DataSource>
+	</DataSources>
+	<DataSets>
+		<DataSet Name="DataSetMascotas">
+			<Query>
+				<DataSourceName>DataSetMascotas</DataSourceName>
+				<CommandText>/* Local Query */</CommandText>
+			</Query>
+			<Fields>
+				<Field Name="MascotaId">
+					<DataField>MascotaId</DataField>
+					<rd:TypeName>System.Int32</rd:TypeName>
+				</Field>
+				<Field Name="Nombre">
+					<DataField>Nombre</DataField>
+					<rd:TypeName>System.String</rd:TypeName>
+				</Field>
+				<Field Name="Especie">
+					<DataField>Especie</DataField>
+					<rd:TypeName>System.String</rd:TypeName>
+				</Field>
+				<Field Name="Raza">
+					<DataField>Raza</DataField>
+					<rd:TypeName>System.String</rd:TypeName>
+				</Field>
+				<Field Name="Sexo">
+					<DataField>Sexo</DataField>
+					<rd:TypeName>System.String</rd:TypeName>
+				</Field>
+				<Field Name="EdadAproximada">
+					<DataField>EdadAproximada</DataField>
+					<rd:TypeName>System.String</rd:TypeName>
+				</Field>
+				<Field Name="Tamanio">
+					<DataField>Tamanio</DataField>
+					<rd:TypeName>System.String</rd:TypeName>
+				</Field>
+				<Field Name="Color">
+					<DataField>Color</DataField>
+					<rd:TypeName>System.String</rd:TypeName>
+				</Field>
+				<Field Name="Estado">
+					<DataField>Estado</DataField>
+					<rd:TypeName>System.String</rd:TypeName>
+				</Field>
+				<Field Name="Esterilizado">
+					<DataField>Esterilizado</DataField>
+					<rd:TypeName>System.Nullable`1[System.Boolean]</rd:TypeName>
+				</Field>
+				<Field Name="FechaIngreso">
+					<DataField>FechaIngreso</DataField>
+					<rd:TypeName>System.Nullable`1[System.DateTime]</rd:TypeName>
+				</Field>
+				<Field Name="DiasEnRefugio">
+					<DataField>DiasEnRefugio</DataField>
+					<rd:TypeName>System.Int32</rd:TypeName>
+				</Field>
+				<Field Name="VeterinarioAsignado">
+					<DataField>VeterinarioAsignado</DataField>
+					<rd:TypeName>System.String</rd:TypeName>
+				</Field>
+				<Field Name="TotalTratamientos">
+					<DataField>TotalTratamientos</DataField>
+					<rd:TypeName>System.Int32</rd:TypeName>
+				</Field>
+				<Field Name="TotalVacunas">
+					<DataField>TotalVacunas</DataField>
+					<rd:TypeName>System.Int32</rd:TypeName>
+				</Field>
+				<Field Name="Microchip">
+					<DataField>Microchip</DataField>
+					<rd:TypeName>System.String</rd:TypeName>
+				</Field>
+				<Field Name="Categoria">
+					<DataField>Categoria</DataField>
+					<rd:TypeName>System.String</rd:TypeName>
+				</Field>
+			</Fields>
+		</DataSet>
+	</DataSets>
+	<Body>
+		<Height>20cm</Height>
+		<Style />
+		<ReportItems>
+
+			<Textbox Name="Titulo">
+				<CanGrow>true</CanGrow>
+				<Top>0cm</Top>
+				<Left>0cm</Left>
+				<Width>19cm</Width>
+				<Height>1.2cm</Height>
+				<Style>
+					<BackgroundColor>#27AE60</BackgroundColor>
+					<Color>White</Color>
+					<FontSize>16pt</FontSize>
+					<FontWeight>Bold</FontWeight>
+					<PaddingLeft>8pt</PaddingLeft>
+					<PaddingTop>6pt</PaddingTop>
+					<Border>
+						<Style>None</Style>
+					</Border>
+				</Style>
+				<Paragraphs>
+					<Paragraph>
+						<TextRuns>
+							<TextRun>
+								<Value>REPORTE DE MASCOTAS REGISTRADAS</Value>
+							</TextRun>
+						</TextRuns>
+					</Paragraph>
+				</Paragraphs>
+			</Textbox>
+
+			<Textbox Name="InfoFiltros">
+				<CanGrow>true</CanGrow>
+				<Top>1.3cm</Top>
+				<Left>0cm</Left>
+				<Width>19cm</Width>
+				<Height>0.7cm</Height>
+				<Style>
+					<BackgroundColor>#ECF0F1</BackgroundColor>
+					<FontSize>9pt</FontSize>
+					<Color>#555555</Color>
+					<PaddingLeft>8pt</PaddingLeft>
+					<PaddingTop>4pt</PaddingTop>
+					<Border>
+						<Style>None</Style>
+					</Border>
+				</Style>
+				<Paragraphs>
+					<Paragraph>
+						<TextRuns>
+							<TextRun>
+								<Value>=("Especie: " &amp; Parameters!FiltroEspecie.Value &amp; "  |  Estado: " &amp; Parameters!FiltroEstado.Value &amp; "  |  Total: " &amp; Parameters!TotalRegistros.Value &amp; "  |  Perros: " &amp; Parameters!TotalPerros.Value &amp; "  |  Gatos: " &amp; Parameters!TotalGatos.Value &amp; "  |  Disponibles: " &amp; Parameters!TotalDisponibles.Value)</Value>
+							</TextRun>
+						</TextRuns>
+					</Paragraph>
+				</Paragraphs>
+			</Textbox>
+
+			<Tablix Name="TablixMascotas">
+				<DataSetName>DataSetMascotas</DataSetName>
+				<Top>2.3cm</Top>
+				<Left>0cm</Left>
+				<Width>19cm</Width>
+				<TablixBody>
+					<TablixColumns>
+						<TablixColumn>
+							<Width>2.8cm</Width>
+						</TablixColumn>
+						<TablixColumn>
+							<Width>2cm</Width>
+						</TablixColumn>
+						<TablixColumn>
+							<Width>2.5cm</Width>
+						</TablixColumn>
+						<TablixColumn>
+							<Width>1.5cm</Width>
+						</TablixColumn>
+						<TablixColumn>
+							<Width>1.8cm</Width>
+						</TablixColumn>
+						<TablixColumn>
+							<Width>3.2cm</Width>
+						</TablixColumn>
+						<TablixColumn>
+							<Width>2cm</Width>
+						</TablixColumn>
+						<TablixColumn>
+							<Width>1.5cm</Width>
+						</TablixColumn>
+						<TablixColumn>
+							<Width>1.7cm</Width>
+						</TablixColumn>
+					</TablixColumns>
+					<TablixRows>
+						<TablixRow>
+							<Height>0.7cm</Height>
+							<TablixCells>
+								<TablixCell>
+									<CellContents>
+										<Textbox Name="HM1">
+											<CanGrow>true</CanGrow>
+											<Paragraphs>
+												<Paragraph>
+													<TextRuns>
+														<TextRun>
+															<Value>Nombre</Value>
+														</TextRun>
+													</TextRuns>
+												</Paragraph>
+											</Paragraphs>
+											<Style>
+												<BackgroundColor>#1E8449</BackgroundColor>
+												<Color>White</Color>
+												<FontWeight>Bold</FontWeight>
+												<FontSize>8pt</FontSize>
+												<TextAlign>Center</TextAlign>
+												<Border>
+													<Style>Solid</Style>
+													<Color>White</Color>
+												</Border>
+												<PaddingTop>3pt</PaddingTop>
+											</Style>
+										</Textbox>
+									</CellContents>
+								</TablixCell>
+								<TablixCell>
+									<CellContents>
+										<Textbox Name="HM2">
+											<CanGrow>true</CanGrow>
+											<Paragraphs>
+												<Paragraph>
+													<TextRuns>
+														<TextRun>
+															<Value>Especie</Value>
+														</TextRun>
+													</TextRuns>
+												</Paragraph>
+											</Paragraphs>
+											<Style>
+												<BackgroundColor>#1E8449</BackgroundColor>
+												<Color>White</Color>
+												<FontWeight>Bold</FontWeight>
+												<FontSize>8pt</FontSize>
+												<TextAlign>Center</TextAlign>
+												<Border>
+													<Style>Solid</Style>
+													<Color>White</Color>
+												</Border>
+												<PaddingTop>3pt</PaddingTop>
+											</Style>
+										</Textbox>
+									</CellContents>
+								</TablixCell>
+								<TablixCell>
+									<CellContents>
+										<Textbox Name="HM3">
+											<CanGrow>true</CanGrow>
+											<Paragraphs>
+												<Paragraph>
+													<TextRuns>
+														<TextRun>
+															<Value>Raza</Value>
+														</TextRun>
+													</TextRuns>
+												</Paragraph>
+											</Paragraphs>
+											<Style>
+												<BackgroundColor>#1E8449</BackgroundColor>
+												<Color>White</Color>
+												<FontWeight>Bold</FontWeight>
+												<FontSize>8pt</FontSize>
+												<TextAlign>Center</TextAlign>
+												<Border>
+													<Style>Solid</Style>
+													<Color>White</Color>
+												</Border>
+												<PaddingTop>3pt</PaddingTop>
+											</Style>
+										</Textbox>
+									</CellContents>
+								</TablixCell>
+								<TablixCell>
+									<CellContents>
+										<Textbox Name="HM4">
+											<CanGrow>true</CanGrow>
+											<Paragraphs>
+												<Paragraph>
+													<TextRuns>
+														<TextRun>
+															<Value>Sexo</Value>
+														</TextRun>
+													</TextRuns>
+												</Paragraph>
+											</Paragraphs>
+											<Style>
+												<BackgroundColor>#1E8449</BackgroundColor>
+												<Color>White</Color>
+												<FontWeight>Bold</FontWeight>
+												<FontSize>8pt</FontSize>
+												<TextAlign>Center</TextAlign>
+												<Border>
+													<Style>Solid</Style>
+													<Color>White</Color>
+												</Border>
+												<PaddingTop>3pt</PaddingTop>
+											</Style>
+										</Textbox>
+									</CellContents>
+								</TablixCell>
+								<TablixCell>
+									<CellContents>
+										<Textbox Name="HM5">
+											<CanGrow>true</CanGrow>
+											<Paragraphs>
+												<Paragraph>
+													<TextRuns>
+														<TextRun>
+															<Value>Estado</Value>
+														</TextRun>
+													</TextRuns>
+												</Paragraph>
+											</Paragraphs>
+											<Style>
+												<BackgroundColor>#1E8449</BackgroundColor>
+												<Color>White</Color>
+												<FontWeight>Bold</FontWeight>
+												<FontSize>8pt</FontSize>
+												<TextAlign>Center</TextAlign>
+												<Border>
+													<Style>Solid</Style>
+													<Color>White</Color>
+												</Border>
+												<PaddingTop>3pt</PaddingTop>
+											</Style>
+										</Textbox>
+									</CellContents>
+								</TablixCell>
+								<TablixCell>
+									<CellContents>
+										<Textbox Name="HM6">
+											<CanGrow>true</CanGrow>
+											<Paragraphs>
+												<Paragraph>
+													<TextRuns>
+														<TextRun>
+															<Value>Veterinario</Value>
+														</TextRun>
+													</TextRuns>
+												</Paragraph>
+											</Paragraphs>
+											<Style>
+												<BackgroundColor>#1E8449</BackgroundColor>
+												<Color>White</Color>
+												<FontWeight>Bold</FontWeight>
+												<FontSize>8pt</FontSize>
+												<TextAlign>Center</TextAlign>
+												<Border>
+													<Style>Solid</Style>
+													<Color>White</Color>
+												</Border>
+												<PaddingTop>3pt</PaddingTop>
+											</Style>
+										</Textbox>
+									</CellContents>
+								</TablixCell>
+								<TablixCell>
+									<CellContents>
+										<Textbox Name="HM7">
+											<CanGrow>true</CanGrow>
+											<Paragraphs>
+												<Paragraph>
+													<TextRuns>
+														<TextRun>
+															<Value>F. Ingreso</Value>
+														</TextRun>
+													</TextRuns>
+												</Paragraph>
+											</Paragraphs>
+											<Style>
+												<BackgroundColor>#1E8449</BackgroundColor>
+												<Color>White</Color>
+												<FontWeight>Bold</FontWeight>
+												<FontSize>8pt</FontSize>
+												<TextAlign>Center</TextAlign>
+												<Border>
+													<Style>Solid</Style>
+													<Color>White</Color>
+												</Border>
+												<PaddingTop>3pt</PaddingTop>
+											</Style>
+										</Textbox>
+									</CellContents>
+								</TablixCell>
+								<TablixCell>
+									<CellContents>
+										<Textbox Name="HM8">
+											<CanGrow>true</CanGrow>
+											<Paragraphs>
+												<Paragraph>
+													<TextRuns>
+														<TextRun>
+															<Value>Días</Value>
+														</TextRun>
+													</TextRuns>
+												</Paragraph>
+											</Paragraphs>
+											<Style>
+												<BackgroundColor>#1E8449</BackgroundColor>
+												<Color>White</Color>
+												<FontWeight>Bold</FontWeight>
+												<FontSize>8pt</FontSize>
+												<TextAlign>Center</TextAlign>
+												<Border>
+													<Style>Solid</Style>
+													<Color>White</Color>
+												</Border>
+												<PaddingTop>3pt</PaddingTop>
+											</Style>
+										</Textbox>
+									</CellContents>
+								</TablixCell>
+								<TablixCell>
+									<CellContents>
+										<Textbox Name="HM9">
+											<CanGrow>true</CanGrow>
+											<Paragraphs>
+												<Paragraph>
+													<TextRuns>
+														<TextRun>
+															<Value>Vacunas</Value>
+														</TextRun>
+													</TextRuns>
+												</Paragraph>
+											</Paragraphs>
+											<Style>
+												<BackgroundColor>#1E8449</BackgroundColor>
+												<Color>White</Color>
+												<FontWeight>Bold</FontWeight>
+												<FontSize>8pt</FontSize>
+												<TextAlign>Center</TextAlign>
+												<Border>
+													<Style>Solid</Style>
+													<Color>White</Color>
+												</Border>
+												<PaddingTop>3pt</PaddingTop>
+											</Style>
+										</Textbox>
+									</CellContents>
+								</TablixCell>
+							</TablixCells>
+						</TablixRow>
+						<TablixRow>
+							<Height>0.6cm</Height>
+							<TablixCells>
+								<TablixCell>
+									<CellContents>
+										<Textbox Name="DM1">
+											<CanGrow>true</CanGrow>
+											<Paragraphs>
+												<Paragraph>
+													<TextRuns>
+														<TextRun>
+															<Value>=Fields!Nombre.Value</Value>
+														</TextRun>
+													</TextRuns>
+												</Paragraph>
+											</Paragraphs>
+											<Style>
+												<Border>
+													<Style>Solid</Style>
+													<Color>#D5D8DC</Color>
+												</Border>
+												<FontSize>8pt</FontSize>
+												<PaddingLeft>3pt</PaddingLeft>
+												<BackgroundColor>=IIF(RowNumber(Nothing) Mod 2 = 0, "#EAFAF1", "White")</BackgroundColor>
+											</Style>
+										</Textbox>
+									</CellContents>
+								</TablixCell>
+								<TablixCell>
+									<CellContents>
+										<Textbox Name="DM2">
+											<CanGrow>true</CanGrow>
+											<Paragraphs>
+												<Paragraph>
+													<TextRuns>
+														<TextRun>
+															<Value>=Fields!Especie.Value</Value>
+														</TextRun>
+													</TextRuns>
+												</Paragraph>
+											</Paragraphs>
+											<Style>
+												<Border>
+													<Style>Solid</Style>
+													<Color>#D5D8DC</Color>
+												</Border>
+												<FontSize>8pt</FontSize>
+												<TextAlign>Center</TextAlign>
+												<BackgroundColor>=IIF(RowNumber(Nothing) Mod 2 = 0, "#EAFAF1", "White")</BackgroundColor>
+											</Style>
+										</Textbox>
+									</CellContents>
+								</TablixCell>
+								<TablixCell>
+									<CellContents>
+										<Textbox Name="DM3">
+											<CanGrow>true</CanGrow>
+											<Paragraphs>
+												<Paragraph>
+													<TextRuns>
+														<TextRun>
+															<Value>=Fields!Raza.Value</Value>
+														</TextRun>
+													</TextRuns>
+												</Paragraph>
+											</Paragraphs>
+											<Style>
+												<Border>
+													<Style>Solid</Style>
+													<Color>#D5D8DC</Color>
+												</Border>
+												<FontSize>8pt</FontSize>
+												<PaddingLeft>3pt</PaddingLeft>
+												<BackgroundColor>=IIF(RowNumber(Nothing) Mod 2 = 0, "#EAFAF1", "White")</BackgroundColor>
+											</Style>
+										</Textbox>
+									</CellContents>
+								</TablixCell>
+								<TablixCell>
+									<CellContents>
+										<Textbox Name="DM4">
+											<CanGrow>true</CanGrow>
+											<Paragraphs>
+												<Paragraph>
+													<TextRuns>
+														<TextRun>
+															<Value>=Fields!Sexo.Value</Value>
+														</TextRun>
+													</TextRuns>
+												</Paragraph>
+											</Paragraphs>
+											<Style>
+												<Border>
+													<Style>Solid</Style>
+													<Color>#D5D8DC</Color>
+												</Border>
+												<FontSize>8pt</FontSize>
+												<TextAlign>Center</TextAlign>
+												<BackgroundColor>=IIF(RowNumber(Nothing) Mod 2 = 0, "#EAFAF1", "White")</BackgroundColor>
+											</Style>
+										</Textbox>
+									</CellContents>
+								</TablixCell>
+								<TablixCell>
+									<CellContents>
+										<Textbox Name="DM5">
+											<CanGrow>true</CanGrow>
+											<Paragraphs>
+												<Paragraph>
+													<TextRuns>
+														<TextRun>
+															<Value>=Fields!Estado.Value</Value>
+														</TextRun>
+													</TextRuns>
+												</Paragraph>
+											</Paragraphs>
+											<Style>
+												<Border>
+													<Style>Solid</Style>
+													<Color>#D5D8DC</Color>
+												</Border>
+												<FontSize>8pt</FontSize>
+												<PaddingLeft>3pt</PaddingLeft>
+												<BackgroundColor>=IIF(RowNumber(Nothing) Mod 2 = 0, "#EAFAF1", "White")</BackgroundColor>
+											</Style>
+										</Textbox>
+									</CellContents>
+								</TablixCell>
+								<TablixCell>
+									<CellContents>
+										<Textbox Name="DM6">
+											<CanGrow>true</CanGrow>
+											<Paragraphs>
+												<Paragraph>
+													<TextRuns>
+														<TextRun>
+															<Value>=Fields!VeterinarioAsignado.Value</Value>
+														</TextRun>
+													</TextRuns>
+												</Paragraph>
+											</Paragraphs>
+											<Style>
+												<Border>
+													<Style>Solid</Style>
+													<Color>#D5D8DC</Color>
+												</Border>
+												<FontSize>8pt</FontSize>
+												<PaddingLeft>3pt</PaddingLeft>
+												<BackgroundColor>=IIF(RowNumber(Nothing) Mod 2 = 0, "#EAFAF1", "White")</BackgroundColor>
+											</Style>
+										</Textbox>
+									</CellContents>
+								</TablixCell>
+								<TablixCell>
+									<CellContents>
+										<Textbox Name="DM7">
+											<CanGrow>true</CanGrow>
+											<Paragraphs>
+												<Paragraph>
+													<TextRuns>
+														<TextRun>
+															<Value>=IIF(Fields!FechaIngreso.Value Is Nothing, "N/A", Format(Fields!FechaIngreso.Value, "dd/MM/yyyy"))</Value>
+														</TextRun>
+													</TextRuns>
+												</Paragraph>
+											</Paragraphs>
+											<Style>
+												<Border>
+													<Style>Solid</Style>
+													<Color>#D5D8DC</Color>
+												</Border>
+												<FontSize>8pt</FontSize>
+												<TextAlign>Center</TextAlign>
+												<BackgroundColor>=IIF(RowNumber(Nothing) Mod 2 = 0, "#EAFAF1", "White")</BackgroundColor>
+											</Style>
+										</Textbox>
+									</CellContents>
+								</TablixCell>
+								<TablixCell>
+									<CellContents>
+										<Textbox Name="DM8">
+											<CanGrow>true</CanGrow>
+											<Paragraphs>
+												<Paragraph>
+													<TextRuns>
+														<TextRun>
+															<Value>=Fields!DiasEnRefugio.Value</Value>
+														</TextRun>
+													</TextRuns>
+												</Paragraph>
+											</Paragraphs>
+											<Style>
+												<Border>
+													<Style>Solid</Style>
+													<Color>#D5D8DC</Color>
+												</Border>
+												<FontSize>8pt</FontSize>
+												<TextAlign>Center</TextAlign>
+												<BackgroundColor>=IIF(RowNumber(Nothing) Mod 2 = 0, "#EAFAF1", "White")</BackgroundColor>
+											</Style>
+										</Textbox>
+									</CellContents>
+								</TablixCell>
+								<TablixCell>
+									<CellContents>
+										<Textbox Name="DM9">
+											<CanGrow>true</CanGrow>
+											<Paragraphs>
+												<Paragraph>
+													<TextRuns>
+														<TextRun>
+															<Value>=Fields!TotalVacunas.Value</Value>
+														</TextRun>
+													</TextRuns>
+												</Paragraph>
+											</Paragraphs>
+											<Style>
+												<Border>
+													<Style>Solid</Style>
+													<Color>#D5D8DC</Color>
+												</Border>
+												<FontSize>8pt</FontSize>
+												<TextAlign>Center</TextAlign>
+												<BackgroundColor>=IIF(RowNumber(Nothing) Mod 2 = 0, "#EAFAF1", "White")</BackgroundColor>
+											</Style>
+										</Textbox>
+									</CellContents>
+								</TablixCell>
+							</TablixCells>
+						</TablixRow>
+					</TablixRows>
+				</TablixBody>
+				<TablixColumnHierarchy>
+					<TablixMembers>
+						<TablixMember/>
+						<TablixMember/>
+						<TablixMember/>
+						<TablixMember/>
+						<TablixMember/>
+						<TablixMember/>
+						<TablixMember/>
+						<TablixMember/>
+						<TablixMember/>
+					</TablixMembers>
+				</TablixColumnHierarchy>
+				<TablixRowHierarchy>
+					<TablixMembers>
+						<TablixMember>
+							<KeepWithGroup>After</KeepWithGroup>
+						</TablixMember>
+						<TablixMember>
+							<Group Name="GrupoMascotas">
+								<GroupExpressions>
+									<GroupExpression>=Fields!MascotaId.Value</GroupExpression>
+								</GroupExpressions>
+							</Group>
+						</TablixMember>
+					</TablixMembers>
+				</TablixRowHierarchy>
+			</Tablix>
+
+			<Textbox Name="Pie">
+				<CanGrow>true</CanGrow>
+				<Top>19cm</Top>
+				<Left>0cm</Left>
+				<Width>19cm</Width>
+				<Height>0.7cm</Height>
+				<Style>
+					<BackgroundColor>#ECF0F1</BackgroundColor>
+					<Color>#7F8C8D</Color>
+					<FontSize>9pt</FontSize>
+					<TextAlign>Center</TextAlign>
+					<PaddingTop>4pt</PaddingTop>
+					<Border>
+						<Style>Solid</Style>
+						<Color>#27AE60</Color>
+					</Border>
+				</Style>
+				<Paragraphs>
+					<Paragraph>
+						<TextRuns>
+							<TextRun>
+								<Value>=("Página " &amp; Globals!PageNumber &amp; " de " &amp; Globals!TotalPages &amp; "   |   ADOPTAMANIA Refugio de Animales")</Value>
+							</TextRun>
+						</TextRuns>
+					</Paragraph>
+				</Paragraphs>
+			</Textbox>
+
+		</ReportItems>
+	</Body>
+	<Width>19cm</Width>
+	<Page>
+		<PageHeight>29.7cm</PageHeight>
+		<PageWidth>21cm</PageWidth>
+		<LeftMargin>1cm</LeftMargin>
+		<RightMargin>1cm</RightMargin>
+		<TopMargin>1cm</TopMargin>
+		<BottomMargin>1cm</BottomMargin>
+		<Style />
+	</Page>
+	<Language>es-EC</Language>
+	<rd:ReportUnitType>Cm</rd:ReportUnitType>
 </Report>

@@ -1,377 +1,578 @@
 ﻿@model MVCMASCOTAS.Models.ViewModels.MascotaViewModel
 
 @{
-    ViewBag.Title = "Registrar Nueva Mascota";
+    ViewBag.Title = "Registrar Nueva Mascota - ADOPTAMANÍA";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-12">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h2>
-                    <i class="fas fa-plus-circle text-success"></i> Registrar Nueva Mascota
-                </h2>
-                <a href="@Url.Action("Gestionar", "Mascotas")" class="btn btn-secondary">
-                    <i class="fas fa-arrow-left"></i> Volver
+<!-- Hero Section -->
+<section class="registrar-hero py-4">
+    <div class="container">
+        <div class="d-flex flex-wrap justify-content-between align-items-center">
+            <div>
+                <h1 class="h2 text-brown mb-1">
+                    <i class="fas fa-plus-circle text-green me-2"></i>Registrar Nueva Mascota
+                </h1>
+                <p class="text-secondary mb-0">Complete el formulario para agregar una mascota al sistema</p>
+            </div>
+            <div class="mt-2 mt-sm-0">
+                <a href="@Url.Action("Gestionar", "Mascotas")" class="btn btn-outline-green">
+                    <i class="fas fa-arrow-left me-2"></i>Volver
                 </a>
             </div>
         </div>
     </div>
+</section>
 
-    @using (Html.BeginForm("Crear", "Mascotas", FormMethod.Post, new { enctype = "multipart/form-data", id = "formCrearMascota" }))
-    {
-        @Html.AntiForgeryToken()
-        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+<!-- Main Content -->
+<section class="py-4 bg-beige">
+    <div class="container">
+        @using (Html.BeginForm("Crear", "Mascotas", FormMethod.Post, new { enctype = "multipart/form-data", id = "formCrearMascota" }))
+        {
+            @Html.AntiForgeryToken()
+            @Html.ValidationSummary(true, "", new { @class = "alert alert-beige border-green" })
 
-        <div class="row">
-            <!-- COLUMNA IZQUIERDA -->
-            <div class="col-lg-8">
-
-                <!-- INFORMACIÓN BÁSICA -->
-                <div class="card shadow-sm mb-4">
-                    <div class="card-header bg-primary text-white">
-                        <h5 class="mb-0">
+            <div class="row g-4">
+                <!-- COLUMNA IZQUIERDA (8 columnas) -->
+                <div class="col-lg-8">
+                    <!-- Información Básica -->
+                    <div class="form-card mb-4">
+                        <div class="form-card-header bg-green text-white">
                             <i class="fas fa-info-circle me-2"></i>Información Básica
-                        </h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="row">
-                            <!-- Nombre -->
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">
-                                    <i class="fas fa-tag me-1 text-primary"></i>
-                                    Nombre <span class="text-danger">*</span>
-                                </label>
-                                @Html.TextBoxFor(m => m.Nombre, new
-                                {
-                                    @class = "form-control",
-                                    placeholder = "Ej: Max, Luna, Rocky...",
-                                    required = "required"
-                                })
-                                @Html.ValidationMessageFor(m => m.Nombre, "", new { @class = "text-danger small" })
-                            </div>
-
-                            <!-- Especie -->
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">
-                                    <i class="fas fa-paw me-1 text-primary"></i>
-                                    Especie <span class="text-danger">*</span>
-                                </label>
-                                @Html.DropDownListFor(m => m.Especie,
-                                    Model.EspeciesList ?? new SelectList(new List<string> { "Perro", "Gato" }),
-                                    "-- Seleccione --",
-                                    new { @class = "form-select", required = "required" })
-                                @Html.ValidationMessageFor(m => m.Especie, "", new { @class = "text-danger small" })
-                            </div>
-
-                            <!-- Raza -->
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">
-                                    <i class="fas fa-dna me-1 text-primary"></i>
-                                    Raza
-                                </label>
-                                @Html.TextBoxFor(m => m.Raza, new
-                                {
-                                    @class = "form-control",
-                                    placeholder = "Ej: Labrador, Mestizo..."
-                                })
-                            </div>
-
-                            <!-- Sexo -->
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">
-                                    <i class="fas fa-venus-mars me-1 text-primary"></i>
-                                    Sexo <span class="text-danger">*</span>
-                                </label>
-                                <select name="Sexo" id="Sexo" class="form-select" required>
-                                    <option value="">-- Seleccione --</option>
-                                    <option value="Macho" selected>Macho</option>
-                                    <option value="Hembra">Hembra</option>
-                                </select>
-                            </div>
-
-                            <!-- Edad -->
-                            <div class="col-md-4 mb-3">
-                                <label class="form-label">
-                                    <i class="fas fa-birthday-cake me-1 text-primary"></i>
-                                    Edad Aproximada <span class="text-danger">*</span>
-                                </label>
-                                @Html.TextBoxFor(m => m.EdadAproximada, new
-                                {
-                                    @class = "form-control",
-                                    placeholder = "Ej: 2 años",
-                                    required = "required"
-                                })
-                            </div>
-
-                            <!-- Tamaño -->
-                            <div class="col-md-4 mb-3">
-                                <label class="form-label">
-                                    <i class="fas fa-ruler-combined me-1 text-primary"></i>
-                                    Tamaño <span class="text-danger">*</span>
-                                </label>
-                                @Html.DropDownListFor(m => m.Tamanio,
-                                    Model.TamaniosList ?? new SelectList(new List<string> { "Pequeño", "Mediano", "Grande" }),
-                                    "-- Seleccione --",
-                                    new { @class = "form-select", required = "required" })
-                            </div>
-
-                            <!-- Color -->
-                            <div class="col-md-4 mb-3">
-                                <label class="form-label">
-                                    <i class="fas fa-palette me-1 text-primary"></i>
-                                    Color
-                                </label>
-                                @Html.TextBoxFor(m => m.Color, new
-                                {
-                                    @class = "form-control",
-                                    placeholder = "Ej: Negro, Blanco..."
-                                })
-                            </div>
-
-                            <!-- Esterilizado -->
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label d-block">
-                                    <i class="fas fa-check-circle me-1 text-primary"></i>
-                                    ¿Esterilizado?
-                                </label>
-                                <div class="form-check form-check-inline">
-                                    @Html.RadioButtonFor(m => m.Esterilizado, true, new { @class = "form-check-input", id = "esterilizadoSi" })
-                                    <label class="form-check-label" for="esterilizadoSi">Sí</label>
+                        </div>
+                        <div class="form-card-body">
+                            <div class="row g-3">
+                                <!-- Nombre -->
+                                <div class="col-md-6">
+                                    <label class="form-label text-brown fw-medium">
+                                        <i class="fas fa-tag text-green me-2"></i>Nombre <span class="text-danger">*</span>
+                                    </label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-white border-green"><i class="fas fa-tag text-green"></i></span>
+                                        @Html.TextBoxFor(m => m.Nombre, new
+                                        {
+                                            @class = "form-control border-green",
+                                            placeholder = "Ej: Max, Luna, Rocky...",
+                                            required = "required"
+                                        })
+                                    </div>
+                                    @Html.ValidationMessageFor(m => m.Nombre, "", new { @class = "text-danger small mt-1" })
                                 </div>
-                                <div class="form-check form-check-inline">
-                                    @Html.RadioButtonFor(m => m.Esterilizado, false, new { @class = "form-check-input", id = "esterilizadoNo", @checked = "checked" })
-                                    <label class="form-check-label" for="esterilizadoNo">No</label>
-                                </div>
-                            </div>
 
-                            <!-- Microchip -->
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">
-                                    <i class="fas fa-microchip me-1 text-primary"></i>
-                                    Microchip
-                                </label>
-                                @Html.TextBoxFor(m => m.Microchip, new
-                                {
-                                    @class = "form-control",
-                                    placeholder = "Número de microchip"
-                                })
+                                <!-- Especie -->
+                                <div class="col-md-6">
+                                    <label class="form-label text-brown fw-medium">
+                                        <i class="fas fa-paw text-green me-2"></i>Especie <span class="text-danger">*</span>
+                                    </label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-white border-green"><i class="fas fa-paw text-green"></i></span>
+                                        @Html.DropDownListFor(m => m.Especie,
+                                            Model.EspeciesList ?? new SelectList(new List<string> { "Perro", "Gato" }),
+                                            "-- Seleccione --",
+                                            new { @class = "form-select border-green", required = "required" })
+                                    </div>
+                                    @Html.ValidationMessageFor(m => m.Especie, "", new { @class = "text-danger small mt-1" })
+                                </div>
+
+                                <!-- Raza -->
+                                <div class="col-md-6">
+                                    <label class="form-label text-brown fw-medium">
+                                        <i class="fas fa-dna text-green me-2"></i>Raza
+                                    </label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-white border-green"><i class="fas fa-dna text-green"></i></span>
+                                        @Html.TextBoxFor(m => m.Raza, new
+                                        {
+                                            @class = "form-control border-green",
+                                            placeholder = "Ej: Labrador, Mestizo..."
+                                        })
+                                    </div>
+                                </div>
+
+                                <!-- Sexo -->
+                                <div class="col-md-6">
+                                    <label class="form-label text-brown fw-medium">
+                                        <i class="fas fa-venus-mars text-green me-2"></i>Sexo <span class="text-danger">*</span>
+                                    </label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-white border-green"><i class="fas fa-venus-mars text-green"></i></span>
+                                        <select name="Sexo" id="Sexo" class="form-select border-green" required>
+                                            <option value="">-- Seleccione --</option>
+                                            <option value="Macho" selected>Macho</option>
+                                            <option value="Hembra">Hembra</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <!-- Edad -->
+                                <div class="col-md-4">
+                                    <label class="form-label text-brown fw-medium">
+                                        <i class="fas fa-birthday-cake text-green me-2"></i>Edad <span class="text-danger">*</span>
+                                    </label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-white border-green"><i class="fas fa-birthday-cake text-green"></i></span>
+                                        @Html.TextBoxFor(m => m.EdadAproximada, new
+                                        {
+                                            @class = "form-control border-green",
+                                            placeholder = "Ej: 2 años",
+                                            required = "required"
+                                        })
+                                    </div>
+                                </div>
+
+                                <!-- Tamaño -->
+                                <div class="col-md-4">
+                                    <label class="form-label text-brown fw-medium">
+                                        <i class="fas fa-ruler-combined text-green me-2"></i>Tamaño <span class="text-danger">*</span>
+                                    </label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-white border-green"><i class="fas fa-ruler-combined text-green"></i></span>
+                                        @Html.DropDownListFor(m => m.Tamanio,
+                                            Model.TamaniosList ?? new SelectList(new List<string> { "Pequeño", "Mediano", "Grande" }),
+                                            "-- Seleccione --",
+                                            new { @class = "form-select border-green", required = "required" })
+                                    </div>
+                                </div>
+
+                                <!-- Color -->
+                                <div class="col-md-4">
+                                    <label class="form-label text-brown fw-medium">
+                                        <i class="fas fa-palette text-green me-2"></i>Color
+                                    </label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-white border-green"><i class="fas fa-palette text-green"></i></span>
+                                        @Html.TextBoxFor(m => m.Color, new
+                                        {
+                                            @class = "form-control border-green",
+                                            placeholder = "Ej: Negro, Blanco..."
+                                        })
+                                    </div>
+                                </div>
+
+                                <!-- Esterilizado (radios) -->
+                                <div class="col-md-6">
+                                    <label class="form-label text-brown fw-medium d-block">
+                                        <i class="fas fa-check-circle text-green me-2"></i>¿Esterilizado?
+                                    </label>
+                                    <div class="form-check form-check-inline">
+                                        @Html.RadioButtonFor(m => m.Esterilizado, true, new { @class = "form-check-input", id = "esterilizadoSi" })
+                                        <label class="form-check-label text-brown" for="esterilizadoSi">Sí</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        @Html.RadioButtonFor(m => m.Esterilizado, false, new { @class = "form-check-input", id = "esterilizadoNo", @checked = "checked" })
+                                        <label class="form-check-label text-brown" for="esterilizadoNo">No</label>
+                                    </div>
+                                </div>
+
+                                <!-- Microchip -->
+                                <div class="col-md-6">
+                                    <label class="form-label text-brown fw-medium">
+                                        <i class="fas fa-microchip text-green me-2"></i>Microchip
+                                    </label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-white border-green"><i class="fas fa-microchip text-green"></i></span>
+                                        @Html.TextBoxFor(m => m.Microchip, new
+                                        {
+                                            @class = "form-control border-green",
+                                            placeholder = "Número de microchip"
+                                        })
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- CATEGORÍA Y ESTADO -->
-                <div class="card shadow-sm mb-4">
-                    <div class="card-header bg-info text-white">
-                        <h5 class="mb-0">
+                    <!-- Categoría y Estado -->
+                    <div class="form-card mb-4">
+                        <div class="form-card-header bg-yellow">
                             <i class="fas fa-flag me-2"></i>Categoría y Estado
-                        </h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="row">
-                            <!-- Categoría -->
-                            <div class="col-md-4 mb-3">
-                                <label class="form-label">
-                                    <i class="fas fa-star me-1 text-info"></i>
-                                    Categoría
-                                </label>
-                                @Html.DropDownListFor(m => m.Categoria,
-                                    Model.CategoriasList ?? new SelectList(new List<string> { "Normal", "Especial" }),
-                                    "-- Seleccione --",
-                                    new { @class = "form-select", id = "selectCategoria" })
-                            </div>
+                        </div>
+                        <div class="form-card-body">
+                            <div class="row g-3">
+                                <!-- Categoría -->
+                                <div class="col-md-4">
+                                    <label class="form-label text-brown fw-medium">
+                                        <i class="fas fa-star text-green me-2"></i>Categoría
+                                    </label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-white border-green"><i class="fas fa-star text-green"></i></span>
+                                        @Html.DropDownListFor(m => m.Categoria,
+                                            Model.CategoriasList ?? new SelectList(new List<string> { "Normal", "Especial" }),
+                                            "-- Seleccione --",
+                                            new { @class = "form-select border-green", id = "selectCategoria" })
+                                    </div>
+                                </div>
 
-                            <!-- Tipo Especial -->
-                            <div class="col-md-8 mb-3" id="divTipoEspecial" style="display: none;">
-                                <label class="form-label">
-                                    <i class="fas fa-info-circle me-1 text-warning"></i>
-                                    Tipo de Necesidad Especial
-                                </label>
-                                @Html.TextBoxFor(m => m.TipoEspecial, new
-                                {
-                                    @class = "form-control",
-                                    placeholder = "Ej: Discapacidad motora, ceguera...",
-                                    id = "TipoEspecial"
-                                })
-                                <small class="text-muted">Especifique el tipo de necesidad especial</small>
-                            </div>
+                                <!-- Tipo Especial (inicialmente oculto) -->
+                                <div class="col-md-8" id="divTipoEspecial" style="display: none;">
+                                    <label class="form-label text-brown fw-medium">
+                                        <i class="fas fa-info-circle text-yellow me-2"></i>Tipo de Necesidad Especial
+                                    </label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-white border-green"><i class="fas fa-info-circle text-yellow"></i></span>
+                                        @Html.TextBoxFor(m => m.TipoEspecial, new
+                                        {
+                                            @class = "form-control border-green",
+                                            placeholder = "Ej: Discapacidad motora, ceguera...",
+                                            id = "TipoEspecial"
+                                        })
+                                    </div>
+                                    <small class="text-secondary">Especifique el tipo de necesidad especial</small>
+                                </div>
 
-                            <!-- Estado -->
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">
-                                    <i class="fas fa-heartbeat me-1 text-info"></i>
-                                    Estado <span class="text-danger">*</span>
-                                </label>
-                                @Html.DropDownListFor(m => m.Estado,
-                                    Model.EstadosList ?? new SelectList(new List<string> { "Rescatada", "En revisión veterinaria", "Disponible para adopción" }),
-                                    new { @class = "form-select", required = "required" })
-                            </div>
+                                <!-- Estado -->
+                                <div class="col-md-6">
+                                    <label class="form-label text-brown fw-medium">
+                                        <i class="fas fa-heartbeat text-green me-2"></i>Estado <span class="text-danger">*</span>
+                                    </label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-white border-green"><i class="fas fa-heartbeat text-green"></i></span>
+                                        @Html.DropDownListFor(m => m.Estado,
+                                            Model.EstadosList ?? new SelectList(new List<string> { "Rescatada", "En revisión veterinaria", "Disponible para adopción" }),
+                                            new { @class = "form-select border-green", required = "required" })
+                                    </div>
+                                </div>
 
-                            <!-- Fecha Ingreso -->
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">
-                                    <i class="fas fa-calendar-alt me-1 text-info"></i>
-                                    Fecha de Ingreso <span class="text-danger">*</span>
-                                </label>
-                                @Html.TextBoxFor(m => m.FechaIngreso, "{0:yyyy-MM-dd}", new
-                                {
-                                    @class = "form-control",
-                                    type = "date",
-                                    required = "required",
-                                    max = DateTime.Now.ToString("yyyy-MM-dd")
-                                })
+                                <!-- Fecha Ingreso -->
+                                <div class="col-md-6">
+                                    <label class="form-label text-brown fw-medium">
+                                        <i class="fas fa-calendar-alt text-green me-2"></i>Fecha de Ingreso <span class="text-danger">*</span>
+                                    </label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-white border-green"><i class="fas fa-calendar-alt text-green"></i></span>
+                                        @Html.TextBoxFor(m => m.FechaIngreso, "{0:yyyy-MM-dd}", new
+                                        {
+                                            @class = "form-control border-green",
+                                            type = "date",
+                                            required = "required",
+                                            max = DateTime.Now.ToString("yyyy-MM-dd")
+                                        })
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- ASIGNACIONES -->
-                <div class="card shadow-sm mb-4">
-                    <div class="card-header bg-success text-white">
-                        <h5 class="mb-0">
+                    <!-- Asignaciones -->
+                    <div class="form-card mb-4">
+                        <div class="form-card-header bg-pink text-brown">
                             <i class="fas fa-users me-2"></i>Asignaciones
-                        </h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="row">
-                            <!-- Veterinario -->
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">
-                                    <i class="fas fa-user-md me-1 text-success"></i>
-                                    Veterinario Asignado
-                                </label>
-                                @Html.DropDownListFor(m => m.VeterinarioAsignado,
-                                    Model.VeterinariosList ?? new SelectList(new List<object>()),
-                                    "-- Sin asignar --",
-                                    new { @class = "form-select" })
-                            </div>
+                        </div>
+                        <div class="form-card-body">
+                            <div class="row g-3">
+                                <!-- Veterinario -->
+                                <div class="col-md-6">
+                                    <label class="form-label text-brown fw-medium">
+                                        <i class="fas fa-user-md text-green me-2"></i>Veterinario Asignado
+                                    </label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-white border-green"><i class="fas fa-user-md text-green"></i></span>
+                                        @Html.DropDownListFor(m => m.VeterinarioAsignado,
+                                            Model.VeterinariosList ?? new SelectList(new List<object>()),
+                                            "-- Sin asignar --",
+                                            new { @class = "form-select border-green" })
+                                    </div>
+                                </div>
 
-                            <!-- Rescatista -->
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">
-                                    <i class="fas fa-hands-helping me-1 text-success"></i>
-                                    Rescatista
-                                </label>
-                                @Html.DropDownListFor(m => m.RescatistaId,
-                                    Model.RescatistasList ?? new SelectList(new List<object>()),
-                                    "-- Sin asignar --",
-                                    new { @class = "form-select" })
+                                <!-- Rescatista -->
+                                <div class="col-md-6">
+                                    <label class="form-label text-brown fw-medium">
+                                        <i class="fas fa-hands-helping text-green me-2"></i>Rescatista
+                                    </label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-white border-green"><i class="fas fa-hands-helping text-green"></i></span>
+                                        @Html.DropDownListFor(m => m.RescatistaId,
+                                            Model.RescatistasList ?? new SelectList(new List<object>()),
+                                            "-- Sin asignar --",
+                                            new { @class = "form-select border-green" })
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- DESCRIPCIONES -->
-                <div class="card shadow-sm mb-4">
-                    <div class="card-header bg-warning text-dark">
-                        <h5 class="mb-0">
+                    <!-- Descripciones -->
+                    <div class="form-card mb-4">
+                        <div class="form-card-header bg-green text-white">
                             <i class="fas fa-align-left me-2"></i>Descripciones
-                        </h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="mb-3">
-                            <label class="form-label">
-                                <i class="fas fa-file-alt me-1 text-warning"></i>
-                                Descripción General
-                            </label>
-                            @Html.TextAreaFor(m => m.DescripcionGeneral, new
-                            {
-                                @class = "form-control",
-                                rows = "4",
-                                placeholder = "Describe las características físicas..."
-                            })
-                            <small class="text-muted">Visible en la página pública</small>
                         </div>
+                        <div class="form-card-body">
+                            <div class="mb-3">
+                                <label class="form-label text-brown fw-medium">
+                                    <i class="fas fa-file-alt text-green me-2"></i>Descripción General
+                                </label>
+                                @Html.TextAreaFor(m => m.DescripcionGeneral, new
+                                {
+                                    @class = "form-control border-green",
+                                    rows = "4",
+                                    placeholder = "Describe las características físicas..."
+                                })
+                                <small class="text-secondary">Visible en la página pública</small>
+                            </div>
 
-                        <div class="mb-3">
-                            <label class="form-label">
-                                <i class="fas fa-heart me-1 text-warning"></i>
-                                Características de Comportamiento
-                            </label>
-                            @Html.TextAreaFor(m => m.CaracteristicasComportamiento, new
-                            {
-                                @class = "form-control",
-                                rows = "4",
-                                placeholder = "Describe el comportamiento..."
-                            })
-                        </div>
+                            <div class="mb-3">
+                                <label class="form-label text-brown fw-medium">
+                                    <i class="fas fa-heart text-green me-2"></i>Características de Comportamiento
+                                </label>
+                                @Html.TextAreaFor(m => m.CaracteristicasComportamiento, new
+                                {
+                                    @class = "form-control border-green",
+                                    rows = "4",
+                                    placeholder = "Describe el comportamiento..."
+                                })
+                            </div>
 
-                        <div class="mb-3">
-                            <label class="form-label">
-                                <i class="fas fa-book me-1 text-warning"></i>
-                                Historia de Rescate
-                            </label>
-                            @Html.TextAreaFor(m => m.HistoriaRescate, new
-                            {
-                                @class = "form-control",
-                                rows = "4",
-                                placeholder = "Cuenta la historia..."
-                            })
+                            <div class="mb-3">
+                                <label class="form-label text-brown fw-medium">
+                                    <i class="fas fa-book text-green me-2"></i>Historia de Rescate
+                                </label>
+                                @Html.TextAreaFor(m => m.HistoriaRescate, new
+                                {
+                                    @class = "form-control border-green",
+                                    rows = "4",
+                                    placeholder = "Cuenta la historia..."
+                                })
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- COLUMNA DERECHA: IMAGEN -->
-            <div class="col-lg-4">
-                <div class="card shadow-sm mb-4">
-                    <div class="card-header bg-secondary text-white">
-                        <h5 class="mb-0">
+                <!-- COLUMNA DERECHA (4 columnas) -->
+                <div class="col-lg-4">
+                    <!-- Imagen Principal -->
+                    <div class="form-card mb-4">
+                        <div class="form-card-header bg-green text-white">
                             <i class="fas fa-image me-2"></i>Imagen Principal
-                        </h5>
-                    </div>
-                    <div class="card-body text-center">
-                        <div class="mb-3">
-                            <img id="imgPreview"
-                                 src="/Content/images/no-image.png"
-                                 class="img-fluid rounded shadow-sm"
-                                 style="max-height: 400px; width: 100%; object-fit: cover;"
-                                 alt="Vista previa">
                         </div>
+                        <div class="form-card-body text-center">
+                            <div class="image-preview-wrapper mb-3">
+                                <img id="imgPreview"
+                                     src="/Content/images/no-image.png"
+                                     class="img-fluid rounded-3 border-green shadow-sm"
+                                     alt="Vista previa">
+                            </div>
 
-                        <div class="mb-3">
-                            <label class="btn btn-primary w-100">
-                                <i class="fas fa-upload me-2"></i>Seleccionar Imagen
-                                <input type="file"
-                                       name="ImagenPrincipalFile"
-                                       id="imagenFile"
-                                       accept="image/jpeg,image/png,image/gif"
-                                       style="display: none;"
-                                       onchange="previewImage(this)">
-                            </label>
-                        </div>
+                            <div class="mb-3">
+                                <label class="btn btn-green w-100">
+                                    <i class="fas fa-upload me-2"></i>Seleccionar Imagen
+                                    <input type="file"
+                                           name="ImagenPrincipalFile"
+                                           id="imagenFile"
+                                           accept="image/jpeg,image/png,image/gif"
+                                           style="display: none;"
+                                           onchange="previewImage(this)">
+                                </label>
+                            </div>
 
-                        <div class="alert alert-info mb-0">
-                            <small>
-                                <i class="fas fa-info-circle me-1"></i>
+                            <div class="alert alert-beige border-green small text-start">
+                                <i class="fas fa-info-circle text-green me-1"></i>
                                 <strong>Formatos:</strong> JPG, PNG, GIF<br>
                                 <strong>Tamaño máximo:</strong> 5 MB
-                            </small>
+                            </div>
+
+                            <div id="imagenError" class="alert alert-pink border-pink mt-3" style="display: none;"></div>
                         </div>
-
-                        <div id="imagenError" class="alert alert-danger mt-3" style="display: none;"></div>
                     </div>
-                </div>
 
-                <!-- Botones -->
-                <div class="card shadow-sm">
-                    <div class="card-body">
-                        <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-success btn-lg" id="btnGuardar">
-                                <i class="fas fa-save me-2"></i>Guardar Mascota
-                            </button>
-                            <a href="@Url.Action("Gestionar", "Mascotas")" class="btn btn-secondary">
-                                <i class="fas fa-times me-2"></i>Cancelar
-                            </a>
+                    <!-- Botones de acción -->
+                    <div class="form-card">
+                        <div class="form-card-body">
+                            <div class="d-grid gap-3">
+                                <button type="submit" class="btn btn-green btn-lg" id="btnGuardar">
+                                    <i class="fas fa-save me-2"></i>Guardar Mascota
+                                </button>
+                                <a href="@Url.Action("Gestionar", "Mascotas")" class="btn btn-outline-green">
+                                    <i class="fas fa-times me-2"></i>Cancelar
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-    }
-</div>
+        }
+    </div>
+</section>
+
+@section Styles {
+    <style>
+        :root {
+            --green: #97C78B;
+            --yellow: #F2C66D;
+            --pink: #FBCDC0;
+            --brown: #2F2F2F;
+            --bg-light: #F2E9D8;
+            --beige: #F5E6D3;
+            --text-secondary: #555555;
+        }
+
+        body {
+            background-color: var(--beige);
+        }
+
+        /* Hero */
+        .registrar-hero {
+            background-color: var(--beige);
+            border-radius: 0 0 30px 30px;
+            margin-bottom: 1rem;
+        }
+
+        /* Tarjetas de formulario */
+        .form-card {
+            background: white;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 15px 35px rgba(151,199,139,0.15);
+            border: none;
+        }
+
+        .form-card-header {
+            padding: 1rem 1.5rem;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+            .form-card-header.bg-green {
+                background-color: var(--green);
+                color: white;
+            }
+
+            .form-card-header.bg-yellow {
+                background-color: var(--yellow);
+                color: var(--brown);
+            }
+
+            .form-card-header.bg-pink {
+                background-color: var(--pink);
+                color: var(--brown);
+            }
+
+        .form-card-body {
+            padding: 1.5rem;
+        }
+
+        /* Input groups */
+        .input-group-text {
+            border: 2px solid var(--green);
+            border-radius: 16px 0 0 16px;
+            background-color: white;
+        }
+
+        .form-control, .form-select {
+            border: 2px solid var(--green);
+            border-left: none;
+            border-radius: 0 16px 16px 0;
+            padding: 0.6rem 1rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+            .form-control:focus, .form-select:focus {
+                border-color: var(--green);
+                box-shadow: 0 0 0 0.2rem rgba(151,199,139,0.25);
+                outline: none;
+            }
+
+        .input-group:focus-within .input-group-text {
+            border-color: var(--green);
+            box-shadow: 0 0 0 0.2rem rgba(151,199,139,0.25);
+        }
+
+        /* Checkboxes y radios */
+        .form-check-input {
+            width: 1.2rem;
+            height: 1.2rem;
+            border: 2px solid var(--green);
+            transition: background-color 0.2s;
+        }
+
+            .form-check-input:checked {
+                background-color: var(--green);
+                border-color: var(--green);
+            }
+
+            .form-check-input:focus {
+                border-color: var(--green);
+                box-shadow: 0 0 0 0.2rem rgba(151,199,139,0.25);
+            }
+
+        /* Botones */
+        .btn-green {
+            background-color: var(--green);
+            border: none;
+            border-radius: 50px;
+            padding: 0.6rem 2rem;
+            font-weight: 500;
+            transition: all 0.3s;
+            color: white;
+        }
+
+            .btn-green:hover {
+                background-color: #86b57a;
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(151,199,139,0.4);
+            }
+
+        .btn-outline-green {
+            border: 2px solid var(--green);
+            background: transparent;
+            color: var(--green);
+            border-radius: 50px;
+            padding: 0.6rem 2rem;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+            .btn-outline-green:hover {
+                background-color: var(--green);
+                color: white;
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(151,199,139,0.3);
+            }
+
+        /* Alertas */
+        .alert-beige {
+            background-color: var(--bg-light);
+            border: 1px solid var(--green);
+            color: var(--brown);
+            border-radius: 16px;
+        }
+
+        .alert-pink {
+            background-color: var(--pink);
+            border: 1px solid var(--green);
+            color: var(--brown);
+            border-radius: 16px;
+        }
+
+        .border-pink {
+            border-color: var(--pink) !important;
+        }
+
+        /* Vista previa de imagen */
+        .image-preview-wrapper {
+            border: 3px dashed var(--green);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: border-color 0.3s;
+        }
+
+            .image-preview-wrapper:hover {
+                border-color: #86b57a;
+            }
+
+        #imgPreview {
+            width: 100%;
+            max-height: 300px;
+            object-fit: cover;
+        }
+
+        /* Responsive */
+        @@media (max-width: 768px) {
+            .form-card-body {
+                padding: 1rem;
+            }
+        }
+    </style>
+}
 
 @section Scripts {
     <script src="~/Scripts/jquery.validate.min.js"></script>
@@ -379,7 +580,7 @@
 
     <script>
         $(document).ready(function () {
-            // Toggle TipoEspecial
+            // Mostrar/ocultar campo de necesidad especial
             $('#selectCategoria').change(function () {
                 if ($(this).val() === 'Especial') {
                     $('#divTipoEspecial').slideDown();
@@ -400,7 +601,12 @@
 
                     if (fileSize > 5) {
                         e.preventDefault();
-                        alert('La imagen no debe superar los 5 MB');
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Archivo demasiado grande',
+                            text: 'La imagen no debe superar los 5 MB',
+                            confirmButtonColor: '#FBCDC0'
+                        });
                         return false;
                     }
                 }
@@ -431,28 +637,3 @@
         }
     </script>
 }
-
-<style>
-    .form-label {
-        font-weight: 500;
-    }
-
-    .card {
-        border: none;
-        border-radius: 10px;
-    }
-
-    .card-header {
-        border-radius: 10px 10px 0 0 !important;
-        padding: 1rem 1.5rem;
-    }
-
-    #imgPreview {
-        border: 3px dashed #dee2e6;
-        transition: all 0.3s;
-    }
-
-        #imgPreview:hover {
-            border-color: #0d6efd;
-        }
-</style>

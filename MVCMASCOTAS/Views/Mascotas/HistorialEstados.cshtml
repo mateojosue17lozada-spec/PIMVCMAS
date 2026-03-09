@@ -3,6 +3,47 @@
 @{
     ViewBag.Title = "Historial de Estados";
     var mascota = ViewBag.Mascota as MVCMASCOTAS.Models.Mascotas;
+
+    // Calcular variables de estadisticas una sola vez
+    var modelList = Model.ToList();
+    var primero = modelList.OrderBy(h => h.FechaCambio).FirstOrDefault();
+    var ultimo = modelList.OrderByDescending(h => h.FechaCambio).FirstOrDefault();
+    var primerCambio = primero != null ? primero.FechaCambio : (DateTime?)null;
+    var meses = primerCambio.HasValue ? Math.Max(1, (DateTime.Now - primerCambio.Value).TotalDays / 30) : 1;
+    var promedio = Math.Round(modelList.Count / meses, 1);
+
+    var primerFecha = primero != null && primero.FechaCambio.HasValue
+                            ? primero.FechaCambio.Value.ToString("dd/MM/yyyy") : "N/A";
+    var ultimaFecha = ultimo != null && ultimo.FechaCambio.HasValue
+                            ? ultimo.FechaCambio.Value.ToString("dd/MM/yyyy") : "N/A";
+}
+
+@functions {
+    string GetEstadoBadgeClass(string estado)
+    {
+        switch (estado)
+        {
+            case "Disponible para adopcion":
+            case "Disponible para adopción":
+                return "bg-success";
+            case "Adoptada":
+                return "bg-info";
+            case "En tratamiento":
+            case "En revision veterinaria":
+            case "En revisión veterinaria":
+            case "Pendiente de examenes":
+            case "Pendiente de exámenes":
+                return "bg-warning";
+            case "Rescatada":
+                return "bg-danger";
+            case "Fallecida":
+                return "bg-dark";
+            case "Archivada":
+                return "bg-secondary";
+            default:
+                return "bg-primary";
+        }
+    }
 }
 
 <div class="container-fluid">
@@ -21,7 +62,7 @@
         </div>
     </div>
 
-    <!-- Información de la mascota -->
+    <!-- Informacion de la mascota -->
     <div class="row mb-4">
         <div class="col-md-8">
             <div class="card shadow-sm">
@@ -79,63 +120,51 @@
         <div class="col-md-4">
             <div class="card shadow-sm border-info">
                 <div class="card-header bg-info text-white">
-                    <h6 class="mb-0"><i class="fas fa-chart-line"></i> Estadísticas</h6>
+                    <h6 class="mb-0"><i class="fas fa-chart-line"></i> Estadisticas</h6>
                 </div>
                 <div class="card-body">
                     <p class="mb-2">
                         <strong>Total cambios:</strong>
-                        <span class="float-end text-primary">@Model.Count()</span>
+                        <span class="float-end text-primary">@modelList.Count</span>
                     </p>
                     <p class="mb-2">
                         <strong>Primer cambio:</strong>
-                        <span class="float-end">
-                            @(Model.OrderBy(h => h.FechaCambio).FirstOrDefault()?.FechaCambio?.ToString("dd/MM/yyyy") ?? "N/A")
-                        </span>
+                        <span class="float-end">@primerFecha</span>
                     </p>
                     <p class="mb-2">
-                        <strong>Último cambio:</strong>
-                        <span class="float-end">
-                            @(Model.OrderByDescending(h => h.FechaCambio).FirstOrDefault()?.FechaCambio?.ToString("dd/MM/yyyy") ?? "N/A")
-                        </span>
+                        <strong>Ultimo cambio:</strong>
+                        <span class="float-end">@ultimaFecha</span>
                     </p>
                     <p class="mb-0">
                         <strong>Promedio por mes:</strong>
-                        <span class="float-end">
-                            @{
-                                var primerCambio = Model.OrderBy(h => h.FechaCambio).FirstOrDefault()?.FechaCambio;
-                                var meses = primerCambio.HasValue ?
-                                    Math.Max(1, (DateTime.Now - primerCambio.Value).TotalDays / 30) : 1;
-                                var promedio = Math.Round(Model.Count() / meses, 1);
-                            }
-                            @promedio
-                        </span>
+                        <span class="float-end">@promedio</span>
                     </p>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Gráfico de línea (simulado) -->
+    <!-- Timeline -->
     <div class="card shadow-sm mb-4">
         <div class="card-header bg-light">
-            <h5 class="mb-0"><i class="fas fa-chart-line"></i> Evolución de Estados</h5>
+            <h5 class="mb-0"><i class="fas fa-chart-line"></i> Evolucion de Estados</h5>
         </div>
         <div class="card-body">
             <div class="timeline">
                 @{
-                    var historialOrdenado = Model.OrderBy(h => h.FechaCambio).ToList();
+                    var historialOrdenado = modelList.OrderBy(h => h.FechaCambio).ToList();
                     for (int i = 0; i < historialOrdenado.Count; i++)
                     {
                         var item = historialOrdenado[i];
+                        var fechaTimeline = item.FechaCambio.HasValue
+                            ? item.FechaCambio.Value.ToString("dd/MM/yyyy HH:mm") : "";
                         <div class="timeline-item @(i % 2 == 0 ? "left" : "right")">
                             <div class="timeline-content">
                                 <div class="timeline-header">
                                     <span class="badge @GetEstadoBadgeClass(item.EstadoNuevo)">
                                         @item.EstadoNuevo
                                     </span>
-                                    <span class="timeline-date">
-                                        @item.FechaCambio?.ToString("dd/MM/yyyy HH:mm")
-                                    </span>
+                                    <span class="timeline-date">@fechaTimeline</span>
                                 </div>
                                 <div class="timeline-body">
                                     <p class="mb-1">
@@ -163,7 +192,7 @@
                                 <div class="timeline-footer">
                                     <small class="text-muted">
                                         <i class="fas fa-user"></i>
-                                        @(item.Usuarios?.NombreCompleto ?? "Usuario desconocido")
+                                        @(item.Usuarios != null ? item.Usuarios.NombreCompleto : "Usuario desconocido")
                                     </small>
                                 </div>
                             </div>
@@ -171,6 +200,7 @@
                     }
                 }
             </div>
+            <div style="clear:both;"></div>
         </div>
     </div>
 
@@ -178,13 +208,13 @@
     <div class="card shadow-sm">
         <div class="card-header bg-light d-flex justify-content-between align-items-center">
             <h5 class="mb-0"><i class="fas fa-table"></i> Detalle de Cambios</h5>
-            <span class="badge bg-primary">@Model.Count() registros</span>
+            <span class="badge bg-primary">@modelList.Count registros</span>
         </div>
         <div class="card-body">
-            @if (Model.Any())
+            @if (modelList.Any())
             {
                 <div class="table-responsive">
-                    <table class="table table-hover">
+                    <table class="table table-hover" id="tablaHistorial">
                         <thead class="table-primary">
                             <tr>
                                 <th>#</th>
@@ -197,11 +227,13 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach (var item in Model.OrderByDescending(h => h.FechaCambio))
+                            @foreach (var item in modelList.OrderByDescending(h => h.FechaCambio))
                             {
+                                var fechaTabla = item.FechaCambio.HasValue
+                                    ? item.FechaCambio.Value.ToString("dd/MM/yyyy HH:mm") : "";
                                 <tr>
                                     <td><strong>@item.HistorialId</strong></td>
-                                    <td>@item.FechaCambio?.ToString("dd/MM/yyyy HH:mm")</td>
+                                    <td>@fechaTabla</td>
                                     <td>
                                         @if (!string.IsNullOrEmpty(item.EstadoAnterior))
                                         {
@@ -221,7 +253,7 @@
                                     </td>
                                     <td>@item.Motivo</td>
                                     <td>
-                                        <small>@(item.Usuarios?.NombreCompleto ?? "N/A")</small>
+                                        <small>@(item.Usuarios != null ? item.Usuarios.NombreCompleto : "N/A")</small>
                                     </td>
                                     <td>
                                         @if (!string.IsNullOrEmpty(item.Observaciones))
@@ -254,36 +286,10 @@
     </div>
 </div>
 
-@functions {
-    string GetEstadoBadgeClass(string estado)
-    {
-        switch (estado)
-        {
-            case "Disponible para adopción":
-                return "bg-success";
-            case "Adoptada":
-                return "bg-info";
-            case "En tratamiento":
-            case "En revisión veterinaria":
-            case "Pendiente de exámenes":
-                return "bg-warning";
-            case "Rescatada":
-                return "bg-danger";
-            case "Fallecida":
-                return "bg-dark";
-            case "Archivada":
-                return "bg-secondary";
-            default:
-                return "bg-primary";
-        }
-    }
-}
-
 @section Scripts {
     <script>
         $(document).ready(function () {
-            // Inicializar DataTables
-            $('.table').DataTable({
+            $('#tablaHistorial').DataTable({
                 order: [[1, 'desc']],
                 language: {
                     url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json'
@@ -291,7 +297,6 @@
                 pageLength: 10
             });
 
-            // Tooltips para observaciones truncadas
             $('[title]').tooltip();
         });
     </script>
@@ -372,7 +377,6 @@
             font-size: 0.8rem;
         }
 
-        /* Responsive */
         @@media (max-width: 768px) {
             .timeline::before {
                 left: 30px;

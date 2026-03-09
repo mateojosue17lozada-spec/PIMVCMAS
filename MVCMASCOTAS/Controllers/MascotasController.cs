@@ -741,19 +741,24 @@ namespace MVCMASCOTAS.Controllers
         }
 
         [AuthorizeRoles("Administrador", "Veterinario", "Rescatista")]
-        public ActionResult HistorialEstados(int id)
+        public ActionResult HistorialEstados(int? id)
         {
+            if (!id.HasValue)
+            {
+                TempData["ErrorMessage"] = "ID de mascota no especificado";
+                return RedirectToAction("Gestionar");
+            }
+
             try
             {
-                var mascota = mascotaService.ObtenerMascotaPorId(id);
+                var mascota = mascotaService.ObtenerMascotaPorId(id.Value);
                 if (mascota == null)
                 {
                     TempData["ErrorMessage"] = "Mascota no encontrada";
                     return RedirectToAction("Gestionar");
                 }
 
-                var historial = mascotaService.ObtenerHistorialEstados(id);
-
+                var historial = mascotaService.ObtenerHistorialEstados(id.Value);
                 ViewBag.Mascota = mascota;
                 ViewBag.SexoTexto = mascota.Sexo == "M" ? "Macho" : "Hembra";
                 ViewBag.ImagenBase64 = mascota.ImagenPrincipal != null ?
@@ -764,7 +769,7 @@ namespace MVCMASCOTAS.Controllers
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"Error en HistorialEstados: {ex.Message}");
-                AuditoriaHelper.RegistrarError("Mascotas", $"Error en HistorialEstados ID:{id}", ex, UserHelper.GetCurrentUserId());
+                AuditoriaHelper.RegistrarError("Mascotas", $"Error en HistorialEstados ID:{id.Value}", ex, UserHelper.GetCurrentUserId());
                 TempData["ErrorMessage"] = "Error al cargar historial";
                 return RedirectToAction("Gestionar");
             }
@@ -869,7 +874,12 @@ namespace MVCMASCOTAS.Controllers
 
         #endregion
 
-        #region SEGUIMIENTO DE ADOPCIONES - SIN MODIFICAR
+        // =====================================================================
+        // REEMPLAZA la sección #region SEGUIMIENTO DE ADOPCIONES completa
+        // en MascotasController.cs
+        // =====================================================================
+
+        #region SEGUIMIENTO DE ADOPCIONES
 
         [AuthorizeRoles("Administrador", "Veterinario")]
         public ActionResult SeguimientoAdopciones()
@@ -877,7 +887,6 @@ namespace MVCMASCOTAS.Controllers
             try
             {
                 var mascotasConSeguimiento = mascotaService.ObtenerMascotasNecesitanSeguimiento();
-
                 return View(mascotasConSeguimiento);
             }
             catch (Exception ex)
@@ -925,25 +934,51 @@ namespace MVCMASCOTAS.Controllers
             }
         }
 
+        // ✅ GET: Acepta tanto ?mascotaId=5 como /CrearSeguimientoManual/5
         [AuthorizeRoles("Administrador", "Veterinario")]
-        public ActionResult CrearSeguimientoManual(int mascotaId)
+        public ActionResult CrearSeguimientoManual(int? mascotaId, int? id)
         {
+            // Resolver el ID desde cualquiera de los dos parámetros
+            int resolvedId = mascotaId ?? id ?? 0;
+
+            System.Diagnostics.Debug.WriteLine($"[SEGUIMIENTO] GET CrearSeguimientoManual - mascotaId={mascotaId}, id={id}, resolved={resolvedId}");
+
+            if (resolvedId == 0)
+            {
+                TempData["ErrorMessage"] = "ID de mascota no especificado.";
+                return RedirectToAction("SeguimientoAdopciones");
+            }
+
             try
             {
-                var mascota = db.Mascotas.Find(mascotaId);
+                var mascota = db.Mascotas.Find(resolvedId);
                 if (mascota == null)
                 {
-                    TempData["ErrorMessage"] = "Mascota no encontrada";
+                    TempData["ErrorMessage"] = $"Mascota con ID {resolvedId} no encontrada.";
                     return RedirectToAction("SeguimientoAdopciones");
                 }
 
+                System.Diagnostics.Debug.WriteLine($"[SEGUIMIENTO] Mascota encontrada: {mascota.Nombre}");
+
+                // Buscar contrato existente
                 var contrato = db.ContratoAdopcion
-                    .FirstOrDefault(c => c.SolicitudAdopcion.MascotaId == mascotaId);
+                    .FirstOrDefault(c => c.SolicitudAdopcion.MascotaId == resolvedId);
+
+                System.Diagnostics.Debug.WriteLine($"[SEGUIMIENTO] Contrato existente: {contrato?.ContratoId.ToString() ?? "null"}");
 
                 if (contrato == null)
                 {
-                    TempData["ErrorMessage"] = "No hay contrato de adopción para esta mascota";
-                    return RedirectToAction("SeguimientoAdopciones");
+                    System.Diagnostics.Debug.WriteLine("[SEGUIMIENTO] Creando contrato ficticio...");
+                    contrato = CrearContratoFicticio(mascota);
+
+                    if (contrato == null)
+                    {
+                        // Si falla CrearContratoFicticio, mostrar el error en SeguimientoMascota
+                        TempData["ErrorMessage"] = "No se pudo crear el contrato automático. Verifique que la mascota tenga estado 'Adoptada' y que existan usuarios en el sistema.";
+                        return RedirectToAction("SeguimientoMascota", new { id = resolvedId });
+                    }
+
+                    System.Diagnostics.Debug.WriteLine($"[SEGUIMIENTO] Contrato ficticio creado: {contrato.ContratoId}");
                 }
 
                 var model = new SeguimientoAdopcion
@@ -955,43 +990,57 @@ namespace MVCMASCOTAS.Controllers
                     EstadoMascota = "Bueno",
                     CondicionesVivienda = "Buenas",
                     RelacionConAdoptante = "Buena",
-                    RequiereIntervencion = false
+                    RequiereIntervencion = false,
+                    ProximoSeguimiento = DateTime.Now.AddDays(30)
                 };
 
                 ViewBag.Mascota = mascota;
                 ViewBag.Contrato = contrato;
-                ViewBag.TiposSeguimiento = new[]
-                {
-                    "Inicial", "Primer Mes", "Tercer Mes", "Sexto Mes", "Anual",
-                    "Manual", "Extraordinario", "Queja", "Seguimiento Especial"
-                };
-                ViewBag.EstadosMascota = new[]
-                {
-                    "Excelente", "Bueno", "Regular", "Malo", "Enfermo",
-                    "Recuperándose", "Por evaluar"
-                };
-                ViewBag.CondicionesVivienda = new[]
-                {
-                    "Excelentes", "Buenas", "Regulares", "Inadecuadas",
-                    "Temporales", "Por evaluar"
-                };
-                ViewBag.Relaciones = new[]
-                {
-                    "Excelente", "Buena", "Regular", "Mala", "Conflictiva",
-                    "Por evaluar"
-                };
+                CargarListasViewBagSeguimiento();
 
+                System.Diagnostics.Debug.WriteLine($"[SEGUIMIENTO] Retornando View con ContratoId={contrato.ContratoId}");
                 return View(model);
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Error en CrearSeguimientoManual GET: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"[SEGUIMIENTO] ERROR CRITICO: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"[SEGUIMIENTO] Inner: {ex.InnerException?.Message}");
+                System.Diagnostics.Debug.WriteLine($"[SEGUIMIENTO] Inner2: {ex.InnerException?.InnerException?.Message}");
+
                 AuditoriaHelper.RegistrarError("Mascotas", "Error en CrearSeguimientoManual GET", ex, UserHelper.GetCurrentUserId());
-                TempData["ErrorMessage"] = "Error al cargar formulario";
+
+                // Mostrar error detallado en pantalla para diagnosticar
+                TempData["ErrorMessage"] = $"Error: {ex.Message} | {ex.InnerException?.Message} | {ex.InnerException?.InnerException?.Message}";
                 return RedirectToAction("SeguimientoAdopciones");
             }
         }
 
+        // Método auxiliar para cargar listas del formulario de seguimiento
+        private void CargarListasViewBagSeguimiento()
+        {
+            ViewBag.TiposSeguimiento = new[]
+            {
+        "Inicial", "Primer Mes", "Tercer Mes", "Sexto Mes", "Anual",
+        "Manual", "Extraordinario", "Queja", "Seguimiento Especial"
+    };
+            ViewBag.EstadosMascota = new[]
+            {
+        "Excelente", "Bueno", "Regular", "Malo", "Enfermo",
+        "Recuperándose", "Por evaluar"
+    };
+            ViewBag.CondicionesVivienda = new[]
+            {
+        "Excelentes", "Buenas", "Regulares", "Inadecuadas",
+        "Temporales", "Por evaluar"
+    };
+            ViewBag.Relaciones = new[]
+            {
+        "Excelente", "Buena", "Regular", "Mala", "Conflictiva",
+        "Por evaluar"
+    };
+        }
+
+        // ✅ POST
         [HttpPost]
         [ValidateAntiForgeryToken]
         [AuthorizeRoles("Administrador", "Veterinario")]
@@ -1004,9 +1053,13 @@ namespace MVCMASCOTAS.Controllers
                     var contrato = db.ContratoAdopcion.Find(model.ContratoId);
                     if (contrato == null)
                     {
-                        ModelState.AddModelError("", "Contrato no encontrado");
+                        ModelState.AddModelError("", "Contrato no encontrado. Intente nuevamente.");
+                        CargarListasViewBagSeguimiento();
                         return View(model);
                     }
+
+                    if (model.ResponsableSeguimiento == 0)
+                        model.ResponsableSeguimiento = UserHelper.GetCurrentUserId() ?? 1;
 
                     db.SeguimientoAdopcion.Add(model);
                     db.SaveChanges();
@@ -1015,97 +1068,82 @@ namespace MVCMASCOTAS.Controllers
                         $"Seguimiento manual creado para contrato ID: {model.ContratoId}",
                         UserHelper.GetCurrentUserId() ?? 1);
 
-                    TempData["SuccessMessage"] = "Seguimiento creado exitosamente";
+                    TempData["SuccessMessage"] = "Seguimiento registrado exitosamente";
 
-                    var mascotaId = contrato.SolicitudAdopcion.MascotaId;
+                    // Obtener mascotaId para redirigir correctamente
+                    var mascotaId = contrato.SolicitudAdopcion?.MascotaId
+                        ?? db.SolicitudAdopcion
+                            .Where(s => s.SolicitudId == contrato.SolicitudId)
+                            .Select(s => s.MascotaId)
+                            .FirstOrDefault();
+
                     return RedirectToAction("SeguimientoMascota", new { id = mascotaId });
                 }
 
+                // ModelState inválido — recargar vista
                 var contratoReload = db.ContratoAdopcion.Find(model.ContratoId);
                 if (contratoReload != null)
                 {
-                    var mascota = db.Mascotas.Find(contratoReload.SolicitudAdopcion.MascotaId);
-                    ViewBag.Mascota = mascota;
+                    var mascotaReload = db.Mascotas.Find(contratoReload.SolicitudAdopcion?.MascotaId ?? 0);
+                    ViewBag.Mascota = mascotaReload;
                     ViewBag.Contrato = contratoReload;
                 }
-
-                ViewBag.TiposSeguimiento = new[]
-                {
-                    "Inicial", "Primer Mes", "Tercer Mes", "Sexto Mes", "Anual",
-                    "Manual", "Extraordinario", "Queja", "Seguimiento Especial"
-                };
-                ViewBag.EstadosMascota = new[]
-                {
-                    "Excelente", "Bueno", "Regular", "Malo", "Enfermo",
-                    "Recuperándose", "Por evaluar"
-                };
-                ViewBag.CondicionesVivienda = new[]
-                {
-                    "Excelentes", "Buenas", "Regulares", "Inadecuadas",
-                    "Temporales", "Por evaluar"
-                };
-                ViewBag.Relaciones = new[]
-                {
-                    "Excelente", "Buena", "Regular", "Mala", "Conflictiva",
-                    "Por evaluar"
-                };
-
+                CargarListasViewBagSeguimiento();
                 return View(model);
             }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"Error en CrearSeguimientoManual POST: {ex.Message}");
                 AuditoriaHelper.RegistrarError("Mascotas", "Error en CrearSeguimientoManual POST", ex, UserHelper.GetCurrentUserId());
-                TempData["ErrorMessage"] = "Error al crear seguimiento";
+                TempData["ErrorMessage"] = "Error al crear seguimiento: " + ex.Message;
                 return View(model);
             }
         }
+
+        // =====================================================================
+        // REEMPLAZA los métodos EditarSeguimiento GET y POST en MascotasController.cs
+        // =====================================================================
 
         [AuthorizeRoles("Administrador", "Veterinario")]
         public ActionResult EditarSeguimiento(int id)
         {
             try
             {
-                var seguimiento = db.SeguimientoAdopcion.Find(id);
+                // ✅ Incluir ContratoAdopcion y SolicitudAdopcion explícitamente
+                var seguimiento = db.SeguimientoAdopcion
+                    .Include(s => s.ContratoAdopcion)
+                    .Include(s => s.ContratoAdopcion.SolicitudAdopcion)
+                    .Include(s => s.ContratoAdopcion.SolicitudAdopcion.Mascotas)
+                    .FirstOrDefault(s => s.SeguimientoId == id);
+
                 if (seguimiento == null)
                 {
                     TempData["ErrorMessage"] = "Seguimiento no encontrado";
                     return RedirectToAction("SeguimientoAdopciones");
                 }
 
-                var contrato = db.ContratoAdopcion.Find(seguimiento.ContratoId);
-                var mascota = contrato?.SolicitudAdopcion?.Mascotas;
+                // ✅ Obtener mascota desde la cadena de navegación
+                var mascota = seguimiento.ContratoAdopcion?.SolicitudAdopcion?.Mascotas;
+
+                // ✅ Si la navegación falló (EF lazy loading issue), buscar directamente
+                if (mascota == null && seguimiento.ContratoAdopcion?.SolicitudAdopcion?.MascotaId != null)
+                {
+                    mascota = db.Mascotas.Find(seguimiento.ContratoAdopcion.SolicitudAdopcion.MascotaId);
+                }
+
+                System.Diagnostics.Debug.WriteLine($"[EDITAR-SEG] SeguimientoId={id}, ContratoId={seguimiento.ContratoId}, Mascota={mascota?.Nombre ?? "null"}");
 
                 ViewBag.Mascota = mascota;
-                ViewBag.Contrato = contrato;
-                ViewBag.TiposSeguimiento = new[]
-                {
-                    "Inicial", "Primer Mes", "Tercer Mes", "Sexto Mes", "Anual",
-                    "Manual", "Extraordinario", "Queja", "Seguimiento Especial"
-                };
-                ViewBag.EstadosMascota = new[]
-                {
-                    "Excelente", "Bueno", "Regular", "Malo", "Enfermo",
-                    "Recuperándose", "Por evaluar"
-                };
-                ViewBag.CondicionesVivienda = new[]
-                {
-                    "Excelentes", "Buenas", "Regulares", "Inadecuadas",
-                    "Temporales", "Por evaluar"
-                };
-                ViewBag.Relaciones = new[]
-                {
-                    "Excelente", "Buena", "Regular", "Mala", "Conflictiva",
-                    "Por evaluar"
-                };
+                ViewBag.Contrato = seguimiento.ContratoAdopcion;
+                CargarListasViewBagSeguimiento();
 
                 return View(seguimiento);
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Error en EditarSeguimiento GET: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"[EDITAR-SEG] ERROR GET: {ex.Message} | {ex.InnerException?.Message}");
                 AuditoriaHelper.RegistrarError("Mascotas", $"Error en EditarSeguimiento GET ID:{id}", ex, UserHelper.GetCurrentUserId());
-                TempData["ErrorMessage"] = "Error al cargar seguimiento";
+                TempData["ErrorMessage"] = "Error al cargar el seguimiento: " + ex.Message;
                 return RedirectToAction("SeguimientoAdopciones");
             }
         }
@@ -1115,60 +1153,110 @@ namespace MVCMASCOTAS.Controllers
         [AuthorizeRoles("Administrador", "Veterinario")]
         public ActionResult EditarSeguimiento(SeguimientoAdopcion model)
         {
+            System.Diagnostics.Debug.WriteLine($"[EDITAR-SEG] POST - SeguimientoId={model.SeguimientoId}, ContratoId={model.ContratoId}");
+
             try
             {
+                // Quitar validación de campos que no se editan desde este form
+                ModelState.Remove("TipoSeguimiento");
+                ModelState.Remove("EstadoMascota");
+                ModelState.Remove("CondicionesVivienda");
+                ModelState.Remove("RelacionConAdoptante");
+
                 if (ModelState.IsValid)
                 {
-                    db.Entry(model).State = EntityState.Modified;
+                    // ✅ Buscar el seguimiento existente en BD y actualizar solo los campos editables
+                    var seguimientoExistente = db.SeguimientoAdopcion.Find(model.SeguimientoId);
+                    if (seguimientoExistente == null)
+                    {
+                        TempData["ErrorMessage"] = "Seguimiento no encontrado.";
+                        return RedirectToAction("SeguimientoAdopciones");
+                    }
+
+                    // Actualizar solo los campos que el formulario envía
+                    seguimientoExistente.FechaSeguimiento = model.FechaSeguimiento;
+                    seguimientoExistente.TipoSeguimiento = model.TipoSeguimiento;
+                    seguimientoExistente.EstadoMascota = model.EstadoMascota;
+                    seguimientoExistente.CondicionesVivienda = model.CondicionesVivienda;
+                    seguimientoExistente.RelacionConAdoptante = model.RelacionConAdoptante;
+                    seguimientoExistente.FotosEvidencia = model.FotosEvidencia;
+                    seguimientoExistente.Observaciones = model.Observaciones;
+                    seguimientoExistente.Recomendaciones = model.Recomendaciones;
+                    seguimientoExistente.RequiereIntervencion = model.RequiereIntervencion;
+                    seguimientoExistente.ProximoSeguimiento = model.ProximoSeguimiento;
+
+                    // Mantener el responsable original si no se envió
+                    if (model.ResponsableSeguimiento == 0)
+                        seguimientoExistente.ResponsableSeguimiento = UserHelper.GetCurrentUserId() ?? seguimientoExistente.ResponsableSeguimiento;
+                    else
+                        seguimientoExistente.ResponsableSeguimiento = model.ResponsableSeguimiento;
+
                     db.SaveChanges();
 
-                    AuditoriaHelper.RegistrarAccion("Mascotas", "EditarSeguimiento",
-                        $"Seguimiento editado ID: {model.SeguimientoId}",
-                        UserHelper.GetCurrentUserId() ?? 1);
+                    AuditoriaHelper.RegistrarAccion(
+                        accion: "Mascotas",
+                        controlador: "EditarSeguimiento",
+                        detalles: $"Seguimiento editado ID: {model.SeguimientoId}",
+                        usuarioId: UserHelper.GetCurrentUserId() ?? 1
+                    );
 
                     TempData["SuccessMessage"] = "Seguimiento actualizado exitosamente";
 
-                    var contrato = db.ContratoAdopcion.Find(model.ContratoId);
-                    var mascotaId = contrato?.SolicitudAdopcion?.MascotaId;
+                    // ✅ Redirigir correctamente obteniendo MascotaId desde BD
+                    var contrato = db.ContratoAdopcion
+                        .Include(c => c.SolicitudAdopcion)
+                        .FirstOrDefault(c => c.ContratoId == seguimientoExistente.ContratoId);
+
+                    int? mascotaId = contrato?.SolicitudAdopcion?.MascotaId;
+
                     if (mascotaId.HasValue)
-                    {
                         return RedirectToAction("SeguimientoMascota", new { id = mascotaId.Value });
-                    }
+
+                    return RedirectToAction("SeguimientoAdopciones");
                 }
 
-                var contratoReload = db.ContratoAdopcion.Find(model.ContratoId);
-                var mascota = contratoReload?.SolicitudAdopcion?.Mascotas;
+                // ModelState inválido — registrar errores para debug
+                foreach (var key in ModelState.Keys)
+                {
+                    var errors = ModelState[key].Errors;
+                    foreach (var error in errors)
+                        System.Diagnostics.Debug.WriteLine($"[EDITAR-SEG] ModelState error - {key}: {error.ErrorMessage}");
+                }
 
-                ViewBag.Mascota = mascota;
+                // Recargar ViewBag para mostrar el formulario con errores
+                var contratoReload = db.ContratoAdopcion
+                    .Include(c => c.SolicitudAdopcion)
+                    .Include(c => c.SolicitudAdopcion.Mascotas)
+                    .FirstOrDefault(c => c.ContratoId == model.ContratoId);
+
+                ViewBag.Mascota = contratoReload?.SolicitudAdopcion?.Mascotas
+                                  ?? (contratoReload?.SolicitudAdopcion?.MascotaId != null
+                                      ? db.Mascotas.Find(contratoReload.SolicitudAdopcion.MascotaId)
+                                      : null);
                 ViewBag.Contrato = contratoReload;
-                ViewBag.TiposSeguimiento = new[]
-                {
-                    "Inicial", "Primer Mes", "Tercer Mes", "Sexto Mes", "Anual",
-                    "Manual", "Extraordinario", "Queja", "Seguimiento Especial"
-                };
-                ViewBag.EstadosMascota = new[]
-                {
-                    "Excelente", "Bueno", "Regular", "Malo", "Enfermo",
-                    "Recuperándose", "Por evaluar"
-                };
-                ViewBag.CondicionesVivienda = new[]
-                {
-                    "Excelentes", "Buenas", "Regulares", "Inadecuadas",
-                    "Temporales", "Por evaluar"
-                };
-                ViewBag.Relaciones = new[]
-                {
-                    "Excelente", "Buena", "Regular", "Mala", "Conflictiva",
-                    "Por evaluar"
-                };
+                CargarListasViewBagSeguimiento();
 
                 return View(model);
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Error en EditarSeguimiento POST: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"[EDITAR-SEG] ERROR POST: {ex.Message} | {ex.InnerException?.Message}");
                 AuditoriaHelper.RegistrarError("Mascotas", $"Error en EditarSeguimiento POST ID:{model.SeguimientoId}", ex, UserHelper.GetCurrentUserId());
-                TempData["ErrorMessage"] = "Error al actualizar seguimiento";
+                TempData["ErrorMessage"] = "Error al actualizar: " + ex.Message + " | " + ex.InnerException?.Message;
+
+                // Intentar recargar vista con datos
+                try
+                {
+                    var contratoFallback = db.ContratoAdopcion
+                        .Include(c => c.SolicitudAdopcion)
+                        .Include(c => c.SolicitudAdopcion.Mascotas)
+                        .FirstOrDefault(c => c.ContratoId == model.ContratoId);
+                    ViewBag.Mascota = contratoFallback?.SolicitudAdopcion?.Mascotas;
+                    ViewBag.Contrato = contratoFallback;
+                }
+                catch { }
+
+                CargarListasViewBagSeguimiento();
                 return View(model);
             }
         }
@@ -1182,18 +1270,13 @@ namespace MVCMASCOTAS.Controllers
             {
                 var seguimiento = db.SeguimientoAdopcion.Find(id);
                 if (seguimiento == null)
-                {
                     return Json(new { success = false, message = "Seguimiento no encontrado" });
-                }
-
-                var contratoId = seguimiento.ContratoId;
 
                 db.SeguimientoAdopcion.Remove(seguimiento);
                 db.SaveChanges();
 
                 AuditoriaHelper.RegistrarAccion("Mascotas", "EliminarSeguimiento",
-                    $"Seguimiento eliminado ID: {id}",
-                    UserHelper.GetCurrentUserId() ?? 1);
+                    $"Seguimiento eliminado ID: {id}", UserHelper.GetCurrentUserId() ?? 1);
 
                 return Json(new { success = true, message = "Seguimiento eliminado" });
             }
@@ -1218,9 +1301,7 @@ namespace MVCMASCOTAS.Controllers
                 var contrato = db.ContratoAdopcion.Find(contratoId);
                 var mascotaId = contrato?.SolicitudAdopcion?.MascotaId;
                 if (mascotaId.HasValue)
-                {
                     return RedirectToAction("SeguimientoMascota", new { id = mascotaId.Value });
-                }
 
                 return RedirectToAction("SeguimientoAdopciones");
             }
@@ -1232,9 +1313,101 @@ namespace MVCMASCOTAS.Controllers
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"Error en CrearSeguimientosAutomaticos: {ex.Message}");
-                AuditoriaHelper.RegistrarError("Mascotas", $"Error en CrearSeguimientosAutomaticos", ex, UserHelper.GetCurrentUserId());
+                AuditoriaHelper.RegistrarError("Mascotas", "Error en CrearSeguimientosAutomaticos", ex, UserHelper.GetCurrentUserId());
                 TempData["ErrorMessage"] = "Error al crear seguimientos automáticos";
                 return RedirectToAction("SeguimientoAdopciones");
+            }
+        }
+
+        private ContratoAdopcion CrearContratoFicticio(Mascotas mascota)
+        {
+            try
+            {
+                // Verificar si ya existe contrato para esta mascota
+                var contratoExistente = db.ContratoAdopcion
+                    .FirstOrDefault(c => c.SolicitudAdopcion.MascotaId == mascota.MascotaId);
+                if (contratoExistente != null)
+                    return contratoExistente;
+
+                // Obtener UsuarioId válido
+                int responsableId = UserHelper.GetCurrentUserId() ?? 0;
+
+                if (responsableId == 0 || !db.Usuarios.Any(u => u.UsuarioId == responsableId))
+                {
+                    var primerUsuario = db.Usuarios
+                        .Where(u => u.Activo == true || u.Activo == null)
+                        .OrderBy(u => u.UsuarioId)
+                        .Select(u => u.UsuarioId)
+                        .FirstOrDefault();
+
+                    if (primerUsuario == 0)
+                        primerUsuario = db.Usuarios.OrderBy(u => u.UsuarioId).Select(u => u.UsuarioId).FirstOrDefault();
+
+                    if (primerUsuario == 0)
+                    {
+                        System.Diagnostics.Debug.WriteLine("[CTR-AUTO] No hay usuarios en la BD");
+                        return null;
+                    }
+
+                    responsableId = primerUsuario;
+                }
+
+                System.Diagnostics.Debug.WriteLine($"[CTR-AUTO] Usando responsableId={responsableId}");
+
+                var solicitud = new SolicitudAdopcion
+                {
+                    MascotaId = mascota.MascotaId,
+                    UsuarioId = responsableId,
+                    FechaSolicitud = mascota.FechaAdopcion ?? DateTime.Now,
+                    Estado = "Completada",
+                    EstadoAdopcion = "No iniciada",
+                    Observaciones = "Generado automaticamente - mascota adoptada directamente."
+                };
+
+                db.SolicitudAdopcion.Add(solicitud);
+                db.SaveChanges();
+
+                System.Diagnostics.Debug.WriteLine($"[CTR-AUTO] Solicitud creada: {solicitud.SolicitudId}");
+
+                var numeroContrato = string.Format("CTR-AUTO-{0:D4}-{1:yyyyMMddHHmmss}", mascota.MascotaId, DateTime.Now);
+
+                var contrato = new ContratoAdopcion
+                {
+                    SolicitudId = solicitud.SolicitudId,
+                    NumeroContrato = numeroContrato,
+                    FechaContrato = mascota.FechaAdopcion ?? DateTime.Now,
+                    AdoptanteNombre = "Adoptante Directo",
+                    AdoptanteCedula = "0000000000",
+                    AdoptanteDireccion = "No especificada",
+                    AdoptanteTelefono = "0000000000",
+                    RepresentanteRefugioNombre = "Refugio ADOPTAMANIA",
+                    RepresentanteRefugioCedula = "0000000000",
+                    MascotaNombre = mascota.Nombre ?? "Sin nombre",
+                    MascotaEspecie = mascota.Especie ?? "No especificada",
+                    MascotaMicrochip = mascota.Microchip ?? "",
+                    TerminosCondiciones = "Contrato generado automaticamente para mascota adoptada directamente.",
+                    Estado = "Activo"
+                };
+
+                db.ContratoAdopcion.Add(contrato);
+                db.SaveChanges();
+
+                System.Diagnostics.Debug.WriteLine($"[CTR-AUTO] Contrato creado: {contrato.ContratoId}");
+                return contrato;
+            }
+            catch (System.Data.Entity.Validation.DbEntityValidationException dbEx)
+            {
+                foreach (var error in dbEx.EntityValidationErrors)
+                    foreach (var ve in error.ValidationErrors)
+                        System.Diagnostics.Debug.WriteLine($"[CTR-AUTO] Validacion - Campo: {ve.PropertyName} | Error: {ve.ErrorMessage}");
+                return null;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"[CTR-AUTO] ERROR: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"[CTR-AUTO] Inner: {ex.InnerException?.Message}");
+                System.Diagnostics.Debug.WriteLine($"[CTR-AUTO] Inner2: {ex.InnerException?.InnerException?.Message}");
+                return null;
             }
         }
 
@@ -1296,6 +1469,45 @@ namespace MVCMASCOTAS.Controllers
                 System.Diagnostics.Debug.WriteLine($"Error en DetalleContrato: {ex.Message}");
                 AuditoriaHelper.RegistrarError("Mascotas", $"Error en DetalleContrato ID:{id}", ex, UserHelper.GetCurrentUserId());
                 TempData["ErrorMessage"] = "Error al cargar contrato";
+                return RedirectToAction("ContratosAdopcion");
+            }
+        }
+
+        [AuthorizeRoles("Administrador")]
+        public ActionResult DescargarContrato(int id)
+        {
+            try
+            {
+                var contrato = db.ContratoAdopcion
+                    .Include(c => c.SolicitudAdopcion)
+                    .FirstOrDefault(c => c.ContratoId == id);
+
+                if (contrato == null)
+                {
+                    TempData["ErrorMessage"] = "Contrato no encontrado";
+                    return RedirectToAction("ContratosAdopcion");
+                }
+
+                // Si ya tiene PDF físico guardado, servirlo directamente
+                if (!string.IsNullOrEmpty(contrato.DocumentoPDF))
+                {
+                    var rutaFisica = Server.MapPath(contrato.DocumentoPDF);
+                    if (System.IO.File.Exists(rutaFisica))
+                    {
+                        return File(rutaFisica, "application/pdf",
+                            string.Format("Contrato_{0}.pdf", contrato.NumeroContrato));
+                    }
+                }
+
+                // Si no hay PDF, generar uno básico como HTML imprimible
+                TempData["InfoMessage"] = "Este contrato no tiene PDF adjunto. Usa el botón Imprimir desde el detalle para generarlo.";
+                return RedirectToAction("DetalleContrato", new { id = id });
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(string.Format("Error en DescargarContrato: {0}", ex.Message));
+                AuditoriaHelper.RegistrarError("Mascotas", string.Format("Error en DescargarContrato ID:{0}", id), ex, UserHelper.GetCurrentUserId());
+                TempData["ErrorMessage"] = "Error al descargar el contrato";
                 return RedirectToAction("ContratosAdopcion");
             }
         }

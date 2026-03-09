@@ -1,54 +1,52 @@
 ﻿@{
-    ViewBag.Title = "Contacto";
+    ViewBag.Title = "Contacto - ADOPTAMANÍA";
 }
 
-<!-- Hero Section -->
-<section class="contact-hero">
-    <div class="container">
+<!-- Hero Section con imagen de fondo -->
+<section class="contact-hero py-5">
+    <div class="container text-center">
         <h1 class="display-3 mb-4 text-white">Contáctanos</h1>
         <p class="lead mb-0 text-white">Estamos aquí para ayudarte y responder todas tus preguntas</p>
     </div>
 </section>
 
 <div class="container">
+    <!-- Tarjetas de Información de Contacto (con imágenes de fondo) -->
     <div class="row mb-5">
-        <!-- Información de Contacto -->
         <div class="col-md-4 mb-4">
-            <div class="contact-info-card text-center">
+            <div class="contact-info-card tarjeta-con-fondo" style="background-image: url('https://images.unsplash.com/photo-1509356843152-3e7d96241e11?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80');">
                 <div class="contact-icon bg-green">
                     <i class="fas fa-map-marker-alt text-white"></i>
                 </div>
-                <h4 class="text-brown">Dirección</h4>
-                <p class="text-brown">@(ViewBag.Direccion ?? "Av. Amazonas N23-45 y Roca")</p>
-                <p class="text-secondary">Quito, Ecuador</p>
+                <h4 class="text-white">Dirección</h4>
+                <p class="text-white">@(ViewBag.Direccion ?? "Av. Amazonas N23-45 y Roca")</p>
+                <p class="text-white">Quito, Ecuador</p>
             </div>
         </div>
-
         <div class="col-md-4 mb-4">
-            <div class="contact-info-card text-center">
+            <div class="contact-info-card tarjeta-con-fondo" style="background-image: url('https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80');">
                 <div class="contact-icon bg-green">
                     <i class="fas fa-phone text-white"></i>
                 </div>
-                <h4 class="text-brown">Teléfono</h4>
-                <p class="text-brown">@(ViewBag.Telefono ?? "(02) 245-6789")</p>
-                <p class="text-secondary">@(ViewBag.Horario ?? "Lun-Vie: 8:00 AM - 6:00 PM")</p>
+                <h4 class="text-white">Teléfono</h4>
+                <p class="text-white">@(ViewBag.Telefono ?? "(02) 245-6789")</p>
+                <p class="text-white">@(ViewBag.Horario ?? "Lun-Vie: 8:00 AM - 6:00 PM")</p>
             </div>
         </div>
-
         <div class="col-md-4 mb-4">
-            <div class="contact-info-card text-center">
+            <div class="contact-info-card tarjeta-con-fondo" style="background-image: url('https://images.unsplash.com/photo-1516387938699-a93567ec168e?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80');">
                 <div class="contact-icon bg-green">
                     <i class="fas fa-envelope text-white"></i>
                 </div>
-                <h4 class="text-brown">Email</h4>
-                <p class="text-brown">@(ViewBag.Email ?? "contacto@refugiomascotas.ec")</p>
-                <p class="text-secondary">Respuesta en 24-48 horas</p>
+                <h4 class="text-white">Email</h4>
+                <p class="text-white">@(ViewBag.Email ?? "contacto@adoptamania.ec")</p>
+                <p class="text-white">Respuesta en 24-48 horas</p>
             </div>
         </div>
     </div>
 
     <div class="row">
-        <!-- Formulario de Contacto -->
+        <!-- Formulario de Contacto (sin cambios, solo estilos) -->
         <div class="col-lg-8 mb-5">
             <div class="contact-form">
                 <h3 class="mb-4 text-brown">Envíanos un Mensaje</h3>
@@ -117,26 +115,26 @@
                 </form>
             </div>
 
-            <!-- Contacto de Emergencia -->
+            <!-- Contacto de Emergencia (rediseñado) -->
             <div class="emergency-contact">
-                <h3><i class="fas fa-exclamation-triangle"></i> Contacto de Emergencia</h3>
-                <p>Para reportar animales en peligro inminente o situaciones de emergencia:</p>
+                <h3 class="text-white"><i class="fas fa-exclamation-triangle"></i> Contacto de Emergencia</h3>
+                <p class="text-white">Para reportar animales en peligro inminente o situaciones de emergencia:</p>
                 <div class="row">
                     <div class="col-md-6">
-                        <h5><i class="fas fa-phone"></i> Rescates 24/7</h5>
-                        <p class="mb-0">099-EMERGENCIA (363-734)</p>
+                        <h5 class="text-white"><i class="fas fa-phone"></i> Rescates 24/7</h5>
+                        <p class="mb-0 text-white">099-EMERGENCIA (363-734)</p>
                     </div>
                     <div class="col-md-6">
-                        <h5><i class="fas fa-ambulance"></i> Veterinaria de Emergencia</h5>
-                        <p class="mb-0">02-245-6789</p>
+                        <h5 class="text-white"><i class="fas fa-ambulance"></i> Veterinaria de Emergencia</h5>
+                        <p class="mb-0 text-white">02-245-6789</p>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Mapa y Horarios -->
+        <!-- Mapa y Horarios (con mejoras visuales) -->
         <div class="col-lg-4">
-            <!-- Mapa -->
+            <!-- Mapa con estilo -->
             <div class="mb-5">
                 <h4 class="mb-3 text-brown">Nuestra Ubicación</h4>
                 <div class="map-container">
@@ -150,69 +148,69 @@
                 </div>
             </div>
 
-            <!-- Horarios de Atención -->
-            <div class="card border-green shadow-hover mb-4">
+            <!-- Horarios de Atención (con imagen de fondo) -->
+            <div class="card border-0 shadow-hover tarjeta-con-fondo mb-4" style="background-image: url('https://images.unsplash.com/photo-1516738901171-8eb4fc13bd20?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80');">
                 <div class="card-body">
-                    <h4 class="card-title mb-4 text-brown"><i class="fas fa-clock text-green"></i> Horarios de Atención</h4>
+                    <h4 class="card-title mb-4 text-white"><i class="fas fa-clock text-white"></i> Horarios de Atención</h4>
                     <ul class="business-hours">
-                        <li class="text-brown">
+                        <li class="text-white">
                             <strong>Lunes - Viernes</strong>
-                            <span class="float-right text-secondary">8:00 AM - 6:00 PM</span>
+                            <span class="float-right">8:00 AM - 6:00 PM</span>
                         </li>
-                        <li class="text-brown">
+                        <li class="text-white">
                             <strong>Sábados</strong>
-                            <span class="float-right text-secondary">9:00 AM - 2:00 PM</span>
+                            <span class="float-right">9:00 AM - 2:00 PM</span>
                         </li>
-                        <li class="text-brown">
+                        <li class="text-white">
                             <strong>Domingos</strong>
-                            <span class="float-right text-secondary">Emergencias solo</span>
+                            <span class="float-right">Emergencias solo</span>
                         </li>
-                        <li class="text-brown">
+                        <li class="text-white">
                             <strong>Adopciones</strong>
-                            <span class="float-right text-secondary">Con cita previa</span>
+                            <span class="float-right">Con cita previa</span>
                         </li>
-                        <li class="text-brown">
+                        <li class="text-white">
                             <strong>Visitas al Refugio</strong>
-                            <span class="float-right text-secondary">10:00 AM - 4:00 PM</span>
+                            <span class="float-right">10:00 AM - 4:00 PM</span>
                         </li>
                     </ul>
                 </div>
             </div>
 
-            <!-- Redes Sociales -->
-            <div class="card border-green shadow-hover">
+            <!-- Redes Sociales (con imagen de fondo) -->
+            <div class="card border-0 shadow-hover tarjeta-con-fondo" style="background-image: url('https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80');">
                 <div class="card-body text-center">
-                    <h4 class="card-title mb-4 text-brown"><i class="fas fa-share-alt text-green"></i> Síguenos</h4>
+                    <h4 class="card-title mb-4 text-white"><i class="fas fa-share-alt text-white"></i> Síguenos</h4>
                     <div class="social-links">
-                        <a href="#" class="btn btn-circle btn-lg mx-1 bg-green text-white">
+                        <a href="#" class="btn btn-circle btn-lg mx-1" style="background-color: var(--verde-menta); color: white;">
                             <i class="fab fa-facebook-f"></i>
                         </a>
-                        <a href="#" class="btn btn-circle btn-lg mx-1 bg-green text-white">
+                        <a href="#" class="btn btn-circle btn-lg mx-1" style="background-color: var(--verde-menta); color: white;">
                             <i class="fab fa-twitter"></i>
                         </a>
-                        <a href="#" class="btn btn-circle btn-lg mx-1 bg-green text-white">
+                        <a href="#" class="btn btn-circle btn-lg mx-1" style="background-color: var(--verde-menta); color: white;">
                             <i class="fab fa-instagram"></i>
                         </a>
-                        <a href="#" class="btn btn-circle btn-lg mx-1 bg-green text-white">
+                        <a href="#" class="btn btn-circle btn-lg mx-1" style="background-color: var(--verde-menta); color: white;">
                             <i class="fab fa-whatsapp"></i>
                         </a>
                     </div>
-                    <p class="text-secondary mt-3 mb-0">@("@")RefugioMascotasEC</p>
+                    <p class="text-white mt-3 mb-0">@("@")ADOPTAMANÍA</p>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Preguntas Frecuentes -->
-<section class="py-5 bg-light-mint">
+<!-- Preguntas Frecuentes (rediseñadas) -->
+<section class="py-5 bg-beige">
     <div class="container">
         <h2 class="text-center mb-5 text-brown">Preguntas Frecuentes</h2>
         <div class="row">
             <div class="col-md-6">
                 <div class="accordion" id="faqAccordion">
-                    <div class="card border-green mb-2">
-                        <div class="card-header bg-green" id="headingOne">
+                    <div class="card border-0 shadow-hover mb-3 tarjeta-con-fondo" style="background-image: url('https://images.unsplash.com/photo-1548199973-03cce0bbc87b?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80');">
+                        <div class="card-header bg-transparent border-0" id="headingOne">
                             <h5 class="mb-0">
                                 <button class="btn btn-link text-white" type="button" data-toggle="collapse" data-target="#collapseOne">
                                     ¿Cómo puedo adoptar una mascota?
@@ -220,15 +218,15 @@
                             </h5>
                         </div>
                         <div id="collapseOne" class="collapse show" data-parent="#faqAccordion">
-                            <div class="card-body text-secondary">
+                            <div class="card-body text-white">
                                 Visita nuestra sección de mascotas disponibles, llena el formulario de adopción
                                 y nuestro equipo se pondrá en contacto para coordinar una entrevista y visita.
                             </div>
                         </div>
                     </div>
 
-                    <div class="card border-green mb-2">
-                        <div class="card-header bg-green" id="headingTwo">
+                    <div class="card border-0 shadow-hover mb-3 tarjeta-con-fondo" style="background-image: url('https://images.unsplash.com/photo-1543852786-1cf6624b9987?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80');">
+                        <div class="card-header bg-transparent border-0" id="headingTwo">
                             <h5 class="mb-0">
                                 <button class="btn btn-link text-white collapsed" type="button" data-toggle="collapse" data-target="#collapseTwo">
                                     ¿Qué incluye el proceso de adopción?
@@ -236,7 +234,7 @@
                             </h5>
                         </div>
                         <div id="collapseTwo" class="collapse" data-parent="#faqAccordion">
-                            <div class="card-body text-secondary">
+                            <div class="card-body text-white">
                                 Incluye entrevista, verificación de condiciones del hogar, firma de contrato,
                                 esterilización, vacunación y seguimiento post-adopción.
                             </div>
@@ -246,8 +244,8 @@
             </div>
             <div class="col-md-6">
                 <div class="accordion" id="faqAccordion2">
-                    <div class="card border-green mb-2">
-                        <div class="card-header bg-green" id="headingThree">
+                    <div class="card border-0 shadow-hover mb-3 tarjeta-con-fondo" style="background-image: url('https://images.unsplash.com/photo-1511632765486-a01980e01a18?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80');">
+                        <div class="card-header bg-transparent border-0" id="headingThree">
                             <h5 class="mb-0">
                                 <button class="btn btn-link text-white" type="button" data-toggle="collapse" data-target="#collapseThree">
                                     ¿Puedo visitar el refugio?
@@ -255,15 +253,15 @@
                             </h5>
                         </div>
                         <div id="collapseThree" class="collapse show" data-parent="#faqAccordion2">
-                            <div class="card-body text-secondary">
+                            <div class="card-body text-white">
                                 Sí, puedes visitarnos de lunes a viernes de 10:00 AM a 4:00 PM.
                                 Recomendamos agendar cita previa.
                             </div>
                         </div>
                     </div>
 
-                    <div class="card border-green mb-2">
-                        <div class="card-header bg-green" id="headingFour">
+                    <div class="card border-0 shadow-hover mb-3 tarjeta-con-fondo" style="background-image: url('https://images.unsplash.com/photo-1548199973-03cce0bbc87b?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80');">
+                        <div class="card-header bg-transparent border-0" id="headingFour">
                             <h5 class="mb-0">
                                 <button class="btn btn-link text-white collapsed" type="button" data-toggle="collapse" data-target="#collapseFour">
                                     ¿Cómo puedo ayudar como voluntario?
@@ -271,7 +269,7 @@
                             </h5>
                         </div>
                         <div id="collapseFour" class="collapse" data-parent="#faqAccordion2">
-                            <div class="card-body text-secondary">
+                            <div class="card-body text-white">
                                 Regístrate en nuestro sistema, asiste a la inducción y elige entre
                                 diversas actividades: paseos, limpieza, socialización, eventos, etc.
                             </div>
@@ -285,65 +283,112 @@
 
 @section Styles {
     <style>
+        /* Hero */
         .contact-hero {
-            background: linear-gradient(rgba(151, 199, 139, 0.8), rgba(242, 201, 109, 0.8)), url('/Content/images/contact-hero.jpg');
+            background: linear-gradient(135deg, rgba(151,199,139,0.9), rgba(242,198,109,0.8)), url('https://images.unsplash.com/photo-1511632765486-a01980e01a18?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');
             background-size: cover;
             background-position: center;
-            padding: 100px 0;
-            margin-bottom: 60px;
-            border-radius: 10px;
+            border-radius: 0 0 30px 30px;
+            margin-bottom: 2rem;
         }
 
+        /* Tarjetas de información de contacto */
         .contact-info-card {
-            background: white;
-            border-radius: 10px;
+            background-size: cover;
+            background-position: center;
+            border-radius: 20px;
             padding: 30px;
-            box-shadow: 0 5px 15px rgba(151, 199, 139, 0.1);
-            margin-bottom: 30px;
             height: 100%;
-            transition: transform 0.3s;
-            border: 2px solid #97C78B;
+            transition: transform 0.3s ease;
+            position: relative;
+            z-index: 0;
+            overflow: hidden;
         }
 
-            .contact-info-card:hover {
-                transform: translateY(-5px);
-                box-shadow: 0 10px 25px rgba(151, 199, 139, 0.2);
-                border-color: #86b57a;
+            .contact-info-card::after {
+                content: "";
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(135deg, rgba(151,199,139,0.7), rgba(242,198,109,0.7));
+                z-index: 1;
+                pointer-events: none;
             }
 
-        .contact-icon {
-            font-size: 2.5em;
-            width: 70px;
-            height: 70px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 20px;
-        }
+            .contact-info-card > * {
+                position: relative;
+                z-index: 2;
+            }
 
+            .contact-info-card .contact-icon {
+                font-size: 2.5em;
+                width: 70px;
+                height: 70px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin: 0 auto 20px;
+                background-color: var(--verde-menta);
+                border: 3px solid white;
+            }
+
+            .contact-info-card h4 {
+                color: white !important;
+                text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            }
+
+            .contact-info-card p {
+                color: white !important;
+                text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            }
+
+        /* Formulario */
         .contact-form {
             background: white;
-            border-radius: 15px;
+            border-radius: 20px;
             padding: 40px;
-            box-shadow: 0 10px 30px rgba(151, 199, 139, 0.1);
-            border: 2px solid #97C78B;
+            box-shadow: 0 10px 30px rgba(151,199,139,0.1);
+            border: 2px solid var(--verde-menta);
         }
 
+        .form-control.border-green {
+            border: 2px solid var(--verde-menta);
+            border-radius: 12px;
+            padding: 12px;
+        }
+
+            .form-control.border-green:focus {
+                border-color: #86b57a;
+                box-shadow: 0 0 0 0.2rem rgba(151,199,139,0.25);
+            }
+
+        /* Contacto de Emergencia */
+        .emergency-contact {
+            background: linear-gradient(135deg, var(--rosado-claro), var(--amarillo-pastel));
+            border-radius: 20px;
+            padding: 30px;
+            margin-top: 30px;
+            border: 2px solid var(--verde-menta);
+            color: white;
+        }
+
+            .emergency-contact h3, .emergency-contact p, .emergency-contact h5 {
+                color: white !important;
+            }
+
+        /* Mapa */
         .map-container {
-            border-radius: 10px;
+            border-radius: 20px;
             overflow: hidden;
-            box-shadow: 0 5px 15px rgba(151, 199, 139, 0.1);
+            box-shadow: 0 10px 30px rgba(151,199,139,0.15);
             height: 400px;
-            border: 2px solid #97C78B;
+            border: 4px solid var(--verde-menta);
         }
 
-        iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-        }
-
+        /* Horarios y Redes (usando la misma clase de tarjeta con fondo) */
         .business-hours {
             list-style: none;
             padding: 0;
@@ -351,22 +396,18 @@
 
             .business-hours li {
                 padding: 10px 0;
-                border-bottom: 1px solid #F2E9D8;
+                border-bottom: 1px solid rgba(255,255,255,0.3);
             }
 
                 .business-hours li:last-child {
                     border-bottom: none;
                 }
 
-        .emergency-contact {
-            background: linear-gradient(135deg, #FBCDC0 0%, #F2C66D 100%);
-            color: #5C4B43;
-            border-radius: 15px;
-            padding: 30px;
-            margin-top: 30px;
-            border: 2px solid #97C78B;
-        }
+                .business-hours li strong {
+                    font-weight: 600;
+                }
 
+        /* Redes sociales */
         .btn-circle {
             width: 50px;
             height: 50px;
@@ -374,12 +415,52 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
+            transition: transform 0.2s ease;
         }
+
+            .btn-circle:hover {
+                transform: scale(1.1);
+            }
+
+        /* Acordeón FAQ */
+        .card.tarjeta-con-fondo {
+            position: relative;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+            .card.tarjeta-con-fondo::after {
+                content: "";
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(135deg, rgba(151,199,139,0.7), rgba(242,198,109,0.7));
+                z-index: 1;
+                pointer-events: none;
+            }
+
+            .card.tarjeta-con-fondo .card-header,
+            .card.tarjeta-con-fondo .card-body {
+                position: relative;
+                z-index: 2;
+            }
+
+            .card.tarjeta-con-fondo .btn-link {
+                color: white !important;
+                text-decoration: none;
+                font-weight: 600;
+            }
+
+                .card.tarjeta-con-fondo .btn-link:hover {
+                    text-decoration: underline;
+                }
 
         /* Responsive */
         @@media (max-width: 768px) {
             .contact-hero {
-                padding: 60px 0;
+                border-radius: 0 0 20px 20px;
             }
 
             .contact-form {
@@ -394,56 +475,11 @@
                 height: 300px;
             }
 
-            .emergency-contact {
-                padding: 20px;
-            }
-
             .btn-circle {
                 width: 40px;
                 height: 40px;
                 margin: 5px;
             }
-
-                .btn-circle i {
-                    font-size: 1rem;
-                }
-        }
-
-        /* Placeholder para imagen de contacto si no existe */
-        .contact-hero {
-            position: relative;
-        }
-
-            .contact-hero:before {
-                content: '';
-                position: absolute;
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                background: linear-gradient(135deg, #97C78B 0%, #F2C66D 100%);
-                z-index: 0;
-                border-radius: 10px;
-            }
-
-            .contact-hero .container {
-                position: relative;
-                z-index: 1;
-            }
-
-        /* Mejoras de formulario */
-        .form-control.border-green:focus {
-            border-color: #86b57a;
-            box-shadow: 0 0 0 0.2rem rgba(151, 199, 139, 0.25);
         }
     </style>
-}
-
-@section Scripts {
-    <script>
-        $(document).ready(function () {
-            // Inicializar acordeón
-            $('.collapse').collapse();
-        });
-    </script>
 }

@@ -1,0 +1,90 @@
+﻿@model MVCMASCOTAS.Controllers.FormularioSimuladoController.FormularioSimuladoItem
+@{
+    ViewBag.Title = "Detalle del Formulario";
+}
+<h2>Detalle del Formulario #@Model.Id</h2>
+<div class="card mb-4">
+    <div class="card-header bg-success text-white"><i class="fas fa-file-alt me-2"></i>@Model.Solicitante - @Model.Mascota</div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <h5>Información de la Solicitud</h5>
+                <p><strong>Solicitante:</strong> @Model.Solicitante</p>
+                <p><strong>Mascota:</strong> @Model.Mascota</p>
+                <p><strong>Fecha Solicitud:</strong> @Model.FechaSolicitud.ToString("dd/MM/yyyy HH:mm")</p>
+                <p><strong>Estado:</strong> @Model.Estado</p>
+            </div>
+            <div class="col-md-6">
+                <h5>Vivienda</h5>
+                <p><strong>Tipo:</strong> @Model.Formulario.TipoVivienda</p>
+                <p><strong>Vivienda propia:</strong> @(Model.Formulario.ViviendaPropia ? "Sí" : "No")</p>
+                <p><strong>Jardín/Patio:</strong> @(Model.Formulario.TieneJardin ? "Sí" : "No")</p>
+                <p><strong>Permiso mascotas:</strong> @(Model.Formulario.PermisoMascotas ? "Sí" : "No")</p>
+            </div>
+        </div>
+        <hr />
+        <div class="row">
+            <div class="col-md-6">
+                <h5>Hogar</h5>
+                <p><strong>Personas en casa:</strong> @Model.Formulario.PersonasEnCasa</p>
+                <p><strong>Hay niños:</strong> @(Model.Formulario.HayNinios ? "Sí" : "No")</p>
+                @if (Model.Formulario.HayNinios)
+                {
+                    <p><strong>Edades niños:</strong> @Model.Formulario.EdadesNinios</p>
+                }
+            </div>
+            <div class="col-md-6">
+                <h5>Experiencia y Mascotas Actuales</h5>
+                <p><strong>Experiencia previa:</strong> @(Model.Formulario.ExperienciaPreviaConMascotas ? "Sí" : "No")</p>
+                @if (Model.Formulario.ExperienciaPreviaConMascotas)
+                {
+                    <p><strong>Detalle:</strong> @Model.Formulario.DetalleExperiencia</p>
+                }
+                <p><strong>Tiene mascotas actualmente:</strong> @(Model.Formulario.TieneMascotasActualmente ? "Sí" : "No")</p>
+                @if (Model.Formulario.TieneMascotasActualmente)
+                {
+                    <p><strong>Perros:</strong> @Model.Formulario.CantidadPerros</p>
+                    <p><strong>Gatos:</strong> @Model.Formulario.CantidadGatos</p>
+                    <p><strong>Otras:</strong> @Model.Formulario.OtrasMascotas</p>
+                    <p><strong>Esterilizadas:</strong> @(Model.Formulario.MascotasEsterilizadas ? "Sí" : "No")</p>
+                }
+            </div>
+        </div>
+        <hr />
+        <div class="row">
+            <div class="col-md-6">
+                <h5>Disponibilidad y Motivos</h5>
+                <p><strong>Tiempo disponible diario:</strong> @Model.Formulario.TiempoDisponibleDiario</p>
+                <p><strong>Quién cuidará:</strong> @Model.Formulario.QuienCuidaraMascota</p>
+                <p><strong>Motivo adopción:</strong> @Model.Formulario.MotivoAdopcion</p>
+            </div>
+            <div class="col-md-6">
+                <h5>Planes ante cambios</h5>
+                <p><strong>Si cambia residencia:</strong> @Model.Formulario.QuePasaSiCambiaResidencia</p>
+                <p><strong>Si problemas comportamiento:</strong> @Model.Formulario.QuePasaSiProblemasComportamiento</p>
+            </div>
+        </div>
+        <hr />
+        <div class="row">
+            <div class="col-md-6">
+                <h5>Referencias</h5>
+                <p><strong>Veterinario referencia:</strong> @Model.Formulario.VeterinarioReferencia</p>
+                <p><strong>Referencia 1:</strong> @Model.Formulario.ReferenciaPersonal1 - @Model.Formulario.TelefonoReferencia1</p>
+                @if (!string.IsNullOrEmpty(Model.Formulario.ReferenciaPersonal2))
+                {
+                    <p><strong>Referencia 2:</strong> @Model.Formulario.ReferenciaPersonal2 - @Model.Formulario.TelefonoReferencia2</p>
+                }
+            </div>
+            <div class="col-md-6">
+                <h5>Compromisos</h5>
+                <p><strong>Acepta esterilización:</strong> @(Model.Formulario.AceptaEsterilizacion ? "Sí" : "No")</p>
+                <p><strong>Acepta visitas seguimiento:</strong> @(Model.Formulario.AceptaVisitasSeguimiento ? "Sí" : "No")</p>
+                <p><strong>Acepta condiciones LOBA:</strong> @(Model.Formulario.AceptaCondicionesLOBA ? "Sí" : "No")</p>
+                <p><strong>Acepta devolución:</strong> @(Model.Formulario.AceptaDevolucionSiNoPuedeAtender ? "Sí" : "No")</p>
+            </div>
+        </div>
+    </div>
+    <div class="card-footer">
+        @Html.ActionLink("Volver al listado", "Index", null, new { @class = "btn btn-secondary" })
+    </div>
+</div>

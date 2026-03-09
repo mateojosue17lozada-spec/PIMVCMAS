@@ -1,10 +1,11 @@
 ﻿@{
-    ViewBag.Title = "Términos y Condiciones";
+    ViewBag.Title = "Términos y Condiciones - ADOPTAMANÍA";
 }
 
-<!-- Hero Section -->
-<section class="terms-hero">
-    <div class="container">
+<!-- Hero Section con imagen de fondo -->
+<section class="terms-hero py-5">
+    <div class="container text-center">
+        <i class="fas fa-file-contract fa-4x text-white mb-4"></i>
         <h1 class="display-4 mb-3 text-white">Términos y Condiciones</h1>
         <p class="lead mb-0 text-white">Por favor, lee detenidamente antes de usar nuestros servicios</p>
     </div>
@@ -12,23 +13,21 @@
 
 <div class="container">
     <div class="row">
-        <!-- Navegación de Términos -->
+        <!-- Navegación de Términos (índice con iconos) -->
         <div class="col-md-3 mb-4">
-            <div class="card border-green shadow-hover scrollspy-terms">
-                <div class="card-body">
-                    <h5 class="card-title mb-3 text-brown">Índice</h5>
-                    <nav class="nav flex-column nav-terms">
-                        <a class="nav-link text-brown" href="#aceptacion">1. Aceptación</a>
-                        <a class="nav-link text-brown" href="#servicios">2. Servicios</a>
-                        <a class="nav-link text-brown" href="#adopcion">3. Adopción</a>
-                        <a class="nav-link text-brown" href="#donaciones">4. Donaciones</a>
-                        <a class="nav-link text-brown" href="#privacidad">5. Privacidad</a>
-                        <a class="nav-link text-brown" href="#responsabilidades">6. Responsabilidades</a>
-                        <a class="nav-link text-brown" href="#propiedad">7. Propiedad</a>
-                        <a class="nav-link text-brown" href="#modificaciones">8. Modificaciones</a>
-                        <a class="nav-link text-brown" href="#jurisdiccion">9. Jurisdicción</a>
-                    </nav>
-                </div>
+            <div class="terms-index-card">
+                <h5 class="text-brown mb-3"><i class="fas fa-list-ul text-green me-2"></i> Índice</h5>
+                <nav class="nav flex-column nav-terms">
+                    <a class="nav-link" href="#aceptacion"><i class="fas fa-check-circle text-green me-2"></i> 1. Aceptación</a>
+                    <a class="nav-link" href="#servicios"><i class="fas fa-paw text-green me-2"></i> 2. Servicios</a>
+                    <a class="nav-link" href="#adopcion"><i class="fas fa-home text-green me-2"></i> 3. Adopción</a>
+                    <a class="nav-link" href="#donaciones"><i class="fas fa-hand-holding-heart text-green me-2"></i> 4. Donaciones</a>
+                    <a class="nav-link" href="#privacidad"><i class="fas fa-lock text-green me-2"></i> 5. Privacidad</a>
+                    <a class="nav-link" href="#responsabilidades"><i class="fas fa-shield-alt text-green me-2"></i> 6. Responsabilidades</a>
+                    <a class="nav-link" href="#propiedad"><i class="fas fa-copyright text-green me-2"></i> 7. Propiedad</a>
+                    <a class="nav-link" href="#modificaciones"><i class="fas fa-edit text-green me-2"></i> 8. Modificaciones</a>
+                    <a class="nav-link" href="#jurisdiccion"><i class="fas fa-gavel text-green me-2"></i> 9. Jurisdicción</a>
+                </nav>
             </div>
         </div>
 
@@ -36,46 +35,84 @@
         <div class="col-md-9">
             <div class="terms-container">
                 <!-- Fecha de actualización -->
-                <div class="last-updated mb-5">
-                    <p class="mb-0 text-brown"><strong>Última actualización:</strong> @DateTime.Now.ToString("dd 'de' MMMM 'de' yyyy")</p>
-                    <p class="mb-0 text-secondary"><small>Versión 3.2 - Vigente desde el 1 de Enero de 2024</small></p>
+                <div class="last-updated d-flex align-items-center mb-5">
+                    <i class="fas fa-calendar-alt fa-2x text-green me-3"></i>
+                    <div>
+                        <p class="mb-0 text-brown"><strong>Última actualización:</strong> @DateTime.Now.ToString("dd 'de' MMMM 'de' yyyy")</p>
+                        <p class="mb-0 text-secondary"><small>Versión 3.2 - Vigente desde el 1 de Enero de 2024</small></p>
+                    </div>
                 </div>
 
                 <!-- Sección 1: Aceptación -->
                 <div class="terms-section" id="aceptacion">
-                    <h3 class="terms-title">1. Aceptación de los Términos</h3>
+                    <h3 class="terms-title"><i class="fas fa-check-circle text-green me-2"></i> 1. Aceptación de los Términos</h3>
                     <p class="text-secondary">
-                        Al acceder y utilizar el sistema web del Refugio de Mascotas Ecuador,
-                        usted acepta estar sujeto a estos Términos y Condiciones en su totalidad.
-                        Si no está de acuerdo con alguna parte de estos términos, debe
-                        abstenerse de usar nuestros servicios.
+                        Al acceder y utilizar el sistema web de ADOPTAMANÍA, usted acepta estar sujeto a estos Términos y Condiciones en su totalidad.
+                        Si no está de acuerdo con alguna parte de estos términos, debe abstenerse de usar nuestros servicios.
                     </p>
-
                     <div class="acceptance-box">
-                        <h6 class="text-brown"><i class="fas fa-exclamation-circle text-green"></i> Importante:</h6>
-                        <p class="mb-0 text-secondary">
-                            El registro en el sistema implica la aceptación explícita de estos términos.
-                            Para usuarios menores de 18 años, se requiere autorización de padres o tutores.
-                        </p>
+                        <div class="d-flex">
+                            <i class="fas fa-exclamation-triangle fa-2x text-yellow me-3"></i>
+                            <div>
+                                <h6 class="text-brown mb-2">Importante:</h6>
+                                <p class="mb-0 text-secondary">
+                                    El registro en el sistema implica la aceptación explícita de estos términos.
+                                    Para usuarios menores de 18 años, se requiere autorización de padres o tutores.
+                                </p>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
                 <!-- Sección 2: Servicios -->
                 <div class="terms-section" id="servicios">
-                    <h3 class="terms-title">2. Servicios Ofrecidos</h3>
+                    <h3 class="terms-title"><i class="fas fa-paw text-green me-2"></i> 2. Servicios Ofrecidos</h3>
                     <p class="text-secondary">Nuestra plataforma proporciona los siguientes servicios:</p>
-
-                    <ul class="terms-list">
-                        <li class="text-secondary">Gestión de adopción responsable de mascotas</li>
-                        <li class="text-secondary">Sistema de donaciones y apadrinamiento</li>
-                        <li class="text-secondary">Reporte de mascotas perdidas y en riesgo</li>
-                        <li class="text-secondary">Programa de voluntariado</li>
-                        <li class="text-secondary">Tienda solidaria de productos para mascotas</li>
-                        <li class="text-secondary">Información sobre cuidado y bienestar animal</li>
-                        <li class="text-secondary">Seguimiento post-adopción y asesoría veterinaria</li>
-                    </ul>
-
-                    <p class="mt-3 text-secondary">
+                    <div class="row g-3 mt-3">
+                        <div class="col-md-6">
+                            <div class="service-item d-flex align-items-start">
+                                <i class="fas fa-check-circle text-green me-2 mt-1"></i>
+                                <span class="text-secondary">Gestión de adopción responsable de mascotas</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="service-item d-flex align-items-start">
+                                <i class="fas fa-check-circle text-green me-2 mt-1"></i>
+                                <span class="text-secondary">Sistema de donaciones y apadrinamiento</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="service-item d-flex align-items-start">
+                                <i class="fas fa-check-circle text-green me-2 mt-1"></i>
+                                <span class="text-secondary">Reporte de mascotas perdidas y en riesgo</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="service-item d-flex align-items-start">
+                                <i class="fas fa-check-circle text-green me-2 mt-1"></i>
+                                <span class="text-secondary">Programa de voluntariado</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="service-item d-flex align-items-start">
+                                <i class="fas fa-check-circle text-green me-2 mt-1"></i>
+                                <span class="text-secondary">Tienda solidaria de productos para mascotas</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="service-item d-flex align-items-start">
+                                <i class="fas fa-check-circle text-green me-2 mt-1"></i>
+                                <span class="text-secondary">Información sobre cuidado y bienestar animal</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="service-item d-flex align-items-start">
+                                <i class="fas fa-check-circle text-green me-2 mt-1"></i>
+                                <span class="text-secondary">Seguimiento post-adopción y asesoría veterinaria</span>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="mt-4 text-secondary">
                         Todos los servicios se ofrecen de acuerdo con la <strong class="text-brown">Ley Orgánica de Bienestar Animal (LOBA)</strong>
                         y regulaciones ecuatorianas vigentes.
                     </p>
@@ -83,158 +120,179 @@
 
                 <!-- Sección 3: Adopción -->
                 <div class="terms-section" id="adopcion">
-                    <h3 class="terms-title">3. Proceso de Adopción</h3>
+                    <h3 class="terms-title"><i class="fas fa-home text-green me-2"></i> 3. Proceso de Adopción</h3>
                     <p class="text-secondary">El proceso de adopción incluye las siguientes etapas y condiciones:</p>
 
-                    <h6 class="mt-4 text-brown">3.1 Requisitos del Adoptante</h6>
-                    <ul class="terms-list warning-list">
-                        <li class="text-secondary">Ser mayor de 21 años</li>
-                        <li class="text-secondary">Completar formulario de solicitud con información veraz</li>
-                        <li class="text-secondary">Contar con vivienda estable y adecuada para la mascota</li>
-                        <li class="text-secondary">Aceptar visita domiciliaria de evaluación</li>
-                        <li class="text-secondary">Proporcionar referencias personales verificables</li>
-                    </ul>
+                    <div class="sub-section">
+                        <h6 class="text-brown"><i class="fas fa-user-check text-green me-2"></i> 3.1 Requisitos del Adoptante</h6>
+                        <ul class="terms-list">
+                            <li><i class="fas fa-check-circle text-green me-2"></i> Ser mayor de 21 años</li>
+                            <li><i class="fas fa-check-circle text-green me-2"></i> Completar formulario de solicitud con información veraz</li>
+                            <li><i class="fas fa-check-circle text-green me-2"></i> Contar con vivienda estable y adecuada para la mascota</li>
+                            <li><i class="fas fa-check-circle text-green me-2"></i> Aceptar visita domiciliaria de evaluación</li>
+                            <li><i class="fas fa-check-circle text-green me-2"></i> Proporcionar referencias personales verificables</li>
+                        </ul>
+                    </div>
 
-                    <h6 class="mt-4 text-brown">3.2 Compromisos del Adoptante</h6>
-                    <p class="text-secondary">El adoptante se compromete a:</p>
-                    <ul class="terms-list">
-                        <li class="text-secondary">Proporcionar alimentación adecuada y agua fresca</li>
-                        <li class="text-secondary">Ofrecer atención veterinaria regular y preventiva</li>
-                        <li class="text-secondary">Esterilizar a la mascota si aún no lo está</li>
-                        <li class="text-secondary">No utilizar a la mascota para reproducción</li>
-                        <li class="text-secondary">Permitir seguimiento post-adopción por 12 meses</li>
-                        <li class="text-secondary">Devolver la mascota al refugio si no puede continuar con su cuidado</li>
-                    </ul>
+                    <div class="sub-section mt-4">
+                        <h6 class="text-brown"><i class="fas fa-handshake text-green me-2"></i> 3.2 Compromisos del Adoptante</h6>
+                        <ul class="terms-list">
+                            <li><i class="fas fa-check-circle text-green me-2"></i> Proporcionar alimentación adecuada y agua fresca</li>
+                            <li><i class="fas fa-check-circle text-green me-2"></i> Ofrecer atención veterinaria regular y preventiva</li>
+                            <li><i class="fas fa-check-circle text-green me-2"></i> Esterilizar a la mascota si aún no lo está</li>
+                            <li><i class="fas fa-check-circle text-green me-2"></i> No utilizar a la mascota para reproducción</li>
+                            <li><i class="fas fa-check-circle text-green me-2"></i> Permitir seguimiento post-adopción por 12 meses</li>
+                            <li><i class="fas fa-check-circle text-green me-2"></i> Devolver la mascota al refugio si no puede continuar con su cuidado</li>
+                        </ul>
+                    </div>
 
-                    <h6 class="mt-4 text-brown">3.3 Derechos del Refugio</h6>
-                    <p class="text-secondary">El refugio se reserva el derecho de:</p>
-                    <ul class="terms-list warning-list">
-                        <li class="text-secondary">Rechazar solicitudes sin obligación de justificación</li>
-                        <li class="text-secondary">Suspender el proceso si se detecta información falsa</li>
-                        <li class="text-secondary">Recuperar la mascota en caso de incumplimiento del contrato</li>
-                        <li class="text-secondary">Denegar adopción a personas con antecedentes de maltrato animal</li>
-                    </ul>
+                    <div class="sub-section mt-4">
+                        <h6 class="text-brown"><i class="fas fa-shield-alt text-green me-2"></i> 3.3 Derechos del Refugio</h6>
+                        <ul class="terms-list warning-list">
+                            <li><i class="fas fa-exclamation-triangle text-yellow me-2"></i> Rechazar solicitudes sin obligación de justificación</li>
+                            <li><i class="fas fa-exclamation-triangle text-yellow me-2"></i> Suspender el proceso si se detecta información falsa</li>
+                            <li><i class="fas fa-exclamation-triangle text-yellow me-2"></i> Recuperar la mascota en caso de incumplimiento del contrato</li>
+                            <li><i class="fas fa-exclamation-triangle text-yellow me-2"></i> Denegar adopción a personas con antecedentes de maltrato animal</li>
+                        </ul>
+                    </div>
                 </div>
 
                 <!-- Sección 4: Donaciones -->
                 <div class="terms-section" id="donaciones">
-                    <h3 class="terms-title">4. Donaciones y Apadrinamiento</h3>
+                    <h3 class="terms-title"><i class="fas fa-hand-holding-heart text-green me-2"></i> 4. Donaciones y Apadrinamiento</h3>
 
-                    <h6 class="text-brown">4.1 Tipos de Donación</h6>
-                    <ul class="terms-list">
-                        <li class="text-secondary"><strong>Donación Única:</strong> Contribución puntual sin compromiso de continuidad</li>
-                        <li class="text-secondary"><strong>Donación Recurrente:</strong> Contribución automática mensual</li>
-                        <li class="text-secondary"><strong>Apadrinamiento:</strong> Donación mensual específica para una mascota</li>
-                    </ul>
+                    <div class="sub-section">
+                        <h6 class="text-brown"><i class="fas fa-tag text-green me-2"></i> 4.1 Tipos de Donación</h6>
+                        <ul class="terms-list">
+                            <li><i class="fas fa-check-circle text-green me-2"></i> <strong>Donación Única:</strong> Contribución puntual sin compromiso de continuidad</li>
+                            <li><i class="fas fa-check-circle text-green me-2"></i> <strong>Donación Recurrente:</strong> Contribución automática mensual</li>
+                            <li><i class="fas fa-check-circle text-green me-2"></i> <strong>Apadrinamiento:</strong> Donación mensual específica para una mascota</li>
+                        </ul>
+                    </div>
 
-                    <h6 class="mt-4 text-brown">4.2 Uso de Fondos</h6>
-                    <p class="text-secondary">
-                        Los fondos donados se destinan exclusivamente a:
-                    </p>
-                    <ul class="terms-list">
-                        <li class="text-secondary">Atención veterinaria y medicamentos</li>
-                        <li class="text-secondary">Alimentación de mascotas rescatadas</li>
-                        <li class="text-secondary">Mantenimiento de instalaciones del refugio</li>
-                        <li class="text-secondary">Programas de esterilización comunitaria</li>
-                        <li class="text-secondary">Campañas de educación y concienciación</li>
-                    </ul>
+                    <div class="sub-section mt-4">
+                        <h6 class="text-brown"><i class="fas fa-piggy-bank text-green me-2"></i> 4.2 Uso de Fondos</h6>
+                        <p class="text-secondary">Los fondos donados se destinan exclusivamente a:</p>
+                        <ul class="terms-list">
+                            <li><i class="fas fa-check-circle text-green me-2"></i> Atención veterinaria y medicamentos</li>
+                            <li><i class="fas fa-check-circle text-green me-2"></i> Alimentación de mascotas rescatadas</li>
+                            <li><i class="fas fa-check-circle text-green me-2"></i> Mantenimiento de instalaciones del refugio</li>
+                            <li><i class="fas fa-check-circle text-green me-2"></i> Programas de esterilización comunitaria</li>
+                            <li><i class="fas fa-check-circle text-green me-2"></i> Campañas de educación y concienciación</li>
+                        </ul>
+                    </div>
 
-                    <h6 class="mt-4 text-brown">4.3 Cancelación</h6>
-                    <p class="text-secondary">
-                        Las donaciones recurrentes pueden cancelarse en cualquier momento
-                        con 5 días de anticipación al siguiente cargo. Los donativos no
-                        son reembolsables salvo error de procesamiento.
-                    </p>
+                    <div class="sub-section mt-4">
+                        <h6 class="text-brown"><i class="fas fa-times-circle text-green me-2"></i> 4.3 Cancelación</h6>
+                        <p class="text-secondary">
+                            Las donaciones recurrentes pueden cancelarse en cualquier momento
+                            con 5 días de anticipación al siguiente cargo. Los donativos no
+                            son reembolsables salvo error de procesamiento.
+                        </p>
+                    </div>
                 </div>
 
                 <!-- Sección 5: Privacidad -->
                 <div class="terms-section" id="privacidad">
-                    <h3 class="terms-title">5. Privacidad y Protección de Datos</h3>
+                    <h3 class="terms-title"><i class="fas fa-lock text-green me-2"></i> 5. Privacidad y Protección de Datos</h3>
                     <p class="text-secondary">
                         Nos comprometemos a proteger su información personal de acuerdo con
                         la <strong class="text-brown">Ley Orgánica de Protección de Datos Personales</strong> de Ecuador.
                     </p>
 
-                    <h6 class="mt-4 text-brown">5.1 Datos Recopilados</h6>
-                    <ul class="terms-list">
-                        <li class="text-secondary">Información de registro (nombre, email, teléfono)</li>
-                        <li class="text-secondary">Datos de adopción y evaluación</li>
-                        <li class="text-secondary">Historial de donaciones y transacciones</li>
-                        <li class="text-secondary">Información de reportes y voluntariado</li>
-                        <li class="text-secondary">Dirección IP y datos de navegación</li>
-                    </ul>
+                    <div class="row mt-4">
+                        <div class="col-md-6">
+                            <div class="privacy-card p-3 mb-3">
+                                <h6 class="text-brown"><i class="fas fa-database text-green me-2"></i> Datos Recopilados</h6>
+                                <ul class="terms-list small">
+                                    <li><i class="fas fa-check-circle text-green me-2"></i> Información de registro (nombre, email, teléfono)</li>
+                                    <li><i class="fas fa-check-circle text-green me-2"></i> Datos de adopción y evaluación</li>
+                                    <li><i class="fas fa-check-circle text-green me-2"></i> Historial de donaciones y transacciones</li>
+                                    <li><i class="fas fa-check-circle text-green me-2"></i> Información de reportes y voluntariado</li>
+                                    <li><i class="fas fa-check-circle text-green me-2"></i> Dirección IP y datos de navegación</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="privacy-card p-3 mb-3">
+                                <h6 class="text-brown"><i class="fas fa-chart-line text-green me-2"></i> Uso de Datos</h6>
+                                <ul class="terms-list small">
+                                    <li><i class="fas fa-check-circle text-green me-2"></i> Procesar solicitudes de adopción y donaciones</li>
+                                    <li><i class="fas fa-check-circle text-green me-2"></i> Mantener comunicación sobre su participación</li>
+                                    <li><i class="fas fa-check-circle text-green me-2"></i> Mejorar nuestros servicios y experiencia de usuario</li>
+                                    <li><i class="fas fa-check-circle text-green me-2"></i> Cumplir con obligaciones legales y regulatorias</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
 
-                    <h6 class="mt-4 text-brown">5.2 Uso de Datos</h6>
-                    <p class="text-secondary">Sus datos se utilizan para:</p>
-                    <ul class="terms-list">
-                        <li class="text-secondary">Procesar solicitudes de adopción y donaciones</li>
-                        <li class="text-secondary">Mantener comunicación sobre su participación</li>
-                        <li class="text-secondary">Mejorar nuestros servicios y experiencia de usuario</li>
-                        <li class="text-secondary">Cumplir con obligaciones legales y regulatorias</li>
-                    </ul>
-
-                    <h6 class="mt-4 text-brown">5.3 Confidencialidad</h6>
-                    <p class="text-secondary">
-                        No compartimos información personal con terceros sin su consentimiento,
-                        excepto cuando sea requerido por ley o para procesar transacciones
-                        financieras con entidades autorizadas.
-                    </p>
+                    <div class="acceptance-box mt-3">
+                        <div class="d-flex">
+                            <i class="fas fa-user-secret fa-2x text-green me-3"></i>
+                            <p class="mb-0 text-secondary">
+                                <strong class="text-brown">Confidencialidad:</strong> No compartimos información personal con terceros sin su consentimiento,
+                                excepto cuando sea requerido por ley o para procesar transacciones financieras con entidades autorizadas.
+                            </p>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Sección 6: Responsabilidades -->
                 <div class="terms-section" id="responsabilidades">
-                    <h3 class="terms-title">6. Limitación de Responsabilidad</h3>
+                    <h3 class="terms-title"><i class="fas fa-shield-alt text-green me-2"></i> 6. Limitación de Responsabilidad</h3>
 
-                    <h6 class="text-brown">6.1 Responsabilidad del Usuario</h6>
-                    <p class="text-secondary">El usuario es responsable de:</p>
-                    <ul class="terms-list warning-list">
-                        <li class="text-secondary">Proporcionar información veraz y actualizada</li>
-                        <li class="text-secondary">Mantener la confidencialidad de su cuenta y contraseña</li>
-                        <li class="text-secondary">Reportar uso no autorizado de su cuenta inmediatamente</li>
-                        <li class="text-secondary">Utilizar el sistema conforme a la ley y moralidad</li>
-                    </ul>
+                    <div class="sub-section">
+                        <h6 class="text-brown"><i class="fas fa-user text-green me-2"></i> 6.1 Responsabilidad del Usuario</h6>
+                        <ul class="terms-list warning-list">
+                            <li><i class="fas fa-exclamation-triangle text-yellow me-2"></i> Proporcionar información veraz y actualizada</li>
+                            <li><i class="fas fa-exclamation-triangle text-yellow me-2"></i> Mantener la confidencialidad de su cuenta y contraseña</li>
+                            <li><i class="fas fa-exclamation-triangle text-yellow me-2"></i> Reportar uso no autorizado de su cuenta inmediatamente</li>
+                            <li><i class="fas fa-exclamation-triangle text-yellow me-2"></i> Utilizar el sistema conforme a la ley y moralidad</li>
+                        </ul>
+                    </div>
 
-                    <h6 class="mt-4 text-brown">6.2 Exclusión de Garantías</h6>
-                    <p class="text-secondary">
-                        El sistema se proporciona "tal cual" sin garantías de ningún tipo.
-                        No garantizamos disponibilidad continua, corrección de errores o
-                        seguridad absoluta contra accesos no autorizados.
-                    </p>
+                    <div class="sub-section mt-4">
+                        <h6 class="text-brown"><i class="fas fa-exclamation-circle text-green me-2"></i> 6.2 Exclusión de Garantías</h6>
+                        <p class="text-secondary">
+                            El sistema se proporciona "tal cual" sin garantías de ningún tipo.
+                            No garantizamos disponibilidad continua, corrección de errores o
+                            seguridad absoluta contra accesos no autorizados.
+                        </p>
+                    </div>
 
-                    <h6 class="mt-4 text-brown">6.3 Daños y Perjuicios</h6>
-                    <p class="text-secondary">
-                        En ningún caso el refugio será responsable por daños directos,
-                        indirectos, incidentales o consecuentes resultantes del uso o
-                        imposibilidad de uso del sistema.
-                    </p>
+                    <div class="sub-section mt-4">
+                        <h6 class="text-brown"><i class="fas fa-balance-scale text-green me-2"></i> 6.3 Daños y Perjuicios</h6>
+                        <p class="text-secondary">
+                            En ningún caso el refugio será responsable por daños directos,
+                            indirectos, incidentales o consecuentes resultantes del uso o
+                            imposibilidad de uso del sistema.
+                        </p>
+                    </div>
                 </div>
 
                 <!-- Sección 7: Propiedad -->
                 <div class="terms-section" id="propiedad">
-                    <h3 class="terms-title">7. Propiedad Intelectual</h3>
+                    <h3 class="terms-title"><i class="fas fa-copyright text-green me-2"></i> 7. Propiedad Intelectual</h3>
                     <p class="text-secondary">
                         Todo el contenido del sistema (diseño, código, logos, imágenes,
-                        textos) es propiedad exclusiva del Refugio de Mascotas Ecuador
-                        o de sus licenciantes y está protegido por leyes de propiedad
-                        intelectual ecuatorianas e internacionales.
+                        textos) es propiedad exclusiva de ADOPTAMANÍA o de sus licenciantes
+                        y está protegido por leyes de propiedad intelectual ecuatorianas e internacionales.
                     </p>
-
-                    <p class="text-secondary">
-                        Queda prohibida la reproducción, distribución, modificación o
+                    <div class="alert alert-green mt-3">
+                        <i class="fas fa-ban me-2"></i> Queda prohibida la reproducción, distribución, modificación o
                         uso comercial sin autorización expresa por escrito.
-                    </p>
+                    </div>
                 </div>
 
                 <!-- Sección 8: Modificaciones -->
                 <div class="terms-section" id="modificaciones">
-                    <h3 class="terms-title">8. Modificaciones a los Términos</h3>
+                    <h3 class="terms-title"><i class="fas fa-edit text-green me-2"></i> 8. Modificaciones a los Términos</h3>
                     <p class="text-secondary">
                         Nos reservamos el derecho de modificar estos Términos y Condiciones
                         en cualquier momento. Los cambios entrarán en vigencia 15 días después
                         de su publicación en el sistema.
                     </p>
-
-                    <p class="text-secondary">
+                    <p class="text-secondary mt-3">
                         Se notificarán los cambios importantes por email a los usuarios
                         registrados. El uso continuado del sistema después de los cambios
                         constituye aceptación de los nuevos términos.
@@ -243,14 +301,13 @@
 
                 <!-- Sección 9: Jurisdicción -->
                 <div class="terms-section" id="jurisdiccion">
-                    <h3 class="terms-title">9. Jurisdicción y Ley Aplicable</h3>
+                    <h3 class="terms-title"><i class="fas fa-gavel text-green me-2"></i> 9. Jurisdicción y Ley Aplicable</h3>
                     <p class="text-secondary">
                         Estos Términos se rigen por las leyes de la República del Ecuador.
                         Cualquier disputa relacionada con estos términos será resuelta en
                         los tribunales competentes de Quito, Ecuador.
                     </p>
-
-                    <p class="text-secondary">
+                    <p class="text-secondary mt-3">
                         Para controversias relacionadas con transacciones electrónicas,
                         se aplicarán las disposiciones de la Ley de Comercio Electrónico,
                         Firmas Electrónicas y Mensajes de Datos.
@@ -259,30 +316,29 @@
 
                 <!-- Aceptación Final -->
                 <div class="acceptance-box mt-5">
-                    <div class="custom-control custom-checkbox">
-                        <input type="checkbox" class="custom-control-input" id="acceptTerms" disabled checked>
-                        <label class="custom-control-label text-brown" for="acceptTerms">
-                            <strong>
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-check-circle fa-3x text-green me-3"></i>
+                        <div>
+                            <p class="mb-2 text-brown fw-bold">
                                 Al usar este sistema, reconozco haber leído, entendido
                                 y aceptado todos los Términos y Condiciones establecidos.
-                            </strong>
-                        </label>
+                            </p>
+                            <p class="mb-0 text-secondary">
+                                Para preguntas o aclaraciones sobre estos términos, contacta a:
+                                <a href="mailto:legal@adoptamania.ec" class="text-green">legal@adoptamania.ec</a>
+                            </p>
+                        </div>
                     </div>
-
-                    <p class="mt-3 mb-0 text-secondary">
-                        Para preguntas o aclaraciones sobre estos términos, contacta a:
-                        <a href="mailto:legal@refugiomascotas.org" class="text-green">legal@refugiomascotas.org</a>
-                    </p>
                 </div>
             </div>
 
             <!-- Botones de acción -->
             <div class="text-center mb-5">
-                <a href="@Url.Action("Index", "Home")" class="btn btn-green text-white btn-lg mr-3">
-                    <i class="fas fa-home"></i> Volver al Inicio
+                <a href="@Url.Action("Index", "Home")" class="btn btn-green text-white btn-lg me-3">
+                    <i class="fas fa-home me-2"></i> Volver al Inicio
                 </a>
                 <button onclick="window.print()" class="btn btn-outline-green btn-lg">
-                    <i class="fas fa-print"></i> Imprimir Términos
+                    <i class="fas fa-print me-2"></i> Imprimir Términos
                 </button>
             </div>
         </div>
@@ -291,26 +347,71 @@
 
 @section Styles {
     <style>
+        /* Hero */
         .terms-hero {
-            background: linear-gradient(135deg, #97C78B 0%, #F2C66D 100%);
-            padding: 80px 0;
-            margin-bottom: 40px;
-            border-radius: 10px;
+            background: linear-gradient(135deg, rgba(151,199,139,0.9), rgba(242,198,109,0.8)), url('https://images.unsplash.com/photo-1585829365295-ab7cd400c167?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');
+            background-size: cover;
+            background-position: center;
+            border-radius: 0 0 30px 30px;
+            margin-bottom: 2rem;
         }
 
+        /* Índice lateral */
+        .terms-index-card {
+            background: white;
+            border-radius: 20px;
+            padding: 1.5rem;
+            box-shadow: 0 8px 20px rgba(151,199,139,0.15);
+            position: sticky;
+            top: 20px;
+            border: none;
+        }
+
+        .nav-terms .nav-link {
+            color: var(--texto-oscuro);
+            padding: 0.6rem 1rem;
+            border-radius: 12px;
+            margin-bottom: 0.2rem;
+            transition: background-color 0.2s, color 0.2s;
+            font-weight: 500;
+        }
+
+            .nav-terms .nav-link:hover {
+                background-color: var(--rosado-claro);
+                color: var(--texto-oscuro);
+            }
+
+            .nav-terms .nav-link.active {
+                background-color: var(--verde-menta);
+                color: white !important;
+            }
+
+                .nav-terms .nav-link.active i {
+                    color: white !important;
+                }
+
+        /* Contenedor principal */
         .terms-container {
             background: white;
-            border-radius: 15px;
-            padding: 40px;
-            box-shadow: 0 10px 30px rgba(151, 199, 139, 0.1);
-            margin-bottom: 40px;
-            border: 2px solid #97C78B;
+            border-radius: 24px;
+            padding: 2.5rem;
+            box-shadow: 0 10px 30px rgba(151,199,139,0.1);
+            border: none;
         }
 
+        /* Última actualización */
+        .last-updated {
+            background: var(--fondo-beige);
+            border-radius: 16px;
+            padding: 1rem 1.5rem;
+            border-left: 5px solid var(--verde-menta);
+        }
+
+        /* Secciones */
         .terms-section {
-            margin-bottom: 40px;
-            padding-bottom: 30px;
-            border-bottom: 2px solid #F2E9D8;
+            margin-bottom: 3rem;
+            padding-bottom: 2rem;
+            border-bottom: 2px solid var(--plomo-calido);
         }
 
             .terms-section:last-child {
@@ -318,86 +419,87 @@
             }
 
         .terms-title {
-            color: #5C4B43;
-            border-left: 4px solid #97C78B;
-            padding-left: 15px;
-            margin-bottom: 20px;
+            color: var(--texto-oscuro);
+            margin-bottom: 1.5rem;
+            font-size: 1.8rem;
         }
 
+        /* Subsecciones */
+        .sub-section {
+            margin-top: 2rem;
+        }
+
+            .sub-section h6 {
+                font-size: 1.2rem;
+                margin-bottom: 1rem;
+            }
+
+        /* Listas */
         .terms-list {
-            list-style-type: none;
-            padding-left: 20px;
+            list-style: none;
+            padding-left: 0;
         }
 
             .terms-list li {
-                margin-bottom: 10px;
-                position: relative;
-                padding-left: 25px;
+                margin-bottom: 0.8rem;
+                display: flex;
+                align-items: flex-start;
             }
 
-                .terms-list li::before {
-                    content: '✓';
-                    position: absolute;
-                    left: 0;
-                    color: #97C78B;
-                    font-weight: bold;
+                .terms-list li i {
+                    margin-right: 0.8rem;
+                    margin-top: 0.2rem;
+                    flex-shrink: 0;
                 }
 
-        .warning-list li::before {
-            content: '⚠';
-            color: #F2C66D;
+        /* Servicios en dos columnas */
+        .service-item {
+            background: #f9f9f9;
+            padding: 0.8rem 1rem;
+            border-radius: 12px;
+            transition: background-color 0.2s;
         }
 
-        .scrollspy-terms {
-            position: sticky;
-            top: 20px;
-        }
-
-        .nav-terms .nav-link {
-            color: #555555;
-            border-left: 3px solid transparent;
-            padding: 8px 15px;
-        }
-
-            .nav-terms .nav-link.active {
-                color: #97C78B;
-                border-left: 3px solid #97C78B;
-                background: #F2E9D8;
+            .service-item:hover {
+                background: var(--fondo-beige);
             }
 
-            .nav-terms .nav-link:hover {
-                color: #5C4B43;
-                background: #F2E9D8;
-            }
-
+        /* Caja de aceptación */
         .acceptance-box {
-            background: #F2E9D8;
-            border-left: 4px solid #97C78B;
-            padding: 20px;
-            border-radius: 8px;
-            margin: 30px 0;
+            background: var(--fondo-beige);
+            border-radius: 16px;
+            padding: 1.5rem;
+            border-left: 5px solid var(--verde-menta);
         }
 
-        .last-updated {
-            background: #F2E9D8;
-            padding: 15px;
-            border-radius: 8px;
-            border: 1px solid #97C78B;
+        /* Tarjetas de privacidad */
+        .privacy-card {
+            background: #f9f9f9;
+            border-radius: 16px;
+            border: 1px solid var(--plomo-calido);
+        }
+
+        /* Alertas */
+        .alert-green {
+            background-color: rgba(151,199,139,0.1);
+            border: 1px solid var(--verde-menta);
+            color: var(--texto-oscuro);
+            border-radius: 12px;
         }
 
         /* Responsive */
         @@media (max-width: 768px) {
             .terms-hero {
-                padding: 50px 0;
+                border-radius: 0 0 20px 20px;
+            }
+
+            .terms-index-card {
+                position: static;
+                margin-bottom: 1.5rem;
             }
 
             .terms-container {
-                padding: 25px;
-            }
-
-            .scrollspy-terms {
-                position: static;
-                margin-bottom: 20px;
+                padding: 1.5rem;
             }
         }
 
@@ -405,27 +507,21 @@
         @@media print {
             .terms-hero {
                 background: white !important;
-                color: #5C4B43 !important;
+                color: black !important;
                 padding: 20px 0;
+            }
+
+                .terms-hero i, .terms-hero h1, .terms-hero p {
+                    color: black !important;
+                }
+
+            .terms-index-card, .btn, footer {
+                display: none !important;
             }
 
             .terms-container {
                 box-shadow: none;
-                border: none;
                 padding: 0;
-            }
-
-            .scrollspy-terms,
-            .btn {
-                display: none !important;
-            }
-
-            .terms-title {
-                color: #5C4B43;
-            }
-
-            .acceptance-box {
-                border: 1px solid #ccc;
             }
         }
     </style>
@@ -434,37 +530,35 @@
 @section Scripts {
     <script>
         $(document).ready(function () {
-            // Suavizar scroll a secciones
+            // Scroll suave a secciones
             $('.nav-terms a').on('click', function (e) {
                 e.preventDefault();
                 var target = $(this).attr('href');
                 $('html, body').animate({
-                    scrollTop: $(target).offset().top - 80
+                    scrollTop: $(target).offset().top - 100
                 }, 500);
-
-                // Marcar como activo
-                $('.nav-terms a').removeClass('active');
-                $(this).addClass('active');
             });
 
             // Resaltar sección activa al hacer scroll
             $(window).on('scroll', function () {
-                var scrollPos = $(document).scrollTop() + 100;
+                var scrollPos = $(document).scrollTop() + 120;
                 $('.terms-section').each(function () {
                     var section = $(this);
                     var sectionId = section.attr('id');
                     var sectionTop = section.offset().top;
-                    var sectionHeight = section.height();
+                    var sectionBottom = sectionTop + section.outerHeight();
 
-                    if (scrollPos >= sectionTop && scrollPos < sectionTop + sectionHeight) {
+                    if (scrollPos >= sectionTop && scrollPos < sectionBottom) {
                         $('.nav-terms a').removeClass('active');
                         $('.nav-terms a[href="#' + sectionId + '"]').addClass('active');
                     }
                 });
             });
 
-            // Activar sección inicial
-            $('.nav-terms a:first').addClass('active');
+            // Activar primera sección por defecto
+            if ($('.nav-terms a.active').length === 0) {
+                $('.nav-terms a:first').addClass('active');
+            }
         });
     </script>
 }

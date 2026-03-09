@@ -1,201 +1,54 @@
 ﻿@model dynamic
 
 @{
-    ViewBag.Title = "Nuestros Servicios";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Nuestros Servicios - ADOPTAMANÍA";
 }
 
-<style>
-    .services-hero {
-        background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('/Content/images/services-hero.jpg');
-        background-size: cover;
-        background-position: center;
-        color: white;
-        padding: 100px 0;
-        text-align: center;
-        margin-bottom: 60px;
-    }
-
-    .service-card {
-        background: white;
-        border-radius: 15px;
-        padding: 40px 30px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-        margin-bottom: 30px;
-        height: 100%;
-        transition: all 0.3s ease;
-        border-top: 5px solid transparent;
-        position: relative;
-        overflow: hidden;
-    }
-
-        .service-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
-        }
-
-    .service-icon {
-        font-size: 3.5em;
-        margin-bottom: 25px;
-        width: 100px;
-        height: 100px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 0 auto 25px;
-        color: white;
-    }
-
-    .service-process {
-        counter-reset: step;
-        position: relative;
-        padding: 40px 0;
-    }
-
-    .process-step {
-        text-align: center;
-        position: relative;
-        margin-bottom: 40px;
-    }
-
-        .process-step::before {
-            counter-increment: step;
-            content: counter(step);
-            width: 60px;
-            height: 60px;
-            background: #667eea;
-            color: white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5em;
-            font-weight: bold;
-            margin: 0 auto 20px;
-            z-index: 2;
-            position: relative;
-        }
-
-        .process-step::after {
-            content: '';
-            position: absolute;
-            top: 30px;
-            left: 50%;
-            width: 100%;
-            height: 2px;
-            background: #dee2e6;
-            z-index: 1;
-        }
-
-        .process-step:last-child::after {
-            display: none;
-        }
-
-    .service-feature {
-        display: flex;
-        align-items: flex-start;
-        margin-bottom: 25px;
-        padding: 20px;
-        background: #f8f9fa;
-        border-radius: 10px;
-        transition: all 0.3s;
-    }
-
-        .service-feature:hover {
-            background: white;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            transform: translateX(5px);
-        }
-
-    .feature-icon {
-        font-size: 2em;
-        margin-right: 20px;
-        color: #667eea;
-        min-width: 50px;
-    }
-
-    .pricing-card {
-        border: 2px solid #dee2e6;
-        border-radius: 15px;
-        padding: 30px;
-        text-align: center;
-        transition: all 0.3s;
-        height: 100%;
-    }
-
-        .pricing-card.popular {
-            border-color: #667eea;
-            transform: scale(1.05);
-            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.2);
-        }
-
-    .pricing-header {
-        border-bottom: 2px solid #dee2e6;
-        padding-bottom: 20px;
-        margin-bottom: 20px;
-    }
-
-    .price {
-        font-size: 3em;
-        font-weight: bold;
-        color: #667eea;
-    }
-
-    .service-cta {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        border-radius: 15px;
-        padding: 50px;
-        margin: 60px 0;
-    }
-</style>
-
-<!-- Hero Section -->
-<section class="services-hero">
-    <div class="container">
-        <h1 class="display-3 mb-4">Nuestros Servicios</h1>
-        <p class="lead mb-0">Servicios integrales para el bienestar animal en Ecuador</p>
+<!-- Hero Section con imagen de fondo -->
+<section class="services-hero py-5">
+    <div class="container text-center">
+        <i class="fas fa-paw fa-4x text-white mb-4"></i>
+        <h1 class="display-3 mb-4 text-white">Nuestros Servicios</h1>
+        <p class="lead mb-0 text-white">Servicios integrales para el bienestar animal en Ecuador</p>
     </div>
 </section>
 
-<!-- Todos los Servicios -->
+<!-- Todos los Servicios (tarjetas con iconos) -->
 <section class="py-5">
     <div class="container">
-        <div class="row">
+        <h2 class="text-center mb-5 text-brown"><i class="fas fa-heart text-green me-2"></i> Lo que ofrecemos</h2>
+        <div class="row g-4">
             @foreach (var servicio in ViewBag.Servicios)
             {
-                <div class="col-lg-4 col-md-6 mb-4">
-                    <div class="service-card" style="border-top-color: #667eea;">
-                        <div class="service-icon" style="background: #667eea;">
-                            <i class="@servicio.Icono"></i>
+                <div class="col-lg-4 col-md-6">
+                    <div class="service-card h-100">
+                        <div class="service-icon-wrapper bg-green">
+                            <i class="@servicio.Icono fa-3x text-white"></i>
                         </div>
-                        <h3 class="text-center mb-3">@servicio.Titulo</h3>
-                        <p class="text-center text-muted mb-4">@servicio.Descripcion</p>
-                        <div class="text-center">
-                            <span class="badge badge-primary badge-pill p-2">
-                                @servicio.Estadistica
+                        <h3 class="text-brown text-center mb-3">@servicio.Titulo</h3>
+                        <p class="text-secondary text-center mb-3">@servicio.Descripcion</p>
+                        <div class="text-center mb-4">
+                            <span class="badge bg-pink text-brown px-3 py-2 rounded-pill">
+                                <i class="fas fa-chart-line me-1"></i> @servicio.Estadistica
                             </span>
                         </div>
-
-                        <!-- Acciones según servicio -->
-                        <div class="text-center mt-4">
+                        <div class="text-center">
                             @if (servicio.Titulo.Contains("Adopción"))
                             {
-                                <a href="@Url.Action("Index", "Mascotas")" class="btn btn-outline-primary btn-sm">
-                                    <i class="fas fa-paw"></i> Ver Mascotas
+                                <a href="@Url.Action("Index", "Mascotas")" class="btn btn-outline-green btn-sm">
+                                    <i class="fas fa-paw me-1"></i> Ver Mascotas
                                 </a>
                             }
                             else if (servicio.Titulo.Contains("Donaciones"))
                             {
-                                <a href="@Url.Action("Donar", "Donaciones")" class="btn btn-outline-success btn-sm">
-                                    <i class="fas fa-donate"></i> Donar Ahora
+                                <a href="@Url.Action("Index", "Donaciones")" class="btn btn-outline-green btn-sm">
+                                    <i class="fas fa-donate me-1"></i> Donar Ahora
                                 </a>
                             }
                             else if (servicio.Titulo.Contains("Voluntariado"))
                             {
-                                <a href="@Url.Action("Inscribirse", "Voluntariado")" class="btn btn-outline-info btn-sm">
-                                    <i class="fas fa-user-plus"></i> Ser Voluntario
+                                <a href="@Url.Action("Inscribirse", "Voluntariado")" class="btn btn-outline-green btn-sm">
+                                    <i class="fas fa-user-plus me-1"></i> Ser Voluntario
                                 </a>
                             }
                         </div>
@@ -206,90 +59,98 @@
     </div>
 </section>
 
-<!-- Proceso de Adopción -->
-<section class="py-5 bg-light">
+<!-- Proceso de Adopción (con iconos y números) -->
+<section class="py-5 bg-beige">
     <div class="container">
-        <h2 class="text-center mb-5">Proceso de Adopción Responsable</h2>
-
-        <div class="service-process">
-            <div class="row">
-                <div class="col-md-3 process-step">
-                    <h5>Exploración</h5>
-                    <p>Conoce a nuestras mascotas disponibles</p>
+        <h2 class="text-center mb-5 text-brown"><i class="fas fa-paw text-green me-2"></i> Proceso de Adopción Responsable</h2>
+        <div class="row g-4">
+            <div class="col-md-3">
+                <div class="process-step text-center">
+                    <div class="step-number bg-green text-white mx-auto mb-3">1</div>
+                    <i class="fas fa-search fa-2x text-green mb-3"></i>
+                    <h5 class="text-brown">Exploración</h5>
+                    <p class="text-secondary">Conoce a nuestras mascotas disponibles</p>
                 </div>
-                <div class="col-md-3 process-step">
-                    <h5>Solicitud</h5>
-                    <p>Llena el formulario de adopción</p>
+            </div>
+            <div class="col-md-3">
+                <div class="process-step text-center">
+                    <div class="step-number bg-green text-white mx-auto mb-3">2</div>
+                    <i class="fas fa-file-signature fa-2x text-green mb-3"></i>
+                    <h5 class="text-brown">Solicitud</h5>
+                    <p class="text-secondary">Llena el formulario de adopción</p>
                 </div>
-                <div class="col-md-3 process-step">
-                    <h5>Evaluación</h5>
-                    <p>Entrevista y visita domiciliaria</p>
+            </div>
+            <div class="col-md-3">
+                <div class="process-step text-center">
+                    <div class="step-number bg-green text-white mx-auto mb-3">3</div>
+                    <i class="fas fa-clipboard-check fa-2x text-green mb-3"></i>
+                    <h5 class="text-brown">Evaluación</h5>
+                    <p class="text-secondary">Entrevista y visita domiciliaria</p>
                 </div>
-                <div class="col-md-3 process-step">
-                    <h5>Adopción</h5>
-                    <p>Firma de contrato y entrega</p>
+            </div>
+            <div class="col-md-3">
+                <div class="process-step text-center">
+                    <div class="step-number bg-green text-white mx-auto mb-3">4</div>
+                    <i class="fas fa-home fa-2x text-green mb-3"></i>
+                    <h5 class="text-brown">Adopción</h5>
+                    <p class="text-secondary">Firma de contrato y entrega</p>
                 </div>
             </div>
         </div>
-
         <div class="text-center mt-5">
-            <a href="@Url.Action("Index", "Mascotas")" class="btn btn-primary btn-lg px-5">
-                <i class="fas fa-play-circle"></i> Comenzar Proceso
+            <a href="@Url.Action("Index", "Mascotas")" class="btn btn-green btn-lg px-5">
+                <i class="fas fa-play-circle me-2"></i> Comenzar Proceso
             </a>
         </div>
     </div>
 </section>
 
-<!-- Servicios Veterinarios -->
+<!-- Servicios Veterinarios (con iconos) -->
 <section class="py-5">
     <div class="container">
-        <h2 class="text-center mb-5">Servicios Veterinarios</h2>
-
-        <div class="row">
+        <h2 class="text-center mb-5 text-brown"><i class="fas fa-stethoscope text-green me-2"></i> Servicios Veterinarios</h2>
+        <div class="row g-4">
             <div class="col-md-6">
-                <div class="service-feature">
-                    <div class="feature-icon">
-                        <i class="fas fa-syringe"></i>
+                <div class="service-feature d-flex align-items-start p-3">
+                    <div class="feature-icon bg-pink rounded-circle me-3">
+                        <i class="fas fa-syringe fa-2x text-brown"></i>
                     </div>
                     <div>
-                        <h5>Vacunación Completa</h5>
-                        <p class="text-muted mb-0">Protocolos de vacunación para perros y gatos según edad y necesidades.</p>
+                        <h5 class="text-brown">Vacunación Completa</h5>
+                        <p class="text-secondary mb-0">Protocolos de vacunación para perros y gatos según edad y necesidades.</p>
                     </div>
                 </div>
             </div>
-
             <div class="col-md-6">
-                <div class="service-feature">
-                    <div class="feature-icon">
-                        <i class="fas fa-user-md"></i>
+                <div class="service-feature d-flex align-items-start p-3">
+                    <div class="feature-icon bg-pink rounded-circle me-3">
+                        <i class="fas fa-user-md fa-2x text-brown"></i>
                     </div>
                     <div>
-                        <h5>Esterilización</h5>
-                        <p class="text-muted mb-0">Cirugías seguras con equipo moderno y seguimiento post-operatorio.</p>
+                        <h5 class="text-brown">Esterilización</h5>
+                        <p class="text-secondary mb-0">Cirugías seguras con equipo moderno y seguimiento post-operatorio.</p>
                     </div>
                 </div>
             </div>
-
             <div class="col-md-6">
-                <div class="service-feature">
-                    <div class="feature-icon">
-                        <i class="fas fa-stethoscope"></i>
+                <div class="service-feature d-flex align-items-start p-3">
+                    <div class="feature-icon bg-pink rounded-circle me-3">
+                        <i class="fas fa-stethoscope fa-2x text-brown"></i>
                     </div>
                     <div>
-                        <h5>Consultas Médicas</h5>
-                        <p class="text-muted mb-0">Diagnóstico y tratamiento de enfermedades, atención de emergencias.</p>
+                        <h5 class="text-brown">Consultas Médicas</h5>
+                        <p class="text-secondary mb-0">Diagnóstico y tratamiento de enfermedades, atención de emergencias.</p>
                     </div>
                 </div>
             </div>
-
             <div class="col-md-6">
-                <div class="service-feature">
-                    <div class="feature-icon">
-                        <i class="fas fa-pills"></i>
+                <div class="service-feature d-flex align-items-start p-3">
+                    <div class="feature-icon bg-pink rounded-circle me-3">
+                        <i class="fas fa-pills fa-2x text-brown"></i>
                     </div>
                     <div>
-                        <h5>Farmacia Veterinaria</h5>
-                        <p class="text-muted mb-0">Medicamentos, alimentos especiales y productos de cuidado.</p>
+                        <h5 class="text-brown">Farmacia Veterinaria</h5>
+                        <p class="text-secondary mb-0">Medicamentos, alimentos especiales y productos de cuidado.</p>
                     </div>
                 </div>
             </div>
@@ -297,143 +158,138 @@
     </div>
 </section>
 
-<!-- Precios de Servicios Veterinarios -->
-<section class="py-5 bg-light">
+<!-- Precios de Servicios Veterinarios (tarjetas) -->
+<section class="py-5 bg-beige">
     <div class="container">
-        <h2 class="text-center mb-5">Precios de Servicios Veterinarios</h2>
-
-        <div class="row justify-content-center">
-            <div class="col-md-4 mb-4">
-                <div class="pricing-card">
-                    <div class="pricing-header">
-                        <h4>Básico</h4>
-                        <div class="price">$25</div>
-                        <p class="text-muted">Consulta General</p>
+        <h2 class="text-center mb-5 text-brown"><i class="fas fa-tag text-green me-2"></i> Precios de Servicios Veterinarios</h2>
+        <div class="row g-4 justify-content-center">
+            <div class="col-md-4">
+                <div class="pricing-card h-100 text-center p-4">
+                    <div class="pricing-icon mb-3">
+                        <i class="fas fa-stethoscope fa-3x text-green"></i>
                     </div>
+                    <h4 class="text-brown">Básico</h4>
+                    <div class="price display-4 text-green mb-2">$25</div>
+                    <p class="text-secondary mb-3">Consulta General</p>
                     <ul class="list-unstyled mb-4">
-                        <li class="mb-2"><i class="fas fa-check text-success mr-2"></i> Consulta médica</li>
-                        <li class="mb-2"><i class="fas fa-check text-success mr-2"></i> Diagnóstico básico</li>
-                        <li class="mb-2"><i class="fas fa-times text-muted mr-2"></i> Vacunas</li>
-                        <li><i class="fas fa-times text-muted mr-2"></i> Exámenes de laboratorio</li>
+                        <li class="mb-2"><i class="fas fa-check-circle text-green me-2"></i> Consulta médica</li>
+                        <li class="mb-2"><i class="fas fa-check-circle text-green me-2"></i> Diagnóstico básico</li>
+                        <li class="mb-2"><i class="fas fa-times-circle text-muted me-2"></i> Vacunas</li>
+                        <li><i class="fas fa-times-circle text-muted me-2"></i> Exámenes de laboratorio</li>
                     </ul>
-                    <a href="@Url.Action("Contact", "Home")" class="btn btn-outline-primary">Agendar</a>
+                    <a href="@Url.Action("Contact", "Home")" class="btn btn-outline-green w-100">Agendar</a>
                 </div>
             </div>
-
-            <div class="col-md-4 mb-4">
-                <div class="pricing-card popular">
-                    <div class="pricing-header">
-                        <span class="badge badge-primary">MÁS POPULAR</span>
-                        <h4>Completo</h4>
-                        <div class="price">$50</div>
-                        <p class="text-muted">Paquetes de Esterilización</p>
+            <div class="col-md-4">
+                <div class="pricing-card popular h-100 text-center p-4">
+                    <div class="pricing-icon mb-3">
+                        <i class="fas fa-heart fa-3x text-green"></i>
                     </div>
+                    <span class="badge bg-pink text-brown px-3 py-2 mb-2">MÁS POPULAR</span>
+                    <h4 class="text-brown">Completo</h4>
+                    <div class="price display-4 text-green mb-2">$50</div>
+                    <p class="text-secondary mb-3">Esterilización</p>
                     <ul class="list-unstyled mb-4">
-                        <li class="mb-2"><i class="fas fa-check text-success mr-2"></i> Cirugía de esterilización</li>
-                        <li class="mb-2"><i class="fas fa-check text-success mr-2"></i> Anestesia y monitoreo</li>
-                        <li class="mb-2"><i class="fas fa-check text-success mr-2"></i> Medicamentos post-operatorios</li>
-                        <li><i class="fas fa-check text-success mr-2"></i> Control a los 7 días</li>
+                        <li class="mb-2"><i class="fas fa-check-circle text-green me-2"></i> Cirugía de esterilización</li>
+                        <li class="mb-2"><i class="fas fa-check-circle text-green me-2"></i> Anestesia y monitoreo</li>
+                        <li class="mb-2"><i class="fas fa-check-circle text-green me-2"></i> Medicamentos post-operatorios</li>
+                        <li><i class="fas fa-check-circle text-green me-2"></i> Control a los 7 días</li>
                     </ul>
-                    <a href="@Url.Action("Contact", "Home")" class="btn btn-primary">Agendar</a>
+                    <a href="@Url.Action("Contact", "Home")" class="btn btn-green w-100">Agendar</a>
                 </div>
             </div>
-
-            <div class="col-md-4 mb-4">
-                <div class="pricing-card">
-                    <div class="pricing-header">
-                        <h4>Vacunación</h4>
-                        <div class="price">$35</div>
-                        <p class="text-muted">Paquete Completo</p>
+            <div class="col-md-4">
+                <div class="pricing-card h-100 text-center p-4">
+                    <div class="pricing-icon mb-3">
+                        <i class="fas fa-syringe fa-3x text-green"></i>
                     </div>
+                    <h4 class="text-brown">Vacunación</h4>
+                    <div class="price display-4 text-green mb-2">$35</div>
+                    <p class="text-secondary mb-3">Paquete Completo</p>
                     <ul class="list-unstyled mb-4">
-                        <li class="mb-2"><i class="fas fa-check text-success mr-2"></i> Pentavalente canina/felina</li>
-                        <li class="mb-2"><i class="fas fa-check text-success mr-2"></i> Antirrábica</li>
-                        <li class="mb-2"><i class="fas fa-check text-success mr-2"></i> Desparasitación</li>
-                        <li><i class="fas fa-check text-success mr-2"></i> Carnet de vacunación</li>
+                        <li class="mb-2"><i class="fas fa-check-circle text-green me-2"></i> Pentavalente canina/felina</li>
+                        <li class="mb-2"><i class="fas fa-check-circle text-green me-2"></i> Antirrábica</li>
+                        <li class="mb-2"><i class="fas fa-check-circle text-green me-2"></i> Desparasitación</li>
+                        <li><i class="fas fa-check-circle text-green me-2"></i> Carnet de vacunación</li>
                     </ul>
-                    <a href="@Url.Action("Contact", "Home")" class="btn btn-outline-primary">Agendar</a>
+                    <a href="@Url.Action("Contact", "Home")" class="btn btn-outline-green w-100">Agendar</a>
                 </div>
             </div>
         </div>
     </div>
 </section>
 
-<!-- Call to Action -->
-<section class="service-cta">
+<!-- Call to Action con imagen de fondo -->
+<section class="service-cta py-5">
     <div class="container text-center">
-        <h2 class="mb-4">¿Necesitas ayuda para tu mascota?</h2>
-        <p class="lead mb-5">Nuestro equipo veterinario está listo para atender a tu compañero.</p>
-
-        <div class="row justify-content-center">
-            <div class="col-md-3 mb-3">
-                <a href="@Url.Action("Contact", "Home")" class="btn btn-light btn-lg btn-block">
-                    <i class="fas fa-calendar-check"></i> Agendar Cita
+        <h2 class="mb-4 text-white">¿Necesitas ayuda para tu mascota?</h2>
+        <p class="lead mb-5 text-white">Nuestro equipo veterinario está listo para atender a tu compañero.</p>
+        <div class="row justify-content-center g-3">
+            <div class="col-md-3">
+                <a href="@Url.Action("Contact", "Home")" class="btn btn-pink btn-lg w-100">
+                    <i class="fas fa-calendar-check me-2"></i> Agendar Cita
                 </a>
             </div>
-            <div class="col-md-3 mb-3">
-                <a href="tel:@ViewBag.Telefono" class="btn btn-outline-light btn-lg btn-block">
-                    <i class="fas fa-phone"></i> Llamar Ahora
+            <div class="col-md-3">
+                <a href="tel:@ViewBag.Telefono" class="btn btn-yellow btn-lg w-100">
+                    <i class="fas fa-phone me-2"></i> Llamar Ahora
                 </a>
             </div>
-            <div class="col-md-3 mb-3">
-                <a href="@Url.Action("ReportarRescate", "Rescate")" class="btn btn-outline-light btn-lg btn-block">
-                    <i class="fas fa-ambulance"></i> Emergencia
+            <div class="col-md-3">
+                <a href="@Url.Action("ReportarRescate", "Rescate")" class="btn btn-light btn-lg w-100 text-brown">
+                    <i class="fas fa-ambulance me-2"></i> Emergencia
                 </a>
             </div>
         </div>
     </div>
 </section>
 
-<!-- Preguntas Frecuentes -->
+<!-- Preguntas Frecuentes (con iconos) -->
 <section class="py-5">
     <div class="container">
-        <h2 class="text-center mb-5">Preguntas sobre Servicios</h2>
-
-        <div class="row">
+        <h2 class="text-center mb-5 text-brown"><i class="fas fa-question-circle text-green me-2"></i> Preguntas sobre Servicios</h2>
+        <div class="row g-4">
             <div class="col-md-6">
-                <div class="card mb-3 border-0 shadow-sm">
-                    <div class="card-body">
-                        <h5 class="card-title">¿Atienden emergencias las 24 horas?</h5>
-                        <p class="card-text text-muted">
-                            Sí, contamos con servicio de emergencias veterinarias las 24 horas
-                            para casos críticos. Llama al 099-EMERGENCIA.
-                        </p>
+                <div class="faq-card d-flex p-3">
+                    <div class="faq-icon bg-pink rounded-circle me-3 flex-shrink-0">
+                        <i class="fas fa-clock fa-2x text-brown"></i>
+                    </div>
+                    <div>
+                        <h5 class="text-brown">¿Atienden emergencias las 24 horas?</h5>
+                        <p class="text-secondary mb-0">Sí, contamos con servicio de emergencias veterinarias las 24 horas para casos críticos. Llama al 099-363-734.</p>
                     </div>
                 </div>
             </div>
-
             <div class="col-md-6">
-                <div class="card mb-3 border-0 shadow-sm">
-                    <div class="card-body">
-                        <h5 class="card-title">¿Ofrecen servicios a domicilio?</h5>
-                        <p class="card-text text-muted">
-                            Sí, para consultas básicas, vacunación y seguimiento post-operatorio
-                            ofrecemos servicio a domicilio en Quito.
-                        </p>
+                <div class="faq-card d-flex p-3">
+                    <div class="faq-icon bg-pink rounded-circle me-3 flex-shrink-0">
+                        <i class="fas fa-home fa-2x text-brown"></i>
+                    </div>
+                    <div>
+                        <h5 class="text-brown">¿Ofrecen servicios a domicilio?</h5>
+                        <p class="text-secondary mb-0">Sí, para consultas básicas, vacunación y seguimiento post-operatorio ofrecemos servicio a domicilio en Quito.</p>
                     </div>
                 </div>
             </div>
-
             <div class="col-md-6">
-                <div class="card mb-3 border-0 shadow-sm">
-                    <div class="card-body">
-                        <h5 class="card-title">¿Aceptan mascotas exóticas?</h5>
-                        <p class="card-text text-muted">
-                            Atendemos perros, gatos y pequeños mamíferos. Para aves y reptiles
-                            contamos con especialistas referidos.
-                        </p>
+                <div class="faq-card d-flex p-3">
+                    <div class="faq-icon bg-pink rounded-circle me-3 flex-shrink-0">
+                        <i class="fas fa-dog fa-2x text-brown"></i>
+                    </div>
+                    <div>
+                        <h5 class="text-brown">¿Aceptan mascotas exóticas?</h5>
+                        <p class="text-secondary mb-0">Atendemos perros, gatos y pequeños mamíferos. Para aves y reptiles contamos con especialistas referidos.</p>
                     </div>
                 </div>
             </div>
-
             <div class="col-md-6">
-                <div class="card mb-3 border-0 shadow-sm">
-                    <div class="card-body">
-                        <h5 class="card-title">¿Hay descuentos para múltiples mascotas?</h5>
-                        <p class="card-text text-muted">
-                            Sí, ofrecemos 20% de descuento en servicios para la segunda mascota
-                            y 30% para la tercera en adelante.
-                        </p>
+                <div class="faq-card d-flex p-3">
+                    <div class="faq-icon bg-pink rounded-circle me-3 flex-shrink-0">
+                        <i class="fas fa-percent fa-2x text-brown"></i>
+                    </div>
+                    <div>
+                        <h5 class="text-brown">¿Hay descuentos para múltiples mascotas?</h5>
+                        <p class="text-secondary mb-0">Sí, ofrecemos 20% de descuento en servicios para la segunda mascota y 30% para la tercera en adelante.</p>
                     </div>
                 </div>
             </div>
@@ -441,35 +297,152 @@
     </div>
 </section>
 
-@section Scripts {
-    <script>
-        $(document).ready(function () {
-            // Animación para las tarjetas de servicio
-            $('.service-card').each(function (i) {
-                $(this).delay(i * 200).animate({
-                    opacity: 1,
-                    top: 0
-                }, 500);
-            });
+@section Styles {
+    <style>
+        /* Hero */
+        .services-hero {
+            background: linear-gradient(135deg, rgba(151,199,139,0.9), rgba(242,198,109,0.8)), url('https://images.unsplash.com/photo-1548199973-03cce0bbc87b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');
+            background-size: cover;
+            background-position: center;
+            border-radius: 0 0 30px 30px;
+            margin-bottom: 2rem;
+        }
 
-            // Contador para precios (efecto visual)
-            $('.price').each(function () {
-                var $this = $(this);
-                var price = parseFloat($this.text().replace('$', ''));
+        /* Tarjetas de servicio */
+        .service-card {
+            background: white;
+            border-radius: 24px;
+            padding: 2rem 1.5rem;
+            box-shadow: 0 8px 20px rgba(151,199,139,0.15);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: none;
+            display: flex;
+            flex-direction: column;
+        }
 
-                $({ count: 0 }).animate({
-                    count: price
-                }, {
-                    duration: 2000,
-                    easing: 'swing',
-                    step: function () {
-                        $this.text('$' + Math.floor(this.count));
-                    },
-                    complete: function () {
-                        $this.text('$' + this.count);
-                    }
-                });
-            });
-        });
-    </script>
+            .service-card:hover {
+                transform: translateY(-6px);
+                box-shadow: 0 15px 30px rgba(151,199,139,0.25);
+            }
+
+        .service-icon-wrapper {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            background-color: var(--verde-menta);
+        }
+
+        /* Proceso de adopción */
+        .process-step {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem 1rem;
+            box-shadow: 0 8px 20px rgba(151,199,139,0.15);
+            height: 100%;
+        }
+
+        .step-number {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        /* Características veterinarias */
+        .service-feature {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(151,199,139,0.1);
+            transition: transform 0.2s;
+        }
+
+            .service-feature:hover {
+                transform: translateX(5px);
+            }
+
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        /* Tarjetas de precios */
+        .pricing-card {
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 8px 20px rgba(151,199,139,0.15);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: none;
+            position: relative;
+        }
+
+            .pricing-card.popular {
+                transform: scale(1.05);
+                box-shadow: 0 15px 30px rgba(151,199,139,0.3);
+                border: 2px solid var(--verde-menta);
+            }
+
+            .pricing-card:hover {
+                transform: translateY(-6px);
+            }
+
+        .price {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--verde-menta);
+            line-height: 1.2;
+        }
+
+        /* CTA */
+        .service-cta {
+            background: linear-gradient(135deg, rgba(151,199,139,0.9), rgba(242,198,109,0.8)), url('https://images.unsplash.com/photo-1511632765486-a01980e01a18?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');
+            background-size: cover;
+            background-position: center;
+            border-radius: 30px;
+            margin: 2rem 0;
+        }
+
+        /* FAQ */
+        .faq-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(151,199,139,0.1);
+            transition: transform 0.2s;
+            height: 100%;
+        }
+
+            .faq-card:hover {
+                transform: translateY(-3px);
+            }
+
+        .faq-icon {
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Responsive */
+        @@media (max-width: 768px) {
+            .services-hero {
+                border-radius: 0 0 20px 20px;
+            }
+
+            .pricing-card.popular {
+                transform: scale(1);
+            }
+        }
+    </style>
 }

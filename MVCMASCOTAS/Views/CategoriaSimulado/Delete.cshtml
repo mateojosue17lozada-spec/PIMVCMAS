@@ -1,0 +1,23 @@
+﻿@model MVCMASCOTAS.Controllers.CategoriaSimuladoController.CategoriaItem
+
+@{
+    ViewBag.Title = "Eliminar Categoría";
+}
+
+<h3>¿Está seguro de eliminar esta categoría?</h3>
+<div>
+    <h4>@Model.Nombre</h4>
+    <dl class="dl-horizontal">
+        <dt>Descripción</dt>
+        <dd>@Model.Descripcion</dd>
+        <dt>Activo</dt>
+        <dd>@Model.Activo</dd>
+    </dl>
+
+    @using (Html.BeginForm())
+    {
+        @Html.AntiForgeryToken()
+        <input type="submit" value="Eliminar" class="btn btn-danger" />
+        @Html.ActionLink("Cancelar", "Index", null, new { @class = "btn btn-default" })
+    }
+</div>

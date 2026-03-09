@@ -1,10 +1,9 @@
-﻿// Controllers/ReportesController.cs
-using MVCMASCOTAS.Models;
+﻿using MVCMASCOTAS.Models;
 using MVCMASCOTAS.Models.CustomModels.Reportes;
-using Microsoft.Reporting.WebForms;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Web.Mvc;
 
 namespace MVCMASCOTAS.Controllers
@@ -14,6 +13,9 @@ namespace MVCMASCOTAS.Controllers
     {
         private RefugioMascotasDBEntities db = new RefugioMascotasDBEntities();
 
+        // ============================================================
+        // INDEX
+        // ============================================================
         public ActionResult Index()
         {
             ViewBag.TotalAdopciones = db.ContratoAdopcion.Count();
@@ -23,60 +25,9 @@ namespace MVCMASCOTAS.Controllers
             return View();
         }
 
-        private byte[] RenderizarReportePDF(string rutaRdlc, string nombreDataSet, object datos, ReportParameter[] parametros)
-        {
-            LocalReport localReport = new LocalReport();
-            localReport.ReportPath = Server.MapPath(rutaRdlc);
-
-            ReportDataSource dataSource = new ReportDataSource(nombreDataSet, datos);
-            localReport.DataSources.Clear();
-            localReport.DataSources.Add(dataSource);
-            localReport.SetParameters(parametros);
-
-            string mimeType, encoding, fileNameExtension;
-            string[] streams;
-            Warning[] warnings;
-
-            byte[] bytes = localReport.Render("PDF", null, out mimeType, out encoding, out fileNameExtension, out streams, out warnings);
-            return bytes;
-        }
-
-        // ============================================
-        // REPORTE 1: ADOPCIONES REALIZADAS
-        // ============================================
-        [Authorize(Roles = "Administrador,Veterinario")]
-        public ActionResult ReporteAdopciones(DateTime? fechaInicio, DateTime? fechaFin)
-        {
-            try
-            {
-                var datos = ObtenerDatosAdopciones(fechaInicio, fechaFin);
-
-                if (!datos.Any())
-                {
-                    TempData["InfoMessage"] = "No hay datos para el período seleccionado.";
-                    return RedirectToAction("Index", "Reportes");
-                }
-
-                ReportParameter[] parametros = new ReportParameter[]
-                {
-                    new ReportParameter("FechaGeneracion", DateTime.Now.ToString("dd/MM/yyyy HH:mm")),
-                    new ReportParameter("Usuario", User.Identity.Name ?? "Sistema"),
-                    new ReportParameter("FechaInicio", fechaInicio?.ToString("dd/MM/yyyy") ?? "Todos"),
-                    new ReportParameter("FechaFin", fechaFin?.ToString("dd/MM/yyyy") ?? "Todos"),
-                    new ReportParameter("TotalRegistros", datos.Count.ToString()),
-                    new ReportParameter("TotalAdopciones", datos.Count.ToString())
-                };
-
-                byte[] bytes = RenderizarReportePDF("~/Reports/rptAdopcionesRealizadas.rdlc", "DataSetAdopciones", datos, parametros);
-                return File(bytes, "application/pdf", $"Adopciones_{DateTime.Now:yyyyMMdd_HHmmss}.pdf");
-            }
-            catch (Exception ex)
-            {
-                TempData["ErrorMessage"] = "Error Reporte Adopciones: " + ex.Message + (ex.InnerException != null ? " | " + ex.InnerException.Message : "");
-                return RedirectToAction("Index", "Reportes");
-            }
-        }
-
+        // ============================================================
+        // DATOS: ADOPCIONES
+        // ============================================================
         private List<AdopcionRealizadaReporteModel> ObtenerDatosAdopciones(DateTime? fechaInicio, DateTime? fechaFin)
         {
             var query = from c in db.ContratoAdopcion
@@ -113,20 +64,17 @@ namespace MVCMASCOTAS.Controllers
                             VeterinarioAsignado = m.Usuarios1 != null ? m.Usuarios1.NombreCompleto : "No asignado"
                         };
 
-            // ✅ Variables locales fuera del lambda para evitar NotSupportedException
             if (fechaInicio.HasValue)
             {
                 DateTime inicio = fechaInicio.Value.Date;
                 query = query.Where(a => a.FechaAdopcion >= inicio);
             }
-
             if (fechaFin.HasValue)
             {
                 DateTime fin = fechaFin.Value.Date.AddDays(1).AddSeconds(-1);
                 query = query.Where(a => a.FechaAdopcion <= fin);
             }
 
-            // ✅ ToList() antes de mapear al modelo final
             return query.ToList().Select(a => new AdopcionRealizadaReporteModel
             {
                 SolicitudId = a.SolicitudId,
@@ -156,45 +104,9 @@ namespace MVCMASCOTAS.Controllers
             }).OrderByDescending(a => a.FechaAdopcion).ToList();
         }
 
-        // ============================================
-        // REPORTE 2: MASCOTAS REGISTRADAS
-        // ============================================
-        [Authorize(Roles = "Administrador,Veterinario")]
-        public ActionResult ReporteMascotas(string especie = "", string estado = "", string sexo = "", bool soloActivas = true)
-        {
-            try
-            {
-                var datos = ObtenerDatosMascotas(especie, estado, sexo, soloActivas);
-
-                if (!datos.Any())
-                {
-                    TempData["InfoMessage"] = "No hay datos para los filtros seleccionados.";
-                    return RedirectToAction("Index", "Reportes");
-                }
-
-                ReportParameter[] parametros = new ReportParameter[]
-                {
-                    new ReportParameter("FechaGeneracion", DateTime.Now.ToString("dd/MM/yyyy HH:mm")),
-                    new ReportParameter("Usuario", User.Identity.Name ?? "Sistema"),
-                    new ReportParameter("FiltroEspecie", string.IsNullOrEmpty(especie) ? "Todas" : especie),
-                    new ReportParameter("FiltroEstado", string.IsNullOrEmpty(estado) ? "Todos" : estado),
-                    new ReportParameter("FiltroSexo", string.IsNullOrEmpty(sexo) ? "Todos" : sexo),
-                    new ReportParameter("TotalRegistros", datos.Count.ToString()),
-                    new ReportParameter("TotalPerros", datos.Count(m => m.Especie == "Perro").ToString()),
-                    new ReportParameter("TotalGatos", datos.Count(m => m.Especie == "Gato").ToString()),
-                    new ReportParameter("TotalDisponibles", datos.Count(m => m.Estado == "Disponible para adopción").ToString())
-                };
-
-                byte[] bytes = RenderizarReportePDF("~/Reports/rptMascotasRegistradas.rdlc", "DataSetMascotas", datos, parametros);
-                return File(bytes, "application/pdf", $"Mascotas_{DateTime.Now:yyyyMMdd_HHmmss}.pdf");
-            }
-            catch (Exception ex)
-            {
-                TempData["ErrorMessage"] = "Error Reporte Mascotas: " + ex.Message + (ex.InnerException != null ? " | " + ex.InnerException.Message : "");
-                return RedirectToAction("Index", "Reportes");
-            }
-        }
-
+        // ============================================================
+        // DATOS: MASCOTAS
+        // ============================================================
         private List<MascotaRegistradaReporteModel> ObtenerDatosMascotas(string especie, string estado, string sexo, bool soloActivas)
         {
             var query = from m in db.Mascotas
@@ -224,16 +136,11 @@ namespace MVCMASCOTAS.Controllers
                             TotalVacunas = m.MascotaVacunas.Count
                         };
 
-            if (!string.IsNullOrEmpty(especie))
-                query = query.Where(m => m.Especie == especie);
-            if (!string.IsNullOrEmpty(estado))
-                query = query.Where(m => m.Estado == estado);
-            if (!string.IsNullOrEmpty(sexo))
-                query = query.Where(m => m.Sexo == sexo);
-            if (soloActivas)
-                query = query.Where(m => m.Activo == true);
+            if (!string.IsNullOrEmpty(especie)) query = query.Where(m => m.Especie == especie);
+            if (!string.IsNullOrEmpty(estado)) query = query.Where(m => m.Estado == estado);
+            if (!string.IsNullOrEmpty(sexo)) query = query.Where(m => m.Sexo == sexo);
+            if (soloActivas) query = query.Where(m => m.Activo == true);
 
-            // ✅ ToList() primero, luego calcular DiasEnRefugio en memoria
             return query.ToList().Select(m => new MascotaRegistradaReporteModel
             {
                 MascotaId = m.MascotaId,
@@ -263,45 +170,9 @@ namespace MVCMASCOTAS.Controllers
             }).OrderByDescending(m => m.FechaIngreso).ToList();
         }
 
-        // ============================================
-        // REPORTE 3: SOLICITUDES DE ADOPCIÓN
-        // ============================================
-        [Authorize(Roles = "Administrador,Veterinario")]
-        public ActionResult ReporteSolicitudes(string estado = "", DateTime? fechaInicio = null, DateTime? fechaFin = null)
-        {
-            try
-            {
-                var datos = ObtenerDatosSolicitudes(estado, fechaInicio, fechaFin);
-
-                if (!datos.Any())
-                {
-                    TempData["InfoMessage"] = "No hay solicitudes para los filtros seleccionados.";
-                    return RedirectToAction("Index", "Reportes");
-                }
-
-                ReportParameter[] parametros = new ReportParameter[]
-                {
-                    new ReportParameter("FechaGeneracion", DateTime.Now.ToString("dd/MM/yyyy HH:mm")),
-                    new ReportParameter("Usuario", User.Identity.Name ?? "Sistema"),
-                    new ReportParameter("FiltroEstado", string.IsNullOrEmpty(estado) ? "Todos" : estado),
-                    new ReportParameter("FechaInicio", fechaInicio?.ToString("dd/MM/yyyy") ?? "Sin filtro"),
-                    new ReportParameter("FechaFin", fechaFin?.ToString("dd/MM/yyyy") ?? "Sin filtro"),
-                    new ReportParameter("TotalRegistros", datos.Count.ToString()),
-                    new ReportParameter("Pendientes", datos.Count(s => s.Estado == "Pendiente").ToString()),
-                    new ReportParameter("Aprobadas", datos.Count(s => s.Estado == "Aprobada").ToString()),
-                    new ReportParameter("Rechazadas", datos.Count(s => s.Estado == "Rechazada").ToString())
-                };
-
-                byte[] bytes = RenderizarReportePDF("~/Reports/rptSolicitudesAdopcion.rdlc", "DataSetSolicitudes", datos, parametros);
-                return File(bytes, "application/pdf", $"Solicitudes_{DateTime.Now:yyyyMMdd_HHmmss}.pdf");
-            }
-            catch (Exception ex)
-            {
-                TempData["ErrorMessage"] = "Error Reporte Solicitudes: " + ex.Message + (ex.InnerException != null ? " | " + ex.InnerException.Message : "");
-                return RedirectToAction("Index", "Reportes");
-            }
-        }
-
+        // ============================================================
+        // DATOS: SOLICITUDES
+        // ============================================================
         private List<SolicitudAdopcionReporteModel> ObtenerDatosSolicitudes(string estado, DateTime? fechaInicio, DateTime? fechaFin)
         {
             var query = from s in db.SolicitudAdopcion
@@ -346,14 +217,10 @@ namespace MVCMASCOTAS.Controllers
                             s.Observaciones
                         };
 
-            if (!string.IsNullOrEmpty(estado))
-                query = query.Where(s => s.Estado == estado);
-            if (fechaInicio.HasValue)
-                query = query.Where(s => s.FechaSolicitud >= fechaInicio.Value.Date);
-            if (fechaFin.HasValue)
-                query = query.Where(s => s.FechaSolicitud <= fechaFin.Value.Date.AddDays(1).AddSeconds(-1));
+            if (!string.IsNullOrEmpty(estado)) query = query.Where(s => s.Estado == estado);
+            if (fechaInicio.HasValue) query = query.Where(s => s.FechaSolicitud >= fechaInicio.Value.Date);
+            if (fechaFin.HasValue) query = query.Where(s => s.FechaSolicitud <= fechaFin.Value.Date.AddDays(1).AddSeconds(-1));
 
-            // ✅ ToList() primero, luego calcular DiasEnProceso en memoria
             return query.ToList().Select(s => new SolicitudAdopcionReporteModel
             {
                 SolicitudId = s.SolicitudId,
@@ -387,59 +254,16 @@ namespace MVCMASCOTAS.Controllers
                 FechaRespuesta = s.FechaRespuesta,
                 MotivoRechazo = s.MotivoRechazo,
                 Observaciones = s.Observaciones,
-                // ✅ Calculado en memoria, no en SQL
                 DiasEnProceso = s.FechaRespuesta.HasValue
-                    ? (s.FechaRespuesta.Value - s.FechaSolicitud).Days
-                    : (DateTime.Now - s.FechaSolicitud).Days,
+                                ? (s.FechaRespuesta.Value - s.FechaSolicitud).Days
+                                : (DateTime.Now - s.FechaSolicitud).Days,
                 FechaGeneracion = DateTime.Now
             }).OrderByDescending(s => s.FechaSolicitud).ToList();
         }
 
-        // ============================================
-        // REPORTE 4: POST-SEGUIMIENTO
-        // ============================================
-        [Authorize(Roles = "Administrador,Veterinario")]
-        public ActionResult ReporteSeguimientos(string tipo = "todos", DateTime? fechaDesde = null, DateTime? fechaHasta = null)
-        {
-            try
-            {
-                var datos = ObtenerDatosSeguimientos(tipo, fechaDesde, fechaHasta);
-
-                if (!datos.Any())
-                {
-                    TempData["InfoMessage"] = "No hay datos de seguimiento para los filtros seleccionados.";
-                    return RedirectToAction("Index", "Reportes");
-                }
-
-                int realizados = datos.Count(s => s.FechaSeguimiento.HasValue);
-                int pendientes = datos.Count(s => !s.FechaSeguimiento.HasValue && (!s.ProximoSeguimiento.HasValue || s.ProximoSeguimiento >= DateTime.Now));
-                int vencidos = datos.Count(s => !s.FechaSeguimiento.HasValue && s.ProximoSeguimiento.HasValue && s.ProximoSeguimiento < DateTime.Now);
-                int requierenIntervencion = datos.Count(s => s.RequiereIntervencion);
-
-                ReportParameter[] parametros = new ReportParameter[]
-                {
-                    new ReportParameter("FechaGeneracion", DateTime.Now.ToString("dd/MM/yyyy HH:mm")),
-                    new ReportParameter("Usuario", User.Identity.Name ?? "Sistema"),
-                    new ReportParameter("FiltroTipo", tipo),
-                    new ReportParameter("FechaDesde", fechaDesde?.ToString("dd/MM/yyyy") ?? "Todas"),
-                    new ReportParameter("FechaHasta", fechaHasta?.ToString("dd/MM/yyyy") ?? "Todas"),
-                    new ReportParameter("TotalRegistros", datos.Count.ToString()),
-                    new ReportParameter("Realizados", realizados.ToString()),
-                    new ReportParameter("Pendientes", pendientes.ToString()),
-                    new ReportParameter("Vencidos", vencidos.ToString()),
-                    new ReportParameter("RequierenIntervencion", requierenIntervencion.ToString())
-                };
-
-                byte[] bytes = RenderizarReportePDF("~/Reports/rptSeguimientoPostAdopcion.rdlc", "DataSetSeguimientos", datos, parametros);
-                return File(bytes, "application/pdf", $"Seguimientos_{DateTime.Now:yyyyMMdd_HHmmss}.pdf");
-            }
-            catch (Exception ex)
-            {
-                TempData["ErrorMessage"] = "Error Reporte Seguimientos: " + ex.Message + (ex.InnerException != null ? " | " + ex.InnerException.Message : "");
-                return RedirectToAction("Index", "Reportes");
-            }
-        }
-
+        // ============================================================
+        // DATOS: SEGUIMIENTOS
+        // ============================================================
         private List<SeguimientoPostAdopcionReporteModel> ObtenerDatosSeguimientos(string tipo, DateTime? fechaDesde, DateTime? fechaHasta)
         {
             var query = from seg in db.SeguimientoAdopcion
@@ -449,31 +273,30 @@ namespace MVCMASCOTAS.Controllers
                         join uAdoptante in db.Usuarios on s.UsuarioId equals uAdoptante.UsuarioId
                         join uResponsable in db.Usuarios on seg.ResponsableSeguimiento equals uResponsable.UsuarioId into responsableJoin
                         from responsable in responsableJoin.DefaultIfEmpty()
-                        select new SeguimientoPostAdopcionReporteModel
+                        select new
                         {
-                            SeguimientoId = seg.SeguimientoId,
-                            FechaSeguimiento = seg.FechaSeguimiento,
-                            TipoSeguimiento = seg.TipoSeguimiento,
-                            EstadoMascota = seg.EstadoMascota,
-                            CondicionesVivienda = seg.CondicionesVivienda,
-                            RelacionConAdoptante = seg.RelacionConAdoptante,
-                            Observaciones = seg.Observaciones,
-                            Recomendaciones = seg.Recomendaciones,
-                            RequiereIntervencion = seg.RequiereIntervencion,
-                            ProximoSeguimiento = seg.ProximoSeguimiento,
-                            ContratoId = c.ContratoId,
-                            NumeroContrato = c.NumeroContrato,
-                            FechaContrato = c.FechaContrato,
-                            MascotaId = m.MascotaId,
-                            NombreMascota = m.Nombre,
-                            EspecieMascota = m.Especie,
-                            RazaMascota = m.Raza ?? "Mestizo",
+                            seg.SeguimientoId,
+                            seg.FechaSeguimiento,
+                            seg.TipoSeguimiento,
+                            seg.EstadoMascota,
+                            seg.CondicionesVivienda,
+                            seg.RelacionConAdoptante,
+                            seg.Observaciones,
+                            seg.Recomendaciones,
+                            seg.RequiereIntervencion,
+                            seg.ProximoSeguimiento,
+                            c.ContratoId,
+                            c.NumeroContrato,
+                            c.FechaContrato,
+                            m.MascotaId,
+                            m.Nombre,
+                            m.Especie,
+                            Raza = m.Raza ?? "Mestizo",
                             NombreAdoptante = uAdoptante.NombreCompleto,
                             TelefonoAdoptante = uAdoptante.Telefono ?? "No registrado",
                             EmailAdoptante = uAdoptante.Email,
                             DireccionAdoptante = uAdoptante.Direccion ?? "No registrada",
-                            ResponsableNombre = responsable != null ? responsable.NombreCompleto : "No asignado",
-                            FechaGeneracion = DateTime.Now
+                            ResponsableNombre = responsable != null ? responsable.NombreCompleto : "No asignado"
                         };
 
             if (tipo == "realizados") query = query.Where(s => s.FechaSeguimiento.HasValue);
@@ -481,41 +304,40 @@ namespace MVCMASCOTAS.Controllers
             else if (tipo == "vencidos") query = query.Where(s => !s.FechaSeguimiento.HasValue && s.ProximoSeguimiento.HasValue && s.ProximoSeguimiento < DateTime.Now);
             else if (tipo == "intervencion") query = query.Where(s => s.RequiereIntervencion);
 
-            if (fechaDesde.HasValue)
-                query = query.Where(s => s.FechaSeguimiento >= fechaDesde.Value.Date || s.ProximoSeguimiento >= fechaDesde.Value.Date);
-            if (fechaHasta.HasValue)
-                query = query.Where(s => s.FechaSeguimiento <= fechaHasta.Value.Date.AddDays(1) || s.ProximoSeguimiento <= fechaHasta.Value.Date.AddDays(1));
+            if (fechaDesde.HasValue) query = query.Where(s => s.FechaSeguimiento >= fechaDesde.Value.Date || s.ProximoSeguimiento >= fechaDesde.Value.Date);
+            if (fechaHasta.HasValue) query = query.Where(s => s.FechaSeguimiento <= fechaHasta.Value.Date.AddDays(1) || s.ProximoSeguimiento <= fechaHasta.Value.Date.AddDays(1));
 
-            return query.OrderByDescending(s => s.ProximoSeguimiento ?? s.FechaSeguimiento).ToList();
+            return query.ToList().Select(x => new SeguimientoPostAdopcionReporteModel
+            {
+                SeguimientoId = x.SeguimientoId,
+                FechaSeguimiento = x.FechaSeguimiento,
+                TipoSeguimiento = x.TipoSeguimiento,
+                EstadoMascota = x.EstadoMascota,
+                CondicionesVivienda = x.CondicionesVivienda,
+                RelacionConAdoptante = x.RelacionConAdoptante,
+                Observaciones = x.Observaciones,
+                Recomendaciones = x.Recomendaciones,
+                RequiereIntervencion = x.RequiereIntervencion,
+                ProximoSeguimiento = x.ProximoSeguimiento,
+                ContratoId = x.ContratoId,
+                NumeroContrato = x.NumeroContrato,
+                FechaContrato = x.FechaContrato,
+                MascotaId = x.MascotaId,
+                NombreMascota = x.Nombre,
+                EspecieMascota = x.Especie,
+                RazaMascota = x.Raza,
+                NombreAdoptante = x.NombreAdoptante,
+                TelefonoAdoptante = x.TelefonoAdoptante,
+                EmailAdoptante = x.EmailAdoptante,
+                DireccionAdoptante = x.DireccionAdoptante,
+                ResponsableNombre = x.ResponsableNombre,
+                FechaGeneracion = DateTime.Now
+            }).OrderByDescending(s => s.ProximoSeguimiento ?? s.FechaSeguimiento).ToList();
         }
 
-        // ============================================
-        // REPORTE 5: ESTADÍSTICAS GENERALES
-        // ============================================
-        [Authorize(Roles = "Administrador,Veterinario")]
-        public ActionResult ReporteEstadisticas()
-        {
-            try
-            {
-                var stats = ObtenerEstadisticasGenerales();
-                var lista = new List<EstadisticasGeneralesReporteModel> { stats };
-
-                ReportParameter[] parametros = new ReportParameter[]
-                {
-                    new ReportParameter("FechaGeneracion", DateTime.Now.ToString("dd/MM/yyyy HH:mm")),
-                    new ReportParameter("Usuario", User.Identity.Name ?? "Sistema")
-                };
-
-                byte[] bytes = RenderizarReportePDF("~/Reports/rptEstadisticasGenerales.rdlc", "DataSetEstadisticas", lista, parametros);
-                return File(bytes, "application/pdf", $"Estadisticas_{DateTime.Now:yyyyMMdd_HHmmss}.pdf");
-            }
-            catch (Exception ex)
-            {
-                TempData["ErrorMessage"] = "Error Reporte Estadísticas: " + ex.Message + (ex.InnerException != null ? " | " + ex.InnerException.Message : "");
-                return RedirectToAction("Index", "Reportes");
-            }
-        }
-
+        // ============================================================
+        // DATOS: ESTADÍSTICAS
+        // ============================================================
         private EstadisticasGeneralesReporteModel ObtenerEstadisticasGenerales()
         {
             var hoy = DateTime.Now;
@@ -536,9 +358,9 @@ namespace MVCMASCOTAS.Controllers
             model.Rescatadas = db.Mascotas.Count(m => m.Estado == "Rescatada" && m.Activo == true);
 
             var adopcionesConFechas = db.Mascotas
-    .Where(m => m.FechaAdopcion.HasValue && m.FechaIngreso.HasValue)
-    .Select(m => new { Ingreso = m.FechaIngreso.Value, Adopcion = m.FechaAdopcion.Value })
-    .ToList(); // ✅ Traer a memoria primero
+                .Where(m => m.FechaAdopcion.HasValue && m.FechaIngreso.HasValue)
+                .Select(m => new { Ingreso = m.FechaIngreso.Value, Adopcion = m.FechaAdopcion.Value })
+                .ToList();
 
             if (adopcionesConFechas.Any())
                 model.PromedioDiasAdopcion = adopcionesConFechas.Average(a => (a.Adopcion - a.Ingreso).TotalDays);
@@ -552,19 +374,9 @@ namespace MVCMASCOTAS.Controllers
             return model;
         }
 
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing) db?.Dispose();
-            base.Dispose(disposing);
-        }
-
-
-        // AGREGA estas acciones al ReportesController existente
-
-        // ============================================
-        // VISTAS HTML CON GRÁFICAS
-        // ============================================
-
+        // ============================================================
+        // VISTAS HTML
+        // ============================================================
         [Authorize(Roles = "Administrador,Veterinario")]
         public ActionResult VerAdopciones(DateTime? fechaInicio, DateTime? fechaFin)
         {
@@ -610,8 +422,89 @@ namespace MVCMASCOTAS.Controllers
         [Authorize(Roles = "Administrador,Veterinario")]
         public ActionResult VerEstadisticas()
         {
-            var stats = ObtenerEstadisticasGenerales();
-            return View(stats);
+            return View(ObtenerEstadisticasGenerales());
+        }
+
+        // ============================================================
+        // EXPORTAR EXCEL/CSV
+        // ============================================================
+        private FileContentResult GenerarCsv(string[] headers, IEnumerable<string[]> rows, string fileName)
+        {
+            var sb = new StringBuilder();
+            sb.AppendLine(string.Join(",", headers.Select(h => "\"" + h + "\"")));
+            foreach (var row in rows)
+                sb.AppendLine(string.Join(",", row.Select(c => "\"" + (c ?? "").Replace("\"", "\"\"") + "\"")));
+            var bytes = Encoding.UTF8.GetPreamble()
+                .Concat(Encoding.UTF8.GetBytes(sb.ToString())).ToArray();
+            return File(bytes, "application/vnd.ms-excel", fileName);
+        }
+
+        [Authorize(Roles = "Administrador,Veterinario")]
+        public ActionResult ExportarExcelAdopciones(DateTime? fechaInicio, DateTime? fechaFin)
+        {
+            var d = ObtenerDatosAdopciones(fechaInicio, fechaFin);
+            var h = new[] { "N° Contrato", "Fecha Adopción", "Mascota", "Especie", "Raza", "Sexo", "Adoptante", "Cédula", "Teléfono", "Email", "Ciudad", "Estado", "Puntaje", "Resultado", "Evaluador", "Veterinario" };
+            var r = d.Select(a => new[] { a.NumeroContrato, a.FechaAdopcion.ToString("dd/MM/yyyy"), a.NombreMascota, a.EspecieMascota, a.RazaMascota, a.SexoMascota, a.NombreAdoptante, a.CedulaAdoptante, a.TelefonoAdoptante, a.EmailAdoptante, a.CiudadAdoptante, a.EstadoSolicitud, a.PuntajeEvaluacion?.ToString() ?? "N/A", a.ResultadoEvaluacion, a.EvaluadoPor, a.VeterinarioAsignado });
+            return GenerarCsv(h, r, $"Adopciones_{DateTime.Now:yyyyMMdd_HHmmss}.csv");
+        }
+
+        [Authorize(Roles = "Administrador,Veterinario")]
+        public ActionResult ExportarExcelMascotas(string especie = "", string estado = "", string sexo = "", bool soloActivas = true)
+        {
+            var d = ObtenerDatosMascotas(especie, estado, sexo, soloActivas);
+            var h = new[] { "Nombre", "Especie", "Raza", "Sexo", "Edad", "Tamaño", "Color", "Categoría", "Estado", "Esterilizado", "Microchip", "Fecha Ingreso", "Días en Refugio", "Veterinario", "Rescatista", "Tratamientos", "Vacunas" };
+            var r = d.Select(m => new[] { m.Nombre, m.Especie, m.Raza, m.Sexo, m.EdadAproximada, m.Tamanio, m.Color, m.Categoria, m.Estado, m.Esterilizado == true ? "Sí" : "No", m.Microchip, m.FechaIngreso?.ToString("dd/MM/yyyy") ?? "N/A", m.DiasEnRefugio.ToString(), m.VeterinarioAsignado, m.RescatistaNombre, m.TotalTratamientos.ToString(), m.TotalVacunas.ToString() });
+            return GenerarCsv(h, r, $"Mascotas_{DateTime.Now:yyyyMMdd_HHmmss}.csv");
+        }
+
+        [Authorize(Roles = "Administrador,Veterinario")]
+        public ActionResult ExportarExcelSolicitudes(string estado = "", DateTime? fechaInicio = null, DateTime? fechaFin = null)
+        {
+            var d = ObtenerDatosSolicitudes(estado, fechaInicio, fechaFin);
+            var h = new[] { "ID", "Fecha", "Solicitante", "Cédula", "Teléfono", "Email", "Ciudad", "Mascota", "Especie", "Raza", "Estado", "Puntaje", "Resultado", "Evaluador", "Tipo Vivienda", "Días en Proceso" };
+            var r = d.Select(s => new[] { s.SolicitudId.ToString(), s.FechaSolicitud.ToString("dd/MM/yyyy"), s.NombreSolicitante, s.CedulaSolicitante, s.TelefonoSolicitante, s.EmailSolicitante, s.CiudadSolicitante, s.NombreMascota, s.EspecieMascota, s.RazaMascota, s.Estado, s.PuntajeEvaluacion?.ToString() ?? "N/A", s.ResultadoEvaluacion, s.EvaluadorNombre, s.TipoVivienda, s.DiasEnProceso.ToString() });
+            return GenerarCsv(h, r, $"Solicitudes_{DateTime.Now:yyyyMMdd_HHmmss}.csv");
+        }
+
+        [Authorize(Roles = "Administrador,Veterinario")]
+        public ActionResult ExportarExcelSeguimientos(string tipo = "todos", DateTime? fechaDesde = null, DateTime? fechaHasta = null)
+        {
+            var d = ObtenerDatosSeguimientos(tipo, fechaDesde, fechaHasta);
+            var h = new[] { "N° Contrato", "Mascota", "Especie", "Adoptante", "Teléfono", "Tipo", "Fecha Seguim.", "Próximo", "Estado Mascota", "Cond. Vivienda", "Relación", "Intervención", "Responsable", "Observaciones" };
+            var r = d.Select(s => new[] { s.NumeroContrato, s.NombreMascota, s.EspecieMascota, s.NombreAdoptante, s.TelefonoAdoptante, s.TipoSeguimiento, s.FechaSeguimiento?.ToString("dd/MM/yyyy") ?? "PENDIENTE", s.ProximoSeguimiento?.ToString("dd/MM/yyyy") ?? "No programado", s.EstadoMascota, s.CondicionesVivienda, s.RelacionConAdoptante, s.RequiereIntervencion ? "Sí" : "No", s.ResponsableNombre, s.Observaciones });
+            return GenerarCsv(h, r, $"Seguimientos_{DateTime.Now:yyyyMMdd_HHmmss}.csv");
+        }
+
+        [Authorize(Roles = "Administrador,Veterinario")]
+        public ActionResult ExportarExcelEstadisticas()
+        {
+            var s = ObtenerEstadisticasGenerales();
+            var h = new[] { "Métrica", "Valor" };
+            var r = new[] {
+                new[] { "Total mascotas activas",       s.TotalMascotas.ToString() },
+                new[] { "Total adopciones",             s.TotalAdopciones.ToString() },
+                new[] { "Solicitudes pendientes",       s.SolicitudesPendientes.ToString() },
+                new[] { "Seguimientos pendientes",      s.SeguimientosPendientes.ToString() },
+                new[] { "Perros",                       s.TotalPerros.ToString() },
+                new[] { "Gatos",                        s.TotalGatos.ToString() },
+                new[] { "Otros",                        s.TotalOtros.ToString() },
+                new[] { "Disponibles para adopción",    s.Disponibles.ToString() },
+                new[] { "En tratamiento",               s.EnTratamiento.ToString() },
+                new[] { "Adoptadas",                    s.Adoptadas.ToString() },
+                new[] { "Rescatadas",                   s.Rescatadas.ToString() },
+                new[] { "Promedio días hasta adopción", s.PromedioDiasAdopcion.ToString("0.0") },
+                new[] { "Sin adoptar >6 meses",         s.MascotasSinAdoptarLargoPlazo.ToString() },
+                new[] { "Adopciones este mes",          s.AdopcionesEsteMes.ToString() },
+                new[] { "Solicitudes este mes",         s.SolicitudesEsteMes.ToString() },
+                new[] { "Ingresos este mes",            s.IngresosEsteMes.ToString() }
+            };
+            return GenerarCsv(h, r, $"Estadisticas_{DateTime.Now:yyyyMMdd_HHmmss}.csv");
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing) db?.Dispose();
+            base.Dispose(disposing);
         }
     }
 }

@@ -1,226 +1,221 @@
 ﻿@model MVCMASCOTAS.Models.ViewModels.ConfirmarApadrinamientoViewModel
 
 @{
-    ViewBag.Title = "Confirmar Apadrinamiento";
+    ViewBag.Title = "Confirmar Apadrinamiento - ADOPTAMANÍA";
     ViewData["Title"] = "Confirmar Apadrinamiento";
 }
 
-<!-- Contenido principal -->
-<div class="container body-content mt-4">
-    <div class="row justify-content-center">
-        <div class="col-md-10">
-            <div class="card shadow-hover border-green">
-                <div class="card-header bg-green text-white">
-                    <h3 class="mb-0"><i class="fa fa-heart me-2"></i> Confirmar Apadrinamiento</h3>
-                </div>
+<!-- Hero Section -->
+<section class="confirmar-hero py-4">
+    <div class="container text-center">
+        <i class="fas fa-heart fa-3x text-green mb-3"></i>
+        <h1 class="display-5 fw-bold mb-2 text-brown">Confirmar Apadrinamiento</h1>
+        <p class="lead mb-3 text-secondary">Completa los datos para finalizar el apadrinamiento</p>
+    </div>
+</section>
 
-                <div class="card-body bg-light-mint">
-                    @using (Html.BeginForm("Confirmar", "Apadrinar", FormMethod.Post, new { @class = "needs-validation", novalidate = "novalidate", id = "apadrinarForm" }))
-                    {
-                        @Html.AntiForgeryToken()
-                        @Html.HiddenFor(m => m.MascotaId)
-                        @Html.HiddenFor(m => m.MascotaNombre)
-                        @Html.HiddenFor(m => m.MascotaEspecie)
+<!-- Main Content -->
+<section class="py-5 bg-beige">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <!-- Mensajes de error/success -->
+                @if (TempData["ErrorMessage"] != null)
+                {
+                    <div class="alert alert-beige border-green alert-dismissible fade show mb-4" role="alert">
+                        <i class="fas fa-exclamation-triangle text-green me-2"></i>
+                        <strong class="text-brown">@TempData["ErrorMessage"]</strong>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                }
+                @if (TempData["SuccessMessage"] != null)
+                {
+                    <div class="alert alert-beige border-green alert-dismissible fade show mb-4" role="alert">
+                        <i class="fas fa-check-circle text-green me-2"></i>
+                        <strong class="text-brown">@TempData["SuccessMessage"]</strong>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                }
 
-                        <!-- Mensajes de error/success -->
-                        if (TempData["ErrorMessage"] != null)
+                <!-- Tarjeta principal -->
+                <div class="confirmar-card">
+                    <div class="confirmar-card-header bg-green text-white">
+                        <i class="fas fa-heart me-2"></i> Confirmar Apadrinamiento
+                    </div>
+                    <div class="confirmar-card-body">
+                        @using (Html.BeginForm("Confirmar", "Apadrinar", FormMethod.Post, new { @class = "needs-validation", novalidate = "novalidate", id = "apadrinarForm" }))
                         {
-                            <div class="alert alert-green border-green alert-dismissible fade show" role="alert">
-                                <i class="fa fa-exclamation-triangle text-green me-2"></i>
-                                <strong class="text-brown">@TempData["ErrorMessage"]</strong>
-                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
+                            @Html.AntiForgeryToken()
+                            @Html.HiddenFor(m => m.MascotaId)
+                            @Html.HiddenFor(m => m.MascotaNombre)
+                            @Html.HiddenFor(m => m.MascotaEspecie)
+
+                            <!-- Información de la mascota -->
+                            <div class="text-center mb-4">
+                                <h4 class="text-brown">Estás apadrinando a:</h4>
+                                <h2 class="text-green">@Model.MascotaNombre</h2>
+                                <p class="text-secondary">@Model.MascotaEspecie</p>
                             </div>
-                        }
 
-                        if (TempData["SuccessMessage"] != null)
-                        {
-                            <div class="alert alert-green border-green alert-dismissible fade show" role="alert">
-                                <i class="fa fa-check-circle text-green me-2"></i>
-                                <strong class="text-brown">@TempData["SuccessMessage"]</strong>
-                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                            </div>
-                        }
-
-                        <!-- Información de la mascota -->
-                        <div class="text-center mb-4">
-                            <h4 class="text-brown">Estás apadrinando a:</h4>
-                            <h2 class="text-green">@Model.MascotaNombre</h2>
-                            <p class="text-secondary">@Model.MascotaEspecie</p>
-                        </div>
-
-                        <!-- Información del usuario -->
-                        <div class="alert-green p-3 rounded mb-4">
-                            <h5 class="text-brown"><i class="fa fa-user text-green me-2"></i> Información del Apadrinador</h5>
-                            <p class="text-secondary mb-1"><strong>Nombre:</strong> @Model.UsuarioNombre</p>
-                            <p class="text-secondary mb-1"><strong>Email:</strong> @Model.UsuarioEmail</p>
-                            @if (!string.IsNullOrEmpty(Model.UsuarioTelefono))
-                            {
-                                <p class="text-secondary mb-0"><strong>Teléfono:</strong> @Model.UsuarioTelefono</p>
-                            }
-                        </div>
-
-                        <!-- Monto mensual -->
-                        <div class="form-group mb-4">
-                            <label for="MontoMensual" class="font-weight-bold text-brown">
-                                <i class="fa fa-dollar-sign text-green me-2"></i>Monto Mensual (USD) *
-                            </label>
-                            <div class="input-group input-group-lg">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text bg-light">
-                                        <i class="fa fa-hand-holding-usd text-green"></i>
-                                    </span>
-                                </div>
-                                @Html.TextBoxFor(m => m.MontoMensualTexto,
-                                    new
+                            <!-- Información del apadrinador -->
+                            <div class="alert alert-beige border-green d-flex align-items-start mb-4">
+                                <i class="fas fa-user-circle fa-2x text-green me-3"></i>
+                                <div>
+                                    <h5 class="text-brown mb-2"><i class="fas fa-id-card me-2 text-green"></i>Información del Apadrinador</h5>
+                                    <p class="text-secondary mb-1"><strong>Nombre:</strong> @Model.UsuarioNombre</p>
+                                    <p class="text-secondary mb-1"><strong>Email:</strong> @Model.UsuarioEmail</p>
+                                    @if (!string.IsNullOrEmpty(Model.UsuarioTelefono))
                                     {
-                                        @class = "form-control border-green",
-                                        type = "text",
-                                        required = "required",
-                                        placeholder = "10.00",
-                                        title = "Ingresa un monto válido (ej. 10.00 o 10,00)",
-                                        id = "MontoMensualInput",
-                                        data_val = "true",
-                                        data_val_required = "El monto mensual es requerido",
-                                        data_val_regex = "Formato inválido. Use 10.00 o 10,00",
-                                        data_val_regex_pattern = @"^\d+([\.,]\d{1,2})?$"
-                                    })
-                                <div class="input-group-append">
-                                    <span class="input-group-text">/mes</span>
+                                        <p class="text-secondary mb-0"><strong>Teléfono:</strong> @Model.UsuarioTelefono</p>
+                                    }
                                 </div>
                             </div>
-                            @Html.ValidationMessageFor(m => m.MontoMensualTexto, "", new { @class = "text-danger small" })
-                            <small class="form-text text-secondary">
-                                <i class="fa fa-info-circle text-green me-1"></i> Monto mínimo: <strong class="text-brown">$10.00</strong> mensuales
-                            </small>
-                        </div>
 
-                        <!-- Método de pago -->
-                        <div class="form-group mb-4">
-                            <label class="font-weight-bold text-brown">
-                                <i class="fa fa-credit-card text-green me-2"></i>Método de Pago *
-                            </label>
-                            <div class="metodos-pago-container">
-                                @foreach (var metodo in Model.MetodosPago)
-                                {
-                                    <div class="metodo-pago-card" onclick="seleccionarMetodoPago('@metodo.Id')">
-                                        <div class="form-check">
-                                            <input class="form-check-input"
-                                                   type="radio"
-                                                   name="MetodoPagoSeleccionado"
-                                                   id="metodo_@metodo.Id"
-                                                   value="@metodo.Id"
-                                                   @(metodo.Id == "tarjeta_credito" ? "checked" : "")
-                                                   required>
-                                            <label class="form-check-label text-brown" for="metodo_@metodo.Id">
-                                                <strong>@metodo.Nombre</strong>
-                                                <br>
-                                                <small class="text-secondary">@metodo.Descripcion</small>
-                                            </label>
-                                        </div>
-                                    </div>
-                                }
-                            </div>
-                            @Html.ValidationMessageFor(m => m.MetodoPagoSeleccionado, "", new { @class = "text-danger small" })
-                        </div>
-
-                        <!-- Beneficios -->
-                        <div class="alert-green p-3 rounded mb-4">
-                            <h5 class="text-brown"><i class="fa fa-gift text-green me-2"></i> Beneficios Incluidos en tu Apadrinamiento</h5>
-                            <div class="row">
-                                <div class="col-md-6 mb-2">
-                                    <i class="fa fa-check-circle text-green me-2"></i> <strong class="text-brown">Actualizaciones mensuales</strong> <span class="text-secondary">con fotos y videos</span>
-                                </div>
-                                <div class="col-md-6 mb-2">
-                                    <i class="fa fa-check-circle text-green me-2"></i> <strong class="text-brown">Certificado digital</strong> <span class="text-secondary">de apadrinamiento</span>
-                                </div>
-                                <div class="col-md-6 mb-2">
-                                    <i class="fa fa-check-circle text-green me-2"></i> <strong class="text-brown">Reportes periódicos</strong> <span class="text-secondary">sobre su salud y bienestar</span>
-                                </div>
-                                <div class="col-md-6 mb-2">
-                                    <i class="fa fa-check-circle text-green me-2"></i> <strong class="text-brown">Tarjeta de agradecimiento</strong> <span class="text-secondary">personalizada</span>
-                                </div>
-                                <div class="col-md-6 mb-2">
-                                    <i class="fa fa-check-circle text-green me-2"></i> <strong class="text-brown">Tu nombre</strong> <span class="text-secondary">en nuestro muro de honor</span>
-                                </div>
-                                <div class="col-md-6 mb-2">
-                                    <i class="fa fa-check-circle text-green me-2"></i> <strong class="text-brown">Visitas especiales</strong> <span class="text-secondary">(con cita previa)</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Términos y condiciones -->
-                        <div class="form-group mb-4">
-                            <div class="form-check">
-                                @Html.CheckBoxFor(m => m.AceptaTerminos, new
-                                {
-                                    @class = "form-check-input",
-                                    id = "AceptaTerminos",
-                                    required = "required"
-                                })
-                                <label class="form-check-label text-brown" for="AceptaTerminos">
-                                    Acepto los <a href="#" class="text-green" data-toggle="modal" data-target="#terminosModal">términos y condiciones</a> del programa de apadrinamiento *
+                            <!-- Monto mensual -->
+                            <div class="mb-4">
+                                <label for="MontoMensualInput" class="form-label text-brown fw-medium">
+                                    <i class="fas fa-dollar-sign text-green me-2"></i>Monto Mensual (USD) *
                                 </label>
+                                <div class="input-group input-group-lg">
+                                    <span class="input-group-text bg-white border-green"><i class="fas fa-hand-holding-heart text-green"></i></span>
+                                    @Html.TextBoxFor(m => m.MontoMensualTexto,
+                                        new
+                                        {
+                                            @class = "form-control border-green",
+                                            type = "text",
+                                            required = "required",
+                                            placeholder = "10.00",
+                                            title = "Ingresa un monto válido (ej. 10.00 o 10,00)",
+                                            id = "MontoMensualInput",
+                                            data_val = "true",
+                                            data_val_required = "El monto mensual es requerido",
+                                            data_val_regex = "Formato inválido. Use 10.00 o 10,00",
+                                            data_val_regex_pattern = @"^\d+([\.,]\d{1,2})?$"
+                                        })
+                                    <span class="input-group-text bg-white border-green">/mes</span>
+                                </div>
+                                @Html.ValidationMessageFor(m => m.MontoMensualTexto, "", new { @class = "text-danger small mt-1" })
+                                <small class="text-secondary">
+                                    <i class="fas fa-info-circle text-green me-1"></i> Monto mínimo: <strong class="text-brown">$10.00</strong> mensuales
+                                </small>
                             </div>
-                            @Html.ValidationMessageFor(m => m.AceptaTerminos, "", new { @class = "text-danger small" })
-                            <span class="text-danger small" id="terminos-error" style="display:none;">Debes aceptar los términos y condiciones</span>
-                        </div>
 
-                        <!-- Resumen -->
-                        <div class="alert alert-warning border border-warning">
-                            <h5 class="text-brown"><i class="fa fa-file-invoice-dollar text-warning me-2"></i> Resumen del Apadrinamiento</h5>
-                            <table class="table table-sm table-borderless mb-0">
-                                <tr>
-                                    <td class="text-brown">Monto mensual:</td>
-                                    <td class="text-right"><strong class="text-green">$<span id="monto-resumen">@Model.MontoMensual.ToString("N2")</span></strong></td>
-                                </tr>
-                                <tr>
-                                    <td class="text-brown">Costo anual estimado:</td>
-                                    <td class="text-right"><strong class="text-green">$<span id="costo-anual">@((Model.MontoMensual * 12).ToString("N2"))</span></strong></td>
-                                </tr>
-                                <tr>
-                                    <td class="text-brown">Duración:</td>
-                                    <td class="text-right"><strong class="text-green">Indefinido</strong></td>
-                                </tr>
-                            </table>
-                        </div>
+                            <!-- Métodos de pago -->
+                            <div class="mb-4">
+                                <label class="form-label text-brown fw-medium">
+                                    <i class="fas fa-credit-card text-green me-2"></i>Método de Pago *
+                                </label>
+                                <div class="row g-3">
+                                    @foreach (var metodo in Model.MetodosPago)
+                                    {
+                                        <div class="col-md-6">
+                                            <div class="metodo-pago-card" onclick="seleccionarMetodoPago('@metodo.Id')">
+                                                <div class="form-check">
+                                                    <input class="form-check-input"
+                                                           type="radio"
+                                                           name="MetodoPagoSeleccionado"
+                                                           id="metodo_@metodo.Id"
+                                                           value="@metodo.Id"
+                                                           @(metodo.Id == "tarjeta_credito" ? "checked" : "")
+                                                           required>
+                                                    <label class="form-check-label text-brown" for="metodo_@metodo.Id">
+                                                        <strong>@metodo.Nombre</strong>
+                                                        <br>
+                                                        <small class="text-secondary">@metodo.Descripcion</small>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                                @Html.ValidationMessageFor(m => m.MetodoPagoSeleccionado, "", new { @class = "text-danger small mt-1" })
+                            </div>
 
-                        <!-- Botones -->
-                        <div class="text-center mt-4">
-                            <a href="@Url.Action("Index", "Apadrinar")" class="btn btn-outline-green btn-lg mr-3">
-                                <i class="fa fa-arrow-left me-2"></i> Volver
-                            </a>
-                            <button type="submit" class="btn btn-green btn-lg" id="btn-confirmar">
-                                <i class="fa fa-heart me-2"></i> <span id="btn-text">Confirmar Apadrinamiento</span>
-                                <span id="btn-loading" style="display:none;">
-                                    <i class="fa fa-spinner fa-spin me-2"></i> Procesando...
-                                </span>
-                            </button>
-                        </div>
-                    }
+                            <!-- Beneficios -->
+                            <div class="alert alert-beige border-green p-3 mb-4">
+                                <h5 class="text-brown mb-3"><i class="fas fa-gift text-green me-2"></i> Beneficios Incluidos</h5>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <p class="mb-2"><i class="fas fa-check-circle text-green me-2"></i><strong class="text-brown">Actualizaciones mensuales</strong> <span class="text-secondary">con fotos y videos</span></p>
+                                        <p class="mb-2"><i class="fas fa-check-circle text-green me-2"></i><strong class="text-brown">Certificado digital</strong> <span class="text-secondary">de apadrinamiento</span></p>
+                                        <p class="mb-2"><i class="fas fa-check-circle text-green me-2"></i><strong class="text-brown">Reportes periódicos</strong> <span class="text-secondary">sobre su salud y bienestar</span></p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <p class="mb-2"><i class="fas fa-check-circle text-green me-2"></i><strong class="text-brown">Tarjeta de agradecimiento</strong> <span class="text-secondary">personalizada</span></p>
+                                        <p class="mb-2"><i class="fas fa-check-circle text-green me-2"></i><strong class="text-brown">Tu nombre</strong> <span class="text-secondary">en el muro de honor</span></p>
+                                        <p class="mb-2"><i class="fas fa-check-circle text-green me-2"></i><strong class="text-brown">Visitas especiales</strong> <span class="text-secondary">(con cita previa)</span></p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Términos y condiciones -->
+                            <div class="mb-4">
+                                <div class="form-check">
+                                    @Html.CheckBoxFor(m => m.AceptaTerminos, new
+                                    {
+                                        @class = "form-check-input",
+                                        id = "AceptaTerminos",
+                                        required = "required"
+                                    })
+                                    <label class="form-check-label text-brown" for="AceptaTerminos">
+                                        Acepto los <a href="#" class="text-green" data-bs-toggle="modal" data-bs-target="#terminosModal">términos y condiciones</a> del programa de apadrinamiento *
+                                    </label>
+                                </div>
+                                @Html.ValidationMessageFor(m => m.AceptaTerminos, "", new { @class = "text-danger small" })
+                                <span class="text-danger small" id="terminos-error" style="display:none;">Debes aceptar los términos y condiciones</span>
+                            </div>
+
+                            <!-- Resumen -->
+                            <div class="alert alert-beige border-yellow p-3 mb-4">
+                                <h5 class="text-brown mb-3"><i class="fas fa-file-invoice-dollar text-yellow me-2"></i> Resumen del Apadrinamiento</h5>
+                                <table class="table table-sm table-borderless mb-0">
+                                    <tr>
+                                        <td class="text-brown">Monto mensual:</td>
+                                        <td class="text-end"><strong class="text-green">$<span id="monto-resumen">@Model.MontoMensual.ToString("N2")</span></strong></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-brown">Costo anual estimado:</td>
+                                        <td class="text-end"><strong class="text-green">$<span id="costo-anual">@((Model.MontoMensual * 12).ToString("N2"))</span></strong></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-brown">Duración:</td>
+                                        <td class="text-end"><strong class="text-green">Indefinido</strong></td>
+                                    </tr>
+                                </table>
+                            </div>
+
+                            <!-- Botones -->
+                            <div class="d-flex flex-column flex-md-row justify-content-center gap-3 mt-4">
+                                <a href="@Url.Action("Index", "Apadrinar")" class="btn btn-outline-green btn-lg">
+                                    <i class="fas fa-arrow-left me-2"></i> Volver
+                                </a>
+                                <button type="submit" class="btn btn-green btn-lg" id="btn-confirmar">
+                                    <span id="btn-text"><i class="fas fa-heart me-2"></i> Confirmar Apadrinamiento</span>
+                                    <span id="btn-loading" style="display:none;">
+                                        <i class="fas fa-spinner fa-spin me-2"></i> Procesando...
+                                    </span>
+                                </button>
+                            </div>
+                        }
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
+</section>
 
 <!-- Modal de Términos -->
-<div class="modal fade" id="terminosModal" tabindex="-1" role="dialog" aria-labelledby="terminosModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
+<div class="modal fade" id="terminosModal" tabindex="-1" aria-labelledby="terminosModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header bg-green text-white">
                 <h5 class="modal-title" id="terminosModalLabel">
-                    <i class="fa fa-file-contract me-2"></i> Términos y Condiciones
+                    <i class="fas fa-file-contract me-2"></i> Términos y Condiciones
                 </h5>
-                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body bg-light-mint">
-                <h5 class="text-brown">Condiciones del Programa de Apadrinamiento</h5>
+            <div class="modal-body">
+                <h5 class="text-brown mb-3">Condiciones del Programa de Apadrinamiento</h5>
                 <ol class="text-secondary">
                     <li>El apadrinamiento es un compromiso de <strong class="text-brown">aportación mensual mínima de $10.00 USD</strong>.</li>
                     <li>Los pagos se realizarán de forma automática cada mes en la fecha establecida.</li>
@@ -233,7 +228,7 @@
                 <p class="text-secondary small"><i>Fecha de actualización: @DateTime.Now.ToString("dd/MM/yyyy")</i></p>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-outline-green" data-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-outline-green" data-bs-dismiss="modal">Cerrar</button>
             </div>
         </div>
     </div>
@@ -241,12 +236,53 @@
 
 @section Styles {
     <style>
-        /* Estilos específicos para esta página */
+        :root {
+            --green: #97C78B;
+            --yellow: #F2C66D;
+            --pink: #FBCDC0;
+            --brown: #2F2F2F;
+            --bg-light: #F2E9D8;
+            --beige: #F5E6D3;
+            --text-secondary: #555555;
+        }
+
+        body {
+            background-color: var(--beige);
+        }
+
+        /* Hero */
+        .confirmar-hero {
+            background-color: var(--beige);
+            border-radius: 0 0 30px 30px;
+            margin-bottom: 1rem;
+        }
+
+        /* Tarjeta principal */
+        .confirmar-card {
+            background: white;
+            border-radius: 30px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(151,199,139,0.15);
+            border: none;
+        }
+
+        .confirmar-card-header {
+            background-color: var(--green);
+            color: white;
+            padding: 1.5rem 2rem;
+            font-weight: 600;
+            font-size: 1.3rem;
+        }
+
+        .confirmar-card-body {
+            padding: 2rem;
+        }
+
+        /* Métodos de pago */
         .metodo-pago-card {
             border: 2px solid var(--bg-light);
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 10px;
+            border-radius: 16px;
+            padding: 1rem;
             cursor: pointer;
             transition: all 0.3s ease;
             background-color: white;
@@ -254,109 +290,160 @@
 
             .metodo-pago-card:hover {
                 border-color: var(--green);
-                background-color: rgba(151, 199, 139, 0.05);
+                background-color: rgba(151,199,139,0.05);
             }
 
             .metodo-pago-card.selected {
                 border-color: var(--green);
-                background-color: rgba(151, 199, 139, 0.1);
+                background-color: rgba(151,199,139,0.1);
             }
 
-        .input-group-lg .form-control {
-            font-size: 1.25rem;
-        }
-
-        .btn-loading {
-            position: relative;
-            color: transparent !important;
-        }
-
-            .btn-loading::after {
-                content: '';
-                position: absolute;
-                left: 50%;
-                top: 50%;
-                width: 20px;
-                height: 20px;
-                margin-left: -10px;
-                margin-top: -10px;
-                border: 2px solid white;
-                border-top-color: transparent;
-                border-radius: 50%;
-                animation: spin 1s linear infinite;
-            }
-
-        @@keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
-        }
-
-        .input-group-prepend {
-            margin-right: -1px;
-        }
-
-        .input-group-append {
-            margin-left: -1px;
-        }
-
+        /* Input group */
         .input-group-text {
+            border: 2px solid var(--green);
+            background-color: white;
+        }
+
+        .input-group .form-control {
+            border-left: none;
+            border-right: none;
+            border-radius: 0;
+        }
+
+        .input-group .input-group-text:first-child {
+            border-radius: 16px 0 0 16px;
+        }
+
+        .input-group .input-group-text:last-child {
+            border-radius: 0 16px 16px 0;
+        }
+
+        .form-control {
+            border: 2px solid var(--green);
+            border-radius: 16px;
+            padding: 0.75rem 1rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            background-color: white;
+        }
+
+            .form-control:focus {
+                border-color: var(--green);
+                box-shadow: 0 0 0 0.2rem rgba(151,199,139,0.25);
+                outline: none;
+            }
+
+        /* Alertas personalizadas */
+        .alert-beige {
             background-color: var(--bg-light);
             border: 1px solid var(--green);
+            color: var(--brown);
+            border-radius: 16px;
         }
 
-        .form-control.border-green:focus {
-            border-color: var(--green);
-            box-shadow: 0 0 0 0.2rem rgba(151, 199, 139, 0.25);
+        .border-yellow {
+            border-color: var(--yellow) !important;
         }
 
-        .form-control.is-valid {
+        /* Botones */
+        .btn-green {
+            background-color: var(--green);
+            border: none;
+            border-radius: 50px;
+            padding: 0.8rem 2.5rem;
+            font-weight: 600;
+            transition: all 0.3s;
+            color: white;
+        }
+
+            .btn-green:hover {
+                background-color: #86b57a;
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(151,199,139,0.4);
+            }
+
+        .btn-outline-green {
+            border: 2px solid var(--green);
+            background: transparent;
+            color: var(--green);
+            border-radius: 50px;
+            padding: 0.8rem 2.5rem;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+            .btn-outline-green:hover {
+                background-color: var(--green);
+                color: white;
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(151,199,139,0.3);
+            }
+
+        /* Checkbox */
+        .form-check-input {
+            width: 1.2rem;
+            height: 1.2rem;
+            margin-top: 0.15rem;
+            border: 2px solid var(--green);
+            transition: background-color 0.2s;
+        }
+
+            .form-check-input:checked {
+                background-color: var(--green);
+                border-color: var(--green);
+            }
+
+            .form-check-input:focus {
+                border-color: var(--green);
+                box-shadow: 0 0 0 0.2rem rgba(151,199,139,0.25);
+            }
+
+        /* Tabla resumen */
+        .table-borderless td {
+            border: none !important;
+            padding: 0.5rem 0;
+        }
+
+        /* Estados de validación */
+        .is-valid {
             border-color: var(--green) !important;
         }
 
-        .form-control.is-invalid {
+        .is-invalid {
             border-color: #dc3545 !important;
         }
 
-        .alert-warning {
-            background-color: rgba(255, 193, 7, 0.1) !important;
+        /* Modal */
+        .modal-content {
+            border-radius: 24px;
+            overflow: hidden;
+            border: none;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
         }
 
-        .text-warning {
-            color: #ffc107 !important;
+        .modal-header {
+            border-bottom: none;
+            padding: 1.2rem 1.5rem;
         }
 
-        .border-warning {
-            border-color: #ffc107 !important;
+        .modal-footer {
+            border-top: 1px solid var(--green);
+            padding: 1rem 1.5rem;
         }
 
-        .me-2 {
-            margin-right: 0.5rem !important;
-        }
+        /* Responsive */
+        @@media (max-width: 768px) {
+            .confirmar-card-body {
+                padding: 1.5rem;
+            }
 
-        .mr-3 {
-            margin-right: 1rem !important;
-        }
-
-        .table-borderless td,
-        .table-borderless th {
-            border: none !important;
-        }
-
-        .form-check-input:checked {
-            background-color: var(--green);
-            border-color: var(--green);
-        }
-
-        .form-check-input:focus {
-            border-color: var(--green);
-            box-shadow: 0 0 0 0.2rem rgba(151, 199, 139, 0.25);
+            .btn-lg {
+                width: 100%;
+            }
         }
     </style>
 }
 
 @section Scripts {
-    @* La ruta del bundle puede variar según tu configuración *@
     <script src="~/Scripts/jquery.validate.min.js"></script>
     <script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>
 
@@ -364,35 +451,23 @@
         $(document).ready(function () {
             console.log('Confirmar apadrinamiento cargado - Inicializando validaciones...');
 
-            // Variables de estado
             var isSubmitting = false;
 
-            // Función para convertir cualquier formato a número
+            // Función para parsear número (punto o coma)
             function parseAnyNumber(value) {
                 if (!value || value.trim() === '') return NaN;
-
-                // Reemplazar comas por puntos para formato español
                 var cleanValue = String(value).replace(',', '.');
-
-                // Eliminar todo excepto números y punto
                 cleanValue = cleanValue.replace(/[^\d.]/g, '');
-
-                // Verificar que no haya múltiples puntos
                 var parts = cleanValue.split('.');
                 if (parts.length > 2) {
-                    // Si hay más de un punto, unir todas excepto la última
                     cleanValue = parts.slice(0, -1).join('') + '.' + parts[parts.length - 1];
                 }
-
                 return parseFloat(cleanValue);
             }
 
-            // Función para formatear número con 2 decimales
             function formatNumber(value) {
                 if (isNaN(value)) return "";
-                // Formatear a 2 decimales
                 var formatted = value.toFixed(2);
-                // Reemplazar punto por coma si el usuario prefiere formato español
                 var currentInput = $('#MontoMensualInput').val();
                 if (currentInput && currentInput.indexOf(',') !== -1) {
                     formatted = formatted.replace('.', ',');
@@ -400,177 +475,117 @@
                 return formatted;
             }
 
-            // Función para validar el monto
             function validarMonto(value) {
                 var monto = parseAnyNumber(value);
-
                 if (isNaN(monto)) {
-                    return {
-                        valido: false,
-                        mensaje: "Por favor, ingresa un monto válido (ej: 10.00 o 10,00)"
-                    };
+                    return { valido: false, mensaje: "Por favor, ingresa un monto válido (ej: 10.00 o 10,00)" };
                 }
-
                 if (monto < 10) {
-                    return {
-                        valido: false,
-                        mensaje: "El monto mínimo es $10.00"
-                    };
+                    return { valido: false, mensaje: "El monto mínimo es $10.00" };
                 }
-
                 if (monto > 10000) {
-                    return {
-                        valido: false,
-                        mensaje: "El monto máximo es $10,000.00"
-                    };
+                    return { valido: false, mensaje: "El monto máximo es $10,000.00" };
                 }
-
-                return {
-                    valido: true,
-                    monto: monto
-                };
+                return { valido: true, monto: monto };
             }
 
-            // Formatear valor inicial al cargar
-            var initialValue = $('#MontoMensualInput').val();
-            if (initialValue) {
-                var parsed = parseAnyNumber(initialValue);
+            // Inicializar
+            var initial = $('#MontoMensualInput').val();
+            if (initial) {
+                var parsed = parseAnyNumber(initial);
                 if (!isNaN(parsed) && parsed >= 10) {
                     $('#MontoMensualInput').val(formatNumber(parsed));
                 }
             }
 
-            // Evento para validar y formatear monto en tiempo real
             $('#MontoMensualInput').on('input change blur', function () {
                 var value = $(this).val();
                 var validacion = validarMonto(value);
-
                 if (!validacion.valido) {
-                    $(this).addClass('is-invalid');
-                    $(this).removeClass('is-valid');
+                    $(this).addClass('is-invalid').removeClass('is-valid');
                     $('#btn-confirmar').prop('disabled', true);
                 } else {
-                    $(this).removeClass('is-invalid');
-                    $(this).addClass('is-valid');
+                    $(this).removeClass('is-invalid').addClass('is-valid');
                     $('#btn-confirmar').prop('disabled', false);
-
-                    // Actualizar resumen
                     actualizarResumen(validacion.monto);
-
-                    // Formatear el valor cuando el usuario termina de escribir
-                    if ($(this).is(':focus') === false) {
+                    if (!$(this).is(':focus')) {
                         $(this).val(formatNumber(validacion.monto));
                     }
                 }
             });
 
-            // Calcular costo anual y actualizar resumen
             function actualizarResumen(monto) {
-                var costoAnual = monto * 12;
                 $('#monto-resumen').text(monto.toFixed(2));
-                $('#costo-anual').text(costoAnual.toFixed(2));
+                $('#costo-anual').text((monto * 12).toFixed(2));
             }
 
-            // Seleccionar método de pago con efecto visual
             window.seleccionarMetodoPago = function (metodoId) {
                 $('.metodo-pago-card').removeClass('selected');
                 $('#metodo_' + metodoId).closest('.metodo-pago-card').addClass('selected');
                 $('#metodo_' + metodoId).prop('checked', true);
             };
-
-            // Inicializar selección del método de pago por defecto
             $('.metodo-pago-card input[type="radio"]:checked').closest('.metodo-pago-card').addClass('selected');
 
-            // Función para mostrar estado de carga
             function mostrarCargando(mostrar) {
                 if (mostrar) {
                     $('#btn-text').hide();
                     $('#btn-loading').show();
-                    $('#btn-confirmar').prop('disabled', true).addClass('btn-loading');
+                    $('#btn-confirmar').prop('disabled', true);
                     isSubmitting = true;
                 } else {
                     $('#btn-text').show();
                     $('#btn-loading').hide();
-                    $('#btn-confirmar').prop('disabled', false).removeClass('btn-loading');
+                    $('#btn-confirmar').prop('disabled', false);
                     isSubmitting = false;
                 }
             }
 
-            // Validación antes de enviar el formulario
             $('#apadrinarForm').submit(function (e) {
-                // Prevenir múltiples envíos
                 if (isSubmitting) {
                     e.preventDefault();
                     return false;
                 }
 
-                console.log('Validando formulario...');
-
-                // Validar monto
                 var montoInput = $('#MontoMensualInput');
                 var montoValue = montoInput.val();
                 var validacion = validarMonto(montoValue);
 
                 if (!validacion.valido) {
                     e.preventDefault();
-                    montoInput.addClass('is-invalid');
-                    montoInput.focus();
-
-                    Swal.fire({
-                        icon: 'warning',
-                        title: 'Error',
-                        text: validacion.mensaje,
-                        confirmButtonColor: '#97C78B'
-                    });
+                    montoInput.addClass('is-invalid').focus();
+                    Swal.fire({ icon: 'warning', title: 'Error', text: validacion.mensaje, confirmButtonColor: '#97C78B' });
                     return false;
                 }
 
-                // Validar términos y condiciones
                 if (!$('#AceptaTerminos').prop('checked')) {
                     e.preventDefault();
                     $('#terminos-error').show();
                     $('#AceptaTerminos').focus();
-
-                    Swal.fire({
-                        icon: 'warning',
-                        title: 'Términos y condiciones',
-                        text: 'Debes aceptar los términos y condiciones para continuar',
-                        confirmButtonColor: '#97C78B'
-                    });
+                    Swal.fire({ icon: 'warning', title: 'Términos y condiciones', text: 'Debes aceptar los términos y condiciones para continuar', confirmButtonColor: '#97C78B' });
                     return false;
                 } else {
                     $('#terminos-error').hide();
                 }
 
-                // Validar método de pago
                 var metodoPagoRadio = $('input[name="MetodoPagoSeleccionado"]:checked');
                 if (metodoPagoRadio.length === 0) {
                     e.preventDefault();
-
-                    Swal.fire({
-                        icon: 'warning',
-                        title: 'Método de pago',
-                        text: 'Por favor, selecciona un método de pago',
-                        confirmButtonColor: '#97C78B'
-                    });
+                    Swal.fire({ icon: 'warning', title: 'Método de pago', text: 'Por favor, selecciona un método de pago', confirmButtonColor: '#97C78B' });
                     return false;
                 }
 
-                // IMPORTANTE: Asegurar que el valor se envíe en formato punto decimal
+                // Formatear valor para envío (punto)
                 montoInput.val(validacion.monto.toFixed(2).replace(',', '.'));
 
-                var metodoPagoText = metodoPagoRadio.closest('.metodo-pago-card')
-                    .find('label strong').text();
+                var metodoPagoText = metodoPagoRadio.closest('.metodo-pago-card').find('label strong').text();
 
-                // Confirmación al usuario usando SweetAlert2
                 e.preventDefault();
-
                 Swal.fire({
                     title: '¿Confirmar apadrinamiento?',
                     html: '<div class="text-center">' +
-                        '<i class="fa fa-heart fa-3x text-green mb-3"></i>' +
+                        '<i class="fas fa-heart fa-3x text-green mb-3"></i>' +
                         '<h5 class="text-brown mb-3">¿Estás seguro de que deseas confirmar este apadrinamiento?</h5>' +
-                        '<div class="text-left bg-light p-3 rounded mb-3">' +
+                        '<div class="text-start bg-light p-3 rounded mb-3">' +
                         '<p class="mb-1"><strong class="text-brown">Mascota:</strong> ' + $('#MascotaNombre').val() + '</p>' +
                         '<p class="mb-1"><strong class="text-brown">Monto mensual:</strong> $' + validacion.monto.toFixed(2) + '</p>' +
                         '<p class="mb-0"><strong class="text-brown">Método de pago:</strong> ' + metodoPagoText + '</p>' +
@@ -581,70 +596,46 @@
                     showCancelButton: true,
                     confirmButtonColor: '#97C78B',
                     cancelButtonColor: '#5C4B43',
-                    confirmButtonText: '<i class="fa fa-heart me-2"></i> Sí, confirmar',
-                    cancelButtonText: '<i class="fa fa-times me-2"></i> Cancelar',
+                    confirmButtonText: '<i class="fas fa-heart me-2"></i> Sí, confirmar',
+                    cancelButtonText: '<i class="fas fa-times me-2"></i> Cancelar',
                     reverseButtons: true
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        // Mostrar estado de carga
                         mostrarCargando(true);
-
-                        // Enviar formulario
                         $(this).off('submit').submit();
-
-                        // Timeout por si algo falla
                         setTimeout(function () {
                             if (isSubmitting) {
                                 mostrarCargando(false);
-                                Swal.fire({
-                                    icon: 'warning',
-                                    title: 'Tiempo de espera agotado',
-                                    text: 'La solicitud está tardando demasiado. Por favor, intenta nuevamente.',
-                                    confirmButtonColor: '#97C78B'
-                                });
+                                Swal.fire({ icon: 'warning', title: 'Tiempo de espera agotado', text: 'La solicitud está tardando demasiado. Por favor, intenta nuevamente.', confirmButtonColor: '#97C78B' });
                             }
-                        }, 30000); // 30 segundos timeout
+                        }, 30000);
                     }
                 });
             });
 
-            // Prevenir entrada de caracteres no válidos
             $('#MontoMensualInput').on('keypress', function (e) {
                 var char = String.fromCharCode(e.which);
-                var currentValue = $(this).val();
-
-                // Permitir: números, punto, coma, teclas de control
-                if (!/[0-9.,]/.test(char) &&
-                    !(e.which >= 37 && e.which <= 40) &&  // flechas
-                    e.which !== 8 && e.which !== 9 &&      // backspace, tab
-                    e.which !== 46) {                      // delete
+                var current = $(this).val();
+                if (!/[0-9.,]/.test(char) && !(e.which >= 37 && e.which <= 40) && e.which !== 8 && e.which !== 9 && e.which !== 46) {
                     e.preventDefault();
                     return false;
                 }
-
-                // Solo permitir un separador decimal (punto o coma)
-                if ((char === '.' || char === ',') &&
-                    (currentValue.indexOf('.') !== -1 || currentValue.indexOf(',') !== -1)) {
+                if ((char === '.' || char === ',') && (current.indexOf('.') !== -1 || current.indexOf(',') !== -1)) {
                     e.preventDefault();
                     return false;
                 }
             });
 
-            // Manejar pegado de texto
             $('#MontoMensualInput').on('paste', function (e) {
-                // Permitir el pegado, la validación se hará después
                 setTimeout(function () {
                     var input = $('#MontoMensualInput');
-                    var value = input.val();
-                    var validacion = validarMonto(value);
-
+                    var val = input.val();
+                    var validacion = validarMonto(val);
                     if (!validacion.valido) {
-                        input.addClass('is-invalid');
-                        input.removeClass('is-valid');
+                        input.addClass('is-invalid').removeClass('is-valid');
                         $('#btn-confirmar').prop('disabled', true);
                     } else {
-                        input.removeClass('is-invalid');
-                        input.addClass('is-valid');
+                        input.removeClass('is-invalid').addClass('is-valid');
                         $('#btn-confirmar').prop('disabled', false);
                         input.val(formatNumber(validacion.monto));
                         actualizarResumen(validacion.monto);
@@ -652,38 +643,27 @@
                 }, 10);
             });
 
-            // Evento para ocultar términos al hacer clic
             $('#AceptaTerminos').change(function () {
-                if ($(this).prop('checked')) {
-                    $('#terminos-error').hide();
-                }
+                if ($(this).prop('checked')) $('#terminos-error').hide();
             });
 
-            // Inicializar validación al cargar la página
-            var initialValidation = validarMonto($('#MontoMensualInput').val());
-            if (!initialValidation.valido) {
+            var initVal = validarMonto($('#MontoMensualInput').val());
+            if (!initVal.valido) {
                 $('#MontoMensualInput').addClass('is-invalid');
                 $('#btn-confirmar').prop('disabled', true);
             } else {
                 $('#MontoMensualInput').addClass('is-valid');
-                actualizarResumen(initialValidation.monto);
+                actualizarResumen(initVal.monto);
             }
 
-            // Si hay un error en TempData, asegurar que el botón no esté deshabilitado
             if ($('.alert-danger').length > 0) {
                 mostrarCargando(false);
-                // Hacer scroll al error
-                $('html, body').animate({
-                    scrollTop: $('.alert-danger').offset().top - 100
-                }, 1000);
+                $('html, body').animate({ scrollTop: $('.alert-danger').offset().top - 100 }, 1000);
             }
 
-            // Auto-ocultar alertas después de 5 segundos
             setTimeout(function () {
                 $('.alert-dismissible').alert('close');
             }, 5000);
-
-            console.log('Validaciones inicializadas correctamente');
         });
     </script>
 }

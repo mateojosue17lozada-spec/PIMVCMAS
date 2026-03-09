@@ -8,71 +8,181 @@
 <html>
 <head>
     <meta charset="utf-8" />
-    <title>Contrato de Adopción</title>
+    <title>Contrato de Adopción - ADOPTAMANÍA</title>
     <style>
-        /* Estilo profesional para el contrato */
+        /* Variables de color (paleta ADOPTAMANÍA) */
+        :root {
+            --verde-menta: #97C78B;
+            --verde-claro: #2BD800;
+            --rosado-pastel: #D9A8A8;
+            --rosado-claro: #FBCDC0;
+            --amarillo-pastel: #F2C66D;
+            --plomo-calido: #D9D3C8;
+            --plomo-azul: #D9D9D9;
+            --texto-oscuro: #2F2F2F;
+            --texto-secundario: #555555;
+            --fondo-beige: #F5E6D3;
+        }
+
         body {
             font-family: 'Times New Roman', Times, serif;
             line-height: 1.6;
-            color: #333;
+            color: var(--texto-oscuro);
             max-width: 800px;
             margin: 40px auto;
             padding: 20px;
+            background-color: #ffffff;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            border-radius: 12px;
         }
 
+        /* Encabezado */
         .header {
             text-align: center;
-            border-bottom: 2px solid #97C78B;
-            padding-bottom: 20px;
+            border-bottom: 3px solid var(--verde-menta);
+            padding-bottom: 15px;
             margin-bottom: 30px;
         }
 
             .header h1 {
-                color: #6B4F47;
+                color: var(--texto-oscuro);
+                font-size: 26px;
+                font-weight: bold;
+                letter-spacing: 1px;
                 margin-bottom: 5px;
             }
 
             .header h2 {
-                color: #97C78B;
-                font-size: 18px;
+                color: var(--verde-menta);
+                font-size: 20px;
                 font-weight: normal;
+                margin-top: 0;
             }
 
+            .header p {
+                color: var(--texto-secundario);
+                font-size: 14px;
+                margin: 5px 0;
+            }
+
+        /* Fecha */
         .fecha-lugar {
             text-align: right;
             margin-bottom: 30px;
             font-style: italic;
+            color: var(--texto-secundario);
+            padding-right: 10px;
         }
 
+        /* Caja de partes */
         .partes {
-            background-color: #f9f9f9;
-            padding: 20px;
-            border-left: 4px solid #97C78B;
+            background-color: var(--fondo-beige);
+            padding: 20px 25px;
+            border-left: 6px solid var(--verde-menta);
+            border-radius: 0 12px 12px 0;
             margin-bottom: 30px;
+            box-shadow: 0 4px 8px rgba(151,199,139,0.1);
         }
 
             .partes p {
-                margin: 5px 0;
+                margin: 8px 0;
             }
 
+            .partes strong {
+                color: var(--texto-oscuro);
+            }
+
+        /* Título de mascota */
+        .mascota-titulo {
+            text-align: center;
+            margin: 30px 0 15px;
+            color: var(--texto-oscuro);
+            font-size: 20px;
+            font-weight: bold;
+            border-bottom: 2px solid var(--rosado-pastel);
+            padding-bottom: 5px;
+        }
+
+        /* Grid de datos de mascota */
+        .datos-mascota {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin: 20px 0 30px;
+        }
+
+        .datos-mascota-item {
+            background-color: #f9f9f9;
+            padding: 12px 15px;
+            border-radius: 8px;
+            border: 1px solid var(--plomo-calido);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            transition: transform 0.2s;
+        }
+
+            .datos-mascota-item:hover {
+                border-color: var(--verde-menta);
+                transform: translateY(-2px);
+            }
+
+            .datos-mascota-item strong {
+                color: var(--texto-oscuro);
+                display: block;
+                font-size: 14px;
+                margin-bottom: 4px;
+            }
+
+            .datos-mascota-item span {
+                color: var(--texto-secundario);
+                font-size: 16px;
+            }
+
+        /* Cláusulas */
         .clausulas {
             margin: 30px 0;
         }
 
         .clausula {
-            margin-bottom: 20px;
+            margin-bottom: 25px;
+            padding: 5px 0;
         }
 
             .clausula h3 {
-                color: #6B4F47;
-                border-bottom: 1px solid #FBCDC0;
+                color: var(--texto-oscuro);
+                border-bottom: 2px solid var(--rosado-claro);
                 padding-bottom: 5px;
+                margin-bottom: 12px;
+                font-size: 18px;
             }
 
+            .clausula p, .clausula ul {
+                color: var(--texto-secundario);
+                text-align: justify;
+            }
+
+            .clausula ul {
+                padding-left: 25px;
+            }
+
+            .clausula li {
+                margin-bottom: 5px;
+            }
+
+        /* Título de cláusulas principal */
+        .clausulas h3:first-of-type {
+            text-align: center;
+            border-bottom: none;
+            margin-top: 20px;
+            font-size: 22px;
+            color: var(--texto-oscuro);
+        }
+
+        /* Firmas */
         .firmas {
             margin-top: 50px;
             display: flex;
             justify-content: space-between;
+            gap: 20px;
         }
 
         .firma {
@@ -81,43 +191,58 @@
         }
 
         .linea-firma {
-            border-top: 1px solid #333;
+            border-top: 2px solid var(--verde-menta);
             margin-top: 40px;
             padding-top: 10px;
         }
 
+        .firma p {
+            margin: 5px 0;
+            color: var(--texto-oscuro);
+        }
+
+            .firma p:first-of-type {
+                font-weight: bold;
+            }
+
+        /* Footer */
         .footer {
             margin-top: 50px;
             text-align: center;
             font-size: 12px;
-            color: #777;
-            border-top: 1px solid #97C78B;
+            color: var(--texto-secundario);
+            border-top: 2px solid var(--plomo-calido);
             padding-top: 20px;
         }
 
-        .datos-mascota {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin: 20px 0;
+        /* Líneas decorativas */
+        hr {
+            border: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--verde-menta), transparent);
+            margin: 30px 0;
         }
 
-            .datos-mascota div {
-                background-color: #f0f0f0;
-                padding: 10px;
-                border-radius: 5px;
+        /* Mejora para impresión */
+        @@media print {
+            body {
+                box-shadow: none;
+                margin: 0;
+                padding: 0.5in;
             }
 
-            .datos-mascota strong {
-                color: #6B4F47;
+            .datos-mascota-item:hover {
+                transform: none;
+                border-color: var(--plomo-calido);
             }
+        }
     </style>
 </head>
 <body>
     <div class="header">
         <h1>CONTRATO DE ADOPCIÓN RESPONSABLE</h1>
         <h2>@System.Configuration.ConfigurationManager.AppSettings["NombreRefugio"]</h2>
-        <p>RUC: 123456789001 | Tel: @System.Configuration.ConfigurationManager.AppSettings["TelefonoContacto"]</p>
+        <p>RUC: 123456789001 | Tel: @System.Configuration.ConfigurationManager.AppSettings["TelefonoContacto"] | @System.Configuration.ConfigurationManager.AppSettings["EmailContacto"]</p>
     </div>
 
     <div class="fecha-lugar">
@@ -130,20 +255,49 @@
         <p><strong>EL/LA ADOPTANTE:</strong> @Model.Usuarios.NombreCompleto, con cédula de identidad No. @Model.Usuarios.Cedula, estado civil [ESTADO CIVIL], de nacionalidad ecuatoriana, con domicilio en @Model.Usuarios.Direccion, @Model.Usuarios.Ciudad, teléfono @Model.Usuarios.Telefono, correo electrónico @Model.Usuarios.Email.</p>
     </div>
 
-    <div class="clausulas">
-        <h3 style="text-align:center; color:#6B4F47;">DATOS DE LA MASCOTA</h3>
-        <div class="datos-mascota">
-            <div><strong>Nombre:</strong> @Model.Mascotas.Nombre</div>
-            <div><strong>Especie:</strong> @Model.Mascotas.Especie</div>
-            <div><strong>Raza:</strong> @Model.Mascotas.Raza</div>
-            <div><strong>Sexo:</strong> @(Model.Mascotas.Sexo == "M" ? "Macho" : "Hembra")</div>
-            <div><strong>Color:</strong> @Model.Mascotas.Color</div>
-            <div><strong>Edad:</strong> @Model.Mascotas.EdadAproximada</div>
-            <div><strong>Esterilizado:</strong> @(Model.Mascotas.Esterilizado == true ? "Sí" : "No")</div>
-            <div><strong>Microchip:</strong> @(Model.Mascotas.Microchip ?? "No registra")</div>
-        </div>
+    <div class="mascota-titulo">
+        DATOS DE LA MASCOTA
+    </div>
 
-        <h3 style="text-align:center; color:#6B4F47; margin-top:30px;">CLÁUSULAS</h3>
+    <div class="datos-mascota">
+        <div class="datos-mascota-item">
+            <strong>Nombre</strong>
+            <span>@Model.Mascotas.Nombre</span>
+        </div>
+        <div class="datos-mascota-item">
+            <strong>Especie</strong>
+            <span>@Model.Mascotas.Especie</span>
+        </div>
+        <div class="datos-mascota-item">
+            <strong>Raza</strong>
+            <span>@Model.Mascotas.Raza</span>
+        </div>
+        <div class="datos-mascota-item">
+            <strong>Sexo</strong>
+            <span>@(Model.Mascotas.Sexo == "M" ? "Macho" : "Hembra")</span>
+        </div>
+        <div class="datos-mascota-item">
+            <strong>Color</strong>
+            <span>@Model.Mascotas.Color</span>
+        </div>
+        <div class="datos-mascota-item">
+            <strong>Edad</strong>
+            <span>@Model.Mascotas.EdadAproximada</span>
+        </div>
+        <div class="datos-mascota-item">
+            <strong>Esterilizado</strong>
+            <span>@(Model.Mascotas.Esterilizado == true ? "Sí" : "No")</span>
+        </div>
+        <div class="datos-mascota-item">
+            <strong>Microchip</strong>
+            <span>@(Model.Mascotas.Microchip ?? "No registra")</span>
+        </div>
+    </div>
+
+    <hr />
+
+    <div class="clausulas">
+        <h3>CLÁUSULAS</h3>
 
         <div class="clausula">
             <h3>PRIMERA.- ANTECEDENTES</h3>
@@ -206,13 +360,13 @@
 
     <div class="firmas">
         <div class="firma">
-            <p>____________________________</p>
+            <div class="linea-firma"></div>
             <p><strong>EL/LA ADOPTANTE</strong></p>
             <p>@Model.Usuarios.NombreCompleto</p>
             <p>C.I. @Model.Usuarios.Cedula</p>
         </div>
         <div class="firma">
-            <p>____________________________</p>
+            <div class="linea-firma"></div>
             <p><strong>EL REFUGIO</strong></p>
             <p>@System.Configuration.ConfigurationManager.AppSettings["NombreRefugio"]</p>
         </div>

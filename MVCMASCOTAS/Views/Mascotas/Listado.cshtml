@@ -5,208 +5,447 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="container-fluid">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>
-            <i class="fas fa-list-alt text-primary"></i> @ViewBag.Titulo
-        </h2>
-        <div>
-            <a href="@Url.Action("Listado", "Mascotas", new { tipo = "Disponibles" })"
-               class="btn @(ViewBag.Tipo == "Disponibles" ? "btn-success" : "btn-outline-success")">
-                <i class="fas fa-heart"></i> Disponibles (@ViewBag.TotalDisponibles)
-            </a>
-            <a href="@Url.Action("Listado", "Mascotas", new { tipo = "Adoptadas" })"
-               class="btn @(ViewBag.Tipo == "Adoptadas" ? "btn-info" : "btn-outline-info")">
-                <i class="fas fa-home"></i> Adoptadas (@ViewBag.TotalAdoptadas)
-            </a>
-            <a href="@Url.Action("Gestionar", "Mascotas")" class="btn btn-secondary">
-                <i class="fas fa-arrow-left"></i> Volver
-            </a>
-        </div>
-    </div>
-
-    <div class="row mb-3">
-        <div class="col-md-4">
-            <div class="card border-success">
-                <div class="card-body text-center">
-                    <h3 class="text-success">@ViewBag.TotalDisponibles</h3>
-                    <p class="text-muted mb-0">Mascotas Disponibles</p>
-                </div>
+<section class="listado-hero py-4">
+    <div class="container">
+        <div class="d-flex flex-wrap justify-content-between align-items-center">
+            <div>
+                <h1 class="h2 text-brown mb-1">
+                    @if (ViewBag.Tipo == "Adoptadas")
+                    {
+                        <i class="fas fa-home text-green me-2"></i>
+                    }
+                    else
+                    {
+                        <i class="fas fa-heart text-green me-2"></i>
+                    }
+                    @ViewBag.Titulo
+                </h1>
+                <p class="text-secondary mb-0">Listado de mascotas @(ViewBag.Tipo == "Adoptadas" ? "adoptadas" : "disponibles")</p>
             </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card border-info">
-                <div class="card-body text-center">
-                    <h3 class="text-info">@ViewBag.TotalAdoptadas</h3>
-                    <p class="text-muted mb-0">Mascotas Adoptadas</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card border-warning">
-                <div class="card-body text-center">
-                    <h3 class="text-warning">@ViewBag.TotalEnTratamiento</h3>
-                    <p class="text-muted mb-0">En Tratamiento</p>
-                </div>
+            <div class="mt-2 mt-sm-0">
+                <a href="@Url.Action("Listado", "Mascotas", new { tipo = "Disponibles" })"
+                   class="btn @(ViewBag.Tipo == "Disponibles" ? "btn-green" : "btn-outline-green") me-2">
+                    <i class="fas fa-heart me-2"></i>Disponibles (@ViewBag.TotalDisponibles)
+                </a>
+                <a href="@Url.Action("Listado", "Mascotas", new { tipo = "Adoptadas" })"
+                   class="btn @(ViewBag.Tipo == "Adoptadas" ? "btn-pink" : "btn-outline-pink") me-2">
+                    <i class="fas fa-home me-2"></i>Adoptadas (@ViewBag.TotalAdoptadas)
+                </a>
+                @if (ViewBag.Tipo == "Adoptadas")
+                {
+                    <a href="@Url.Action("SeguimientoAdopciones", "Mascotas")" class="btn btn-green me-2">
+                        <i class="fas fa-clipboard-check me-2"></i>Panel Seguimientos
+                    </a>
+                }
+                <a href="@Url.Action("Gestionar", "Mascotas")" class="btn btn-outline-green">
+                    <i class="fas fa-arrow-left me-2"></i>Volver
+                </a>
             </div>
         </div>
     </div>
+</section>
 
-    <div class="card shadow-sm">
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-hover table-striped">
-                    <thead class="table-primary">
-                        <tr>
-                            <th>ID</th>
-                            <th>Foto</th>
-                            <th>Nombre</th>
-                            <th>Especie / Raza</th>
-                            <th class="text-center">Sexo</th>
-                            <th>Edad</th>
-                            <th>Tamaño</th>
-                            <th>Fecha Ingreso</th>
-                            @if (ViewBag.Tipo == "Adoptadas")
-                            {
-                                <th>Fecha Adopción</th>
-                            }
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @if (Model != null && Model.Any())
-                        {
-                            foreach (var mascota in Model)
-                            {
-                                string sexoTexto = mascota.Sexo == "M" ? "Macho" : "Hembra";
-                                string sexoSimbolo = mascota.Sexo == "M" ? "♂" : "♀";
-                                string imagenUrl = "/Content/images/no-image.png";
+<section class="py-4 bg-beige">
+    <div class="container">
+        <div class="row g-3 mb-4">
+            <div class="col-md-4">
+                <div class="stat-card">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0 me-3"><i class="fas fa-heart fa-3x text-green"></i></div>
+                        <div>
+                            <div class="text-xs text-uppercase fw-bold text-green">Disponibles</div>
+                            <div class="h3 mb-0 fw-bold text-brown">@ViewBag.TotalDisponibles</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-card">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0 me-3"><i class="fas fa-home fa-3x text-info"></i></div>
+                        <div>
+                            <div class="text-xs text-uppercase fw-bold text-green">Adoptadas</div>
+                            <div class="h3 mb-0 fw-bold text-brown">@ViewBag.TotalAdoptadas</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-card">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0 me-3"><i class="fas fa-medkit fa-3x text-yellow"></i></div>
+                        <div>
+                            <div class="text-xs text-uppercase fw-bold text-green">En Tratamiento</div>
+                            <div class="h3 mb-0 fw-bold text-brown">@ViewBag.TotalEnTratamiento</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-                                if (mascota.ImagenPrincipal != null && mascota.ImagenPrincipal.Length > 0)
+        <div class="table-card">
+            <div class="table-card-header bg-green text-white d-flex justify-content-between align-items-center">
+                <span><i class="fas fa-list me-2"></i>@ViewBag.Titulo</span>
+                @if (ViewBag.Tipo == "Adoptadas")
+                {
+                    <a href="@Url.Action("SeguimientoAdopciones", "Mascotas")" class="btn btn-sm btn-light text-green fw-medium">
+                        <i class="fas fa-clipboard-check me-1"></i>Panel de Seguimientos
+                    </a>
+                }
+            </div>
+            <div class="table-card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Foto</th>
+                                <th>Nombre</th>
+                                <th>Especie / Raza</th>
+                                <th class="text-center">Sexo</th>
+                                <th>Edad</th>
+                                <th>Tamaño</th>
+                                <th>F. Ingreso</th>
+                                @if (ViewBag.Tipo == "Adoptadas")
                                 {
-                                    imagenUrl = MVCMASCOTAS.Helpers.ImageHelper.GetImageDataUri(mascota.ImagenPrincipal);
+                                    <th>F. Adopción</th>
                                 }
+                                <th class="text-center">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model != null && Model.Any())
+                            {
+                                foreach (var mascota in Model)
+                                {
+                                    string sexoTexto = mascota.Sexo == "M" ? "Macho" : "Hembra";
+                                    string imagenUrl = "/Content/images/no-image.png";
 
-                                <tr>
-                                    <td><strong>#@mascota.MascotaId</strong></td>
-                                    <td>
-                                        <img src="@imagenUrl"
-                                             alt="@mascota.Nombre"
-                                             style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px; border: 2px solid #dee2e6;"
-                                             onerror="this.src='/Content/images/no-image.png'">
-                                    </td>
-                                    <td>
-                                        <strong class="text-primary">@mascota.Nombre</strong>
-                                        @if (mascota.Esterilizado == true)
-                                        {
-                                            <br /><span class="badge bg-success" title="Esterilizado"><i class="fas fa-check"></i> Esterilizado</span>
-                                        }
-                                        @if (mascota.Categoria == "Especial")
-                                        {
-                                            <br /><span class="badge bg-warning" title="Especial"><i class="fas fa-star"></i> Especial</span>
-                                        }
-                                    </td>
-                                    <td>
-                                        <strong>@mascota.Especie</strong>
-                                        @if (!string.IsNullOrEmpty(mascota.Raza))
-                                        {
-                                            <br /><small class="text-muted">@mascota.Raza</small>
-                                        }
-                                    </td>
-                                    <td class="text-center">
-                                        @if (mascota.Sexo == "M")
-                                        {
-                                            <span class="badge bg-info" title="@sexoTexto" data-bs-toggle="tooltip">
-                                                <i class="fas fa-mars"></i> @sexoSimbolo
-                                            </span>
-                                        }
-                                        else
-                                        {
-                                            <span class="badge bg-pink" title="@sexoTexto" data-bs-toggle="tooltip">
-                                                <i class="fas fa-venus"></i> @sexoSimbolo
-                                            </span>
-                                        }
-                                    </td>
-                                    <td>@(mascota.EdadAproximada ?? "N/A")</td>
-                                    <td>
-                                        <span class="badge @(
-                                            mascota.Tamanio == "Pequeño" ? "bg-success" :
-                                            mascota.Tamanio == "Mediano" ? "bg-warning" :
-                                            mascota.Tamanio == "Grande" ? "bg-secondary" : "bg-dark"
-                                        )">
-                                            @mascota.Tamanio
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <small>@(mascota.FechaIngreso?.ToString("dd/MM/yyyy") ?? "N/A")</small>
-                                    </td>
-                                    @if (ViewBag.Tipo == "Adoptadas")
+                                    if (mascota.ImagenPrincipal != null && mascota.ImagenPrincipal.Length > 0)
                                     {
-                                        <td>
-                                            @{
-                                                var historial = ViewBag.HistorialEstados as List<MVCMASCOTAS.Models.HistorialEstadosMascota>;
-                                                var fechaAdopcion = historial?.FirstOrDefault(h => h.MascotaId == mascota.MascotaId && h.EstadoNuevo == "Adoptada")?.FechaCambio;
-                                            }
-                                            <small>@(fechaAdopcion?.ToString("dd/MM/yyyy") ?? "N/A")</small>
-                                        </td>
+                                        imagenUrl = MVCMASCOTAS.Helpers.ImageHelper.GetImageDataUri(mascota.ImagenPrincipal);
                                     }
-                                    <td>
-                                        <div class="btn-group btn-group-sm" role="group">
-                                            <a href="@Url.Action("Detalle", "Mascotas", new { id = mascota.MascotaId })"
-                                               class="btn btn-info"
-                                               title="Ver Detalles"
-                                               data-bs-toggle="tooltip">
-                                                <i class="fas fa-eye"></i>
-                                            </a>
-                                            <a href="@Url.Action("Editar", "Mascotas", new { id = mascota.MascotaId })"
-                                               class="btn btn-warning"
-                                               title="Editar"
-                                               data-bs-toggle="tooltip">
-                                                <i class="fas fa-edit"></i>
-                                            </a>
+
+                                    <tr>
+                                        <td><span class="badge bg-light-mint text-brown px-3 py-2">#@mascota.MascotaId</span></td>
+                                        <td>
+                                            <div class="avatar-wrapper">
+                                                <img src="@imagenUrl" alt="@mascota.Nombre" onerror="this.src='/Content/images/no-image.png'">
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span class="fw-medium text-brown">@mascota.Nombre</span>
+                                            @if (mascota.Esterilizado == true)
+                                            {
+                                                <br /><span class="badge bg-green text-white mt-1"><i class="fas fa-check me-1"></i>Esterilizado</span>
+                                            }
+                                            @if (mascota.Categoria == "Especial")
+                                            {
+                                                <br /><span class="badge bg-yellow text-brown mt-1"><i class="fas fa-star me-1"></i>Especial</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            <span class="text-brown">@mascota.Especie</span>
+                                            @if (!string.IsNullOrEmpty(mascota.Raza))
+                                            {
+                                                <br /><small class="text-secondary">@mascota.Raza</small>
+                                            }
+                                        </td>
+                                        <td class="text-center">
+                                            @if (mascota.Sexo == "M")
+                                            {
+                                                <span class="badge bg-green text-white px-3 py-2" title="@sexoTexto">
+                                                    <i class="fas fa-mars me-1"></i>♂
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-pink text-brown px-3 py-2" title="@sexoTexto">
+                                                    <i class="fas fa-venus me-1"></i>♀
+                                                </span>
+                                            }
+                                        </td>
+                                        <td class="text-secondary">@(mascota.EdadAproximada ?? "N/A")</td>
+                                        <td>
+                                            <span class="badge @(
+                                                mascota.Tamanio == "Pequeño" ? "bg-green text-white" :
+                                                mascota.Tamanio == "Mediano" ? "bg-yellow text-brown" :
+                                                mascota.Tamanio == "Grande" ? "bg-info text-white" : "bg-secondary text-white"
+                                            ) px-3 py-2">@mascota.Tamanio</span>
+                                        </td>
+                                        <td class="text-secondary">@(mascota.FechaIngreso?.ToString("dd/MM/yyyy") ?? "N/A")</td>
+                                        @if (ViewBag.Tipo == "Adoptadas")
+                                        {
+                                            <td class="text-secondary">
+                                                @{
+                                                    var historial = ViewBag.HistorialEstados as List<MVCMASCOTAS.Models.HistorialEstadosMascota>;
+                                                    var fechaAdopcion = historial?.FirstOrDefault(h => h.MascotaId == mascota.MascotaId && h.EstadoNuevo == "Adoptada")?.FechaCambio;
+                                                }
+                                                @(fechaAdopcion?.ToString("dd/MM/yyyy") ?? "N/A")
+                                            </td>
+                                        }
+                                        <td class="text-center">
+                                            <div class="d-flex justify-content-center gap-2">
+                                                <a href="@Url.Action("Detalle", "Mascotas", new { id = mascota.MascotaId })"
+                                                   class="btn btn-sm btn-outline-green" title="Ver Detalles">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                                <a href="@Url.Action("Editar", "Mascotas", new { id = mascota.MascotaId })"
+                                                   class="btn btn-sm btn-yellow" title="Editar">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                @if (ViewBag.Tipo == "Adoptadas")
+                                                {
+                                                    <a href="@Url.Action("SeguimientoMascota", "Mascotas", new { id = mascota.MascotaId })"
+                                                       class="btn btn-sm btn-green" title="Ver/Registrar Seguimiento">
+                                                        <i class="fas fa-clipboard-check"></i>
+                                                    </a>
+                                                }
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="@(ViewBag.Tipo == "Adoptadas" ? "10" : "9")" class="text-center py-5">
+                                        <div class="empty-state">
+                                            <i class="fas fa-info-circle fa-3x text-green mb-3"></i>
+                                            <h5 class="text-brown mb-2">No hay mascotas @(ViewBag.Tipo == "Adoptadas" ? "adoptadas" : "disponibles")</h5>
+                                            <p class="text-secondary mb-0">
+                                                @(ViewBag.Tipo == "Adoptadas"
+                                                    ? "Las mascotas adoptadas aparecerán aquí."
+                                                    : "Las mascotas disponibles para adopción aparecerán aquí.")
+                                            </p>
                                         </div>
                                     </td>
                                 </tr>
                             }
-                        }
-                        else
-                        {
-                            <tr>
-                                <td colspan="@(ViewBag.Tipo == "Adoptadas" ? "10" : "9")" class="text-center py-5">
-                                    <div class="alert alert-info mb-0">
-                                        <i class="fas fa-info-circle fa-3x mb-3 d-block"></i>
-                                        <h5>No hay mascotas @(ViewBag.Tipo == "Adoptadas" ? "adoptadas" : "disponibles") en este momento</h5>
-                                        <p class="mb-0 text-muted">
-                                            @(ViewBag.Tipo == "Adoptadas"
-                                                ? "Las mascotas adoptadas aparecerán aquí."
-                                                : "Las mascotas disponibles para adopción aparecerán aquí.")
-                                        </p>
-                                    </div>
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
-</div>
+</section>
+
+@section Styles {
+    <style>
+        body {
+            background-color: var(--fondo-beige);
+        }
+
+        .listado-hero {
+            background-color: var(--fondo-beige);
+            border-radius: 0 0 30px 30px;
+            margin-bottom: 1rem;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 24px;
+            padding: 1.5rem;
+            box-shadow: 0 8px 20px rgba(151,199,139,0.15);
+            transition: transform 0.3s, box-shadow 0.3s;
+            border: none;
+        }
+
+            .stat-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 15px 30px rgba(151,199,139,0.25);
+            }
+
+        .table-card {
+            background: white;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 15px 35px rgba(151,199,139,0.15);
+            border: none;
+        }
+
+        .table-card-header {
+            padding: 1rem 1.5rem;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .table {
+            margin-bottom: 0;
+        }
+
+            .table th {
+                background-color: #F2E9D8;
+                color: var(--texto-oscuro);
+                font-weight: 600;
+                border-bottom: 2px solid var(--verde-menta);
+                padding: 1rem 0.5rem;
+            }
+
+            .table td {
+                padding: 1rem 0.5rem;
+                border-bottom: 1px solid #F2E9D8;
+            }
+
+        .table-hover tbody tr:hover {
+            background-color: rgba(151,199,139,0.05);
+        }
+
+        .avatar-wrapper {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 2px solid var(--verde-menta);
+            background-color: #F2E9D8;
+        }
+
+            .avatar-wrapper img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+
+        .badge.bg-green {
+            background-color: var(--verde-menta) !important;
+            color: white !important;
+        }
+
+        .badge.bg-yellow {
+            background-color: var(--amarillo-suave) !important;
+            color: var(--texto-oscuro) !important;
+        }
+
+        .badge.bg-pink {
+            background-color: var(--rosa-pastel) !important;
+            color: var(--texto-oscuro) !important;
+        }
+
+        .badge.bg-info {
+            background-color: #17a2b8 !important;
+            color: white !important;
+        }
+
+        .badge.bg-light-mint {
+            background-color: #F2E9D8 !important;
+            color: var(--texto-oscuro) !important;
+            border: 1px solid var(--verde-menta);
+        }
+
+        .btn-green {
+            background-color: var(--verde-menta);
+            border: none;
+            border-radius: 50px;
+            padding: 0.6rem 1.8rem;
+            font-weight: 500;
+            color: white;
+            transition: all 0.3s;
+        }
+
+            .btn-green:hover {
+                background-color: #86b57a;
+                transform: translateY(-2px);
+                color: white;
+            }
+
+            .btn-green.btn-sm {
+                padding: 0.35rem 0.7rem;
+            }
+
+        .btn-pink {
+            background-color: var(--rosa-pastel);
+            border: none;
+            border-radius: 50px;
+            padding: 0.6rem 1.8rem;
+            font-weight: 500;
+            color: var(--texto-oscuro);
+            transition: all 0.3s;
+        }
+
+            .btn-pink:hover {
+                background-color: #f9c2b0;
+                transform: translateY(-2px);
+            }
+
+        .btn-yellow {
+            background-color: var(--amarillo-suave);
+            border: none;
+            border-radius: 50px;
+            padding: 0.4rem 0.8rem;
+            font-weight: 500;
+            color: var(--texto-oscuro);
+            transition: all 0.3s;
+        }
+
+            .btn-yellow:hover {
+                background-color: #e6b85c;
+                transform: translateY(-2px);
+            }
+
+        .btn-outline-green {
+            border: 2px solid var(--verde-menta);
+            background: transparent;
+            color: var(--verde-menta);
+            border-radius: 50px;
+            padding: 0.4rem 1.8rem;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+            .btn-outline-green:hover {
+                background-color: var(--verde-menta);
+                color: white;
+                transform: translateY(-2px);
+            }
+
+        .btn-outline-pink {
+            border: 2px solid var(--rosa-pastel);
+            background: transparent;
+            color: var(--texto-oscuro);
+            border-radius: 50px;
+            padding: 0.4rem 1.8rem;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+            .btn-outline-pink:hover {
+                background-color: var(--rosa-pastel);
+                transform: translateY(-2px);
+            }
+
+        .empty-state {
+            background: white;
+            border-radius: 24px;
+            padding: 2.5rem;
+            border: 2px dashed var(--verde-menta);
+            display: inline-block;
+        }
+
+        .gap-2 {
+            gap: 0.5rem;
+        }
+
+        .text-xs {
+            font-size: 0.7rem;
+        }
+
+        @@media (max-width: 768px) {
+            .stat-card {
+                padding: 1rem;
+            }
+
+            .table th, .table td {
+                white-space: nowrap;
+            }
+        }
+    </style>
+}
 
 @section Scripts {
     <script>
         $(document).ready(function () {
-            // Activar tooltips de Bootstrap
             var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-                return new bootstrap.Tooltip(tooltipTriggerEl);
-            });
+            tooltipTriggerList.map(function (el) { return new bootstrap.Tooltip(el); });
         });
     </script>
 }
-
-<style>
-    .badge.bg-pink {
-        background-color: #FBCDC0 !important;
-        color: #5C4B43 !important;
-    }
-</style>

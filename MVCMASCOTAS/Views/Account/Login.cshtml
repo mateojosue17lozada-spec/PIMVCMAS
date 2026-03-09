@@ -1,65 +1,64 @@
 ﻿@model MVCMASCOTAS.Models.ViewModels.LoginViewModel
 
 @{
-    ViewBag.Title = "Iniciar Sesión";
+    ViewBag.Title = "Iniciar Sesión - ADOPTAMANÍA";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<section class="py-4">
-    <div class="container">
-        <div class="text-center">
-            <h1 class="display-5 fw-bold mb-2 text-brown">
-                <i class="fa fa-sign-in-alt text-green"></i> Iniciar Sesión
-            </h1>
-            <p class="lead mb-3 text-secondary">Accede a tu cuenta del Refugio de Mascotas</p>
-        </div>
+<!-- Hero Section -->
+<section class="login-hero py-4">
+    <div class="container text-center">
+        <i class="fas fa-paw fa-3x text-green mb-3"></i>
+        <h1 class="display-5 fw-bold mb-2 text-brown">Iniciar Sesión</h1>
+        <p class="lead mb-3 text-secondary">Accede a tu cuenta de ADOPTAMANÍA</p>
     </div>
 </section>
 
-<section class="py-5 bg-light-mint">
+<!-- Main Content -->
+<section class="py-5 bg-beige">
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-md-8 col-lg-6">
-                <div class="card border-green shadow-hover">
-                    <div class="card-header bg-green text-white">
-                        <h3 class="text-center mb-0">
-                            <i class="fa fa-sign-in-alt"></i> Iniciar Sesión
-                        </h3>
+                <!-- Tarjeta principal de login -->
+                <div class="login-card">
+                    <div class="login-card-header bg-green text-white text-center">
+                        <i class="fas fa-sign-in-alt fa-3x mb-3"></i>
+                        <h3 class="mb-0">Iniciar Sesión</h3>
                     </div>
-                    <div class="card-body p-4 p-md-5">
+                    <div class="login-card-body p-4 p-md-5">
                         <p class="text-center text-secondary mb-4">Ingresa tus credenciales para continuar</p>
 
+                        <!-- Mensajes de TempData -->
                         @if (TempData["ErrorMessage"] != null)
                         {
-                            <div class="alert alert-danger border-danger alert-dismissible fade show" role="alert">
-                                <i class="fa fa-exclamation-circle"></i>
-                                <strong>@TempData["ErrorMessage"]</strong>
+                            <div class="alert alert-beige border-green alert-dismissible fade show" role="alert">
+                                <i class="fas fa-exclamation-circle text-green me-2"></i>
+                                <strong class="text-brown">@TempData["ErrorMessage"]</strong>
                                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                             </div>
                         }
-
                         @if (TempData["WarningMessage"] != null)
                         {
-                            <div class="alert alert-warning border-warning alert-dismissible fade show" role="alert">
-                                <i class="fa fa-exclamation-triangle"></i>
-                                <strong>@TempData["WarningMessage"]</strong>
+                            <div class="alert alert-beige border-green alert-dismissible fade show" role="alert">
+                                <i class="fas fa-exclamation-triangle text-yellow me-2"></i>
+                                <strong class="text-brown">@TempData["WarningMessage"]</strong>
                                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                             </div>
                         }
-
                         @if (TempData["SuccessMessage"] != null)
                         {
-                            <div class="alert alert-success border-success alert-dismissible fade show" role="alert">
-                                <i class="fa fa-check-circle"></i>
-                                <strong>@TempData["SuccessMessage"]</strong>
+                            <div class="alert alert-beige border-green alert-dismissible fade show" role="alert">
+                                <i class="fas fa-check-circle text-green me-2"></i>
+                                <strong class="text-brown">@TempData["SuccessMessage"]</strong>
                                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                             </div>
                         }
 
+                        <!-- Error de login personalizado -->
                         @if (ViewBag.ErrorLogin != null)
                         {
-                            <div class="alert alert-green border-green text-center">
-                                <i class="fa fa-exclamation-triangle text-green"></i>
+                            <div class="alert alert-beige border-green text-center">
+                                <i class="fas fa-exclamation-triangle text-yellow me-2"></i>
                                 <strong class="text-brown">@ViewBag.ErrorLogin</strong>
                             </div>
                         }
@@ -71,50 +70,61 @@
                             <!-- Validation Summary -->
                             if (!ViewData.ModelState.IsValid)
                             {
-                                <div class="alert alert-danger border-danger">
+                                <div class="alert alert-beige border-green">
                                     @Html.ValidationSummary(true, "")
                                 </div>
                             }
 
-                            <!-- Si hay usuario con email no confirmado -->
+                            <!-- Email no confirmado -->
                             if (ViewBag.EmailNoConfirmado != null && (bool)ViewBag.EmailNoConfirmado)
                             {
-                                <div class="alert alert-warning border-warning mb-4">
-                                    <i class="fa fa-envelope text-warning"></i>
-                                    <strong>Email no confirmado</strong>
-                                    <p class="mb-1">Tu email no ha sido confirmado. Por favor, revisa tu correo.</p>
-                                    @if (ViewBag.UsuarioId != null)
-                                    {
-                                        <div class="mt-2">
-                                            <!-- NO usar otro <form> aquí, usar un link o AJAX -->
-                                            @Html.ActionLink("Reenviar enlace de confirmación", "ResendConfirmationEmail", "Account",
-                                                new { email = Model.Email },
-                                                new { @class = "btn btn-warning btn-sm" })
+                                <div class="alert alert-beige border-green mb-4">
+                                    <div class="d-flex align-items-start">
+                                        <i class="fas fa-envelope fa-2x text-yellow me-3"></i>
+                                        <div>
+                                            <strong class="text-brown">Email no confirmado</strong>
+                                            <p class="mb-1 text-secondary">Tu email no ha sido confirmado. Por favor, revisa tu correo.</p>
+                                            @if (ViewBag.UsuarioId != null)
+                                            {
+                                                @Html.ActionLink("Reenviar enlace de confirmación", "ResendConfirmationEmail", "Account",
+                                                    new { email = Model.Email },
+                                                    new { @class = "btn btn-yellow btn-sm mt-2" })
+                                            }
                                         </div>
-                                    }
+                                    </div>
                                 </div>
                             }
 
+                            <!-- Campo Email -->
                             <div class="form-group mb-4">
                                 <label for="Email" class="form-label text-brown fw-medium">
-                                    <i class="fa fa-envelope text-green"></i> Correo Electrónico *
-                                </label>
-                                @Html.TextBoxFor(m => m.Email, new
-                                {
-                                    @class = "form-control border-green",
-                                    placeholder = "correo@ejemplo.com",
-                                    type = "email",
-                                    required = "required",
-                                    autocomplete = "email"
-                                })
-                                <span class="text-danger small mt-1">@Html.ValidationMessageFor(m => m.Email)</span>
-                            </div>
-
-                            <div class="form-group mb-4">
-                                <label for="Password" class="form-label text-brown fw-medium">
-                                    <i class="fa fa-lock text-green"></i> Contraseña *
+                                    <i class="fas fa-envelope text-green me-2"></i> Correo Electrónico *
                                 </label>
                                 <div class="input-group">
+                                    <span class="input-group-text bg-white border-green">
+                                        <i class="fas fa-envelope text-green"></i>
+                                    </span>
+                                    @Html.TextBoxFor(m => m.Email, new
+                                    {
+                                        @class = "form-control border-green",
+                                        placeholder = "correo@ejemplo.com",
+                                        type = "email",
+                                        required = "required",
+                                        autocomplete = "email"
+                                    })
+                                </div>
+                                @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger small mt-1" })
+                            </div>
+
+                            <!-- Campo Contraseña -->
+                            <div class="form-group mb-4">
+                                <label for="Password" class="form-label text-brown fw-medium">
+                                    <i class="fas fa-lock text-green me-2"></i> Contraseña *
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-white border-green">
+                                        <i class="fas fa-lock text-green"></i>
+                                    </span>
                                     @Html.PasswordFor(m => m.Password, new
                                     {
                                         @class = "form-control border-green",
@@ -124,55 +134,60 @@
                                         autocomplete = "current-password"
                                     })
                                     <button type="button" class="btn btn-outline-green toggle-password" data-target="#Password">
-                                        <i class="fa fa-eye"></i>
+                                        <i class="fas fa-eye"></i>
                                     </button>
                                 </div>
-                                <span class="text-danger small mt-1">@Html.ValidationMessageFor(m => m.Password)</span>
+                                @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger small mt-1" })
                                 <div class="text-end mt-2">
                                     <a href="@Url.Action("ForgotPassword", "Account")" class="small text-green">
-                                        <i class="fa fa-question-circle"></i> ¿Olvidaste tu contraseña?
+                                        <i class="fas fa-question-circle me-1"></i> ¿Olvidaste tu contraseña?
                                     </a>
                                 </div>
                             </div>
 
-                            <div class="form-group form-check mb-4">
+                            <!-- Remember Me -->
+                            <div class="form-check mb-4">
                                 @Html.CheckBoxFor(m => m.RememberMe, new { @class = "form-check-input", id = "RememberMe" })
                                 <label class="form-check-label text-brown" for="RememberMe">
-                                    <i class="fa fa-clock text-green me-1"></i> Recordarme en este dispositivo
+                                    <i class="fas fa-clock text-green me-1"></i> Recordarme en este dispositivo
                                 </label>
                             </div>
 
+                            <!-- Botón de envío -->
                             <div class="d-grid mb-4">
                                 <button type="submit" class="btn btn-green btn-lg text-white" id="btnLogin">
-                                    <i class="fa fa-sign-in-alt"></i> Iniciar Sesión
+                                    <i class="fas fa-sign-in-alt me-2"></i> Iniciar Sesión
                                 </button>
                             </div>
                         }
 
+                        <!-- Enlaces adicionales -->
                         <div class="text-center mt-4 pt-3 border-top border-green">
                             <div class="mb-3">
                                 <p class="text-brown mb-2">¿No tienes cuenta?</p>
                                 <a href="@Url.Action("Register", "Account")" class="btn btn-pink">
-                                    <i class="fa fa-user-plus"></i> Regístrate aquí
+                                    <i class="fas fa-user-plus me-2"></i> Regístrate aquí
                                 </a>
                             </div>
                             <div>
                                 <a href="@Url.Action("Index", "Home")" class="btn btn-outline-green">
-                                    <i class="fa fa-arrow-left"></i> Volver al Inicio
+                                    <i class="fas fa-arrow-left me-2"></i> Volver al Inicio
                                 </a>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="card border-green shadow-hover mt-4">
-                    <div class="card-body text-center">
-                        <h5 class="text-brown mb-3">
-                            <i class="fa fa-heart text-green"></i> Bienvenido al Refugio
-                        </h5>
-                        <p class="text-secondary mb-0">
-                            Accede para reportar mascotas perdidas, ver adopciones, hacer donaciones y más.
-                        </p>
+                <!-- Tarjeta de bienvenida adicional -->
+                <div class="welcome-card mt-4 p-4">
+                    <div class="d-flex align-items-start">
+                        <i class="fas fa-heart fa-3x text-green me-3"></i>
+                        <div>
+                            <h5 class="text-brown mb-2">Bienvenido a ADOPTAMANÍA</h5>
+                            <p class="text-secondary mb-0">
+                                Accede para reportar mascotas perdidas, ver adopciones, hacer donaciones y más.
+                            </p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -180,14 +195,166 @@
     </div>
 </section>
 
+@section Styles {
+    <style>
+        /* Hero */
+        .login-hero {
+            background-color: var(--fondo-beige);
+            border-radius: 0 0 30px 30px;
+            margin-bottom: 1rem;
+        }
+
+        /* Tarjeta de login */
+        .login-card {
+            background: white;
+            border-radius: 30px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(151, 199, 139, 0.15);
+            border: none;
+        }
+
+        .login-card-header {
+            padding: 2rem 1.5rem 1.5rem;
+        }
+
+        .login-card-body {
+            padding: 2rem;
+        }
+
+        /* Tarjeta de bienvenida */
+        .welcome-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 8px 20px rgba(151, 199, 139, 0.1);
+            border-left: 5px solid var(--verde-menta);
+        }
+
+        /* Alertas personalizadas */
+        .alert-beige {
+            background-color: var(--fondo-beige);
+            border: 1px solid var(--verde-menta);
+            color: var(--texto-oscuro);
+            border-radius: 16px;
+        }
+
+        /* Input group */
+        .input-group-text {
+            border-radius: 12px 0 0 12px;
+            border-right: none;
+            background-color: white;
+        }
+
+        .form-control {
+            border-radius: 0 12px 12px 0;
+            border-left: none;
+            padding: 0.75rem 1rem;
+            font-size: 1rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+            .form-control:focus {
+                border-color: var(--verde-menta);
+                box-shadow: 0 0 0 0.2rem rgba(151, 199, 139, 0.25);
+                outline: none;
+            }
+
+        .input-group:focus-within .input-group-text {
+            border-color: var(--verde-menta);
+            box-shadow: 0 0 0 0.2rem rgba(151, 199, 139, 0.25);
+        }
+
+        /* Botón de toggle contraseña */
+        .btn-outline-green {
+            border: 2px solid var(--verde-menta);
+            background: transparent;
+            color: var(--verde-menta);
+            border-radius: 0 12px 12px 0;
+            border-left: none;
+            transition: all 0.2s;
+        }
+
+            .btn-outline-green:hover {
+                background-color: var(--verde-menta);
+                color: white;
+            }
+
+        /* Checkbox personalizado */
+        .form-check-input:checked {
+            background-color: var(--verde-menta);
+            border-color: var(--verde-menta);
+        }
+
+        .form-check-input:focus {
+            border-color: var(--verde-menta);
+            box-shadow: 0 0 0 0.2rem rgba(151, 199, 139, 0.25);
+        }
+
+        /* Botones principales */
+        .btn-green {
+            background-color: var(--verde-menta);
+            border: none;
+            border-radius: 50px;
+            padding: 0.8rem 2rem;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+            .btn-green:hover {
+                background-color: #86b57a;
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(151, 199, 139, 0.4);
+            }
+
+        .btn-pink {
+            background-color: var(--rosado-claro);
+            border: none;
+            border-radius: 50px;
+            padding: 0.6rem 1.5rem;
+            font-weight: 600;
+            transition: all 0.3s;
+            color: var(--texto-oscuro);
+        }
+
+            .btn-pink:hover {
+                background-color: #f9c2b0;
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(249, 194, 176, 0.4);
+            }
+
+        .btn-outline-green:not(.toggle-password) {
+            border-radius: 50px;
+            border-left: 2px solid var(--verde-menta);
+        }
+
+        /* Enlaces */
+        a.text-green {
+            color: var(--verde-menta);
+            text-decoration: none;
+        }
+
+            a.text-green:hover {
+                text-decoration: underline;
+            }
+
+        /* Responsive */
+        @@media (max-width: 768px) {
+            .login-card-header {
+                padding: 1.5rem 1rem;
+            }
+
+            .login-card-body {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+}
+
 @section Scripts {
     @Scripts.Render("~/bundles/jqueryval")
 
-    <script type="text/javascript">
+    <script>
         $(document).ready(function () {
-            console.log('Login page loaded');
-
-            // Toggle password visibility
+            // Toggle contraseña
             $('.toggle-password').click(function () {
                 var target = $(this).data('target');
                 var input = $(target);
@@ -202,7 +369,7 @@
                 }
             });
 
-            // Auto-focus en el campo de email
+            // Auto-focus en email
             $('#Email').focus();
 
             // Validación básica
@@ -212,56 +379,35 @@
 
                 if (!email || !password) {
                     e.preventDefault();
-                    alert('Por favor, completa todos los campos requeridos.');
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Campos incompletos',
+                        text: 'Por favor, completa todos los campos requeridos.',
+                        confirmButtonColor: '#97C78B'
+                    });
                     return false;
                 }
 
-                // Validar formato de email - CORREGIDO
-                var atPos = email.indexOf('@@');  // Doble @@ para escapar en Razor
-                var dotPos = email.lastIndexOf('.');
-
-                if (atPos < 1 || dotPos < atPos + 2 || dotPos + 2 >= email.length) {
+                // Validación simple de email
+                var emailPattern = /^[^\s@@]+@@[^\s@@]+\.[^\s@@]+$/;
+                if (!emailPattern.test(email)) {
                     e.preventDefault();
-                    alert('Por favor, ingresa un email válido.');
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Email inválido',
+                        text: 'Por favor, ingresa un correo electrónico válido.',
+                        confirmButtonColor: '#97C78B'
+                    });
                     $('#Email').focus();
                     return false;
                 }
 
                 // Deshabilitar botón y mostrar spinner
-                $('#btnLogin').prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Iniciando sesión...');
+                $('#btnLogin')
+                    .prop('disabled', true)
+                    .html('<i class="fas fa-spinner fa-spin me-2"></i> Iniciando sesión...');
                 return true;
             });
         });
     </script>
-}
-
-@section Styles {
-    <style>
-        .form-check-input:checked {
-            background-color: var(--green);
-            border-color: var(--green);
-        }
-
-        .form-check-input:focus {
-            border-color: var(--green);
-            box-shadow: 0 0 0 0.25rem rgba(151, 199, 139, 0.25);
-        }
-
-        .input-group .btn-outline-green {
-            border-left: none;
-        }
-
-        .form-control:focus {
-            border-color: var(--green) !important;
-            box-shadow: 0 0 0 0.25rem rgba(151, 199, 139, 0.25) !important;
-        }
-
-        .btn-link.text-green {
-            text-decoration: none;
-        }
-
-            .btn-link.text-green:hover {
-                text-decoration: underline;
-            }
-    </style>
 }

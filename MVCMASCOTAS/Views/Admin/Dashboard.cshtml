@@ -1,23 +1,20 @@
 ﻿@model MVCMASCOTAS.Models.ViewModels.DashboardViewModel
 @{
-    ViewData["Title"] = "Dashboard Administrativo - Sistema Integral";
+    ViewData["Title"] = "Dashboard Administrativo - ADOPTAMANÍA";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 <!-- Hero Section -->
-<section class="py-4">
-    <div class="container">
-        <div class="text-center">
-            <h1 class="display-5 fw-bold mb-2 text-brown">
-                <i class="fa fa-user-shield text-green"></i> Panel de Control Administrativo
-            </h1>
-            <p class="lead mb-3 text-secondary">Bienvenido al sistema integral de gestión del refugio</p>
-        </div>
+<section class="dashboard-hero py-4">
+    <div class="container text-center">
+        <i class="fas fa-user-shield fa-3x text-green mb-3"></i>
+        <h1 class="display-5 fw-bold mb-2 text-brown">Panel de Control Administrativo</h1>
+        <p class="lead mb-3 text-secondary">Bienvenido al sistema integral de gestión del refugio</p>
     </div>
 </section>
 
 <!-- Main Content -->
-<section class="py-5 bg-light-mint">
+<section class="py-5 bg-beige">
     <div class="container">
         <!-- Alertas del Sistema -->
         @{
@@ -27,651 +24,375 @@
 
         @if (alertasSistema != null && alertasSistema.Any())
         {
-            <div class="alert alert-green border-green alert-dismissible fade show mb-4" role="alert">
-                <h5><i class="fa fa-exclamation-triangle text-green"></i> Alertas del Sistema</h5>
-                <ul class="mb-0">
-                    @foreach (var alerta in alertasSistema)
-                    {
-                        <li>@alerta</li>
-                    }
-                </ul>
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+            <div class="alert alert-beige border-green alert-dismissible fade show mb-4" role="alert">
+                <div class="d-flex align-items-start">
+                    <i class="fas fa-exclamation-triangle fa-2x text-yellow me-3"></i>
+                    <div>
+                        <h5 class="text-brown mb-2"><i class="fas fa-bell text-green me-2"></i> Alertas del Sistema</h5>
+                        <ul class="mb-0">
+                            @foreach (var alerta in alertasSistema)
+                            {
+                                <li class="text-secondary">@alerta</li>
+                            }
+                        </ul>
+                    </div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
         }
 
         <!-- Alertas de Mascotas Perdidas -->
         @if (Model.HayAlertasMascotasPerdidas && alertasMascotasPerdidas != null && alertasMascotasPerdidas.Any())
         {
-            <div class="alert alert-green border-green alert-dismissible fade show mb-4" role="alert">
-                <h5><i class="fa fa-search text-green"></i> Alertas de Mascotas Perdidas</h5>
-                <ul class="mb-0">
-                    @foreach (var alerta in alertasMascotasPerdidas)
-                    {
-                        <li>@alerta</li>
-                    }
-                </ul>
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+            <div class="alert alert-beige border-green alert-dismissible fade show mb-4" role="alert">
+                <div class="d-flex align-items-start">
+                    <i class="fas fa-search fa-2x text-yellow me-3"></i>
+                    <div>
+                        <h5 class="text-brown mb-2"><i class="fas fa-paw text-green me-2"></i> Alertas de Mascotas Perdidas</h5>
+                        <ul class="mb-0">
+                            @foreach (var alerta in alertasMascotasPerdidas)
+                            {
+                                <li class="text-secondary">@alerta</li>
+                            }
+                        </ul>
+                    </div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
         }
 
         <!-- Widgets de Acceso Rápido -->
-        <div class="row mb-4">
-            <div class="col-12">
-                <h4 class="mb-3 text-brown"><i class="fa fa-rocket text-green"></i> Acceso Rápido</h4>
-            </div>
-
-            <!-- WIDGETS EXISTENTES -->
-            <div class="col-md-2 col-sm-4 col-6 mb-3">
-                <a href="/Admin/Usuarios" class="text-decoration-none">
-                    <div class="card text-center h-100 border-green shadow-hover">
-                        <div class="card-body">
-                            <i class="fa fa-users fa-2x text-green mb-2"></i>
-                            <h6 class="text-brown">Usuarios</h6>
-                            <small class="text-secondary">Gestionar usuarios</small>
-                        </div>
-                    </div>
-                </a>
-            </div>
-
-            <!-- ============================================= -->
-            <!-- NUEVOS WIDGETS DEL MASCOTASCONTROLLER -->
-            <!-- ============================================= -->
-            <!-- Gestionar Mascotas -->
-            <div class="col-md-2 col-sm-4 col-6 mb-3">
-                <a href="/Mascotas/Gestionar" class="text-decoration-none">
-                    <div class="card text-center h-100 border-green shadow-hover">
-                        <div class="card-body">
-                            <i class="fa fa-paw fa-2x text-green mb-2"></i>
-                            <h6 class="text-brown">Gestionar Mascotas</h6>
-                            <small class="text-secondary">@Model.TotalMascotas total</small>
-                        </div>
-                    </div>
-                </a>
-            </div>
-
-            <!-- Crear Nueva Mascota -->
-            <div class="col-md-2 col-sm-4 col-6 mb-3">
-                <a href="/Mascotas/Crear" class="text-decoration-none">
-                    <div class="card text-center h-100 border-green shadow-hover">
-                        <div class="card-body">
-                            <i class="fa fa-plus-circle fa-2x text-green mb-2"></i>
-                            <h6 class="text-brown">Nueva Mascota</h6>
-                            <small class="text-secondary">Registrar nueva</small>
-                        </div>
-                    </div>
-                </a>
-            </div>
-
-            <!-- Listado por Tipo -->
-            <div class="col-md-2 col-sm-4 col-6 mb-3">
-                <a href="/Mascotas/Listado?tipo=Disponibles" class="text-decoration-none">
-                    <div class="card text-center h-100 border-green shadow-hover">
-                        <div class="card-body">
-                            <i class="fa fa-list fa-2x text-green mb-2"></i>
-                            <h6 class="text-brown">Mascotas Disponibles</h6>
-                            <small class="text-secondary">@Model.MascotasDisponibles disponibles</small>
-                        </div>
-                    </div>
-                </a>
-            </div>
-
-            <!-- Seguimiento de Adopciones -->
-            <div class="col-md-2 col-sm-4 col-6 mb-3">
-                <a href="/Mascotas/SeguimientoAdopciones" class="text-decoration-none">
-                    <div class="card text-center h-100 border-green shadow-hover">
-                        <div class="card-body">
-                            <i class="fa fa-heartbeat fa-2x text-green mb-2"></i>
-                            <h6 class="text-brown">Seguimiento Adopciones</h6>
-                            <small class="text-secondary">Monitorear adoptados</small>
-                        </div>
-                    </div>
-                </a>
-            </div>
-
-            <!-- Contratos de Adopción -->
-            <div class="col-md-2 col-sm-4 col-6 mb-3">
-                <a href="/Mascotas/ContratosAdopcion" class="text-decoration-none">
-                    <div class="card text-center h-100 border-green shadow-hover">
-                        <div class="card-body">
-                            <i class="fa fa-file-contract fa-2x text-green mb-2"></i>
-                            <h6 class="text-brown">Contratos Adopción</h6>
-                            <small class="text-secondary">Gestión de contratos</small>
-                        </div>
-                    </div>
-                </a>
-            </div>
-
-            <!-- Historial de Estados -->
-            <div class="col-md-2 col-sm-4 col-6 mb-3">
-                <a href="/Mascotas/Gestionar" class="text-decoration-none">
-                    <div class="card text-center h-100 border-green shadow-hover">
-                        <div class="card-body">
-                            <i class="fa fa-history fa-2x text-green mb-2"></i>
-                            <h6 class="text-brown">Historial Estados</h6>
-                            <small class="text-secondary">Ver cambios de estado</small>
-                        </div>
-                    </div>
-                </a>
-            </div>
-
-            <!-- Mascotas Archivadas -->
-            <div class="col-md-2 col-sm-4 col-6 mb-3">
-                <a href="/Mascotas/MascotasArchivadas" class="text-decoration-none">
-                    <div class="card text-center h-100 border-green shadow-hover">
-                        <div class="card-body">
-                            <i class="fa fa-archive fa-2x text-green mb-2"></i>
-                            <h6 class="text-brown">Mascotas Archivadas</h6>
-                            <small class="text-secondary">Ver historial archivado</small>
-                        </div>
-                    </div>
-                </a>
-            </div>
-
-            <!-- Exportar Mascotas -->
-            <div class="col-md-2 col-sm-4 col-6 mb-3">
-                <a href="/Mascotas/ExportarMascotas" class="text-decoration-none">
-                    <div class="card text-center h-100 border-green shadow-hover">
-                        <div class="card-body">
-                            <i class="fa fa-file-export fa-2x text-green mb-2"></i>
-                            <h6 class="text-brown">Exportar Mascotas</h6>
-                            <small class="text-secondary">Generar reportes CSV</small>
-                        </div>
-                    </div>
-                </a>
-            </div>
-
-            <!-- WIDGETS EXISTENTES CONTINUACIÓN -->
-            <div class="col-md-2 col-sm-4 col-6 mb-3">
-                <a href="/Admin/SolicitudAdopcion" class="text-decoration-none">
-                    <div class="card text-center h-100 border-green shadow-hover">
-                        <div class="card-body">
-                            <i class="fa fa-heart fa-2x text-green mb-2"></i>
-                            <h6 class="text-brown">Adopciones</h6>
-                            <small class="text-secondary">@Model.SolicitudesPendientes pendientes</small>
-                        </div>
-                    </div>
-                </a>
-            </div>
-
-            <div class="col-md-2 col-sm-4 col-6 mb-3">
-                <a href="/Admin/PanelVeterinario" class="text-decoration-none">
-                    <div class="card text-center h-100 border-green shadow-hover">
-                        <div class="card-body">
-                            <i class="fa fa-user-md fa-2x text-green mb-2"></i>
-                            <h6 class="text-brown">Veterinaria</h6>
-                            <small class="text-secondary">@Model.ConsultasPendientes pendientes</small>
-                        </div>
-                    </div>
-                </a>
-            </div>
-
-            <div class="col-md-2 col-sm-4 col-6 mb-3">
-                <a href="/Admin/GestionDonaciones" class="text-decoration-none">
-                    <div class="card text-center h-100 border-green shadow-hover">
-                        <div class="card-body">
-                            <i class="fa fa-donate fa-2x text-green mb-2"></i>
-                            <h6 class="text-brown">Donaciones</h6>
-                            <small class="text-secondary">$@Model.TotalDonacionesMes.ToString("N2") este mes</small>
-                        </div>
-                    </div>
-                </a>
-            </div>
-
-            <div class="col-md-2 col-sm-4 col-6 mb-3">
-                <a href="/Admin/PanelContabilidad" class="text-decoration-none">
-                    <div class="card text-center h-100 border-green shadow-hover">
-                        <div class="card-body">
-                            <i class="fa fa-calculator fa-2x text-green mb-2"></i>
-                            <h6 class="text-brown">Contabilidad</h6>
-                            <small class="text-secondary">Balance: $@Model.BalanceMes.ToString("N2")</small>
-                        </div>
-                    </div>
-                </a>
-            </div>
-
-            <!-- WIDGETS NUEVOS EXISTENTES -->
-            <div class="col-md-2 col-sm-4 col-6 mb-3">
-                <a href="/Admin/Roles" class="text-decoration-none">
-                    <div class="card text-center h-100 border-green shadow-hover">
-                        <div class="card-body">
-                            <i class="fa fa-user-tag fa-2x text-green mb-2"></i>
-                            <h6 class="text-brown">Roles</h6>
-                            <small class="text-secondary">Gestionar roles</small>
-                        </div>
-                    </div>
-                </a>
-            </div>
-
-            <div class="col-md-2 col-sm-4 col-6 mb-3">
-                <a href="/Admin/Configuracion" class="text-decoration-none">
-                    <div class="card text-center h-100 border-green shadow-hover">
-                        <div class="card-body">
-                            <i class="fa fa-cogs fa-2x text-green mb-2"></i>
-                            <h6 class="text-brown">Configuración</h6>
-                            <small class="text-secondary">@Model.AjustesSistema ajustes</small>
-                        </div>
-                    </div>
-                </a>
-            </div>
-
-            <div class="col-md-2 col-sm-4 col-6 mb-3">
-                <a href="/Admin/Auditoria" class="text-decoration-none">
-                    <div class="card text-center h-100 border-green shadow-hover">
-                        <div class="card-body">
-                            <i class="fa fa-clipboard-list fa-2x text-green mb-2"></i>
-                            <h6 class="text-brown">Auditoría</h6>
-                            <small class="text-secondary">@Model.RegistrosAuditoriaDia hoy</small>
-                        </div>
-                    </div>
-                </a>
-            </div>
-
-            <!-- WIDGET MASCOTAS PERDIDAS -->
-            <div class="col-md-2 col-sm-4 col-6 mb-3">
-                <a href="/Rescate/MascotasPerdidas" class="text-decoration-none">
-                    <div class="card text-center h-100 border-green shadow-hover">
-                        <div class="card-body">
-                            <i class="fa fa-search fa-2x text-green mb-2"></i>
-                            <h6 class="text-brown">Mascotas Perdidas</h6>
-                            <small class="text-secondary">@Model.MascotasPerdidasActivas activas</small>
-                        </div>
-                    </div>
-                </a>
-            </div>
-
-            <div class="col-md-2 col-sm-4 col-6 mb-3">
-                <a href="/Rescate/ReportarMascotaPerdida" class="text-decoration-none">
-                    <div class="card text-center h-100 border-green shadow-hover">
-                        <div class="card-body">
-                            <i class="fa fa-exclamation-triangle fa-2x text-green mb-2"></i>
-                            <h6 class="text-brown">Reportar Pérdida</h6>
-                            <small class="text-secondary">Nuevo reporte</small>
-                        </div>
-                    </div>
-                </a>
-            </div>
+    <div class="row mb-4">
+        <div class="col-12">
+            <h4 class="mb-3 text-brown"><i class="fas fa-rocket text-green me-2"></i> Acceso Rápido</h4>
         </div>
+
+        <div class="col-md-2 col-sm-4 col-6 mb-3">
+            <a href="/Admin/Usuarios" class="text-decoration-none">
+                <div class="quick-card text-center">
+                    <i class="fas fa-users fa-2x text-green mb-2"></i>
+                    <h6 class="text-brown">Usuarios</h6>
+                    <small class="text-secondary">Gestionar usuarios</small>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-md-2 col-sm-4 col-6 mb-3">
+            <a href="/Mascotas/Gestionar" class="text-decoration-none">
+                <div class="quick-card text-center">
+                    <i class="fas fa-paw fa-2x text-green mb-2"></i>
+                    <h6 class="text-brown">Gestionar Mascotas</h6>
+                    <small class="text-secondary">@Model.TotalMascotas total</small>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-md-2 col-sm-4 col-6 mb-3">
+            <a href="/Mascotas/Crear" class="text-decoration-none">
+                <div class="quick-card text-center">
+                    <i class="fas fa-plus-circle fa-2x text-green mb-2"></i>
+                    <h6 class="text-brown">Nueva Mascota</h6>
+                    <small class="text-secondary">Registrar nueva</small>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-md-2 col-sm-4 col-6 mb-3">
+            <a href="/Mascotas/Listado?tipo=Disponibles" class="text-decoration-none">
+                <div class="quick-card text-center">
+                    <i class="fas fa-list fa-2x text-green mb-2"></i>
+                    <h6 class="text-brown">Mascotas Disponibles</h6>
+                    <small class="text-secondary">@Model.MascotasDisponibles disponibles</small>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-md-2 col-sm-4 col-6 mb-3">
+            <a href="/Mascotas/SeguimientoAdopciones" class="text-decoration-none">
+                <div class="quick-card text-center">
+                    <i class="fas fa-heartbeat fa-2x text-green mb-2"></i>
+                    <h6 class="text-brown">Seguimiento Adopciones</h6>
+                    <small class="text-secondary">Monitorear adoptados</small>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-md-2 col-sm-4 col-6 mb-3">
+            <a href="/Mascotas/ContratosAdopcion" class="text-decoration-none">
+                <div class="quick-card text-center">
+                    <i class="fas fa-file-contract fa-2x text-green mb-2"></i>
+                    <h6 class="text-brown">Contratos Adopción</h6>
+                    <small class="text-secondary">Gestión de contratos</small>
+                </div>
+            </a>
+        </div>
+
+
+        <div class="col-md-2 col-sm-4 col-6 mb-3">
+            <a href="/Mascotas/MascotasArchivadas" class="text-decoration-none">
+                <div class="quick-card text-center">
+                    <i class="fas fa-archive fa-2x text-green mb-2"></i>
+                    <h6 class="text-brown">Mascotas Archivadas</h6>
+                    <small class="text-secondary">Ver historial archivado</small>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-md-2 col-sm-4 col-6 mb-3">
+            <a href="/Mascotas/ExportarMascotas" class="text-decoration-none">
+                <div class="quick-card text-center">
+                    <i class="fas fa-file-export fa-2x text-green mb-2"></i>
+                    <h6 class="text-brown">Exportar Mascotas</h6>
+                    <small class="text-secondary">Generar reportes CSV</small>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-md-2 col-sm-4 col-6 mb-3">
+            <a href="/Admin/SolicitudAdopcion" class="text-decoration-none">
+                <div class="quick-card text-center">
+                    <i class="fas fa-heart fa-2x text-green mb-2"></i>
+                    <h6 class="text-brown">Adopciones</h6>
+                    <small class="text-secondary">@Model.SolicitudesPendientes pendientes</small>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-md-2 col-sm-4 col-6 mb-3">
+            <a href="/Admin/PanelVeterinario" class="text-decoration-none">
+                <div class="quick-card text-center">
+                    <i class="fas fa-user-md fa-2x text-green mb-2"></i>
+                    <h6 class="text-brown">Veterinaria</h6>
+                    <small class="text-secondary">@Model.ConsultasPendientes pendientes</small>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-md-2 col-sm-4 col-6 mb-3">
+            <a href="/Admin/GestionDonaciones" class="text-decoration-none">
+                <div class="quick-card text-center">
+                    <i class="fas fa-donate fa-2x text-green mb-2"></i>
+                    <h6 class="text-brown">Donaciones</h6>
+                    <small class="text-secondary">$@Model.TotalDonacionesMes.ToString("N2") este mes</small>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-md-2 col-sm-4 col-6 mb-3">
+            <a href="/Admin/PanelContabilidad" class="text-decoration-none">
+                <div class="quick-card text-center">
+                    <i class="fas fa-calculator fa-2x text-green mb-2"></i>
+                    <h6 class="text-brown">Contabilidad</h6>
+                    <small class="text-secondary">Balance: $@Model.BalanceMes.ToString("N2")</small>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-md-2 col-sm-4 col-6 mb-3">
+            <a href="/Admin/Roles" class="text-decoration-none">
+                <div class="quick-card text-center">
+                    <i class="fas fa-user-tag fa-2x text-green mb-2"></i>
+                    <h6 class="text-brown">Roles</h6>
+                    <small class="text-secondary">Gestionar roles</small>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-md-2 col-sm-4 col-6 mb-3">
+            <a href="/Admin/Configuracion" class="text-decoration-none">
+                <div class="quick-card text-center">
+                    <i class="fas fa-cogs fa-2x text-green mb-2"></i>
+                    <h6 class="text-brown">Configuración</h6>
+                    <small class="text-secondary">@Model.AjustesSistema ajustes</small>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-md-2 col-sm-4 col-6 mb-3">
+            <a href="/Admin/Auditoria" class="text-decoration-none">
+                <div class="quick-card text-center">
+                    <i class="fas fa-clipboard-list fa-2x text-green mb-2"></i>
+                    <h6 class="text-brown">Auditoría</h6>
+                    <small class="text-secondary">@Model.RegistrosAuditoriaDia hoy</small>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-md-2 col-sm-4 col-6 mb-3">
+            <a href="/Rescate/MascotasPerdidas" class="text-decoration-none">
+                <div class="quick-card text-center">
+                    <i class="fas fa-search fa-2x text-green mb-2"></i>
+                    <h6 class="text-brown">Mascotas Perdidas</h6>
+                    <small class="text-secondary">@Model.MascotasPerdidasActivas activas</small>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-md-2 col-sm-4 col-6 mb-3">
+            <a href="@Url.Action("Index", "CategoriaSimulado")" class="text-decoration-none">
+                <div class="quick-card text-center">
+                    <i class="fas fa-tags fa-2x text-green mb-2"></i>
+                    <h6 class="text-brown">Categorías</h6>
+                    <small class="text-secondary">Administrar</small>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-md-2 col-sm-4 col-6 mb-3">
+            <a href="@Url.Action("Index", "FormularioSimulado")" class="text-decoration-none">
+                <div class="quick-card text-center">
+                    <i class="fas fa-file-alt fa-2x text-green mb-2"></i>
+                    <h6 class="text-brown">Formularios</h6>
+                    <small class="text-secondary">Gestionar</small>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-md-2 col-sm-4 col-6 mb-3">
+            <a href="/Rescate/ReportarMascotaPerdida" class="text-decoration-none">
+                <div class="quick-card text-center">
+                    <i class="fas fa-exclamation-triangle fa-2x text-green mb-2"></i>
+                    <h6 class="text-brown">Reportar Pérdida</h6>
+                    <small class="text-secondary">Nuevo reporte</small>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-md-2 col-sm-4 col-6 mb-3">
+            <a href="/Reportes/Index" class="text-decoration-none">
+                <div class="quick-card text-center">
+                    <i class="fas fa-chart-bar fa-2x text-green mb-2"></i>
+                    <h6 class="text-brown">Reportes</h6>
+                    <small class="text-secondary">Ver reportes del sistema</small>
+                </div>
+            </a>
+        </div>
+    </div>
 
         <!-- Estadísticas Principales -->
-        <div class="row">
-            <!-- Mascotas -->
-            <div class="col-md-6 col-lg-3 mb-4">
-                <div class="card bg-green text-white shadow-hover">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <h6 class="card-title text-white">MASCOTAS TOTAL</h6>
-                                <h3 class="mb-0">@Model.TotalMascotas</h3>
-                            </div>
-                            <i class="fa fa-paw fa-2x opacity-75"></i>
+        <div class="row g-3 mb-5">
+            <div class="col-md-6 col-lg-3">
+                <div class="stat-card bg-green text-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-white">MASCOTAS TOTAL</h6>
+                            <div class="h3 mb-0">@Model.TotalMascotas</div>
                         </div>
-                        <div class="mt-3">
-                            <span class="badge bg-yellow text-brown me-2">
-                                <i class="fa fa-heart"></i> @Model.MascotasAdoptadas adoptadas
-                            </span>
-                            <span class="badge bg-yellow text-brown">
-                                <i class="fa fa-medkit"></i> @Model.MascotasEnTratamiento en tratamiento
-                            </span>
+                        <i class="fas fa-paw fa-2x opacity-50"></i>
+                    </div>
+                    <div class="mt-3 d-flex gap-2">
+                        <span class="badge bg-yellow text-brown"><i class="fas fa-heart me-1"></i> @Model.MascotasAdoptadas adoptadas</span>
+                        <span class="badge bg-yellow text-brown"><i class="fas fa-medkit me-1"></i> @Model.MascotasEnTratamiento en tratamiento</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-3">
+                <div class="stat-card bg-green text-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-white">ADOPCIONES</h6>
+                            <div class="h3 mb-0">@Model.AdopcionesEsteMes</div>
+                            <small>este mes</small>
                         </div>
+                        <i class="fas fa-heart fa-2x opacity-50"></i>
+                    </div>
+                    <div class="mt-3 d-flex gap-2">
+                        <span class="badge bg-yellow text-brown"><i class="fas fa-clock me-1"></i> @Model.SolicitudesPendientes pendientes</span>
+                        <span class="badge bg-yellow text-brown"><i class="fas fa-check me-1"></i> @Model.SolicitudesAprobadas aprobadas</span>
                     </div>
                 </div>
             </div>
 
-            <!-- Adopciones -->
-            <div class="col-md-6 col-lg-3 mb-4">
-                <div class="card bg-green text-white shadow-hover">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <h6 class="card-title text-white">ADOPCIONES</h6>
-                                <h3 class="mb-0">@Model.AdopcionesEsteMes</h3>
-                                <small>este mes</small>
-                            </div>
-                            <i class="fa fa-heart fa-2x opacity-75"></i>
+            <div class="col-md-6 col-lg-3">
+                <div class="stat-card bg-green text-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-white">DONACIONES</h6>
+                            <div class="h3 mb-0">$@Model.TotalDonacionesMes.ToString("N2")</div>
+                            <small>este mes</small>
                         </div>
-                        <div class="mt-3">
-                            <span class="badge bg-yellow text-brown me-2">
-                                <i class="fa fa-clock"></i> @Model.SolicitudesPendientes pendientes
-                            </span>
-                            <span class="badge bg-yellow text-brown">
-                                <i class="fa fa-check"></i> @Model.SolicitudesAprobadas aprobadas
-                            </span>
+                        <i class="fas fa-donate fa-2x opacity-50"></i>
+                    </div>
+                    <div class="mt-3 d-flex gap-2">
+                        <span class="badge bg-yellow text-brown"><i class="fas fa-users me-1"></i> @Model.NumeroDonantesMes donantes</span>
+                        <span class="badge bg-yellow text-brown"><i class="fas fa-hands-helping me-1"></i> @Model.ApadrinamientosActivos apadrinamientos</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-3">
+                <div class="stat-card bg-green text-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-white">CONTABILIDAD</h6>
+                            <div class="h3 mb-0">$@Model.BalanceMes.ToString("N2")</div>
+                            <small>balance mensual</small>
                         </div>
+                        <i class="fas fa-calculator fa-2x opacity-50"></i>
+                    </div>
+                    <div class="mt-3 d-flex gap-2">
+                        <span class="badge bg-yellow text-brown"><i class="fas fa-arrow-up me-1"></i> $@Model.IngresosMes.ToString("N2") ingresos</span>
+                        <span class="badge bg-yellow text-brown"><i class="fas fa-arrow-down me-1"></i> $@Model.EgresosMes.ToString("N2") egresos</span>
                     </div>
                 </div>
             </div>
 
-            <!-- Donaciones -->
-            <div class="col-md-6 col-lg-3 mb-4">
-                <div class="card bg-green text-white shadow-hover">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <h6 class="card-title text-white">DONACIONES</h6>
-                                <h3 class="mb-0">$@Model.TotalDonacionesMes.ToString("N2")</h3>
-                                <small>este mes</small>
-                            </div>
-                            <i class="fa fa-donate fa-2x opacity-75"></i>
+            <div class="col-md-6 col-lg-3">
+                <div class="stat-card bg-green text-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-white">MASCOTAS PERDIDAS</h6>
+                            <div class="h3 mb-0">@Model.MascotasPerdidasActivas</div>
+                            <small>activas</small>
                         </div>
-                        <div class="mt-3">
-                            <span class="badge bg-yellow text-brown me-2">
-                                <i class="fa fa-users"></i> @Model.NumeroDonantesMes donantes
-                            </span>
-                            <span class="badge bg-yellow text-brown">
-                                <i class="fa fa-hands-helping"></i> @Model.ApadrinamientosActivos apadrinamientos
-                            </span>
+                        <i class="fas fa-search fa-2x opacity-50"></i>
+                    </div>
+                    <div class="mt-3 d-flex gap-2">
+                        <span class="badge bg-yellow text-brown"><i class="fas fa-eye me-1"></i> @Model.ReportesAvistamiento avistamientos</span>
+                        <span class="badge bg-yellow text-brown"><i class="fas fa-check-circle me-1"></i> @Model.MascotasEncontradas encontradas</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-3">
+                <div class="stat-card bg-green text-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-white">SEGUIMIENTO</h6>
+                            <div class="h3 mb-0">@(Model.SeguimientosPendientes ?? 0)</div>
+                            <small>pendientes</small>
                         </div>
+                        <i class="fas fa-heartbeat fa-2x opacity-50"></i>
                     </div>
-                </div>
-            </div>
-
-            <!-- Contabilidad -->
-            <div class="col-md-6 col-lg-3 mb-4">
-                <div class="card bg-green text-white shadow-hover">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <h6 class="card-title text-white">CONTABILIDAD</h6>
-                                <h3 class="mb-0">$@Model.BalanceMes.ToString("N2")</h3>
-                                <small>balance mensual</small>
-                            </div>
-                            <i class="fa fa-calculator fa-2x opacity-75"></i>
-                        </div>
-                        <div class="mt-3">
-                            <span class="badge bg-yellow text-brown me-2">
-                                <i class="fa fa-arrow-up"></i> $@Model.IngresosMes.ToString("N2") ingresos
-                            </span>
-                            <span class="badge bg-yellow text-brown">
-                                <i class="fa fa-arrow-down"></i> $@Model.EgresosMes.ToString("N2") egresos
-                            </span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- MASCOTAS PERDIDAS -->
-            <div class="col-md-6 col-lg-3 mb-4">
-                <div class="card bg-green text-white shadow-hover">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <h6 class="card-title text-white">MASCOTAS PERDIDAS</h6>
-                                <h3 class="mb-0">@Model.MascotasPerdidasActivas</h3>
-                                <small>activas</small>
-                            </div>
-                            <i class="fa fa-search fa-2x opacity-75"></i>
-                        </div>
-                        <div class="mt-3">
-                            <span class="badge bg-yellow text-brown me-2">
-                                <i class="fa fa-eye"></i> @Model.ReportesAvistamiento avistamientos
-                            </span>
-                            <span class="badge bg-yellow text-brown">
-                                <i class="fa fa-check-circle"></i> @Model.MascotasEncontradas encontradas
-                            </span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- NUEVO: SEGUIMIENTO ADOPCIONES -->
-            <div class="col-md-6 col-lg-3 mb-4">
-                <div class="card bg-green text-white shadow-hover">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <h6 class="card-title text-white">SEGUIMIENTO</h6>
-                                @{
-                                    var seguimientosPendientes = Model.SeguimientosPendientes ?? 0;
-                                    var contratosActivos = Model.ContratosActivos ?? 0;
-                                    var historialEstados = Model.HistorialEstados ?? 0;
-                                }
-                                <h3 class="mb-0">@seguimientosPendientes</h3>
-                                <small>pendientes</small>
-                            </div>
-                            <i class="fa fa-heartbeat fa-2x opacity-75"></i>
-                        </div>
-                        <div class="mt-3">
-                            <span class="badge bg-yellow text-brown me-2">
-                                <i class="fa fa-file-contract"></i> @contratosActivos contratos
-                            </span>
-                            <span class="badge bg-yellow text-brown">
-                                <i class="fa fa-history"></i> @historialEstados cambios
-                            </span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Sección de Estadísticas Secundarias -->
-        <div class="row mt-4">
-            <!-- Veterinaria -->
-            <div class="col-md-4 col-lg-2 mb-4">
-                <div class="card bg-green text-white shadow-hover">
-                    <div class="card-body text-center">
-                        <i class="fa fa-stethoscope fa-2x mb-2"></i>
-                        <h5 class="mb-1">@Model.ConsultasPendientes</h5>
-                        <small>Consultas pendientes</small>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Voluntariado -->
-            <div class="col-md-4 col-lg-2 mb-4">
-                <div class="card bg-green text-white shadow-hover">
-                    <div class="card-body text-center">
-                        <i class="fa fa-hands-helping fa-2x mb-2"></i>
-                        <h5 class="mb-1">@Model.VoluntariosActivos</h5>
-                        <small>Voluntarios activos</small>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Tienda -->
-            <div class="col-md-4 col-lg-2 mb-4">
-                <div class="card bg-green text-white shadow-hover">
-                    <div class="card-body text-center">
-                        <i class="fa fa-store fa-2x mb-2"></i>
-                        <h5 class="mb-1">@Model.ProductosBajoStock</h5>
-                        <small>Productos bajo stock</small>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Rescate -->
-            <div class="col-md-4 col-lg-2 mb-4">
-                <div class="card bg-green text-white shadow-hover">
-                    <div class="card-body text-center">
-                        <i class="fa fa-ambulance fa-2x mb-2"></i>
-                        <h5 class="mb-1">@Model.ReportesAbiertos</h5>
-                        <small>Reportes abiertos</small>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Vacunaciones -->
-            <div class="col-md-4 col-lg-2 mb-4">
-                <div class="card bg-green text-white shadow-hover">
-                    <div class="card-body text-center">
-                        <i class="fa fa-syringe fa-2x mb-2"></i>
-                        <h5 class="mb-1">@Model.VacunacionesPendientes</h5>
-                        <small>Vacunas pendientes</small>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Tratamientos -->
-            <div class="col-md-4 col-lg-2 mb-4">
-                <div class="card bg-green text-white shadow-hover">
-                    <div class="card-body text-center">
-                        <i class="fa fa-pills fa-2x mb-2"></i>
-                        <h5 class="mb-1">@Model.TratamientosActivos</h5>
-                        <small>Tratamientos activos</small>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- NUEVA SECCIÓN: Estadísticas de Mascotas Perdidas -->
-        <div class="row mt-2">
-            <!-- Mascotas Perdidas Reportadas -->
-            <div class="col-md-4 col-lg-2 mb-4">
-                <div class="card bg-green text-white shadow-hover">
-                    <div class="card-body text-center">
-                        <i class="fa fa-exclamation-triangle fa-2x mb-2"></i>
-                        <h5 class="mb-1">@Model.MascotasPerdidasMes</h5>
-                        <small>Reportadas este mes</small>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Mascotas Encontradas -->
-            <div class="col-md-4 col-lg-2 mb-4">
-                <div class="card bg-green text-white shadow-hover">
-                    <div class="card-body text-center">
-                        <i class="fa fa-check-circle fa-2x mb-2"></i>
-                        <h5 class="mb-1">@Model.MascotasEncontradas</h5>
-                        <small>Encontradas</small>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Tasa de Encuentros -->
-            <div class="col-md-4 col-lg-2 mb-4">
-                <div class="card bg-green text-white shadow-hover">
-                    <div class="card-body text-center">
-                        <i class="fa fa-percentage fa-2x mb-2"></i>
-                        <h5 class="mb-1">@Model.TasaEncuentros.ToString("N1")%</h5>
-                        <small>Tasa de encuentros</small>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Estado Mascotas Perdidas -->
-            <div class="col-md-4 col-lg-2 mb-4">
-                <div class="card bg-green text-white shadow-hover">
-                    <div class="card-body text-center">
-                        <i class="fa fa-search fa-2x mb-2"></i>
-                        <h5 class="mb-1">@(Model.EstadoMascotasPerdidas ?? "N/A")</h5>
-                        <small>Estado actual</small>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Avistamientos -->
-            <div class="col-md-4 col-lg-2 mb-4">
-                <div class="card bg-green text-white shadow-hover">
-                    <div class="card-body text-center">
-                        <i class="fa fa-eye fa-2x mb-2"></i>
-                        <h5 class="mb-1">@Model.ReportesAvistamiento</h5>
-                        <small>Avistamientos</small>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- NUEVA SECCIÓN: Estadísticas de Gestión Mascotas -->
-        <div class="row mt-2">
-            <!-- Mascotas Disponibles -->
-            <div class="col-md-4 col-lg-2 mb-4">
-                <div class="card bg-green text-white shadow-hover">
-                    <div class="card-body text-center">
-                        <i class="fa fa-heart fa-2x mb-2"></i>
-                        <h5 class="mb-1">@Model.MascotasDisponibles</h5>
-                        <small>Disponibles adopción</small>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Mascotas Archivadas -->
-            <div class="col-md-4 col-lg-2 mb-4">
-                <div class="card bg-green text-white shadow-hover">
-                    <div class="card-body text-center">
-                        <i class="fa fa-archive fa-2x mb-2"></i>
-                        <h5 class="mb-1">@Model.MascotasArchivadas</h5>
-                        <small>Archivadas</small>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Cambios Estado -->
-            <div class="col-md-4 col-lg-2 mb-4">
-                <div class="card bg-green text-white shadow-hover">
-                    <div class="card-body text-center">
-                        <i class="fa fa-history fa-2x mb-2"></i>
-                        @{
-                            var historialEstadosDisplay = Model.HistorialEstados ?? 0;
-                        }
-                        <h5 class="mb-1">@historialEstadosDisplay</h5>
-                        <small>Cambios estado</small>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Seguimientos Activos -->
-            <div class="col-md-4 col-lg-2 mb-4">
-                <div class="card bg-green text-white shadow-hover">
-                    <div class="card-body text-center">
-                        <i class="fa fa-heartbeat fa-2x mb-2"></i>
-                        @{
-                            var seguimientosActivosDisplay = Model.SeguimientosActivos ?? 0;
-                        }
-                        <h5 class="mb-1">@seguimientosActivosDisplay</h5>
-                        <small>Seguimientos activos</small>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Contratos Vigentes -->
-            <div class="col-md-4 col-lg-2 mb-4">
-                <div class="card bg-green text-white shadow-hover">
-                    <div class="card-body text-center">
-                        <i class="fa fa-file-contract fa-2x mb-2"></i>
-                        @{
-                            var contratosActivosDisplay = Model.ContratosActivos ?? 0;
-                        }
-                        <h5 class="mb-1">@contratosActivosDisplay</h5>
-                        <small>Contratos vigentes</small>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Porcentaje Adopción -->
-            <div class="col-md-4 col-lg-2 mb-4">
-                <div class="card bg-green text-white shadow-hover">
-                    <div class="card-body text-center">
-                        <i class="fa fa-chart-line fa-2x mb-2"></i>
-                        <h5 class="mb-1">@Model.TasaAdopcion.ToString("N1")%</h5>
-                        <small>Tasa adopción</small>
+                    <div class="mt-3 d-flex gap-2">
+                        <span class="badge bg-yellow text-brown"><i class="fas fa-file-contract me-1"></i> @(Model.ContratosActivos ?? 0) contratos</span>
+                        <span class="badge bg-yellow text-brown"><i class="fas fa-history me-1"></i> @(Model.HistorialEstados ?? 0) cambios</span>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- Gráficos y Listas -->
-        <div class="row mt-4">
-            <!-- Columna Izquierda -->
+        <div class="row g-4">
+            <!-- Columna Izquierda (8 columnas) -->
             <div class="col-lg-8">
                 <!-- Gráfico de Mascotas por Especie -->
-                <div class="card shadow-hover mb-4 border-green">
-                    <div class="card-header bg-green text-white">
-                        <h6 class="m-0 font-weight-bold"><i class="fa fa-chart-pie"></i> Distribución de Mascotas por Especie</h6>
+                <div class="chart-card mb-4">
+                    <div class="chart-card-header bg-green text-white">
+                        <i class="fas fa-chart-pie me-2"></i> Distribución de Mascotas por Especie
                     </div>
-                    <div class="card-body">
+                    <div class="chart-card-body">
                         @if (Model.MascotasPorEspecie != null && Model.MascotasPorEspecie.Any())
                         {
-                            <div class="chart-pie pt-4">
+                            <div class="chart-container">
                                 <canvas id="mascotasEspecieChart"></canvas>
                             </div>
                             <div class="mt-4 text-center small">
                                 @foreach (var item in Model.MascotasPorEspecie)
                                 {
-                                    <span class="mr-3">
-                                        <i class="fa fa-circle text-green"></i>
+                                    <span class="me-3">
+                                        <i class="fas fa-circle text-green me-1"></i>
                                         @item.Key: @item.Value
                                     </span>
                                 }
@@ -679,29 +400,29 @@
                         }
                         else
                         {
-                            <div class="alert alert-green text-center border-green">
-                                <i class="fa fa-info-circle text-green"></i> No hay datos de mascotas para mostrar.
+                            <div class="alert alert-beige border-green text-center">
+                                <i class="fas fa-info-circle text-green me-2"></i> No hay datos de mascotas para mostrar.
                             </div>
                         }
                     </div>
                 </div>
 
-                <!-- Gráfico de Mascotas Perdidas -->
-                <div class="card shadow-hover mb-4 border-green">
-                    <div class="card-header bg-green text-white">
-                        <h6 class="m-0 font-weight-bold"><i class="fa fa-chart-bar"></i> Mascotas Perdidas por Especie</h6>
+                <!-- Gráfico de Mascotas Perdidas por Especie -->
+                <div class="chart-card mb-4">
+                    <div class="chart-card-header bg-green text-white">
+                        <i class="fas fa-chart-bar me-2"></i> Mascotas Perdidas por Especie
                     </div>
-                    <div class="card-body">
+                    <div class="chart-card-body">
                         @if (Model.MascotasPerdidasPorEspecie != null && Model.MascotasPerdidasPorEspecie.Any())
                         {
-                            <div class="chart-bar pt-4" style="height: 300px;">
+                            <div class="chart-container" style="height: 300px;">
                                 <canvas id="mascotasPerdidasChart"></canvas>
                             </div>
                             <div class="mt-4 text-center small">
                                 @foreach (var item in Model.MascotasPerdidasPorEspecie)
                                 {
-                                    <span class="mr-3">
-                                        <i class="fa fa-circle text-green"></i>
+                                    <span class="me-3">
+                                        <i class="fas fa-circle text-green me-1"></i>
                                         @item.Key: @item.Value
                                     </span>
                                 }
@@ -709,23 +430,23 @@
                         }
                         else
                         {
-                            <div class="alert alert-green text-center border-green">
-                                <i class="fa fa-info-circle text-green"></i> No hay datos de mascotas perdidas para mostrar.
+                            <div class="alert alert-beige border-green text-center">
+                                <i class="fas fa-info-circle text-green me-2"></i> No hay datos de mascotas perdidas para mostrar.
                             </div>
                         }
                     </div>
                 </div>
 
                 <!-- Últimas Solicitudes de Adopción -->
-                <div class="card shadow-hover mb-4 border-green">
-                    <div class="card-header bg-green text-white">
-                        <h6 class="m-0 font-weight-bold"><i class="fa fa-heart"></i> Últimas Solicitudes de Adopción</h6>
+                <div class="list-card mb-4">
+                    <div class="list-card-header bg-green text-white">
+                        <i class="fas fa-heart me-2"></i> Últimas Solicitudes de Adopción
                     </div>
-                    <div class="card-body">
+                    <div class="list-card-body">
                         @if (Model.UltimasSolicitudes != null && Model.UltimasSolicitudes.Any())
                         {
                             <div class="table-responsive">
-                                <table class="table table-sm table-hover">
+                                <table class="table table-hover align-middle">
                                     <thead>
                                         <tr>
                                             <th>Solicitante</th>
@@ -740,11 +461,11 @@
                                         {
                                             <tr>
                                                 <td>
-                                                    <strong class="text-brown">@(solicitud.Usuarios?.NombreCompleto ?? "N/A")</strong><br>
-                                                    <small class="text-secondary">@(solicitud.Usuarios?.Email ?? "")</small>
+                                                    <strong class="text-brown">@(solicitud.Usuarios?.NombreCompleto ?? "N/A")</strong>
+                                                    <br><small class="text-secondary">@(solicitud.Usuarios?.Email ?? "")</small>
                                                 </td>
                                                 <td>
-                                                    <i class="fa @(solicitud.Mascotas?.Especie == "Perro" ? "fa-dog text-green" : "fa-cat text-green") mr-1"></i>
+                                                    <i class="fas @(solicitud.Mascotas?.Especie == "Perro" ? "fa-dog" : "fa-cat") text-green me-1"></i>
                                                     @(solicitud.Mascotas?.Nombre ?? "N/A")
                                                 </td>
                                                 <td class="text-secondary">@(solicitud.FechaSolicitud?.ToString("dd/MM/yy") ?? "")</td>
@@ -761,19 +482,14 @@
                                                     {
                                                         <span class="badge bg-pink text-brown">Rechazada</span>
                                                     }
-                                                    else if (solicitud.Estado == "En evaluación")
-                                                    {
-                                                        <span class="badge bg-light-mint text-brown">En evaluación</span>
-                                                    }
                                                     else
                                                     {
                                                         <span class="badge bg-light-mint text-brown">@solicitud.Estado</span>
                                                     }
                                                 </td>
                                                 <td class="text-center">
-                                                    <a href="/Admin/DetallesSolicitud/@solicitud.SolicitudId"
-                                                       class="btn btn-sm btn-outline-green">
-                                                        <i class="fa fa-eye"></i>
+                                                    <a href="/Admin/DetallesSolicitud/@solicitud.SolicitudId" class="btn btn-sm btn-outline-green">
+                                                        <i class="fas fa-eye"></i>
                                                     </a>
                                                 </td>
                                             </tr>
@@ -781,37 +497,37 @@
                                     </tbody>
                                 </table>
                             </div>
-                            <div class="text-center mt-2">
+                            <div class="text-center mt-3">
                                 <a href="/Admin/SolicitudAdopcion" class="btn btn-sm btn-outline-green">
-                                    <i class="fa fa-list"></i> Ver todas las solicitudes
+                                    <i class="fas fa-list me-2"></i> Ver todas las solicitudes
                                 </a>
                             </div>
                         }
                         else
                         {
-                            <div class="alert alert-green text-center border-green">
-                                <i class="fa fa-info-circle text-green"></i> No hay solicitudes recientes.
+                            <div class="alert alert-beige border-green text-center">
+                                <i class="fas fa-info-circle text-green me-2"></i> No hay solicitudes recientes.
                             </div>
                         }
                     </div>
                 </div>
 
                 <!-- Últimos Movimientos Contables -->
-                <div class="card shadow-hover border-green">
-                    <div class="card-header bg-green text-white">
-                        <h6 class="m-0 font-weight-bold"><i class="fa fa-file-invoice-dollar"></i> Últimos Movimientos Contables</h6>
+                <div class="list-card">
+                    <div class="list-card-header bg-green text-white">
+                        <i class="fas fa-file-invoice-dollar me-2"></i> Últimos Movimientos Contables
                     </div>
-                    <div class="card-body">
+                    <div class="list-card-body">
                         @if (Model.UltimosMovimientos != null && Model.UltimosMovimientos.Any())
                         {
                             <div class="table-responsive">
-                                <table class="table table-sm table-hover">
+                                <table class="table table-hover align-middle">
                                     <thead>
                                         <tr>
                                             <th>Fecha</th>
                                             <th>Concepto</th>
                                             <th>Tipo</th>
-                                            <th class="text-right">Monto</th>
+                                            <th class="text-end">Monto</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -820,11 +536,10 @@
                                             <tr>
                                                 <td class="text-secondary">@(movimiento.FechaMovimiento?.ToString("dd/MM/yy") ?? "")</td>
                                                 <td>
-                                                    <small class="text-brown">@movimiento.Concepto</small>
+                                                    <span class="text-brown">@movimiento.Concepto</span>
                                                     @if (!string.IsNullOrEmpty(movimiento.NumeroComprobante))
                                                     {
-                                                        <br>
-                                                        <small class="text-secondary">#@movimiento.NumeroComprobante</small>
+                                                        <br><small class="text-secondary">#@movimiento.NumeroComprobante</small>
                                                     }
                                                 </td>
                                                 <td>
@@ -837,8 +552,8 @@
                                                         <span class="badge bg-pink text-brown">Egreso</span>
                                                     }
                                                 </td>
-                                                <td class="text-right @(movimiento.TipoMovimiento == "Ingreso" ? "text-green" : "text-brown")">
-                                                    <strong>$@movimiento.Monto.ToString("N2")</strong>
+                                                <td class="text-end fw-bold @(movimiento.TipoMovimiento == "Ingreso" ? "text-green" : "text-brown")">
+                                                    $@movimiento.Monto.ToString("N2")
                                                 </td>
                                             </tr>
                                         }
@@ -848,60 +563,56 @@
                         }
                         else
                         {
-                            <div class="alert alert-green text-center border-green">
-                                <i class="fa fa-info-circle text-green"></i> No hay movimientos recientes.
+                            <div class="alert alert-beige border-green text-center">
+                                <i class="fas fa-info-circle text-green me-2"></i> No hay movimientos recientes.
                             </div>
                         }
                     </div>
                 </div>
             </div>
 
-            <!-- Columna Derecha -->
+            <!-- Columna Derecha (4 columnas) -->
             <div class="col-lg-4">
                 <!-- Últimas Mascotas Perdidas -->
-                <div class="card shadow-hover mb-4 border-green">
-                    <div class="card-header bg-green text-white">
-                        <h6 class="m-0 font-weight-bold"><i class="fa fa-search"></i> Últimas Mascotas Perdidas</h6>
+                <div class="list-card mb-4">
+                    <div class="list-card-header bg-green text-white">
+                        <i class="fas fa-search me-2"></i> Últimas Mascotas Perdidas
                     </div>
-                    <div class="card-body">
+                    <div class="list-card-body">
                         @if (Model.UltimasMascotasPerdidas != null && Model.UltimasMascotasPerdidas.Any())
                         {
                             <div class="list-group">
                                 @foreach (var mascota in Model.UltimasMascotasPerdidas)
                                 {
-                                    <a href="/Rescate/DetalleMascotaPerdida/@mascota.MascotaPerdidaId"
-                                       class="list-group-item list-group-item-action border-green">
+                                    <a href="/Rescate/DetalleMascotaPerdida/@mascota.MascotaPerdidaId" class="list-group-item list-group-item-action">
                                         <div class="d-flex align-items-center">
                                             @if (mascota.ImagenMascota != null && mascota.ImagenMascota.Length > 0)
                                             {
                                                 <img src="data:image/jpeg;base64,@Convert.ToBase64String(mascota.ImagenMascota)"
                                                      alt="@mascota.NombreMascota"
-                                                     class="rounded mr-3"
+                                                     class="rounded me-3"
                                                      style="width: 50px; height: 50px; object-fit: cover;">
                                             }
                                             else
                                             {
-                                                <div class="rounded bg-light-mint mr-3 d-flex align-items-center justify-content-center"
-                                                     style="width: 50px; height: 50px;">
-                                                    <i class="fa @(mascota.Especie == "Perro" ? "fa-dog" : "fa-cat") text-secondary"></i>
+                                                <div class="avatar-placeholder bg-light-mint me-3">
+                                                    <i class="fas @(mascota.Especie == "Perro" ? "fa-dog" : "fa-cat") text-secondary"></i>
                                                 </div>
                                             }
                                             <div class="flex-grow-1">
                                                 <h6 class="mb-0 text-brown">@mascota.NombreMascota</h6>
                                                 <small class="text-secondary">
-                                                    @mascota.Especie • Perdida el: @mascota.FechaPerdida.ToString("dd/MM")
+                                                    @mascota.Especie • Perdida: @mascota.FechaPerdida.ToString("dd/MM")
                                                 </small>
                                             </div>
-                                            <div>
-                                                @if (mascota.Recompensa.HasValue && mascota.Recompensa > 0)
-                                                {
-                                                    <span class="badge bg-yellow text-brown">$@mascota.Recompensa.Value.ToString("N0")</span>
-                                                }
-                                            </div>
+                                            @if (mascota.Recompensa.HasValue && mascota.Recompensa > 0)
+                                            {
+                                                <span class="badge bg-yellow text-brown">$@mascota.Recompensa.Value.ToString("N0")</span>
+                                            }
                                         </div>
                                         <div class="mt-2">
                                             <small class="text-secondary">
-                                                <i class="fa fa-map-marker-alt"></i> @mascota.UbicacionPerdida
+                                                <i class="fas fa-map-marker-alt me-1"></i> @mascota.UbicacionPerdida
                                             </small>
                                         </div>
                                     </a>
@@ -909,20 +620,20 @@
                             </div>
                             <div class="text-center mt-3">
                                 <a href="/Rescate/MascotasPerdidas" class="btn btn-sm btn-outline-green">
-                                    <i class="fa fa-list"></i> Ver todas
+                                    <i class="fas fa-list me-2"></i> Ver todas
                                 </a>
-                                <a href="/Rescate/ReportarMascotaPerdida" class="btn btn-sm btn-green text-white ml-2">
-                                    <i class="fa fa-plus"></i> Nuevo reporte
+                                <a href="/Rescate/ReportarMascotaPerdida" class="btn btn-sm btn-green">
+                                    <i class="fas fa-plus me-2"></i> Nuevo reporte
                                 </a>
                             </div>
                         }
                         else
                         {
-                            <div class="alert alert-green text-center border-green">
-                                <i class="fa fa-info-circle text-green"></i> No hay mascotas perdidas recientes.
+                            <div class="alert alert-beige border-green text-center">
+                                <i class="fas fa-info-circle text-green me-2"></i> No hay mascotas perdidas recientes.
                                 <div class="mt-2">
-                                    <a href="/Rescate/ReportarMascotaPerdida" class="btn btn-sm btn-green text-white">
-                                        <i class="fa fa-plus"></i> Reportar mascota perdida
+                                    <a href="/Rescate/ReportarMascotaPerdida" class="btn btn-sm btn-green">
+                                        <i class="fas fa-plus me-2"></i> Reportar mascota perdida
                                     </a>
                                 </div>
                             </div>
@@ -931,23 +642,22 @@
                 </div>
 
                 <!-- Últimas Donaciones -->
-                <div class="card shadow-hover mb-4 border-green">
-                    <div class="card-header bg-green text-white">
-                        <h6 class="m-0 font-weight-bold"><i class="fa fa-donate"></i> Últimas Donaciones</h6>
+                <div class="list-card mb-4">
+                    <div class="list-card-header bg-green text-white">
+                        <i class="fas fa-donate me-2"></i> Últimas Donaciones
                     </div>
-                    <div class="card-body">
+                    <div class="list-card-body">
                         @if (Model.UltimasDonaciones != null && Model.UltimasDonaciones.Any())
                         {
                             <div class="list-group">
                                 @foreach (var donacion in Model.UltimasDonaciones)
                                 {
-                                    <div class="list-group-item list-group-item-action border-green">
+                                    <div class="list-group-item">
                                         <div class="d-flex w-100 justify-content-between align-items-center">
                                             <div>
                                                 <h6 class="mb-1 text-brown">@(donacion.Usuarios?.NombreCompleto ?? "Donante anónimo")</h6>
                                                 <small class="text-secondary">
-                                                    <i class="fa fa-calendar"></i>
-                                                    @(donacion.FechaDonacion?.ToString("dd/MM/yyyy HH:mm") ?? "")
+                                                    <i class="fas fa-calendar-alt me-1"></i> @(donacion.FechaDonacion?.ToString("dd/MM/yyyy HH:mm") ?? "")
                                                 </small>
                                             </div>
                                             <span class="badge bg-green text-white">$@donacion.Monto.ToString("N2")</span>
@@ -955,10 +665,10 @@
                                         @if (!string.IsNullOrEmpty(donacion.TipoDonacion))
                                         {
                                             <div class="mt-2">
-                                                <span class="badge bg-light-mint text-brown">@donacion.TipoDonacion</span>
+                                                <span class="badge bg-light-mint text-brown me-1">@donacion.TipoDonacion</span>
                                                 @if (donacion.Anonima == true)
                                                 {
-                                                    <span class="badge bg-pink text-brown ml-1">Anónima</span>
+                                                    <span class="badge bg-pink text-brown">Anónima</span>
                                                 }
                                             </div>
                                         }
@@ -967,52 +677,48 @@
                             </div>
                             <div class="text-center mt-3">
                                 <a href="/Admin/GestionDonaciones" class="btn btn-sm btn-outline-green">
-                                    <i class="fa fa-hand-holding-usd"></i> Ver todas las donaciones
+                                    <i class="fas fa-hand-holding-usd me-2"></i> Ver todas las donaciones
                                 </a>
                             </div>
                         }
                         else
                         {
-                            <div class="alert alert-green text-center border-green">
-                                <i class="fa fa-info-circle text-green"></i> No hay donaciones recientes.
+                            <div class="alert alert-beige border-green text-center">
+                                <i class="fas fa-info-circle text-green me-2"></i> No hay donaciones recientes.
                             </div>
                         }
                     </div>
                 </div>
 
                 <!-- Mascotas Recientes -->
-                <div class="card shadow-hover mb-4 border-green">
-                    <div class="card-header bg-green text-white">
-                        <h6 class="m-0 font-weight-bold"><i class="fa fa-paw"></i> Mascotas Recientes</h6>
+                <div class="list-card mb-4">
+                    <div class="list-card-header bg-green text-white">
+                        <i class="fas fa-paw me-2"></i> Mascotas Recientes
                     </div>
-                    <div class="card-body">
+                    <div class="list-card-body">
                         @if (Model.MascotasRecientes != null && Model.MascotasRecientes.Any())
                         {
                             <div class="list-group">
                                 @foreach (var mascota in Model.MascotasRecientes)
                                 {
-                                    <a href="/Mascotas/Detalle/@mascota.MascotaId"
-                                       class="list-group-item list-group-item-action border-green">
+                                    <a href="/Mascotas/Detalle/@mascota.MascotaId" class="list-group-item list-group-item-action">
                                         <div class="d-flex align-items-center">
                                             @if (mascota.ImagenPrincipal != null && mascota.ImagenPrincipal.Length > 0)
                                             {
                                                 <img src="data:image/jpeg;base64,@Convert.ToBase64String(mascota.ImagenPrincipal)"
                                                      alt="@mascota.Nombre"
-                                                     class="rounded mr-3"
+                                                     class="rounded me-3"
                                                      style="width: 50px; height: 50px; object-fit: cover;">
                                             }
                                             else
                                             {
-                                                <div class="rounded bg-light-mint mr-3 d-flex align-items-center justify-content-center"
-                                                     style="width: 50px; height: 50px;">
-                                                    <i class="fa @(mascota.Especie == "Perro" ? "fa-dog" : "fa-cat") text-secondary"></i>
+                                                <div class="avatar-placeholder bg-light-mint me-3">
+                                                    <i class="fas @(mascota.Especie == "Perro" ? "fa-dog" : "fa-cat") text-secondary"></i>
                                                 </div>
                                             }
                                             <div class="flex-grow-1">
                                                 <h6 class="mb-0 text-brown">@mascota.Nombre</h6>
-                                                <small class="text-secondary">
-                                                    @mascota.Especie • @mascota.Raza
-                                                </small>
+                                                <small class="text-secondary">@mascota.Especie • @mascota.Raza</small>
                                             </div>
                                             <div>
                                                 @if (mascota.Estado == "Disponible para adopción")
@@ -1034,20 +740,20 @@
                             </div>
                             <div class="text-center mt-3">
                                 <a href="/Mascotas/Gestionar" class="btn btn-sm btn-outline-green">
-                                    <i class="fa fa-list"></i> Ver todas las mascotas
+                                    <i class="fas fa-list me-2"></i> Ver todas
                                 </a>
-                                <a href="/Mascotas/Crear" class="btn btn-sm btn-green text-white ml-2">
-                                    <i class="fa fa-plus"></i> Nueva mascota
+                                <a href="/Mascotas/Crear" class="btn btn-sm btn-green">
+                                    <i class="fas fa-plus me-2"></i> Nueva mascota
                                 </a>
                             </div>
                         }
                         else
                         {
-                            <div class="alert alert-green text-center border-green">
-                                <i class="fa fa-info-circle text-green"></i> No hay mascotas recientes.
+                            <div class="alert alert-beige border-green text-center">
+                                <i class="fas fa-info-circle text-green me-2"></i> No hay mascotas recientes.
                                 <div class="mt-2">
-                                    <a href="/Mascotas/Crear" class="btn btn-sm btn-green text-white">
-                                        <i class="fa fa-plus"></i> Registrar nueva mascota
+                                    <a href="/Mascotas/Crear" class="btn btn-sm btn-green">
+                                        <i class="fas fa-plus me-2"></i> Registrar nueva mascota
                                     </a>
                                 </div>
                             </div>
@@ -1056,27 +762,27 @@
                 </div>
 
                 <!-- Estado del Sistema -->
-                <div class="card shadow-hover border-green">
-                    <div class="card-header bg-green text-white">
-                        <h6 class="m-0 font-weight-bold"><i class="fa fa-cogs"></i> Estado del Sistema</h6>
+                <div class="system-card">
+                    <div class="system-card-header bg-green text-white">
+                        <i class="fas fa-cogs me-2"></i> Estado del Sistema
                     </div>
-                    <div class="card-body">
+                    <div class="system-card-body">
                         <!-- Estado General -->
                         <div class="mb-3">
                             <div class="d-flex justify-content-between mb-1">
-                                <span><i class="fa fa-heartbeat text-green"></i> Estado General</span>
-                                <span class="font-weight-bold @(Model.SistemaSaludable ? "text-green" : "text-brown")">
+                                <span><i class="fas fa-heartbeat text-green me-2"></i> Estado General</span>
+                                <span class="fw-bold @(Model.SistemaSaludable ? "text-green" : "text-brown")">
                                     @(Model.SistemaSaludable ? "SALUDABLE" : "REQUIERE ATENCIÓN")
                                 </span>
                             </div>
                             <small class="text-secondary">
                                 @if (Model.SistemaSaludable)
                                 {
-                                    <i class="fa fa-check-circle text-green"></i> @:Todas las áreas funcionan correctamente
+                                    <i class="fas fa-check-circle text-green me-1"></i> @:Todas las áreas funcionan correctamente
                                 }
                                 else
                                 {
-                                    <i class="fa fa-exclamation-triangle text-brown"></i> @:Algunas áreas requieren atención
+                                    <i class="fas fa-exclamation-triangle text-brown me-1"></i> @:Algunas áreas requieren atención
                                 }
                             </small>
                         </div>
@@ -1084,8 +790,8 @@
                         <!-- Mascotas Perdidas -->
                         <div class="mb-3">
                             <div class="d-flex justify-content-between mb-1">
-                                <span><i class="fa fa-search text-green"></i> Mascotas Perdidas</span>
-                                <span class="font-weight-bold @(Model.MascotasPerdidasRequiereAtencion ? "text-brown" : "text-green")">
+                                <span><i class="fas fa-search text-green me-2"></i> Mascotas Perdidas</span>
+                                <span class="fw-bold @(Model.MascotasPerdidasRequiereAtencion ? "text-brown" : "text-green")">
                                     @(Model.EstadoMascotasPerdidas ?? "N/A")
                                 </span>
                             </div>
@@ -1093,12 +799,8 @@
                                 @{
                                     var widthMascotasPerdidas = Math.Min(Model.MascotasPerdidasActivas * 5, 100);
                                 }
-                                <div class="progress-bar bg-green"
-                                     role="progressbar"
-                                     style="width: @widthMascotasPerdidas%"
-                                     aria-valuenow="@Model.MascotasPerdidasActivas"
-                                     aria-valuemin="0"
-                                     aria-valuemax="20"></div>
+                                <div class="progress-bar bg-green" role="progressbar" style="width: @widthMascotasPerdidas%"
+                                     aria-valuenow="@Model.MascotasPerdidasActivas" aria-valuemin="0" aria-valuemax="20"></div>
                             </div>
                             <small class="text-secondary">
                                 @Model.MascotasPerdidasActivas activas • @Model.TasaEncuentros.ToString("N1")% encontradas
@@ -1108,29 +810,25 @@
                         <!-- Tasa de Adopción -->
                         <div class="mb-3">
                             <div class="d-flex justify-content-between mb-1">
-                                <span><i class="fa fa-heart text-green"></i> Tasa de Adopción</span>
-                                <span class="font-weight-bold">@Model.TasaAdopcion.ToString("N1")%</span>
+                                <span><i class="fas fa-heart text-green me-2"></i> Tasa de Adopción</span>
+                                <span class="fw-bold">@Model.TasaAdopcion.ToString("N1")%</span>
                             </div>
                             <div class="progress" style="height: 6px;">
-                                <div class="progress-bar bg-green"
-                                     role="progressbar"
-                                     style="width: @Model.TasaAdopcion%"
-                                     aria-valuenow="@Model.TasaAdopcion"
-                                     aria-valuemin="0"
-                                     aria-valuemax="100"></div>
+                                <div class="progress-bar bg-green" role="progressbar" style="width: @Model.TasaAdopcion%"
+                                     aria-valuenow="@Model.TasaAdopcion" aria-valuemin="0" aria-valuemax="100"></div>
                             </div>
                             <small class="text-secondary">
                                 @if (Model.TasaAdopcion >= 40)
                                 {
-                                    <i class="fa fa-check text-green"></i> @:Excelente
+                                    <i class="fas fa-check text-green me-1"></i> @:Excelente
                                 }
                                 else if (Model.TasaAdopcion >= 20)
                                 {
-                                    <i class="fa fa-check-circle text-yellow"></i> @:Aceptable
+                                    <i class="fas fa-check-circle text-yellow me-1"></i> @:Aceptable
                                 }
                                 else
                                 {
-                                    <i class="fa fa-exclamation-triangle text-brown"></i> @:Necesita mejorar
+                                    <i class="fas fa-exclamation-triangle text-brown me-1"></i> @:Necesita mejorar
                                 }
                             </small>
                         </div>
@@ -1138,19 +836,19 @@
                         <!-- Balance Mensual -->
                         <div class="mb-3">
                             <div class="d-flex justify-content-between mb-1">
-                                <span><i class="fa fa-chart-line text-green"></i> Balance Mensual</span>
-                                <span class="font-weight-bold @(Model.BalanceMes >= 0 ? "text-green" : "text-brown")">
+                                <span><i class="fas fa-chart-line text-green me-2"></i> Balance Mensual</span>
+                                <span class="fw-bold @(Model.BalanceMes >= 0 ? "text-green" : "text-brown")">
                                     $@Model.BalanceMes.ToString("N2")
                                 </span>
                             </div>
                             <small class="text-secondary">
                                 @if (Model.BalanceMes >= 0)
                                 {
-                                    <i class="fa fa-arrow-up text-green"></i> @:Superávit
+                                    <i class="fas fa-arrow-up text-green me-1"></i> @:Superávit
                                 }
                                 else
                                 {
-                                    <i class="fa fa-arrow-down text-brown"></i> @:Déficit
+                                    <i class="fas fa-arrow-down text-brown me-1"></i> @:Déficit
                                 }
                             </small>
                         </div>
@@ -1158,64 +856,58 @@
                         <!-- Gestión Mascotas -->
                         <div class="mb-3">
                             <div class="d-flex justify-content-between mb-1">
-                                <span><i class="fa fa-paw text-green"></i> Gestión Mascotas</span>
-                                <span class="font-weight-bold">
-                                    @Model.EstadoGestionMascotasCalculado
-                                </span>
+                                <span><i class="fas fa-paw text-green me-2"></i> Gestión Mascotas</span>
+                                <span class="fw-bold">@Model.EstadoGestionMascotasCalculado</span>
                             </div>
                             <small class="text-secondary">
-                                <i class="fa fa-check-circle"></i> @Model.MascotasDisponibles disponibles
-                                <i class="fa fa-archive ml-2"></i> @Model.MascotasArchivadas archivadas
+                                <i class="fas fa-check-circle me-1"></i> @Model.MascotasDisponibles disponibles
+                                <i class="fas fa-archive ms-2 me-1"></i> @Model.MascotasArchivadas archivadas
                             </small>
                         </div>
 
                         <!-- Auditoría -->
                         <div class="mb-3">
                             <div class="d-flex justify-content-between mb-1">
-                                <span><i class="fa fa-clipboard-check text-green"></i> Actividad Auditoría</span>
-                                <span class="font-weight-bold">
-                                    @(Model.EstadoAuditoria ?? "N/A")
-                                </span>
+                                <span><i class="fas fa-clipboard-check text-green me-2"></i> Actividad Auditoría</span>
+                                <span class="fw-bold">@(Model.EstadoAuditoria ?? "N/A")</span>
                             </div>
                             <small class="text-secondary">
-                                <i class="fa fa-database"></i> @Model.RegistrosAuditoriaDia registros hoy
+                                <i class="fas fa-database me-1"></i> @Model.RegistrosAuditoriaDia registros hoy
                             </small>
                         </div>
 
                         <!-- Configuración -->
                         <div class="mb-3">
                             <div class="d-flex justify-content-between mb-1">
-                                <span><i class="fa fa-cogs text-green"></i> Configuración</span>
-                                <span class="font-weight-bold">
-                                    @(Model.EstadoConfiguracion ?? "N/A")
-                                </span>
+                                <span><i class="fas fa-cogs text-green me-2"></i> Configuración</span>
+                                <span class="fw-bold">@(Model.EstadoConfiguracion ?? "N/A")</span>
                             </div>
                             <small class="text-secondary">
                                 @Model.AjustesSistema ajustes activos
                                 @if (Model.ConfiguracionesCriticas > 0)
                                 {
-                                    <span class="badge bg-pink text-brown ml-1">@Model.ConfiguracionesCriticas críticas</span>
+                                    <span class="badge bg-pink text-brown ms-1">@Model.ConfiguracionesCriticas críticas</span>
                                 }
                             </small>
                         </div>
 
                         <!-- Resumen -->
-                        <div class="alert alert-green border-green small mb-0">
+                        <div class="alert alert-beige border-green small mb-0">
                             @if (Model.HayAlertasCriticas)
                             {
-                                <i class="fa fa-exclamation-triangle text-brown"></i>
-                                <strong class="text-brown">Atención:</strong> @:Hay áreas que requieren atención inmediata
+                                <i class="fas fa-exclamation-triangle text-brown me-1"></i>
+                                <strong class="text-brown">Atención:</strong> <span>Hay áreas que requieren atención inmediata</span>
                             }
                             else
                             {
-                                <i class="fa fa-check-circle text-green"></i>
-                                <strong class="text-brown">Sistema OK:</strong> @:Todas las áreas funcionan correctamente
+                                <i class="fas fa-check-circle text-green me-1"></i>
+                                <strong class="text-brown">Sistema OK:</strong> <span>Todas las áreas funcionan correctamente</span>
                             }
                         </div>
 
                         <div class="mt-3 text-center">
                             <small class="text-secondary">
-                                <i class="fa fa-clock"></i> Última actualización: @DateTime.Now.ToString("dd/MM/yyyy HH:mm")
+                                <i class="fas fa-clock me-1"></i> Última actualización: @DateTime.Now.ToString("dd/MM/yyyy HH:mm")
                             </small>
                         </div>
                     </div>
@@ -1225,196 +917,275 @@
     </div>
 </section>
 
-<script>
-    $(document).ready(function () {
-        console.log('Dashboard Administrativo loaded');
-
-        // Auto cerrar alertas después de 5 segundos
-        setTimeout(function () {
-            $('.alert').fadeOut('slow');
-        }, 5000);
-
-        // Hover effect para cards
-        $('.shadow-hover').hover(
-            function() {
-                $(this).addClass('shadow-lg');
-            },
-            function() {
-                $(this).removeClass('shadow-lg');
-            }
-        );
-
-        // Inicializar tooltips
-        $('[data-toggle="tooltip"]').tooltip();
-
-        // Configurar gráficos si hay datos
-        @if (Model.MascotasPorEspecie != null && Model.MascotasPorEspecie.Any())
-        {
-            <text>
-            var ctx = document.getElementById('mascotasEspecieChart');
-            if (ctx) {
-                var labels = [];
-                var data = [];
-
-                @foreach (var item in Model.MascotasPorEspecie)
-                {
-                    @:labels.push('@item.Key');
-                    @:data.push(@item.Value);
-                }
-
-                new Chart(ctx, {
-                    type: 'pie',
-                    data: {
-                        labels: labels,
-                        datasets: [{
-                            data: data,
-                            backgroundColor: ['#97C78B', '#F2C66D', '#FBCDC0', '#F2E9D8', '#5C4B43'],
-                            borderColor: '#fff',
-                            borderWidth: 2
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                position: 'bottom',
-                                labels: {
-                                    color: '#5C4B43',
-                                    padding: 15,
-                                    font: { size: 12 }
-                                }
-                            }
-                        }
-                    }
-                });
-            }
-            </text>
+@section Styles {
+    <style>
+        /* Hero */
+        .dashboard-hero {
+            background-color: var(--fondo-beige);
+            border-radius: 0 0 30px 30px;
+            margin-bottom: 1rem;
         }
 
-        @if (Model.MascotasPerdidasPorEspecie != null && Model.MascotasPerdidasPorEspecie.Any())
-        {
-            <text>
-            var ctx2 = document.getElementById('mascotasPerdidasChart');
-            if (ctx2) {
-                var labels2 = [];
-                var data2 = [];
+        /* Tarjetas de acceso rápido */
+        .quick-card {
+            background: white;
+            border-radius: 20px;
+            padding: 1.2rem 0.5rem;
+            box-shadow: 0 8px 20px rgba(151,199,139,0.15);
+            transition: all 0.3s ease;
+            height: 100%;
+        }
 
-                @foreach (var item in Model.MascotasPerdidasPorEspecie)
-                {
-                    @:labels2.push('@item.Key');
-                    @:data2.push(@item.Value);
-                }
+            .quick-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 15px 30px rgba(151,199,139,0.25);
+            }
 
-                new Chart(ctx2, {
-                    type: 'bar',
-                    data: {
-                        labels: labels2,
-                        datasets: [{
-                            label: 'Mascotas Perdidas',
-                            data: data2,
-                            backgroundColor: '#97C78B',
-                            borderColor: '#86b57a',
-                            borderWidth: 2
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                ticks: {
-                                    precision: 0
-                                }
-                            }
+        /* Tarjetas de estadísticas principales */
+        .stat-card {
+            border-radius: 24px;
+            padding: 1.5rem;
+            box-shadow: 0 8px 20px rgba(151,199,139,0.15);
+            transition: transform 0.3s;
+            height: 100%;
+        }
+
+            .stat-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 15px 30px rgba(151,199,139,0.25);
+            }
+
+        .opacity-50 {
+            opacity: 0.5;
+        }
+
+        /* Tarjetas de gráficos y listas */
+        .chart-card, .list-card, .system-card {
+            background: white;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 8px 20px rgba(151,199,139,0.15);
+            border: none;
+        }
+
+        .chart-card-header, .list-card-header, .system-card-header {
+            background-color: var(--verde-menta);
+            color: white;
+            padding: 1rem 1.5rem;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .chart-card-body, .list-card-body, .system-card-body {
+            padding: 1.5rem;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 250px;
+            width: 100%;
+        }
+
+        /* Listas */
+        .list-group-item {
+            border: 1px solid var(--plomo-calido);
+            border-radius: 12px;
+            margin-bottom: 0.5rem;
+            transition: background-color 0.2s;
+        }
+
+            .list-group-item:hover {
+                background-color: var(--fondo-beige);
+            }
+
+        .avatar-placeholder {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        /* Alertas */
+        .alert-beige {
+            background-color: var(--fondo-beige);
+            border: 1px solid var(--verde-menta);
+            color: var(--texto-oscuro);
+            border-radius: 16px;
+        }
+
+        /* Badges */
+        .badge {
+            font-size: 0.8rem;
+            font-weight: 500;
+            border-radius: 30px;
+            padding: 0.4rem 0.8rem;
+        }
+
+        /* Botones */
+        .btn-green {
+            background-color: var(--verde-menta);
+            border: none;
+            border-radius: 50px;
+            padding: 0.4rem 1.2rem;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+            .btn-green:hover {
+                background-color: #86b57a;
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(151,199,139,0.4);
+            }
+
+        .btn-outline-green {
+            border: 2px solid var(--verde-menta);
+            background: transparent;
+            color: var(--verde-menta);
+            border-radius: 50px;
+            padding: 0.4rem 1.2rem;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+            .btn-outline-green:hover {
+                background-color: var(--verde-menta);
+                color: white;
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(151,199,139,0.3);
+            }
+
+        /* Progreso */
+        .progress {
+            background-color: var(--plomo-calido);
+            border-radius: 30px;
+        }
+
+        .progress-bar {
+            background-color: var(--verde-menta);
+        }
+
+        /* Responsive */
+        @@media (max-width: 768px) {
+            .chart-container {
+                height: 200px;
+            }
+
+            .stat-card {
+                padding: 1rem;
+            }
+
+            .quick-card {
+                padding: 1rem 0.25rem;
+            }
+        }
+    </style>
+}
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            // Auto cerrar alertas después de 5 segundos
+            setTimeout(function () {
+                $('.alert').fadeOut('slow');
+            }, 5000);
+
+            // Gráfico de Mascotas por Especie
+            @if (Model.MascotasPorEspecie != null && Model.MascotasPorEspecie.Any())
+            {
+                <text>
+                var ctx = document.getElementById('mascotasEspecieChart');
+                if (ctx) {
+                    var labels = [];
+                    var data = [];
+
+                    @foreach (var item in Model.MascotasPorEspecie)
+                    {
+                        @:labels.push('@item.Key');
+                        @:data.push(@item.Value);
+                    }
+
+                    new Chart(ctx, {
+                        type: 'pie',
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                data: data,
+                                backgroundColor: ['#97C78B', '#F2C66D', '#FBCDC0', '#D9A8A8', '#5C4B43'],
+                                borderColor: '#fff',
+                                borderWidth: 2
+                            }]
                         },
-                        plugins: {
-                            legend: {
-                                display: false
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    position: 'bottom',
+                                    labels: {
+                                        color: '#2F2F2F',
+                                        padding: 15,
+                                        font: { size: 12 }
+                                    }
+                                }
                             }
                         }
-                    }
-                });
+                    });
+                }
+                </text>
             }
-            </text>
-        }
-    });
-</script>
 
-<style>
-    .chart-pie, .chart-bar {
-        position: relative;
-        height: 250px;
-    }
+            // Gráfico de Mascotas Perdidas por Especie
+            @if (Model.MascotasPerdidasPorEspecie != null && Model.MascotasPerdidasPorEspecie.Any())
+            {
+                <text>
+                var ctx2 = document.getElementById('mascotasPerdidasChart');
+                if (ctx2) {
+                    var labels2 = [];
+                    var data2 = [];
 
-    .chart-bar {
-        height: 300px;
-    }
+                    @foreach (var item in Model.MascotasPerdidasPorEspecie)
+                    {
+                        @:labels2.push('@item.Key');
+                        @:data2.push(@item.Value);
+                    }
 
-    .list-group-item:hover {
-        background-color: #F2E9D8;
-        cursor: pointer;
-    }
-
-    .progress {
-        background-color: #F2E9D8;
-        border-radius: 10px;
-        overflow: hidden;
-    }
-
-    .progress-bar {
-        background-color: var(--green);
-    }
-
-    .badge {
-        font-size: 0.8em;
-        font-weight: 600;
-        padding: 0.25em 0.5em;
-    }
-
-    .bg-yellow {
-        background-color: var(--yellow) !important;
-    }
-
-    .bg-pink {
-        background-color: var(--pink) !important;
-    }
-
-    .text-decoration-none:hover {
-        text-decoration: none;
-    }
-
-    .shadow-lg {
-        box-shadow: 0 10px 25px rgba(151, 199, 139, 0.3) !important;
-    }
-
-    .opacity-75 {
-        opacity: 0.75;
-    }
-
-    .alert-green {
-        background-color: rgba(151, 199, 139, 0.1);
-        border: 1px solid var(--green);
-        color: var(--brown);
-    }
-
-    /* Responsive */
-    @@media (max-width: 768px) {
-        .chart-pie, .chart-bar {
-            height: 200px;
-        }
-
-        .card-body {
-            padding: 1rem;
-        }
-
-        h6 {
-            font-size: 0.9rem;
-        }
-
-        small {
-            font-size: 0.75rem;
-        }
-    }
-</style>
+                    new Chart(ctx2, {
+                        type: 'bar',
+                        data: {
+                            labels: labels2,
+                            datasets: [{
+                                label: 'Mascotas Perdidas',
+                                data: data2,
+                                backgroundColor: '#97C78B',
+                                borderColor: '#86b57a',
+                                borderWidth: 2
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    ticks: {
+                                        precision: 0
+                                    }
+                                }
+                            },
+                            plugins: {
+                                legend: {
+                                    display: false
+                                }
+                            }
+                        }
+                    });
+                }
+                </text>
+            }
+        });
+    </script>
+}

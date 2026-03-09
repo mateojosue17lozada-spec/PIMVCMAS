@@ -1,236 +1,346 @@
 ﻿@model IEnumerable<MVCMASCOTAS.Models.ViewModels.MascotaResumenViewModel>
 
 @{
-    ViewBag.Title = "Apadrinar una Mascota";
+    ViewBag.Title = "Apadrinar una Mascota - ADOPTAMANÍA";
     ViewData["Title"] = "Apadrinar una Mascota";
 }
 
-<!-- Contenido principal -->
-<div class="container body-content mt-4">
-    <div class="page-header mb-4">
-        <h2 class="text-brown font-weight-bold"><i class="fa fa-heart text-green"></i> Programa de Apadrinamiento</h2>
-        <p class="lead text-secondary">Ayuda a cubrir los gastos de cuidado de una mascota con una contribución mensual</p>
+<!-- Hero Section -->
+<section class="apadrinar-hero py-5">
+    <div class="container text-center">
+        <i class="fas fa-heart fa-4x text-white mb-4"></i>
+        <h1 class="display-4 fw-bold mb-3 text-white">Programa de Apadrinamiento</h1>
+        <p class="lead mb-0 text-white">Ayuda a cubrir los gastos de cuidado de una mascota con una contribución mensual</p>
     </div>
+</section>
 
-    @if (TempData["ErrorMessage"] != null)
-    {
-        <div class="alert alert-green border-green alert-dismissible fade show" role="alert">
-            <i class="fa fa-exclamation-triangle text-green"></i> <strong class="text-brown">@TempData["ErrorMessage"]</strong>
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
-        </div>
-    }
+<!-- Main Content -->
+<section class="py-5 bg-beige">
+    <div class="container">
+        <!-- Mensajes de TempData -->
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert alert-beige border-green alert-dismissible fade show mb-4" role="alert">
+                <i class="fas fa-exclamation-triangle text-green me-2"></i>
+                <strong class="text-brown">@TempData["ErrorMessage"]</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
 
-    @if (TempData["SuccessMessage"] != null)
-    {
-        <div class="alert alert-green border-green alert-dismissible fade show" role="alert">
-            <i class="fa fa-check-circle text-green"></i> <strong class="text-brown">@TempData["SuccessMessage"]</strong>
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
-        </div>
-    }
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-beige border-green alert-dismissible fade show mb-4" role="alert">
+                <i class="fas fa-check-circle text-green me-2"></i>
+                <strong class="text-brown">@TempData["SuccessMessage"]</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
 
-    @if (TempData["WarningMessage"] != null)
-    {
-        <div class="alert alert-warning border-warning alert-dismissible fade show" role="alert">
-            <i class="fa fa-exclamation-circle text-warning"></i> <strong class="text-brown">@TempData["WarningMessage"]</strong>
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
-        </div>
-    }
+        @if (TempData["WarningMessage"] != null)
+        {
+            <div class="alert alert-beige border-yellow alert-dismissible fade show mb-4" role="alert">
+                <i class="fas fa-exclamation-circle text-yellow me-2"></i>
+                <strong class="text-brown">@TempData["WarningMessage"]</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
 
-    <div class="alert alert-green border-green mb-4">
-        <div class="d-flex">
-            <i class="fa fa-info-circle fa-2x text-green me-3 align-self-start mt-1"></i>
-            <div>
-                <h5 class="text-brown mb-2">¿Cómo funciona el apadrinamiento?</h5>
-                <div class="row">
+        <!-- Información del programa -->
+        <div class="info-card mb-5">
+            <div class="info-card-header bg-green text-white">
+                <i class="fas fa-info-circle me-2"></i>¿Cómo funciona el apadrinamiento?
+            </div>
+            <div class="info-card-body">
+                <div class="row g-4">
                     <div class="col-md-6">
-                        <ul class="mb-0 text-secondary">
-                            <li><i class="fa fa-check-circle text-green me-2"></i>Eliges una mascota para apadrinar</li>
-                            <li><i class="fa fa-check-circle text-green me-2"></i>Contribución mensual mínima de $10</li>
-                            <li><i class="fa fa-check-circle text-green me-2"></i>Actualizaciones mensuales con fotos</li>
+                        <ul class="list-unstyled">
+                            <li class="mb-3"><i class="fas fa-check-circle text-green fa-lg me-3"></i> <span class="text-brown">Eliges una mascota para apadrinar</span></li>
+                            <li class="mb-3"><i class="fas fa-check-circle text-green fa-lg me-3"></i> <span class="text-brown">Contribución mensual mínima de $10</span></li>
+                            <li class="mb-3"><i class="fas fa-check-circle text-green fa-lg me-3"></i> <span class="text-brown">Actualizaciones mensuales con fotos</span></li>
                         </ul>
                     </div>
                     <div class="col-md-6">
-                        <ul class="mb-0 text-secondary">
-                            <li><i class="fa fa-check-circle text-green me-2"></i>Certificado de apadrinamiento digital</li>
-                            <li><i class="fa fa-check-circle text-green me-2"></i>Visitas programadas (con cita previa)</li>
-                            <li><i class="fa fa-check-circle text-green me-2"></i>Tu nombre en nuestro muro de honor</li>
+                        <ul class="list-unstyled">
+                            <li class="mb-3"><i class="fas fa-check-circle text-green fa-lg me-3"></i> <span class="text-brown">Certificado de apadrinamiento digital</span></li>
+                            <li class="mb-3"><i class="fas fa-check-circle text-green fa-lg me-3"></i> <span class="text-brown">Visitas programadas (con cita previa)</span></li>
+                            <li class="mb-3"><i class="fas fa-check-circle text-green fa-lg me-3"></i> <span class="text-brown">Tu nombre en nuestro muro de honor</span></li>
                         </ul>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <div class="row">
-        @if (Model != null && Model.Any())
-        {
-            foreach (var mascota in Model)
+        <!-- Tarjetas de mascotas -->
+        <div class="row g-4">
+            @if (Model != null && Model.Any())
             {
-                <div class="col-md-4 mb-4">
-                    <div class="card h-100 shadow-hover border-green">
-                        @if (mascota.ImagenPrincipal != null && mascota.ImagenPrincipal.Length > 0)
-                        {
-                            <div class="card-img-top">
-                                <img src="data:image/jpeg;base64,@Convert.ToBase64String(mascota.ImagenPrincipal)"
-                                     style="height: 250px; object-fit: cover; width: 100%;"
-                                     alt="@mascota.Nombre">
-                            </div>
-                        }
-                        else
-                        {
-                            <div class="card-img-top">
-                                <img src="~/Content/images/no-image.png"
-                                     style="height: 250px; object-fit: cover; width: 100%;"
-                                     alt="Sin imagen">
-                            </div>
-                        }
-                        <div class="card-body bg-light-mint">
-                            <h5 class="card-title text-brown">
-                                <i class="fa fa-paw text-green me-2"></i>@mascota.Nombre
-                                @if (mascota.Esterilizado)
+                foreach (var mascota in Model)
+                {
+                    <div class="col-md-4">
+                        <div class="pet-card h-100">
+                            <div class="pet-card-img">
+                                @if (mascota.ImagenPrincipal != null && mascota.ImagenPrincipal.Length > 0)
                                 {
-                                    <span class="badge bg-green badge-estado ml-2" title="Esterilizado">
-                                        <i class="fa fa-check-circle"></i> Esterilizado
-                                    </span>
-                                }
-                            </h5>
-                            <p class="card-text text-secondary">
-                                <i class="fa fa-dog text-green me-2"></i> <strong>Especie:</strong> @mascota.Especie<br />
-                                @if (!string.IsNullOrEmpty(mascota.Raza))
-                                {
-                                    <i class="fa fa-paw text-green me-2"></i> <strong>Raza:</strong> @mascota.Raza<br />
-                                }
-                                <i class="fa fa-venus-mars text-green me-2"></i> <strong>Sexo:</strong>
-                                @if (mascota.Sexo == "M")
-                                {
-                                    <span>Macho</span>
-                                }
-                                else if (mascota.Sexo == "F")
-                                {
-                                    <span>Hembra</span>
+                                    <img src="data:image/jpeg;base64,@Convert.ToBase64String(mascota.ImagenPrincipal)"
+                                         alt="@mascota.Nombre">
                                 }
                                 else
                                 {
-                                    <span>@mascota.Sexo</span>
+                                    <img src="~/Content/images/no-image.png" alt="Sin imagen">
                                 }
-                                <br />
-                                <i class="fa fa-calendar text-green me-2"></i> <strong>Edad:</strong> @mascota.EdadAproximada<br />
-                                @if (!string.IsNullOrEmpty(mascota.Tamanio))
-                                {
-                                    <i class="fa fa-ruler-combined text-green me-2"></i> <strong>Tamaño:</strong> @mascota.Tamanio<br />
-                                }
-                                @if (!string.IsNullOrEmpty(mascota.Color))
-                                {
-                                    <i class="fa fa-palette text-green me-2"></i> <strong>Color:</strong> @mascota.Color<br />
-                                }
-                                <i class="fa fa-heartbeat text-green me-2"></i> <strong>Estado:</strong>
-                                <span class="badge badge-estado
-                                    @(mascota.Estado == "Rescatada" ? "bg-yellow" :
-                                      mascota.Estado == "En tratamiento" ? "bg-info" :
-                                      mascota.Estado == "Disponible para adopción" ? "bg-green" :
-                                      mascota.Estado == "En cuarentena" ? "bg-secondary" :
-                                      "bg-light")">
-                                    @mascota.Estado
-                                </span>
-                            </p>
-                            @if (!string.IsNullOrEmpty(mascota.DescripcionGeneral))
-                            {
-                                <div class="mt-3">
-                                    <p class="text-secondary small mb-0">
-                                        <strong class="text-brown"><i class="fa fa-file-alt text-green me-2"></i>Descripción:</strong><br>
-                                        @(mascota.DescripcionGeneral.Length > 100 ? mascota.DescripcionGeneral.Substring(0, 100) + "..." : mascota.DescripcionGeneral)
+                            </div>
+                            <div class="pet-card-body">
+                                <h5 class="pet-card-title">
+                                    <i class="fas fa-paw text-green me-2"></i>@mascota.Nombre
+                                    @if (mascota.Esterilizado)
+                                    {
+                                        <span class="badge bg-green text-white ms-2" title="Esterilizado">
+                                            <i class="fas fa-check-circle me-1"></i> Esterilizado
+                                        </span>
+                                    }
+                                </h5>
+                                <div class="pet-card-info">
+                                    <p><i class="fas fa-dog text-green me-2"></i> <strong>Especie:</strong> @mascota.Especie</p>
+                                    @if (!string.IsNullOrEmpty(mascota.Raza))
+                                    {
+                                        <p><i class="fas fa-paw text-green me-2"></i> <strong>Raza:</strong> @mascota.Raza</p>
+                                    }
+                                    <p>
+                                        <i class="fas fa-venus-mars text-green me-2"></i> <strong>Sexo:</strong>
+                                        @if (mascota.Sexo == "M")
+                                        {
+                                            <span>Macho</span>
+                                        }
+                                        else if (mascota.Sexo == "F")
+                                        {
+                                            <span>Hembra</span>
+                                        }
+                                        else
+                                        {
+                                            <span>@mascota.Sexo</span>
+                                        }
+                                    </p>
+                                    <p><i class="fas fa-calendar-alt text-green me-2"></i> <strong>Edad:</strong> @mascota.EdadAproximada</p>
+                                    @if (!string.IsNullOrEmpty(mascota.Tamanio))
+                                    {
+                                        <p><i class="fas fa-ruler-combined text-green me-2"></i> <strong>Tamaño:</strong> @mascota.Tamanio</p>
+                                    }
+                                    @if (!string.IsNullOrEmpty(mascota.Color))
+                                    {
+                                        <p><i class="fas fa-palette text-green me-2"></i> <strong>Color:</strong> @mascota.Color</p>
+                                    }
+                                    <p>
+                                        <i class="fas fa-heartbeat text-green me-2"></i> <strong>Estado:</strong>
+                                        <span class="badge @(mascota.Estado == "Rescatada" ? "bg-yellow text-brown" :
+                                                            mascota.Estado == "En tratamiento" ? "bg-info text-white" :
+                                                            mascota.Estado == "Disponible para adopción" ? "bg-green text-white" :
+                                                            mascota.Estado == "En cuarentena" ? "bg-secondary text-white" :
+                                                            "bg-light text-brown") px-3 py-2">
+                                            @mascota.Estado
+                                        </span>
                                     </p>
                                 </div>
-                            }
-
-                            <!-- Mostrar mensaje si el usuario ya apadrina esta mascota -->
-                            @if (ViewBag.ApadrinamientosUsuario != null)
-                            {
-                                var apadrinamientosUsuario = ViewBag.ApadrinamientosUsuario as System.Collections.Generic.List<int> ?? new List<int>();
-                                if (apadrinamientosUsuario.Contains(mascota.MascotaId))
+                                @if (!string.IsNullOrEmpty(mascota.DescripcionGeneral))
                                 {
-                                    <div class="mt-3">
-                                        <div class="alert-green p-2 rounded small mb-0">
-                                            <i class="fa fa-check-circle text-green me-1"></i> <span class="text-brown">Ya apadrinas a esta mascota</span>
-                                        </div>
-                                    </div>
+                                    <p class="pet-card-descripcion">
+                                        <i class="fas fa-file-alt text-green me-2"></i>
+                                        <span class="text-secondary">@(mascota.DescripcionGeneral.Length > 100 ? mascota.DescripcionGeneral.Substring(0, 100) + "…" : mascota.DescripcionGeneral)</span>
+                                    </p>
                                 }
-                            }
-                        </div>
-                        <div class="card-footer bg-white border-top border-green">
-                            @if (ViewBag.ApadrinamientosUsuario != null)
-                            {
-                                var apadrinamientosUsuario = ViewBag.ApadrinamientosUsuario as System.Collections.Generic.List<int> ?? new List<int>();
-                                if (apadrinamientosUsuario.Contains(mascota.MascotaId))
+
+                                @if (ViewBag.ApadrinamientosUsuario != null)
                                 {
-                                    <a href="@Url.Action("MisApadrinamientos", "Apadrinar")" class="btn btn-green btn-block">
-                                        <i class="fa fa-heart me-2"></i> Ya apadrinado
-                                    </a>
+                                    var apadrinamientosUsuario = ViewBag.ApadrinamientosUsuario as List<int> ?? new List<int>();
+                                    if (apadrinamientosUsuario.Contains(mascota.MascotaId))
+                                    {
+                                        <div class="alert alert-beige border-green small mt-3">
+                                            <i class="fas fa-check-circle text-green me-1"></i>
+                                            <span class="text-brown">Ya apadrinas a esta mascota</span>
+                                        </div>
+                                    }
+                                }
+                            </div>
+                            <div class="pet-card-footer">
+                                @if (ViewBag.ApadrinamientosUsuario != null)
+                                {
+                                    var apadrinamientosUsuario = ViewBag.ApadrinamientosUsuario as List<int> ?? new List<int>();
+                                    if (apadrinamientosUsuario.Contains(mascota.MascotaId))
+                                    {
+                                        <a href="@Url.Action("MisApadrinamientos", "Apadrinar")" class="btn btn-green w-100">
+                                            <i class="fas fa-heart me-2"></i> Ver mis apadrinamientos
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <a href="@Url.Action("Confirmar", "Apadrinar", new { id = mascota.MascotaId })"
+                                           class="btn btn-green w-100">
+                                            <i class="fas fa-heart me-2"></i> Apadrinar a @mascota.Nombre
+                                        </a>
+                                    }
                                 }
                                 else
                                 {
                                     <a href="@Url.Action("Confirmar", "Apadrinar", new { id = mascota.MascotaId })"
-                                       class="btn btn-green btn-block">
-                                        <i class="fa fa-heart me-2"></i> Apadrinar a @mascota.Nombre
+                                       class="btn btn-green w-100">
+                                        <i class="fas fa-heart me-2"></i> Apadrinar a @mascota.Nombre
                                     </a>
                                 }
-                            }
-                            else
-                            {
-                                <a href="@Url.Action("Confirmar", "Apadrinar", new { id = mascota.MascotaId })"
-                                   class="btn btn-green btn-block">
-                                    <i class="fa fa-heart me-2"></i> Apadrinar a @mascota.Nombre
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="col-12">
+                    <div class="info-card text-center py-5">
+                        <div class="info-card-body">
+                            <i class="fas fa-exclamation-triangle fa-4x text-secondary mb-3"></i>
+                            <h4 class="text-brown mb-2">No hay mascotas disponibles para apadrinamiento</h4>
+                            <p class="text-secondary mb-2">Todas nuestras mascotas tienen padrinos activos en este momento.</p>
+                            <p class="text-secondary">
+                                ¡Puedes realizar una
+                                <a href="@Url.Action("Donar", "Donaciones")" class="text-green fw-bold">
+                                    donación general
                                 </a>
-                            }
+                                para ayudar a todas!
+                            </p>
                         </div>
                     </div>
                 </div>
             }
-        }
-        else
-        {
-            <div class="col-12">
-                <div class="card shadow-hover border-green text-center py-4">
-                    <div class="card-body bg-light-mint">
-                        <i class="fa fa-exclamation-triangle fa-3x text-secondary mb-3"></i>
-                        <h4 class="text-brown mb-2">No hay mascotas disponibles para apadrinamiento</h4>
-                        <p class="text-secondary mb-2">Todas nuestras mascotas tienen padrinos activos en este momento.</p>
-                        <p class="text-secondary mb-0">
-                            ¡Puedes realizar una
-                            <a href="@Url.Action("Donar", "Donaciones")" class="text-green font-weight-bold">
-                                donación general
-                            </a>
-                            para ayudar a todas!
-                        </p>
-                    </div>
-                </div>
-            </div>
-        }
+        </div>
     </div>
-</div>
+</section>
 
 @section Styles {
     <style>
-        /* Estilos específicos para esta página */
-        .badge-estado {
-            font-size: 0.8em;
-            padding: 0.3em 0.6em;
+        :root {
+            --green: #97C78B;
+            --yellow: #F2C66D;
+            --pink: #FBCDC0;
+            --brown: #2F2F2F;
+            --bg-light: #F2E9D8;
+            --beige: #F5E6D3;
+            --text-secondary: #555555;
+            --info: #17a2b8;
         }
 
-        .badge.bg-info {
-            background-color: #17a2b8 !important;
+        body {
+            background-color: var(--beige);
+        }
+
+        /* Hero */
+        .apadrinar-hero {
+            background: linear-gradient(135deg, rgba(151,199,139,0.9), rgba(242,198,109,0.8)), url('https://images.unsplash.com/photo-1450778869180-41d0601e046e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');
+            background-size: cover;
+            background-position: center;
+            border-radius: 0 0 30px 30px;
+            margin-bottom: 1rem;
+        }
+
+        /* Tarjetas de información */
+        .info-card {
+            background: white;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 15px 35px rgba(151,199,139,0.15);
+            border: none;
+        }
+
+        .info-card-header {
+            padding: 1rem 1.5rem;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .info-card-body {
+            padding: 1.5rem;
+        }
+
+        /* Tarjetas de mascotas */
+        .pet-card {
+            background: white;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 15px 35px rgba(151,199,139,0.15);
+            transition: transform 0.3s, box-shadow 0.3s;
+            border: none;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+            .pet-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 20px 40px rgba(151,199,139,0.25);
+            }
+
+        .pet-card-img {
+            height: 250px;
+            overflow: hidden;
+        }
+
+            .pet-card-img img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                transition: transform 0.5s;
+            }
+
+            .pet-card-img:hover img {
+                transform: scale(1.05);
+            }
+
+        .pet-card-body {
+            padding: 1.5rem;
+            flex: 1;
+        }
+
+        .pet-card-title {
+            font-size: 1.3rem;
+            color: var(--brown);
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .pet-card-info p {
+            margin-bottom: 0.5rem;
+            color: var(--text-secondary);
+        }
+
+        .pet-card-descripcion {
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            border-top: 1px dashed var(--green);
+            padding-top: 1rem;
+        }
+
+        .pet-card-footer {
+            padding: 1rem 1.5rem;
+            border-top: 2px solid var(--green);
+            background-color: var(--bg-light);
+        }
+
+        /* Badges */
+        .badge.bg-green {
+            background-color: var(--green) !important;
             color: white !important;
         }
 
-        .badge.bg-light {
-            background-color: #f8f9fa !important;
-            color: #212529 !important;
+        .badge.bg-yellow {
+            background-color: var(--yellow) !important;
+            color: var(--brown) !important;
+        }
+
+        .badge.bg-pink {
+            background-color: var(--pink) !important;
+            color: var(--brown) !important;
+        }
+
+        .badge.bg-info {
+            background-color: var(--info) !important;
+            color: white !important;
         }
 
         .badge.bg-secondary {
@@ -238,64 +348,62 @@
             color: white !important;
         }
 
-        .alert-warning {
-            background-color: rgba(255, 193, 7, 0.1) !important;
+        .badge.bg-light {
+            background-color: #f8f9fa !important;
+            color: var(--brown) !important;
         }
 
-        .text-warning {
-            color: #ffc107 !important;
+        /* Alertas personalizadas */
+        .alert-beige {
+            background-color: var(--bg-light);
+            border: 1px solid var(--green);
+            color: var(--brown);
+            border-radius: 16px;
         }
 
-        .border-warning {
-            border-color: #ffc107 !important;
+        .border-yellow {
+            border-color: var(--yellow) !important;
         }
 
-        .me-2 {
-            margin-right: 0.5rem !important;
+        /* Botones */
+        .btn-green {
+            background-color: var(--green);
+            border: none;
+            border-radius: 50px;
+            padding: 0.6rem 1.8rem;
+            font-weight: 500;
+            transition: all 0.3s;
+            color: white;
         }
 
-        .me-3 {
-            margin-right: 1rem !important;
-        }
-
-        .ml-2 {
-            margin-left: 0.5rem !important;
-        }
-
-        .mt-1 {
-            margin-top: 0.25rem !important;
-        }
-
-        .align-self-start {
-            align-self: flex-start !important;
-        }
-
-        .card-img-top {
-            overflow: hidden;
-        }
-
-            .card-img-top img {
-                transition: transform 0.5s ease;
+            .btn-green:hover {
+                background-color: #86b57a;
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(151,199,139,0.4);
             }
 
-            .card-img-top:hover img {
-                transform: scale(1.05);
+        /* Responsive */
+        @@media (max-width: 768px) {
+            .pet-card-img {
+                height: 200px;
             }
+        }
     </style>
 }
 
 @section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-        $(document).ready(function() {
+        $(document).ready(function () {
             console.log('Lista de mascotas para apadrinar cargada');
 
             // Auto-ocultar alertas después de 5 segundos
-            setTimeout(function() {
+            setTimeout(function () {
                 $('.alert-dismissible').alert('close');
             }, 5000);
 
             // Si no está autenticado y hace clic en apadrinar
-            $('.btn-green').on('click', function(e) {
+            $('.btn-green').on('click', function (e) {
                 var isAuthenticated = @(User.Identity.IsAuthenticated ? "true" : "false");
                 if (!isAuthenticated) {
                     e.preventDefault();
@@ -309,7 +417,7 @@
             Swal.fire({
                 title: '¡Necesitas iniciar sesión!',
                 html: '<div class="text-center">' +
-                      '<i class="fa fa-user-lock fa-3x text-green mb-3"></i>' +
+                      '<i class="fas fa-user-lock fa-3x text-green mb-3"></i>' +
                       '<h4 class="text-brown">Para apadrinar una mascota necesitas una cuenta</h4>' +
                       '<p class="text-secondary">Puedes iniciar sesión o crear una cuenta gratuita en segundos.</p>' +
                       '</div>',
@@ -317,8 +425,8 @@
                 showCancelButton: true,
                 confirmButtonColor: '#97C78B',
                 cancelButtonColor: '#5C4B43',
-                confirmButtonText: '<i class="fa fa-sign-in-alt me-2"></i> Iniciar Sesión',
-                cancelButtonText: '<i class="fa fa-user-plus me-2"></i> Crear Cuenta'
+                confirmButtonText: '<i class="fas fa-sign-in-alt me-2"></i> Iniciar Sesión',
+                cancelButtonText: '<i class="fas fa-user-plus me-2"></i> Crear Cuenta'
             }).then((result) => {
                 if (result.isConfirmed) {
                     window.location.href = '@Url.Action("Login", "Account", new { returnUrl = Url.Action("Index", "Apadrinar") })';

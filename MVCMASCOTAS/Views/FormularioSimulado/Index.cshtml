@@ -1,0 +1,42 @@
+﻿@model IEnumerable<MVCMASCOTAS.Controllers.FormularioSimuladoController.FormularioSimuladoItem>
+@{
+    ViewBag.Title = "Gestión de Formularios de Adopción (Simulado)";
+}
+<h2>Gestión de Formularios de Adopción</h2>
+
+
+<div>
+    <a href="@Url.Action("Dashboard", "Admin")" class="btn btn-outline-green btn-sm">
+        <i class="fa fa-arrow-left"></i> Dashboard
+    </a>
+</div>
+
+
+<table class="table table-striped">
+    <thead>
+        <tr><th>ID</th><th>Solicitante</th><th>Mascota</th><th>Fecha Solicitud</th><th>Estado</th><th>Acciones</th></tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Id</td>
+                <td>@item.Solicitante</td>
+                <td>@item.Mascota</td>
+                <td>@item.FechaSolicitud.ToShortDateString()</td>
+                <td>
+                    @if (item.Estado == "Pendiente")
+                    {<span class="badge bg-warning">Pendiente</span> }
+                    else if (item.Estado == "Aprobada")
+                    { <span class="badge bg-success">Aprobada</span> }
+                    else
+                    { <span class="badge bg-danger">Rechazada</span>}
+                </td>
+                <td>
+                    <a href="@Url.Action("Details", new { id = item.Id })" class="btn btn-sm btn-info"><i class="fas fa-eye"></i> Ver</a>
+                    <a href="@Url.Action("Delete", new { id = item.Id })" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -1,39 +1,34 @@
 ﻿@model MVCMASCOTAS.Models.ViewModels.EditProfileViewModel
 
 @{
-    ViewBag.Title = "Editar Perfil";
+    ViewBag.Title = "Editar Perfil - ADOPTAMANÍA";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 <!-- Hero Section -->
-<section class="py-4">
-    <div class="container">
-        <div class="text-center">
-            <h1 class="display-5 fw-bold mb-2 text-brown">
-                <i class="fa fa-user-edit text-green"></i> Editar Perfil
-            </h1>
-            <p class="lead mb-3 text-secondary">Actualiza tu información personal y de contacto</p>
-        </div>
+<section class="profile-hero py-4">
+    <div class="container text-center">
+        <i class="fas fa-user-edit fa-3x text-green mb-3"></i>
+        <h1 class="display-5 fw-bold mb-2 text-brown">Editar Perfil</h1>
+        <p class="lead mb-3 text-secondary">Actualiza tu información personal y de contacto</p>
     </div>
 </section>
 
 <!-- Main Content -->
-<section class="py-5 bg-light-mint">
+<section class="py-5 bg-beige">
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-lg-10">
-                <div class="card border-green shadow-hover">
-                    <div class="card-header bg-green text-white">
-                        <h4 class="mb-0">
-                            <i class="fa fa-user-edit me-2"></i>@ViewBag.Title
-                        </h4>
+                <div class="profile-card">
+                    <div class="profile-card-header bg-green text-white">
+                        <i class="fas fa-user-edit me-2"></i> @ViewBag.Title
                     </div>
 
-                    <div class="card-body">
+                    <div class="profile-card-body">
                         @if (TempData["SuccessMessage"] != null)
                         {
-                            <div class="alert alert-green border-green alert-dismissible fade show" role="alert">
-                                <i class="fa fa-check-circle text-green me-2"></i>
+                            <div class="alert alert-beige border-green alert-dismissible fade show" role="alert">
+                                <i class="fas fa-check-circle text-green me-2"></i>
                                 <strong class="text-brown">@TempData["SuccessMessage"]</strong>
                                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                             </div>
@@ -41,8 +36,8 @@
 
                         @if (TempData["ErrorMessage"] != null)
                         {
-                            <div class="alert alert-green border-green alert-dismissible fade show" role="alert">
-                                <i class="fa fa-exclamation-triangle text-green me-2"></i>
+                            <div class="alert alert-beige border-green alert-dismissible fade show" role="alert">
+                                <i class="fas fa-exclamation-triangle text-green me-2"></i>
                                 <strong class="text-brown">@TempData["ErrorMessage"]</strong>
                                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                             </div>
@@ -52,38 +47,36 @@
                                new { enctype = "multipart/form-data", @class = "needs-validation", novalidate = "novalidate", id = "editProfileForm" }))
                         {
                             @Html.AntiForgeryToken()
-                            @Html.ValidationSummary(true, "", new { @class = "alert alert-green border-green" })
+                            @Html.ValidationSummary(true, "", new { @class = "alert alert-beige border-green mb-4" })
 
-                            <div class="row">
+                            <div class="row g-4">
                                 <!-- Columna izquierda - Imagen de perfil -->
-                                <div class="col-md-4 mb-4">
-                                    <div class="text-center">
+                                <div class="col-md-4">
+                                    <div class="profile-image-section text-center">
                                         @if (!string.IsNullOrEmpty(Model.ImagenPerfilBase64))
                                         {
                                             <img id="profileImage" src="data:image/jpeg;base64,@Model.ImagenPerfilBase64"
-                                                 class="img-fluid rounded-circle border border-3 border-green mb-3"
-                                                 style="width: 200px; height: 200px; object-fit: cover;"
+                                                 class="profile-avatar mb-3"
                                                  alt="Imagen de perfil actual" />
                                         }
                                         else
                                         {
-                                            <div id="profileImage" class="rounded-circle border border-3 border-green mb-3 d-flex align-items-center justify-content-center mx-auto"
-                                                 style="width: 200px; height: 200px; background-color: var(--bg-light);">
-                                                <i class="fa fa-user fa-5x text-secondary"></i>
+                                            <div id="profileImage" class="profile-avatar-placeholder mx-auto mb-3">
+                                                <i class="fas fa-user fa-5x text-secondary"></i>
                                             </div>
                                         }
 
                                         <div class="mb-3">
-                                            <label for="NuevaImagenPerfil" class="form-label text-brown fw-medium">
-                                                <i class="fa fa-camera text-green me-1"></i>Cambiar imagen
+                                            <label for="NuevaImagenPerfil" class="btn btn-outline-green d-inline-flex align-items-center gap-2">
+                                                <i class="fas fa-camera"></i> Cambiar imagen
                                             </label>
-                                            <input type="file" class="form-control border-green" id="NuevaImagenPerfil"
+                                            <input type="file" class="d-none" id="NuevaImagenPerfil"
                                                    name="NuevaImagenPerfil" accept="image/*"
                                                    onchange="previewImage(this)" />
-                                            @Html.ValidationMessageFor(model => model.NuevaImagenPerfil, "", new { @class = "text-danger small" })
-                                            <div class="form-text text-secondary">
-                                                <i class="fa fa-info-circle text-green"></i> Formatos permitidos: JPG, PNG, GIF (máx. 5MB)
+                                            <div class="form-text text-secondary small mt-2">
+                                                <i class="fas fa-info-circle text-green"></i> JPG, PNG, GIF (máx. 5MB)
                                             </div>
+                                            @Html.ValidationMessageFor(model => model.NuevaImagenPerfil, "", new { @class = "text-danger small" })
                                         </div>
                                     </div>
                                 </div>
@@ -91,15 +84,20 @@
                                 <!-- Columna derecha - Formulario -->
                                 <div class="col-md-8">
                                     <h5 class="mb-4 border-bottom pb-2 text-brown">
-                                        <i class="fa fa-info-circle text-green me-2"></i>Información Personal
+                                        <i class="fas fa-info-circle text-green me-2"></i>Información Personal
                                     </h5>
 
                                     <!-- Nombre Completo -->
                                     <div class="mb-4">
                                         @Html.LabelFor(model => model.NombreCompleto,
                                             new { @class = "form-label text-brown fw-medium" })
-                                        @Html.TextBoxFor(model => model.NombreCompleto,
-                                            new { @class = "form-control border-green", placeholder = "Ingrese su nombre completo" })
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-white border-green">
+                                                <i class="fas fa-user text-green"></i>
+                                            </span>
+                                            @Html.TextBoxFor(model => model.NombreCompleto,
+                                                new { @class = "form-control border-green", placeholder = "Ingrese su nombre completo" })
+                                        </div>
                                         @Html.ValidationMessageFor(model => model.NombreCompleto, "",
                                             new { @class = "text-danger small mt-1" })
                                     </div>
@@ -108,8 +106,13 @@
                                     <div class="mb-4">
                                         @Html.LabelFor(model => model.Telefono,
                                             new { @class = "form-label text-brown fw-medium" })
-                                        @Html.TextBoxFor(model => model.Telefono,
-                                            new { @class = "form-control border-green", placeholder = "Ej: 0991234567" })
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-white border-green">
+                                                <i class="fas fa-phone-alt text-green"></i>
+                                            </span>
+                                            @Html.TextBoxFor(model => model.Telefono,
+                                                new { @class = "form-control border-green", placeholder = "Ej: 0991234567" })
+                                        </div>
                                         @Html.ValidationMessageFor(model => model.Telefono, "",
                                             new { @class = "text-danger small mt-1" })
                                     </div>
@@ -118,13 +121,18 @@
                                     <div class="mb-4">
                                         @Html.LabelFor(model => model.Direccion,
                                             new { @class = "form-label text-brown fw-medium" })
-                                        @Html.TextAreaFor(model => model.Direccion,
-                                            new
-                                                 {
-                                                     @class = "form-control border-green",
-                                                     rows = "2",
-                                                  placeholder = "Ingrese su dirección completa"
-                                                 })
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-white border-green">
+                                                <i class="fas fa-map-marker-alt text-green"></i>
+                                            </span>
+                                            @Html.TextAreaFor(model => model.Direccion,
+                                                new
+                                                {
+                                                    @class = "form-control border-green",
+                                                    rows = "2",
+                                                    placeholder = "Ingrese su dirección completa"
+                                                })
+                                        </div>
                                         @Html.ValidationMessageFor(model => model.Direccion, "",
                                             new { @class = "text-danger small mt-1" })
                                     </div>
@@ -134,16 +142,26 @@
                                         <div class="col-md-6 mb-4">
                                             @Html.LabelFor(model => model.Ciudad,
                                                 new { @class = "form-label text-brown fw-medium" })
-                                            @Html.TextBoxFor(model => model.Ciudad,
-                                                new { @class = "form-control border-green", placeholder = "Ciudad" })
+                                            <div class="input-group">
+                                                <span class="input-group-text bg-white border-green">
+                                                    <i class="fas fa-city text-green"></i>
+                                                </span>
+                                                @Html.TextBoxFor(model => model.Ciudad,
+                                                    new { @class = "form-control border-green", placeholder = "Ciudad" })
+                                            </div>
                                             @Html.ValidationMessageFor(model => model.Ciudad, "",
                                                 new { @class = "text-danger small mt-1" })
                                         </div>
                                         <div class="col-md-6 mb-4">
                                             @Html.LabelFor(model => model.Provincia,
                                                 new { @class = "form-label text-brown fw-medium" })
-                                            @Html.TextBoxFor(model => model.Provincia,
-                                                new { @class = "form-control border-green", placeholder = "Provincia" })
+                                            <div class="input-group">
+                                                <span class="input-group-text bg-white border-green">
+                                                    <i class="fas fa-globe text-green"></i>
+                                                </span>
+                                                @Html.TextBoxFor(model => model.Provincia,
+                                                    new { @class = "form-control border-green", placeholder = "Provincia" })
+                                            </div>
                                             @Html.ValidationMessageFor(model => model.Provincia, "",
                                                 new { @class = "text-danger small mt-1" })
                                         </div>
@@ -151,53 +169,45 @@
 
                                     <!-- Información de solo lectura -->
                                     <h6 class="mt-4 mb-3 border-bottom pb-2 text-brown">
-                                        <i class="fa fa-lock text-green me-2"></i>Información no editable
+                                        <i class="fas fa-lock text-green me-2"></i>Información no editable
                                     </h6>
 
                                     <div class="row">
                                         <div class="col-md-6 mb-3">
                                             <label class="form-label text-brown fw-medium">
-                                                <i class="fa fa-envelope text-green me-1"></i>Email
+                                                <i class="fas fa-envelope text-green me-1"></i>Email
                                             </label>
-                                            @Html.TextBoxFor(model => model.Email,
-                                                new { @class = "form-control-plaintext bg-light-mint p-2 rounded", @readonly = "readonly" })
+                                            <div class="readonly-field">
+                                                <i class="fas fa-envelope-open-text text-green me-2"></i>
+                                                @Html.DisplayFor(model => model.Email)
+                                            </div>
                                         </div>
                                         <div class="col-md-6 mb-3">
                                             <label class="form-label text-brown fw-medium">
-                                                <i class="fa fa-id-card text-green me-1"></i>Cédula
+                                                <i class="fas fa-id-card text-green me-1"></i>Cédula
                                             </label>
-                                            @Html.TextBoxFor(model => model.Cedula,
-                                                new
-                                                     {
-                                                         @class = "form-control-plaintext bg-light-mint p-2 rounded",
-                                                         @readonly = "readonly",
-                                                      value = Model.Cedula ?? "No disponible"
-                                                     })
+                                            <div class="readonly-field">
+                                                <i class="fas fa-id-card text-green me-2"></i>
+                                                @(Model.Cedula ?? "No disponible")
+                                            </div>
                                         </div>
                                     </div>
 
-                                    <!-- Información adicional de solo lectura -->
                                     <div class="row">
                                         <div class="col-md-6 mb-3">
                                             <label class="form-label text-brown fw-medium">
-                                                <i class="fa fa-calendar-alt text-green me-1"></i>Fecha de Registro
+                                                <i class="fas fa-calendar-alt text-green me-1"></i>Fecha de Registro
                                             </label>
-                                            @if (Model.FechaRegistro.HasValue)
-                                            {
-                                                <input type="text" class="form-control-plaintext bg-light-mint p-2 rounded"
-                                                       value="@Model.FechaRegistro.Value.ToString("dd/MM/yyyy HH:mm")" readonly />
-                                            }
-                                            else
-                                            {
-                                                <input type="text" class="form-control-plaintext bg-light-mint p-2 rounded"
-                                                       value="No disponible" readonly />
-                                            }
+                                            <div class="readonly-field">
+                                                <i class="fas fa-calendar-check text-green me-2"></i>
+                                                @(Model.FechaRegistro?.ToString("dd/MM/yyyy HH:mm") ?? "No disponible")
+                                            </div>
                                         </div>
                                         <div class="col-md-6 mb-3">
                                             <label class="form-label text-brown fw-medium">
-                                                <i class="fa fa-check-circle text-green me-1"></i>Estado de Cuenta
+                                                <i class="fas fa-check-circle text-green me-1"></i>Estado de Cuenta
                                             </label>
-                                            <div class="d-flex flex-wrap gap-2">
+                                            <div class="d-flex flex-wrap gap-2 mt-2">
                                                 @if (Model.Activo == true)
                                                 {
                                                     <span class="badge bg-green">Activo</span>
@@ -223,15 +233,15 @@
                                     <!-- Botones -->
                                     <div class="d-flex justify-content-between mt-4 pt-3 border-top border-green">
                                         <a href="@Url.Action("MiPerfil", "Account")"
-                                           class="btn btn-outline-green">
-                                            <i class="fa fa-arrow-left me-1"></i>Volver al Perfil
+                                           class="btn btn-outline-green rounded-pill">
+                                            <i class="fas fa-arrow-left me-2"></i>Volver al Perfil
                                         </a>
                                         <div>
-                                            <button type="reset" class="btn btn-outline-green me-2" onclick="resetForm()">
-                                                <i class="fa fa-redo me-1"></i>Cancelar Cambios
+                                            <button type="reset" class="btn btn-outline-green rounded-pill me-2" onclick="resetForm()">
+                                                <i class="fas fa-undo me-2"></i>Cancelar
                                             </button>
-                                            <button type="submit" class="btn btn-green text-white">
-                                                <i class="fa fa-save me-1"></i>Guardar Cambios
+                                            <button type="submit" class="btn btn-green rounded-pill">
+                                                <i class="fas fa-save me-2"></i>Guardar Cambios
                                             </button>
                                         </div>
                                     </div>
@@ -241,14 +251,14 @@
                     </div>
                 </div>
 
-                <!-- Enlace para cambiar contraseña -->
-                <div class="card border-green shadow-hover mt-4">
-                    <div class="card-body">
-                        <h6 class="mb-3 text-brown">
-                            <i class="fa fa-key text-green me-2"></i>Seguridad
+                <!-- Tarjeta para cambiar contraseña -->
+                <div class="security-card mt-4">
+                    <div class="security-card-body">
+                        <h6 class="text-brown mb-3">
+                            <i class="fas fa-key text-green me-2"></i>Seguridad
                         </h6>
-                        <a href="@Url.Action("ChangePassword", "Account")" class="btn btn-pink">
-                            <i class="fa fa-lock me-1"></i>Cambiar Contraseña
+                        <a href="@Url.Action("ChangePassword", "Account")" class="btn btn-pink rounded-pill">
+                            <i class="fas fa-lock me-2"></i>Cambiar Contraseña
                         </a>
                     </div>
                 </div>
@@ -271,15 +281,13 @@
                     if (imgElement.is('img')) {
                         imgElement
                             .attr('src', e.target.result)
-                            .removeClass('border-green')
+                            .removeClass('border-success')
                             .addClass('border-green');
                     } else {
                         // Si es un div (icono de usuario), reemplazarlo por imagen
                         imgElement.replaceWith(
                             '<img id="profileImage" src="' + e.target.result +
-                            '" class="img-fluid rounded-circle border border-3 border-green mb-3"' +
-                            ' style="width: 200px; height: 200px; object-fit: cover;"' +
-                            ' alt="Imagen de perfil nueva" />'
+                            '" class="profile-avatar mb-3" alt="Imagen de perfil nueva" />'
                         );
                     }
                 }
@@ -303,18 +311,15 @@
                     // Si es un div (icono), reemplazar por imagen
                     imgElement.replaceWith(
                         '<img id="profileImage" src="data:image/jpeg;base64,' + originalImage +
-                        '" class="img-fluid rounded-circle border border-3 border-green mb-3"' +
-                        ' style="width: 200px; height: 200px; object-fit: cover;"' +
-                        ' alt="Imagen de perfil actual" />'
+                        '" class="profile-avatar mb-3" alt="Imagen de perfil actual" />'
                     );
                 }
             } else {
                 // Restaurar icono de usuario
                 if (imgElement.is('img')) {
                     imgElement.replaceWith(
-                        '<div id="profileImage" class="rounded-circle border border-3 border-green mb-3 d-flex align-items-center justify-content-center mx-auto"' +
-                        ' style="width: 200px; height: 200px; background-color: var(--bg-light);">' +
-                        '<i class="fa fa-user fa-5x text-secondary"></i>' +
+                        '<div id="profileImage" class="profile-avatar-placeholder mx-auto mb-3">' +
+                        '<i class="fas fa-user fa-5x text-secondary"></i>' +
                         '</div>'
                     );
                 }
@@ -357,7 +362,6 @@
             var toast = new bootstrap.Toast(toastElement, { delay: 3000 });
             toast.show();
 
-            // Remover del DOM después de ocultarse
             toastElement.on('hidden.bs.toast', function () {
                 $(this).remove();
             });
@@ -387,8 +391,6 @@
                 if (fileSize > 5) {
                     showToast('Archivo demasiado grande', 'La imagen no debe exceder 5 MB.', 'warning');
                     this.value = '';
-
-                    // Restaurar imagen original
                     resetForm();
                 }
             }
@@ -398,34 +400,209 @@
 
 @section Styles {
     <style>
-        /* Estilos específicos para Editar Perfil */
-        .form-control:focus {
-            border-color: var(--green) !important;
-            box-shadow: 0 0 0 0.25rem rgba(151, 199, 139, 0.25) !important;
+        /* Hero */
+        .profile-hero {
+            background-color: var(--fondo-beige);
+            border-radius: 0 0 30px 30px;
+            margin-bottom: 1rem;
         }
 
-        .form-control-plaintext.bg-light-mint {
-            background-color: var(--bg-light) !important;
-            cursor: not-allowed;
+        /* Tarjeta principal */
+        .profile-card {
+            background: white;
+            border-radius: 30px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(151, 199, 139, 0.15);
+            border: none;
         }
 
-        .border-success {
-            border-color: var(--green) !important;
+        .profile-card-header {
+            padding: 1.5rem 2rem;
+            font-size: 1.5rem;
+            font-weight: 600;
+            background-color: var(--verde-menta);
+            color: white;
         }
 
-        .badge {
-            font-size: 0.75em;
-            padding: 0.35em 0.65em;
+        .profile-card-body {
+            padding: 2.5rem;
         }
 
-        /* Estilo para imagen de perfil */
-        .rounded-circle {
-            transition: all 0.3s ease;
+        /* Avatar */
+        .profile-avatar {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 5px solid var(--verde-menta);
+            box-shadow: 0 10px 25px rgba(151,199,139,0.3);
+            transition: transform 0.3s;
         }
 
-            .rounded-circle:hover {
-                transform: scale(1.02);
-                box-shadow: 0 5px 15px rgba(151, 199, 139, 0.3);
+            .profile-avatar:hover {
+                transform: scale(1.03);
             }
+
+        .profile-avatar-placeholder {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background-color: var(--fondo-beige);
+            border: 5px solid var(--verde-menta);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Input groups */
+        .input-group-text {
+            border-radius: 12px 0 0 12px;
+            border-right: none;
+            background-color: white;
+        }
+
+        .form-control {
+            border-radius: 0 12px 12px 0;
+            border-left: none;
+            padding: 0.75rem 1rem;
+            font-size: 1rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+            .form-control:focus {
+                border-color: var(--verde-menta);
+                box-shadow: 0 0 0 0.2rem rgba(151,199,139,0.25);
+                outline: none;
+            }
+
+        .input-group:focus-within .input-group-text {
+            border-color: var(--verde-menta);
+            box-shadow: 0 0 0 0.2rem rgba(151,199,139,0.25);
+        }
+
+        /* Campos de solo lectura */
+        .readonly-field {
+            background-color: var(--fondo-beige);
+            border: 2px solid var(--plomo-calido);
+            border-radius: 12px;
+            padding: 0.75rem 1rem;
+            color: var(--texto-secundario);
+            display: flex;
+            align-items: center;
+        }
+
+            .readonly-field i {
+                margin-right: 0.5rem;
+            }
+
+        /* Badges */
+        .badge.bg-green {
+            background-color: var(--verde-menta) !important;
+            color: white;
+            font-size: 0.85rem;
+            padding: 0.5rem 1rem;
+            border-radius: 30px;
+        }
+
+        .badge.bg-pink {
+            background-color: var(--rosado-claro) !important;
+            color: var(--texto-oscuro);
+            font-size: 0.85rem;
+            padding: 0.5rem 1rem;
+            border-radius: 30px;
+        }
+
+        /* Botones */
+        .btn-green {
+            background-color: var(--verde-menta);
+            border: none;
+            border-radius: 50px;
+            padding: 0.6rem 2rem;
+            font-weight: 600;
+            transition: all 0.3s;
+            color: white;
+        }
+
+            .btn-green:hover {
+                background-color: #86b57a;
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(151,199,139,0.4);
+                color: white;
+            }
+
+        .btn-pink {
+            background-color: var(--rosado-claro);
+            border: none;
+            border-radius: 50px;
+            padding: 0.6rem 2rem;
+            font-weight: 600;
+            transition: all 0.3s;
+            color: var(--texto-oscuro);
+        }
+
+            .btn-pink:hover {
+                background-color: #f9c2b0;
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(249,194,176,0.4);
+            }
+
+        .btn-outline-green {
+            border: 2px solid var(--verde-menta);
+            background: transparent;
+            color: var(--verde-menta);
+            border-radius: 50px;
+            padding: 0.6rem 2rem;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+            .btn-outline-green:hover {
+                background-color: var(--verde-menta);
+                color: white;
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(151,199,139,0.3);
+            }
+
+        /* Tarjeta de seguridad */
+        .security-card {
+            background: white;
+            border-radius: 24px;
+            padding: 1.5rem;
+            box-shadow: 0 10px 25px rgba(151,199,139,0.15);
+            border: none;
+        }
+
+        .security-card-body {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        /* Alertas */
+        .alert-beige {
+            background-color: var(--fondo-beige);
+            border: 1px solid var(--verde-menta);
+            color: var(--texto-oscuro);
+            border-radius: 16px;
+        }
+
+        /* Responsive */
+        @@media (max-width: 768px) {
+            .profile-card-body {
+                padding: 1.5rem;
+            }
+
+            .profile-avatar, .profile-avatar-placeholder {
+                width: 150px;
+                height: 150px;
+            }
+
+            .security-card-body {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
     </style>
 }

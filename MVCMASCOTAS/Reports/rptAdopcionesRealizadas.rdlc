@@ -1,906 +1,755 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Report xmlns="http://schemas.microsoft.com/sqlserver/reporting/2016/01/reportdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
-  <AutoRefresh>0</AutoRefresh>
-  <DataSources>
-    <DataSource Name="DataSourceAdopciones">
-      <ConnectionProperties>
-        <DataProvider>SQL</DataProvider>
-        <ConnectString>Data Source=localhost;Initial Catalog=RefugioMascotasDB</ConnectString>
-      </ConnectionProperties>
-      <rd:DataSourceID>f5e5d5c5-b5a5-4a5a-9a5a-5a5a5a5a5a5a</rd:DataSourceID>
-    </DataSource>
-  </DataSources>
-  <DataSets>
-    <DataSet Name="DataSetAdopciones">
-      <Query>
-        <DataSourceName>DataSourceAdopciones</DataSourceName>
-        <CommandText>SELECT * FROM Adopciones</CommandText>
-      </Query>
-      <Fields>
-        <Field Name="SolicitudId">
-          <DataField>SolicitudId</DataField>
-          <rd:TypeName>System.Int32</rd:TypeName>
-        </Field>
-        <Field Name="FechaSolicitud">
-          <DataField>FechaSolicitud</DataField>
-          <rd:TypeName>System.DateTime</rd:TypeName>
-        </Field>
-        <Field Name="FechaAdopcion">
-          <DataField>FechaAdopcion</DataField>
-          <rd:TypeName>System.DateTime</rd:TypeName>
-        </Field>
-        <Field Name="NumeroContrato">
-          <DataField>NumeroContrato</DataField>
-          <rd:TypeName>System.String</rd:TypeName>
-        </Field>
-        <Field Name="MascotaId">
-          <DataField>MascotaId</DataField>
-          <rd:TypeName>System.Int32</rd:TypeName>
-        </Field>
-        <Field Name="NombreMascota">
-          <DataField>NombreMascota</DataField>
-          <rd:TypeName>System.String</rd:TypeName>
-        </Field>
-        <Field Name="EspecieMascota">
-          <DataField>EspecieMascota</DataField>
-          <rd:TypeName>System.String</rd:TypeName>
-        </Field>
-        <Field Name="RazaMascota">
-          <DataField>RazaMascota</DataField>
-          <rd:TypeName>System.String</rd:TypeName>
-        </Field>
-        <Field Name="SexoMascota">
-          <DataField>SexoMascota</DataField>
-          <rd:TypeName>System.String</rd:TypeName>
-        </Field>
-        <Field Name="EdadMascota">
-          <DataField>EdadMascota</DataField>
-          <rd:TypeName>System.String</rd:TypeName>
-        </Field>
-        <Field Name="TamanioMascota">
-          <DataField>TamanioMascota</DataField>
-          <rd:TypeName>System.String</rd:TypeName>
-        </Field>
-        <Field Name="AdoptanteId">
-          <DataField>AdoptanteId</DataField>
-          <rd:TypeName>System.Int32</rd:TypeName>
-        </Field>
-        <Field Name="NombreAdoptante">
-          <DataField>NombreAdoptante</DataField>
-          <rd:TypeName>System.String</rd:TypeName>
-        </Field>
-        <Field Name="CedulaAdoptante">
-          <DataField>CedulaAdoptante</DataField>
-          <rd:TypeName>System.String</rd:TypeName>
-        </Field>
-        <Field Name="TelefonoAdoptante">
-          <DataField>TelefonoAdoptante</DataField>
-          <rd:TypeName>System.String</rd:TypeName>
-        </Field>
-        <Field Name="EmailAdoptante">
-          <DataField>EmailAdoptante</DataField>
-          <rd:TypeName>System.String</rd:TypeName>
-        </Field>
-        <Field Name="DireccionAdoptante">
-          <DataField>DireccionAdoptante</DataField>
-          <rd:TypeName>System.String</rd:TypeName>
-        </Field>
-        <Field Name="CiudadAdoptante">
-          <DataField>CiudadAdoptante</DataField>
-          <rd:TypeName>System.String</rd:TypeName>
-        </Field>
-        <Field Name="EstadoSolicitud">
-          <DataField>EstadoSolicitud</DataField>
-          <rd:TypeName>System.String</rd:TypeName>
-        </Field>
-        <Field Name="PuntajeEvaluacion">
-          <DataField>PuntajeEvaluacion</DataField>
-          <rd:TypeName>System.Int32</rd:TypeName>
-        </Field>
-        <Field Name="ResultadoEvaluacion">
-          <DataField>ResultadoEvaluacion</DataField>
-          <rd:TypeName>System.String</rd:TypeName>
-        </Field>
-        <Field Name="EvaluadoPor">
-          <DataField>EvaluadoPor</DataField>
-          <rd:TypeName>System.String</rd:TypeName>
-        </Field>
-        <Field Name="VeterinarioAsignado">
-          <DataField>VeterinarioAsignado</DataField>
-          <rd:TypeName>System.String</rd:TypeName>
-        </Field>
-        <Field Name="FechaGeneracion">
-          <DataField>FechaGeneracion</DataField>
-          <rd:TypeName>System.DateTime</rd:TypeName>
-        </Field>
-      </Fields>
-    </DataSet>
-  </DataSets>
-  <ReportSections>
-    <ReportSection>
-      <Body>
-        <ReportItems>
-          <Rectangle Name="RectanguloEncabezado">
-            <ReportItems>
-              <Textbox Name="TextboxTitulo">
-                <CanGrow>true</CanGrow>
-                <Paragraphs>
-                  <Paragraph>
-                    <TextRuns>
-                      <TextRun>
-                        <Value>REPORTE DE ADOPCIONES REALIZADAS</Value>
-                        <Style>
-                          <FontSize>20pt</FontSize>
-                          <FontWeight>Bold</FontWeight>
-                          <Color>White</Color>
-                        </Style>
-                      </TextRun>
-                    </TextRuns>
-                    <Style />
-                  </Paragraph>
-                </Paragraphs>
-                <Height>2.12361cm</Height>
-                <Width>12cm</Width>
-                <Style>
-                  <FontSize>20pt</FontSize>
-                  <FontWeight>Bold</FontWeight>
-                  <Color>White</Color>
-                  <PaddingLeft>5pt</PaddingLeft>
-                  <PaddingTop>5pt</PaddingTop>
-                </Style>
-              </Textbox>
-              <Textbox Name="TextboxLogo">
-                <CanGrow>true</CanGrow>
-                <Paragraphs>
-                  <Paragraph>
-                    <TextRuns>
-                      <TextRun>
-                        <Value>REFUGIO DE MASCOTAS</Value>
-                        <Style>
-                          <FontSize>16pt</FontSize>
-                          <FontWeight>Bold</FontWeight>
-                          <Color>#f1c40f</Color>
-                        </Style>
-                      </TextRun>
-                    </TextRuns>
-                    <Style />
-                  </Paragraph>
-                </Paragraphs>
-                <Left>12.40733cm</Left>
-                <Height>1.42361cm</Height>
-                <Width>6.59267cm</Width>
-                <ZIndex>1</ZIndex>
-                <Style>
-                  <FontSize>16pt</FontSize>
-                  <FontWeight>Bold</FontWeight>
-                  <TextAlign>Right</TextAlign>
-                  <Color>#f1c40f</Color>
-                  <PaddingRight>5pt</PaddingRight>
-                  <PaddingTop>5pt</PaddingTop>
-                </Style>
-              </Textbox>
-            </ReportItems>
-            <Height>2.12361cm</Height>
-            <Width>19cm</Width>
-            <Style>
-              <Border>
-                <Style>Solid</Style>
-              </Border>
-              <BackgroundColor>#2c3e50</BackgroundColor>
-            </Style>
-          </Rectangle>
-          <Rectangle Name="RectanguloFiltros">
-            <ReportItems>
-              <Textbox Name="TextboxFechaGeneracion">
-                <CanGrow>true</CanGrow>
-                <Paragraphs>
-                  <Paragraph>
-                    <TextRuns>
-                      <TextRun>
-                        <Value>=("Fecha de generación: " &amp; Parameters!FechaGeneracion.Value)</Value>
-                        <Style />
-                      </TextRun>
-                    </TextRuns>
-                    <Style />
-                  </Paragraph>
-                </Paragraphs>
-                <Height>0.6cm</Height>
-                <Width>10cm</Width>
-                <Style>
-                  <Color>#2c3e50</Color>
-                  <PaddingLeft>5pt</PaddingLeft>
-                  <PaddingTop>5pt</PaddingTop>
-                </Style>
-              </Textbox>
-              <Textbox Name="TextboxUsuario">
-                <CanGrow>true</CanGrow>
-                <Paragraphs>
-                  <Paragraph>
-                    <TextRuns>
-                      <TextRun>
-                        <Value>=("Generado por: " &amp; Parameters!Usuario.Value)</Value>
-                        <Style />
-                      </TextRun>
-                    </TextRuns>
-                    <Style />
-                  </Paragraph>
-                </Paragraphs>
-                <Top>0.7cm</Top>
-                <Height>0.6cm</Height>
-                <Width>10cm</Width>
-                <ZIndex>1</ZIndex>
-                <Style>
-                  <Color>#2c3e50</Color>
-                  <PaddingLeft>5pt</PaddingLeft>
-                </Style>
-              </Textbox>
-              <Textbox Name="TextboxRangoFechas">
-                <CanGrow>true</CanGrow>
-                <Paragraphs>
-                  <Paragraph>
-                    <TextRuns>
-                      <TextRun>
-                        <Value>=("Período: " &amp; Parameters!FechaInicio.Value &amp; " - " &amp; Parameters!FechaFin.Value)</Value>
-                        <Style />
-                      </TextRun>
-                    </TextRuns>
-                    <Style />
-                  </Paragraph>
-                </Paragraphs>
-                <Left>14cm</Left>
-                <Height>1.2cm</Height>
-                <Width>5cm</Width>
-                <ZIndex>2</ZIndex>
-                <Style>
-                  <TextAlign>Right</TextAlign>
-                  <Color>#2c3e50</Color>
-                  <PaddingRight>5pt</PaddingRight>
-                  <PaddingTop>5pt</PaddingTop>
-                </Style>
-              </Textbox>
-            </ReportItems>
-            <Top>1.6cm</Top>
-            <Height>1.5cm</Height>
-            <Width>19cm</Width>
-            <ZIndex>1</ZIndex>
-            <Style>
-              <Border>
-                <Color>#bdc3c7</Color>
-                <Style>Solid</Style>
-              </Border>
-              <BackgroundColor>#ecf0f1</BackgroundColor>
-            </Style>
-          </Rectangle>
-          <Rectangle Name="RectanguloPie">
-            <ReportItems>
-              <Textbox Name="TextboxTotalRegistros">
-                <CanGrow>true</CanGrow>
-                <Paragraphs>
-                  <Paragraph>
-                    <TextRuns>
-                      <TextRun>
-                        <Value>=("Total de adopciones: " &amp; Parameters!TotalRegistros.Value)</Value>
-                        <Style />
-                      </TextRun>
-                    </TextRuns>
-                    <Style />
-                  </Paragraph>
-                </Paragraphs>
-                <Height>1cm</Height>
-                <Width>10cm</Width>
-                <Style>
-                  <FontSize>12pt</FontSize>
-                  <FontWeight>Bold</FontWeight>
-                  <Color>#2c3e50</Color>
-                  <PaddingLeft>5pt</PaddingLeft>
-                  <PaddingTop>5pt</PaddingTop>
-                </Style>
-              </Textbox>
-              <Textbox Name="TextboxPieDerecha">
-                <CanGrow>true</CanGrow>
-                <Paragraphs>
-                  <Paragraph>
-                    <TextRuns>
-                      <TextRun>
-                        <Value>=("Página " &amp; Globals!PageNumber &amp; " de " &amp; Globals!TotalPages)</Value>
-                        <Style />
-                      </TextRun>
-                    </TextRuns>
-                    <Style />
-                  </Paragraph>
-                </Paragraphs>
-                <Left>14cm</Left>
-                <Height>1cm</Height>
-                <Width>5cm</Width>
-                <ZIndex>1</ZIndex>
-                <Style>
-                  <TextAlign>Right</TextAlign>
-                  <Color>#7f8c8d</Color>
-                  <PaddingRight>5pt</PaddingRight>
-                  <PaddingTop>5pt</PaddingTop>
-                </Style>
-              </Textbox>
-            </ReportItems>
-            <Top>20cm</Top>
-            <Height>1.5cm</Height>
-            <Width>19cm</Width>
-            <ZIndex>2</ZIndex>
-            <Style>
-              <Border>
-                <Color>#2c3e50</Color>
-                <Style>Solid</Style>
-              </Border>
-              <BackgroundColor>#ecf0f1</BackgroundColor>
-            </Style>
-          </Rectangle>
-          <Tablix Name="TablixAdopciones">
-            <TablixBody>
-              <TablixColumns>
-                <TablixColumn>
-                  <Width>2cm</Width>
-                </TablixColumn>
-                <TablixColumn>
-                  <Width>2.5cm</Width>
-                </TablixColumn>
-                <TablixColumn>
-                  <Width>3cm</Width>
-                </TablixColumn>
-                <TablixColumn>
-                  <Width>3cm</Width>
-                </TablixColumn>
-                <TablixColumn>
-                  <Width>2.5cm</Width>
-                </TablixColumn>
-                <TablixColumn>
-                  <Width>2.5cm</Width>
-                </TablixColumn>
-                <TablixColumn>
-                  <Width>2cm</Width>
-                </TablixColumn>
-                <TablixColumn>
-                  <Width>1.5cm</Width>
-                </TablixColumn>
-              </TablixColumns>
-              <TablixRows>
-                <TablixRow>
-                  <Height>0.8cm</Height>
-                  <TablixCells>
-                    <TablixCell>
-                      <CellContents>
-                        <Textbox Name="Textbox1">
-                          <CanGrow>true</CanGrow>
-                          <Paragraphs>
-                            <Paragraph>
-                              <TextRuns>
-                                <TextRun>
-                                  <Value>N° Contrato</Value>
-                                  <Style />
-                                </TextRun>
-                              </TextRuns>
-                              <Style />
-                            </Paragraph>
-                          </Paragraphs>
-                          <Style>
-                            <Border>
-                              <Color>White</Color>
-                              <Style>Solid</Style>
-                            </Border>
-                            <BackgroundColor>#3498db</BackgroundColor>
-                            <FontWeight>Bold</FontWeight>
-                            <TextAlign>Center</TextAlign>
-                            <Color>White</Color>
-                          </Style>
-                        </Textbox>
-                      </CellContents>
-                    </TablixCell>
-                    <TablixCell>
-                      <CellContents>
-                        <Textbox Name="Textbox2">
-                          <CanGrow>true</CanGrow>
-                          <Paragraphs>
-                            <Paragraph>
-                              <TextRuns>
-                                <TextRun>
-                                  <Value>Fecha Adopción</Value>
-                                  <Style />
-                                </TextRun>
-                              </TextRuns>
-                              <Style />
-                            </Paragraph>
-                          </Paragraphs>
-                          <Style>
-                            <Border>
-                              <Color>White</Color>
-                              <Style>Solid</Style>
-                            </Border>
-                            <BackgroundColor>#3498db</BackgroundColor>
-                            <FontWeight>Bold</FontWeight>
-                            <TextAlign>Center</TextAlign>
-                            <Color>White</Color>
-                          </Style>
-                        </Textbox>
-                      </CellContents>
-                    </TablixCell>
-                    <TablixCell>
-                      <CellContents>
-                        <Textbox Name="Textbox3">
-                          <CanGrow>true</CanGrow>
-                          <Paragraphs>
-                            <Paragraph>
-                              <TextRuns>
-                                <TextRun>
-                                  <Value>Mascota</Value>
-                                  <Style />
-                                </TextRun>
-                              </TextRuns>
-                              <Style />
-                            </Paragraph>
-                          </Paragraphs>
-                          <Style>
-                            <Border>
-                              <Color>White</Color>
-                              <Style>Solid</Style>
-                            </Border>
-                            <BackgroundColor>#3498db</BackgroundColor>
-                            <FontWeight>Bold</FontWeight>
-                            <TextAlign>Center</TextAlign>
-                            <Color>White</Color>
-                          </Style>
-                        </Textbox>
-                      </CellContents>
-                    </TablixCell>
-                    <TablixCell>
-                      <CellContents>
-                        <Textbox Name="Textbox4">
-                          <CanGrow>true</CanGrow>
-                          <Paragraphs>
-                            <Paragraph>
-                              <TextRuns>
-                                <TextRun>
-                                  <Value>Especie/Raza</Value>
-                                  <Style />
-                                </TextRun>
-                              </TextRuns>
-                              <Style />
-                            </Paragraph>
-                          </Paragraphs>
-                          <Style>
-                            <Border>
-                              <Color>White</Color>
-                              <Style>Solid</Style>
-                            </Border>
-                            <BackgroundColor>#3498db</BackgroundColor>
-                            <FontWeight>Bold</FontWeight>
-                            <TextAlign>Center</TextAlign>
-                            <Color>White</Color>
-                          </Style>
-                        </Textbox>
-                      </CellContents>
-                    </TablixCell>
-                    <TablixCell>
-                      <CellContents>
-                        <Textbox Name="Textbox5">
-                          <CanGrow>true</CanGrow>
-                          <Paragraphs>
-                            <Paragraph>
-                              <TextRuns>
-                                <TextRun>
-                                  <Value>Adoptante</Value>
-                                  <Style />
-                                </TextRun>
-                              </TextRuns>
-                              <Style />
-                            </Paragraph>
-                          </Paragraphs>
-                          <Style>
-                            <Border>
-                              <Color>White</Color>
-                              <Style>Solid</Style>
-                            </Border>
-                            <BackgroundColor>#3498db</BackgroundColor>
-                            <FontWeight>Bold</FontWeight>
-                            <TextAlign>Center</TextAlign>
-                            <Color>White</Color>
-                          </Style>
-                        </Textbox>
-                      </CellContents>
-                    </TablixCell>
-                    <TablixCell>
-                      <CellContents>
-                        <Textbox Name="Textbox6">
-                          <CanGrow>true</CanGrow>
-                          <Paragraphs>
-                            <Paragraph>
-                              <TextRuns>
-                                <TextRun>
-                                  <Value>Teléfono</Value>
-                                  <Style />
-                                </TextRun>
-                              </TextRuns>
-                              <Style />
-                            </Paragraph>
-                          </Paragraphs>
-                          <Style>
-                            <Border>
-                              <Color>White</Color>
-                              <Style>Solid</Style>
-                            </Border>
-                            <BackgroundColor>#3498db</BackgroundColor>
-                            <FontWeight>Bold</FontWeight>
-                            <TextAlign>Center</TextAlign>
-                            <Color>White</Color>
-                          </Style>
-                        </Textbox>
-                      </CellContents>
-                    </TablixCell>
-                    <TablixCell>
-                      <CellContents>
-                        <Textbox Name="Textbox7">
-                          <CanGrow>true</CanGrow>
-                          <Paragraphs>
-                            <Paragraph>
-                              <TextRuns>
-                                <TextRun>
-                                  <Value>Evaluación</Value>
-                                  <Style />
-                                </TextRun>
-                              </TextRuns>
-                              <Style />
-                            </Paragraph>
-                          </Paragraphs>
-                          <Style>
-                            <Border>
-                              <Color>White</Color>
-                              <Style>Solid</Style>
-                            </Border>
-                            <BackgroundColor>#3498db</BackgroundColor>
-                            <FontWeight>Bold</FontWeight>
-                            <TextAlign>Center</TextAlign>
-                            <Color>White</Color>
-                          </Style>
-                        </Textbox>
-                      </CellContents>
-                    </TablixCell>
-                    <TablixCell>
-                      <CellContents>
-                        <Textbox Name="Textbox8">
-                          <CanGrow>true</CanGrow>
-                          <Paragraphs>
-                            <Paragraph>
-                              <TextRuns>
-                                <TextRun>
-                                  <Value>Veterinario</Value>
-                                  <Style />
-                                </TextRun>
-                              </TextRuns>
-                              <Style />
-                            </Paragraph>
-                          </Paragraphs>
-                          <Style>
-                            <Border>
-                              <Color>White</Color>
-                              <Style>Solid</Style>
-                            </Border>
-                            <BackgroundColor>#3498db</BackgroundColor>
-                            <FontWeight>Bold</FontWeight>
-                            <TextAlign>Center</TextAlign>
-                            <Color>White</Color>
-                          </Style>
-                        </Textbox>
-                      </CellContents>
-                    </TablixCell>
-                  </TablixCells>
-                </TablixRow>
-                <TablixRow>
-                  <Height>0.7cm</Height>
-                  <TablixCells>
-                    <TablixCell>
-                      <CellContents>
-                        <Textbox Name="NumeroContrato">
-                          <CanGrow>true</CanGrow>
-                          <Paragraphs>
-                            <Paragraph>
-                              <TextRuns>
-                                <TextRun>
-                                  <Value>=Fields!NumeroContrato.Value</Value>
-                                  <Style />
-                                </TextRun>
-                              </TextRuns>
-                              <Style />
-                            </Paragraph>
-                          </Paragraphs>
-                          <Style>
-                            <Border>
-                              <Color>#bdc3c7</Color>
-                              <Style>Solid</Style>
-                            </Border>
-                            <TextAlign>Center</TextAlign>
-                          </Style>
-                        </Textbox>
-                      </CellContents>
-                    </TablixCell>
-                    <TablixCell>
-                      <CellContents>
-                        <Textbox Name="FechaAdopcion">
-                          <CanGrow>true</CanGrow>
-                          <Paragraphs>
-                            <Paragraph>
-                              <TextRuns>
-                                <TextRun>
-                                  <Value>=Format(Fields!FechaAdopcion.Value, "dd/MM/yyyy")</Value>
-                                  <Style />
-                                </TextRun>
-                              </TextRuns>
-                              <Style />
-                            </Paragraph>
-                          </Paragraphs>
-                          <Style>
-                            <Border>
-                              <Color>#bdc3c7</Color>
-                              <Style>Solid</Style>
-                            </Border>
-                            <TextAlign>Center</TextAlign>
-                          </Style>
-                        </Textbox>
-                      </CellContents>
-                    </TablixCell>
-                    <TablixCell>
-                      <CellContents>
-                        <Textbox Name="NombreMascota">
-                          <CanGrow>true</CanGrow>
-                          <Paragraphs>
-                            <Paragraph>
-                              <TextRuns>
-                                <TextRun>
-                                  <Value>=Fields!NombreMascota.Value</Value>
-                                  <Style />
-                                </TextRun>
-                              </TextRuns>
-                              <Style />
-                            </Paragraph>
-                          </Paragraphs>
-                          <Style>
-                            <Border>
-                              <Color>#bdc3c7</Color>
-                              <Style>Solid</Style>
-                            </Border>
-                          </Style>
-                        </Textbox>
-                      </CellContents>
-                    </TablixCell>
-                    <TablixCell>
-                      <CellContents>
-                        <Textbox Name="EspecieRaza">
-                          <CanGrow>true</CanGrow>
-                          <Paragraphs>
-                            <Paragraph>
-                              <TextRuns>
-                                <TextRun>
-                                  <Value>=(Fields!EspecieMascota.Value &amp; " - " &amp; Fields!RazaMascota.Value)</Value>
-                                  <Style />
-                                </TextRun>
-                              </TextRuns>
-                              <Style />
-                            </Paragraph>
-                          </Paragraphs>
-                          <Style>
-                            <Border>
-                              <Color>#bdc3c7</Color>
-                              <Style>Solid</Style>
-                            </Border>
-                          </Style>
-                        </Textbox>
-                      </CellContents>
-                    </TablixCell>
-                    <TablixCell>
-                      <CellContents>
-                        <Textbox Name="NombreAdoptante">
-                          <CanGrow>true</CanGrow>
-                          <Paragraphs>
-                            <Paragraph>
-                              <TextRuns>
-                                <TextRun>
-                                  <Value>=Fields!NombreAdoptante.Value</Value>
-                                  <Style />
-                                </TextRun>
-                              </TextRuns>
-                              <Style />
-                            </Paragraph>
-                          </Paragraphs>
-                          <Style>
-                            <Border>
-                              <Color>#bdc3c7</Color>
-                              <Style>Solid</Style>
-                            </Border>
-                          </Style>
-                        </Textbox>
-                      </CellContents>
-                    </TablixCell>
-                    <TablixCell>
-                      <CellContents>
-                        <Textbox Name="TelefonoAdoptante">
-                          <CanGrow>true</CanGrow>
-                          <Paragraphs>
-                            <Paragraph>
-                              <TextRuns>
-                                <TextRun>
-                                  <Value>=Fields!TelefonoAdoptante.Value</Value>
-                                  <Style />
-                                </TextRun>
-                              </TextRuns>
-                              <Style />
-                            </Paragraph>
-                          </Paragraphs>
-                          <Style>
-                            <Border>
-                              <Color>#bdc3c7</Color>
-                              <Style>Solid</Style>
-                            </Border>
-                          </Style>
-                        </Textbox>
-                      </CellContents>
-                    </TablixCell>
-                    <TablixCell>
-                      <CellContents>
-                        <Textbox Name="PuntajeEvaluacion">
-                          <CanGrow>true</CanGrow>
-                          <Paragraphs>
-                            <Paragraph>
-                              <TextRuns>
-                                <TextRun>
-                                  <Value>=IIF(IsNothing(Fields!PuntajeEvaluacion.Value), "N/A", CStr(Fields!PuntajeEvaluacion.Value) &amp; "%")</Value>
-                                  <Style />
-                                </TextRun>
-                              </TextRuns>
-                              <Style />
-                            </Paragraph>
-                          </Paragraphs>
-                          <Style>
-                            <Border>
-                              <Color>#bdc3c7</Color>
-                              <Style>Solid</Style>
-                            </Border>
-                            <FontWeight>Bold</FontWeight>
-                            <TextAlign>Center</TextAlign>
-                            <Color>=IIF(Fields!PuntajeEvaluacion.Value &gt;= 80, "Green", IIF(Fields!PuntajeEvaluacion.Value &gt;= 60, "Orange", "Red"))</Color>
-                          </Style>
-                        </Textbox>
-                      </CellContents>
-                    </TablixCell>
-                    <TablixCell>
-                      <CellContents>
-                        <Textbox Name="Veterinario">
-                          <CanGrow>true</CanGrow>
-                          <Paragraphs>
-                            <Paragraph>
-                              <TextRuns>
-                                <TextRun>
-                                  <Value>=Fields!VeterinarioAsignado.Value</Value>
-                                  <Style />
-                                </TextRun>
-                              </TextRuns>
-                              <Style />
-                            </Paragraph>
-                          </Paragraphs>
-                          <Style>
-                            <Border>
-                              <Color>#bdc3c7</Color>
-                              <Style>Solid</Style>
-                            </Border>
-                          </Style>
-                        </Textbox>
-                      </CellContents>
-                    </TablixCell>
-                  </TablixCells>
-                </TablixRow>
-              </TablixRows>
-            </TablixBody>
-            <TablixColumnHierarchy>
-              <TablixMembers>
-                <TablixMember />
-                <TablixMember />
-                <TablixMember />
-                <TablixMember />
-                <TablixMember />
-                <TablixMember />
-                <TablixMember />
-                <TablixMember />
-              </TablixMembers>
-            </TablixColumnHierarchy>
-            <TablixRowHierarchy>
-              <TablixMembers>
-                <TablixMember>
-                  <KeepWithGroup>After</KeepWithGroup>
-                </TablixMember>
-                <TablixMember>
-                  <Group Name="Detalle" />
-                </TablixMember>
-              </TablixMembers>
-            </TablixRowHierarchy>
-            <DataSetName>DataSetAdopciones</DataSetName>
-            <Top>3.3cm</Top>
-            <Height>1.5cm</Height>
-            <Width>19cm</Width>
-            <ZIndex>3</ZIndex>
-            <Style>
-              <Border>
-                <Color>#34495e</Color>
-                <Style>Solid</Style>
-              </Border>
-            </Style>
-          </Tablix>
-        </ReportItems>
-        <Height>22cm</Height>
-        <Style />
-      </Body>
-      <Width>21cm</Width>
-      <Page>
-        <PageHeight>29.7cm</PageHeight>
-        <PageWidth>21cm</PageWidth>
-        <LeftMargin>1cm</LeftMargin>
-        <RightMargin>1cm</RightMargin>
-        <TopMargin>1cm</TopMargin>
-        <BottomMargin>1cm</BottomMargin>
-        <Style />
-      </Page>
-    </ReportSection>
-  </ReportSections>
-  <ReportParameters>
-    <ReportParameter Name="FechaGeneracion">
-      <DataType>String</DataType>
-      <Prompt>FechaGeneracion</Prompt>
-    </ReportParameter>
-    <ReportParameter Name="Usuario">
-      <DataType>String</DataType>
-      <Prompt>Usuario</Prompt>
-    </ReportParameter>
-    <ReportParameter Name="FechaInicio">
-      <DataType>String</DataType>
-      <Prompt>FechaInicio</Prompt>
-    </ReportParameter>
-    <ReportParameter Name="FechaFin">
-      <DataType>String</DataType>
-      <Prompt>FechaFin</Prompt>
-    </ReportParameter>
-    <ReportParameter Name="TotalRegistros">
-      <DataType>String</DataType>
-      <Prompt>TotalRegistros</Prompt>
-    </ReportParameter>
-  </ReportParameters>
-  <ReportParametersLayout>
-    <GridLayoutDefinition>
-      <NumberOfColumns>2</NumberOfColumns>
-      <NumberOfRows>3</NumberOfRows>
-      <CellDefinitions>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>0</RowIndex>
-          <ParameterName>FechaGeneracion</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>1</ColumnIndex>
-          <RowIndex>0</RowIndex>
-          <ParameterName>Usuario</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>1</RowIndex>
-          <ParameterName>FechaInicio</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>1</ColumnIndex>
-          <RowIndex>1</RowIndex>
-          <ParameterName>FechaFin</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>2</RowIndex>
-          <ParameterName>TotalRegistros</ParameterName>
-        </CellDefinition>
-      </CellDefinitions>
-    </GridLayoutDefinition>
-  </ReportParametersLayout>
-  <Language>es-ES</Language>
-  <rd:ReportUnitType>Cm</rd:ReportUnitType>
-  <rd:ReportID>a1b2c3d4-e5f6-4a5b-8c7d-9e0f1a2b3c4d</rd:ReportID>
+<Report xmlns="http://schemas.microsoft.com/sqlserver/reporting/2008/01/reportdefinition"
+        xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
+	<ReportParameters>
+		<ReportParameter Name="FechaGeneracion">
+			<DataType>String</DataType>
+			<DefaultValue>
+				<Values>
+					<Value></Value>
+				</Values>
+			</DefaultValue>
+			<Prompt>FechaGeneracion</Prompt>
+		</ReportParameter>
+		<ReportParameter Name="Usuario">
+			<DataType>String</DataType>
+			<DefaultValue>
+				<Values>
+					<Value></Value>
+				</Values>
+			</DefaultValue>
+			<Prompt>Usuario</Prompt>
+		</ReportParameter>
+		<ReportParameter Name="FechaInicio">
+			<DataType>String</DataType>
+			<DefaultValue>
+				<Values>
+					<Value>Todos</Value>
+				</Values>
+			</DefaultValue>
+			<Prompt>FechaInicio</Prompt>
+		</ReportParameter>
+		<ReportParameter Name="FechaFin">
+			<DataType>String</DataType>
+			<DefaultValue>
+				<Values>
+					<Value>Todos</Value>
+				</Values>
+			</DefaultValue>
+			<Prompt>FechaFin</Prompt>
+		</ReportParameter>
+		<ReportParameter Name="TotalRegistros">
+			<DataType>String</DataType>
+			<DefaultValue>
+				<Values>
+					<Value>0</Value>
+				</Values>
+			</DefaultValue>
+			<Prompt>TotalRegistros</Prompt>
+		</ReportParameter>
+		<ReportParameter Name="TotalAdopciones">
+			<DataType>String</DataType>
+			<DefaultValue>
+				<Values>
+					<Value>0</Value>
+				</Values>
+			</DefaultValue>
+			<Prompt>TotalAdopciones</Prompt>
+		</ReportParameter>
+	</ReportParameters>
+	<DataSources>
+		<DataSource Name="DataSetAdopciones">
+			<ConnectionProperties>
+				<DataProvider>System.Data.DataSet</DataProvider>
+				<ConnectString>/* Local Connection */</ConnectString>
+			</ConnectionProperties>
+			<rd:DataSourceID>00000000-0000-0000-0000-000000000001</rd:DataSourceID>
+		</DataSource>
+	</DataSources>
+	<DataSets>
+		<DataSet Name="DataSetAdopciones">
+			<Query>
+				<DataSourceName>DataSetAdopciones</DataSourceName>
+				<CommandText>/* Local Query */</CommandText>
+			</Query>
+			<Fields>
+				<Field Name="NumeroContrato">
+					<DataField>NumeroContrato</DataField>
+					<rd:TypeName>System.String</rd:TypeName>
+				</Field>
+				<Field Name="FechaAdopcion">
+					<DataField>FechaAdopcion</DataField>
+					<rd:TypeName>System.DateTime</rd:TypeName>
+				</Field>
+				<Field Name="FechaSolicitud">
+					<DataField>FechaSolicitud</DataField>
+					<rd:TypeName>System.DateTime</rd:TypeName>
+				</Field>
+				<Field Name="NombreMascota">
+					<DataField>NombreMascota</DataField>
+					<rd:TypeName>System.String</rd:TypeName>
+				</Field>
+				<Field Name="EspecieMascota">
+					<DataField>EspecieMascota</DataField>
+					<rd:TypeName>System.String</rd:TypeName>
+				</Field>
+				<Field Name="RazaMascota">
+					<DataField>RazaMascota</DataField>
+					<rd:TypeName>System.String</rd:TypeName>
+				</Field>
+				<Field Name="SexoMascota">
+					<DataField>SexoMascota</DataField>
+					<rd:TypeName>System.String</rd:TypeName>
+				</Field>
+				<Field Name="EdadMascota">
+					<DataField>EdadMascota</DataField>
+					<rd:TypeName>System.String</rd:TypeName>
+				</Field>
+				<Field Name="NombreAdoptante">
+					<DataField>NombreAdoptante</DataField>
+					<rd:TypeName>System.String</rd:TypeName>
+				</Field>
+				<Field Name="CedulaAdoptante">
+					<DataField>CedulaAdoptante</DataField>
+					<rd:TypeName>System.String</rd:TypeName>
+				</Field>
+				<Field Name="TelefonoAdoptante">
+					<DataField>TelefonoAdoptante</DataField>
+					<rd:TypeName>System.String</rd:TypeName>
+				</Field>
+				<Field Name="EmailAdoptante">
+					<DataField>EmailAdoptante</DataField>
+					<rd:TypeName>System.String</rd:TypeName>
+				</Field>
+				<Field Name="CiudadAdoptante">
+					<DataField>CiudadAdoptante</DataField>
+					<rd:TypeName>System.String</rd:TypeName>
+				</Field>
+				<Field Name="EstadoSolicitud">
+					<DataField>EstadoSolicitud</DataField>
+					<rd:TypeName>System.String</rd:TypeName>
+				</Field>
+				<Field Name="PuntajeEvaluacion">
+					<DataField>PuntajeEvaluacion</DataField>
+					<rd:TypeName>System.Nullable`1[System.Int32]</rd:TypeName>
+				</Field>
+				<Field Name="ResultadoEvaluacion">
+					<DataField>ResultadoEvaluacion</DataField>
+					<rd:TypeName>System.String</rd:TypeName>
+				</Field>
+				<Field Name="EvaluadoPor">
+					<DataField>EvaluadoPor</DataField>
+					<rd:TypeName>System.String</rd:TypeName>
+				</Field>
+				<Field Name="VeterinarioAsignado">
+					<DataField>VeterinarioAsignado</DataField>
+					<rd:TypeName>System.String</rd:TypeName>
+				</Field>
+			</Fields>
+		</DataSet>
+	</DataSets>
+	<Body>
+		<Height>20cm</Height>
+		<Style />
+		<ReportItems>
+
+			<!-- ENCABEZADO -->
+			<Textbox Name="Titulo">
+				<CanGrow>true</CanGrow>
+				<Top>0cm</Top>
+				<Left>0cm</Left>
+				<Width>19cm</Width>
+				<Height>1.2cm</Height>
+				<Style>
+					<BackgroundColor>#3498DB</BackgroundColor>
+					<Color>White</Color>
+					<FontSize>16pt</FontSize>
+					<FontWeight>Bold</FontWeight>
+					<PaddingLeft>8pt</PaddingLeft>
+					<PaddingTop>6pt</PaddingTop>
+					<Border>
+						<Style>None</Style>
+					</Border>
+				</Style>
+				<Paragraphs>
+					<Paragraph>
+						<TextRuns>
+							<TextRun>
+								<Value>REPORTE DE ADOPCIONES REALIZADAS</Value>
+							</TextRun>
+						</TextRuns>
+					</Paragraph>
+				</Paragraphs>
+			</Textbox>
+
+			<Textbox Name="InfoFiltros">
+				<CanGrow>true</CanGrow>
+				<Top>1.3cm</Top>
+				<Left>0cm</Left>
+				<Width>19cm</Width>
+				<Height>0.7cm</Height>
+				<Style>
+					<BackgroundColor>#ECF0F1</BackgroundColor>
+					<FontSize>9pt</FontSize>
+					<Color>#555555</Color>
+					<PaddingLeft>8pt</PaddingLeft>
+					<PaddingTop>4pt</PaddingTop>
+					<Border>
+						<Style>None</Style>
+					</Border>
+				</Style>
+				<Paragraphs>
+					<Paragraph>
+						<TextRuns>
+							<TextRun>
+								<Value>=("Período: " &amp; Parameters!FechaInicio.Value &amp; " al " &amp; Parameters!FechaFin.Value &amp; "   |   Total: " &amp; Parameters!TotalAdopciones.Value &amp; "   |   Generado: " &amp; Parameters!FechaGeneracion.Value &amp; " por " &amp; Parameters!Usuario.Value)</Value>
+							</TextRun>
+						</TextRuns>
+					</Paragraph>
+				</Paragraphs>
+			</Textbox>
+
+			<!-- TABLA DE DATOS -->
+			<Tablix Name="TablixAdopciones">
+				<DataSetName>DataSetAdopciones</DataSetName>
+				<Top>2.3cm</Top>
+				<Left>0cm</Left>
+				<Width>19cm</Width>
+				<TablixBody>
+					<TablixColumns>
+						<TablixColumn>
+							<Width>2.5cm</Width>
+						</TablixColumn>
+						<TablixColumn>
+							<Width>2.2cm</Width>
+						</TablixColumn>
+						<TablixColumn>
+							<Width>2.5cm</Width>
+						</TablixColumn>
+						<TablixColumn>
+							<Width>2cm</Width>
+						</TablixColumn>
+						<TablixColumn>
+							<Width>3.5cm</Width>
+						</TablixColumn>
+						<TablixColumn>
+							<Width>2cm</Width>
+						</TablixColumn>
+						<TablixColumn>
+							<Width>2cm</Width>
+						</TablixColumn>
+						<TablixColumn>
+							<Width>2.3cm</Width>
+						</TablixColumn>
+					</TablixColumns>
+					<TablixRows>
+						<!-- Encabezados -->
+						<TablixRow>
+							<Height>0.7cm</Height>
+							<TablixCells>
+								<TablixCell>
+									<CellContents>
+										<Textbox Name="H1">
+											<CanGrow>true</CanGrow>
+											<Paragraphs>
+												<Paragraph>
+													<TextRuns>
+														<TextRun>
+															<Value>N° Contrato</Value>
+														</TextRun>
+													</TextRuns>
+												</Paragraph>
+											</Paragraphs>
+											<Style>
+												<BackgroundColor>#2980B9</BackgroundColor>
+												<Color>White</Color>
+												<FontWeight>Bold</FontWeight>
+												<FontSize>8pt</FontSize>
+												<TextAlign>Center</TextAlign>
+												<Border>
+													<Style>Solid</Style>
+													<Color>White</Color>
+												</Border>
+												<PaddingTop>3pt</PaddingTop>
+											</Style>
+										</Textbox>
+									</CellContents>
+								</TablixCell>
+								<TablixCell>
+									<CellContents>
+										<Textbox Name="H2">
+											<CanGrow>true</CanGrow>
+											<Paragraphs>
+												<Paragraph>
+													<TextRuns>
+														<TextRun>
+															<Value>Fecha</Value>
+														</TextRun>
+													</TextRuns>
+												</Paragraph>
+											</Paragraphs>
+											<Style>
+												<BackgroundColor>#2980B9</BackgroundColor>
+												<Color>White</Color>
+												<FontWeight>Bold</FontWeight>
+												<FontSize>8pt</FontSize>
+												<TextAlign>Center</TextAlign>
+												<Border>
+													<Style>Solid</Style>
+													<Color>White</Color>
+												</Border>
+												<PaddingTop>3pt</PaddingTop>
+											</Style>
+										</Textbox>
+									</CellContents>
+								</TablixCell>
+								<TablixCell>
+									<CellContents>
+										<Textbox Name="H3">
+											<CanGrow>true</CanGrow>
+											<Paragraphs>
+												<Paragraph>
+													<TextRuns>
+														<TextRun>
+															<Value>Mascota</Value>
+														</TextRun>
+													</TextRuns>
+												</Paragraph>
+											</Paragraphs>
+											<Style>
+												<BackgroundColor>#2980B9</BackgroundColor>
+												<Color>White</Color>
+												<FontWeight>Bold</FontWeight>
+												<FontSize>8pt</FontSize>
+												<TextAlign>Center</TextAlign>
+												<Border>
+													<Style>Solid</Style>
+													<Color>White</Color>
+												</Border>
+												<PaddingTop>3pt</PaddingTop>
+											</Style>
+										</Textbox>
+									</CellContents>
+								</TablixCell>
+								<TablixCell>
+									<CellContents>
+										<Textbox Name="H4">
+											<CanGrow>true</CanGrow>
+											<Paragraphs>
+												<Paragraph>
+													<TextRuns>
+														<TextRun>
+															<Value>Especie/Raza</Value>
+														</TextRun>
+													</TextRuns>
+												</Paragraph>
+											</Paragraphs>
+											<Style>
+												<BackgroundColor>#2980B9</BackgroundColor>
+												<Color>White</Color>
+												<FontWeight>Bold</FontWeight>
+												<FontSize>8pt</FontSize>
+												<TextAlign>Center</TextAlign>
+												<Border>
+													<Style>Solid</Style>
+													<Color>White</Color>
+												</Border>
+												<PaddingTop>3pt</PaddingTop>
+											</Style>
+										</Textbox>
+									</CellContents>
+								</TablixCell>
+								<TablixCell>
+									<CellContents>
+										<Textbox Name="H5">
+											<CanGrow>true</CanGrow>
+											<Paragraphs>
+												<Paragraph>
+													<TextRuns>
+														<TextRun>
+															<Value>Adoptante</Value>
+														</TextRun>
+													</TextRuns>
+												</Paragraph>
+											</Paragraphs>
+											<Style>
+												<BackgroundColor>#2980B9</BackgroundColor>
+												<Color>White</Color>
+												<FontWeight>Bold</FontWeight>
+												<FontSize>8pt</FontSize>
+												<TextAlign>Center</TextAlign>
+												<Border>
+													<Style>Solid</Style>
+													<Color>White</Color>
+												</Border>
+												<PaddingTop>3pt</PaddingTop>
+											</Style>
+										</Textbox>
+									</CellContents>
+								</TablixCell>
+								<TablixCell>
+									<CellContents>
+										<Textbox Name="H6">
+											<CanGrow>true</CanGrow>
+											<Paragraphs>
+												<Paragraph>
+													<TextRuns>
+														<TextRun>
+															<Value>Cédula</Value>
+														</TextRun>
+													</TextRuns>
+												</Paragraph>
+											</Paragraphs>
+											<Style>
+												<BackgroundColor>#2980B9</BackgroundColor>
+												<Color>White</Color>
+												<FontWeight>Bold</FontWeight>
+												<FontSize>8pt</FontSize>
+												<TextAlign>Center</TextAlign>
+												<Border>
+													<Style>Solid</Style>
+													<Color>White</Color>
+												</Border>
+												<PaddingTop>3pt</PaddingTop>
+											</Style>
+										</Textbox>
+									</CellContents>
+								</TablixCell>
+								<TablixCell>
+									<CellContents>
+										<Textbox Name="H7">
+											<CanGrow>true</CanGrow>
+											<Paragraphs>
+												<Paragraph>
+													<TextRuns>
+														<TextRun>
+															<Value>Ciudad</Value>
+														</TextRun>
+													</TextRuns>
+												</Paragraph>
+											</Paragraphs>
+											<Style>
+												<BackgroundColor>#2980B9</BackgroundColor>
+												<Color>White</Color>
+												<FontWeight>Bold</FontWeight>
+												<FontSize>8pt</FontSize>
+												<TextAlign>Center</TextAlign>
+												<Border>
+													<Style>Solid</Style>
+													<Color>White</Color>
+												</Border>
+												<PaddingTop>3pt</PaddingTop>
+											</Style>
+										</Textbox>
+									</CellContents>
+								</TablixCell>
+								<TablixCell>
+									<CellContents>
+										<Textbox Name="H8">
+											<CanGrow>true</CanGrow>
+											<Paragraphs>
+												<Paragraph>
+													<TextRuns>
+														<TextRun>
+															<Value>Resultado</Value>
+														</TextRun>
+													</TextRuns>
+												</Paragraph>
+											</Paragraphs>
+											<Style>
+												<BackgroundColor>#2980B9</BackgroundColor>
+												<Color>White</Color>
+												<FontWeight>Bold</FontWeight>
+												<FontSize>8pt</FontSize>
+												<TextAlign>Center</TextAlign>
+												<Border>
+													<Style>Solid</Style>
+													<Color>White</Color>
+												</Border>
+												<PaddingTop>3pt</PaddingTop>
+											</Style>
+										</Textbox>
+									</CellContents>
+								</TablixCell>
+							</TablixCells>
+						</TablixRow>
+						<!-- Fila de datos -->
+						<TablixRow>
+							<Height>0.6cm</Height>
+							<TablixCells>
+								<TablixCell>
+									<CellContents>
+										<Textbox Name="D1">
+											<CanGrow>true</CanGrow>
+											<Paragraphs>
+												<Paragraph>
+													<TextRuns>
+														<TextRun>
+															<Value>=Fields!NumeroContrato.Value</Value>
+														</TextRun>
+													</TextRuns>
+												</Paragraph>
+											</Paragraphs>
+											<Style>
+												<Border>
+													<Style>Solid</Style>
+													<Color>#D5D8DC</Color>
+												</Border>
+												<FontSize>8pt</FontSize>
+												<PaddingLeft>3pt</PaddingLeft>
+												<BackgroundColor>=IIF(RowNumber(Nothing) Mod 2 = 0, "#EBF5FB", "White")</BackgroundColor>
+											</Style>
+										</Textbox>
+									</CellContents>
+								</TablixCell>
+								<TablixCell>
+									<CellContents>
+										<Textbox Name="D2">
+											<CanGrow>true</CanGrow>
+											<Paragraphs>
+												<Paragraph>
+													<TextRuns>
+														<TextRun>
+															<Value>=Format(Fields!FechaAdopcion.Value, "dd/MM/yyyy")</Value>
+														</TextRun>
+													</TextRuns>
+												</Paragraph>
+											</Paragraphs>
+											<Style>
+												<Border>
+													<Style>Solid</Style>
+													<Color>#D5D8DC</Color>
+												</Border>
+												<FontSize>8pt</FontSize>
+												<TextAlign>Center</TextAlign>
+												<BackgroundColor>=IIF(RowNumber(Nothing) Mod 2 = 0, "#EBF5FB", "White")</BackgroundColor>
+											</Style>
+										</Textbox>
+									</CellContents>
+								</TablixCell>
+								<TablixCell>
+									<CellContents>
+										<Textbox Name="D3">
+											<CanGrow>true</CanGrow>
+											<Paragraphs>
+												<Paragraph>
+													<TextRuns>
+														<TextRun>
+															<Value>=Fields!NombreMascota.Value</Value>
+														</TextRun>
+													</TextRuns>
+												</Paragraph>
+											</Paragraphs>
+											<Style>
+												<Border>
+													<Style>Solid</Style>
+													<Color>#D5D8DC</Color>
+												</Border>
+												<FontSize>8pt</FontSize>
+												<PaddingLeft>3pt</PaddingLeft>
+												<BackgroundColor>=IIF(RowNumber(Nothing) Mod 2 = 0, "#EBF5FB", "White")</BackgroundColor>
+											</Style>
+										</Textbox>
+									</CellContents>
+								</TablixCell>
+								<TablixCell>
+									<CellContents>
+										<Textbox Name="D4">
+											<CanGrow>true</CanGrow>
+											<Paragraphs>
+												<Paragraph>
+													<TextRuns>
+														<TextRun>
+															<Value>=(Fields!EspecieMascota.Value &amp; " / " &amp; Fields!RazaMascota.Value)</Value>
+														</TextRun>
+													</TextRuns>
+												</Paragraph>
+											</Paragraphs>
+											<Style>
+												<Border>
+													<Style>Solid</Style>
+													<Color>#D5D8DC</Color>
+												</Border>
+												<FontSize>8pt</FontSize>
+												<PaddingLeft>3pt</PaddingLeft>
+												<BackgroundColor>=IIF(RowNumber(Nothing) Mod 2 = 0, "#EBF5FB", "White")</BackgroundColor>
+											</Style>
+										</Textbox>
+									</CellContents>
+								</TablixCell>
+								<TablixCell>
+									<CellContents>
+										<Textbox Name="D5">
+											<CanGrow>true</CanGrow>
+											<Paragraphs>
+												<Paragraph>
+													<TextRuns>
+														<TextRun>
+															<Value>=Fields!NombreAdoptante.Value</Value>
+														</TextRun>
+													</TextRuns>
+												</Paragraph>
+											</Paragraphs>
+											<Style>
+												<Border>
+													<Style>Solid</Style>
+													<Color>#D5D8DC</Color>
+												</Border>
+												<FontSize>8pt</FontSize>
+												<PaddingLeft>3pt</PaddingLeft>
+												<BackgroundColor>=IIF(RowNumber(Nothing) Mod 2 = 0, "#EBF5FB", "White")</BackgroundColor>
+											</Style>
+										</Textbox>
+									</CellContents>
+								</TablixCell>
+								<TablixCell>
+									<CellContents>
+										<Textbox Name="D6">
+											<CanGrow>true</CanGrow>
+											<Paragraphs>
+												<Paragraph>
+													<TextRuns>
+														<TextRun>
+															<Value>=Fields!CedulaAdoptante.Value</Value>
+														</TextRun>
+													</TextRuns>
+												</Paragraph>
+											</Paragraphs>
+											<Style>
+												<Border>
+													<Style>Solid</Style>
+													<Color>#D5D8DC</Color>
+												</Border>
+												<FontSize>8pt</FontSize>
+												<TextAlign>Center</TextAlign>
+												<BackgroundColor>=IIF(RowNumber(Nothing) Mod 2 = 0, "#EBF5FB", "White")</BackgroundColor>
+											</Style>
+										</Textbox>
+									</CellContents>
+								</TablixCell>
+								<TablixCell>
+									<CellContents>
+										<Textbox Name="D7">
+											<CanGrow>true</CanGrow>
+											<Paragraphs>
+												<Paragraph>
+													<TextRuns>
+														<TextRun>
+															<Value>=Fields!CiudadAdoptante.Value</Value>
+														</TextRun>
+													</TextRuns>
+												</Paragraph>
+											</Paragraphs>
+											<Style>
+												<Border>
+													<Style>Solid</Style>
+													<Color>#D5D8DC</Color>
+												</Border>
+												<FontSize>8pt</FontSize>
+												<PaddingLeft>3pt</PaddingLeft>
+												<BackgroundColor>=IIF(RowNumber(Nothing) Mod 2 = 0, "#EBF5FB", "White")</BackgroundColor>
+											</Style>
+										</Textbox>
+									</CellContents>
+								</TablixCell>
+								<TablixCell>
+									<CellContents>
+										<Textbox Name="D8">
+											<CanGrow>true</CanGrow>
+											<Paragraphs>
+												<Paragraph>
+													<TextRuns>
+														<TextRun>
+															<Value>=Fields!ResultadoEvaluacion.Value</Value>
+														</TextRun>
+													</TextRuns>
+												</Paragraph>
+											</Paragraphs>
+											<Style>
+												<Border>
+													<Style>Solid</Style>
+													<Color>#D5D8DC</Color>
+												</Border>
+												<FontSize>8pt</FontSize>
+												<TextAlign>Center</TextAlign>
+												<BackgroundColor>=IIF(RowNumber(Nothing) Mod 2 = 0, "#EBF5FB", "White")</BackgroundColor>
+											</Style>
+										</Textbox>
+									</CellContents>
+								</TablixCell>
+							</TablixCells>
+						</TablixRow>
+					</TablixRows>
+				</TablixBody>
+				<TablixColumnHierarchy>
+					<TablixMembers>
+						<TablixMember/>
+						<TablixMember/>
+						<TablixMember/>
+						<TablixMember/>
+						<TablixMember/>
+						<TablixMember/>
+						<TablixMember/>
+						<TablixMember/>
+					</TablixMembers>
+				</TablixColumnHierarchy>
+				<TablixRowHierarchy>
+					<TablixMembers>
+						<TablixMember>
+							<KeepWithGroup>After</KeepWithGroup>
+						</TablixMember>
+						<TablixMember>
+							<Group Name="GrupoAdopciones">
+								<GroupExpressions>
+									<GroupExpression>=Fields!NumeroContrato.Value</GroupExpression>
+								</GroupExpressions>
+							</Group>
+						</TablixMember>
+					</TablixMembers>
+				</TablixRowHierarchy>
+			</Tablix>
+
+			<!-- PIE -->
+			<Textbox Name="Pie">
+				<CanGrow>true</CanGrow>
+				<Top>19cm</Top>
+				<Left>0cm</Left>
+				<Width>19cm</Width>
+				<Height>0.7cm</Height>
+				<Style>
+					<BackgroundColor>#ECF0F1</BackgroundColor>
+					<Color>#7F8C8D</Color>
+					<FontSize>9pt</FontSize>
+					<TextAlign>Center</TextAlign>
+					<PaddingTop>4pt</PaddingTop>
+					<Border>
+						<Style>Solid</Style>
+						<Color>#3498DB</Color>
+					</Border>
+				</Style>
+				<Paragraphs>
+					<Paragraph>
+						<TextRuns>
+							<TextRun>
+								<Value>=("Página " &amp; Globals!PageNumber &amp; " de " &amp; Globals!TotalPages &amp; "   |   ADOPTAMANIA Refugio de Animales")</Value>
+							</TextRun>
+						</TextRuns>
+					</Paragraph>
+				</Paragraphs>
+			</Textbox>
+
+		</ReportItems>
+	</Body>
+	<Width>19cm</Width>
+	<Page>
+		<PageHeight>29.7cm</PageHeight>
+		<PageWidth>21cm</PageWidth>
+		<LeftMargin>1cm</LeftMargin>
+		<RightMargin>1cm</RightMargin>
+		<TopMargin>1cm</TopMargin>
+		<BottomMargin>1cm</BottomMargin>
+		<Style />
+	</Page>
+	<Language>es-EC</Language>
+	<rd:ReportUnitType>Cm</rd:ReportUnitType>
 </Report>

@@ -1,234 +1,510 @@
-﻿@model IEnumerable<dynamic>
+﻿@model IEnumerable<MVCMASCOTAS.Models.ViewModels.SeguimientoAdopcionViewModel>
 
 @{
-    ViewBag.Title = "Seguimiento de Adopciones";
+    ViewBag.Title = "Seguimiento de Adopciones - ADOPTAMANÍA";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="container-fluid">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2><i class="fas fa-clipboard-check text-primary"></i> Seguimiento de Adopciones</h2>
-        <div>
-            <a href="@Url.Action("Listado", "Mascotas", new { tipo = "Adoptadas" })" class="btn btn-outline-primary">
-                <i class="fas fa-dog"></i> Ver Adoptadas
-            </a>
-            <a href="@Url.Action("ContratosAdopcion", "Mascotas")" class="btn btn-info">
-                <i class="fas fa-file-contract"></i> Ver Contratos
-            </a>
+<section class="seguimiento-hero py-4">
+    <div class="container">
+        <div class="d-flex flex-wrap justify-content-between align-items-center">
+            <div>
+                <h1 class="h2 text-brown mb-1">
+                    <i class="fas fa-clipboard-check text-green me-2"></i>Seguimiento de Adopciones
+                </h1>
+                <p class="text-secondary mb-0">Control de seguimientos post-adopción</p>
+            </div>
+            <div class="mt-2 mt-sm-0">
+                <a href="@Url.Action("Listado", "Mascotas", new { tipo = "Adoptadas" })" class="btn btn-outline-green me-2">
+                    <i class="fas fa-dog me-2"></i>Ver Adoptadas
+                </a>
+                <a href="@Url.Action("ContratosAdopcion", "Mascotas")" class="btn btn-outline-green">
+                    <i class="fas fa-file-contract me-2"></i>Ver Contratos
+                </a>
+            </div>
         </div>
     </div>
+</section>
 
-    <!-- Filtros de seguimiento -->
-    <div class="card shadow-sm mb-4">
-        <div class="card-header bg-light">
-            <h5 class="mb-0"><i class="fas fa-filter"></i> Filtros de Seguimiento</h5>
-        </div>
-        <div class="card-body">
-            <form method="get" action="@Url.Action("SeguimientoAdopciones")" class="row g-3">
-                <div class="col-md-3">
-                    <label class="form-label">Estado del Seguimiento:</label>
-                    <select name="estadoSeguimiento" class="form-select">
-                        <option value="">Todos los estados</option>
-                        <option value="Vencido">Vencido</option>
-                        <option value="Próximo">Próximo</option>
-                        <option value="Programado">Programado</option>
-                        <option value="Sin programar">Sin programar</option>
-                    </select>
-                </div>
-                <div class="col-md-3">
-                    <label class="form-label">Intervención:</label>
-                    <select name="intervencion" class="form-select">
-                        <option value="">Todas</option>
-                        <option value="true">Requiere Intervención</option>
-                        <option value="false">Sin Intervención</option>
-                    </select>
-                </div>
-                <div class="col-md-4">
-                    <label class="form-label">Buscar:</label>
-                    <input type="text" name="buscar" class="form-control"
-                           placeholder="Nombre mascota o adoptante..." />
-                </div>
-                <div class="col-md-2 d-flex align-items-end">
-                    <button type="submit" class="btn btn-primary w-100">
-                        <i class="fas fa-search"></i> Buscar
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
+<section class="py-4 bg-beige">
+    <div class="container">
 
-    @if (Model != null && Model.Any())
-    {
-        <div class="row">
-            @foreach (var item in Model)
-            {
-                <div class="col-md-6 col-lg-4 mb-4">
-                    <div class="card shadow-sm h-100">
-                        <div class="card-header @(item.EstadoSeguimiento == "Vencido" ? "bg-danger" :
-                                                  item.EstadoSeguimiento == "Próximo" ? "bg-warning" :
-                                                  item.EstadoSeguimiento == "Programado" ? "bg-info" : "bg-secondary") text-white">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <h6 class="mb-0">
-                                    @if (item.EstadoSeguimiento == "Vencido")
-                                    {
-                                        <i class="fas fa-exclamation-triangle"></i>
-                                    }
-                                    else if (item.EstadoSeguimiento == "Próximo")
-                                    {
-                                        <i class="fas fa-clock"></i>
-                                    }
-                                    else if (item.EstadoSeguimiento == "Programado")
-                                    {
-                                        <i class="fas fa-calendar-check"></i>
-                                    }
-                                    else
-                                    {
-                                        <i class="fas fa-question-circle"></i>
-                                    }
-                                    @item.EstadoSeguimiento
-                                </h6>
-                                @if (item.RequiereIntervencion)
-                                {
-                                    <span class="badge bg-danger">
-                                        <i class="fas fa-exclamation-circle"></i> Intervención
-                                    </span>
-                                }
-                            </div>
+        <div class="filter-card mb-4">
+            <div class="filter-header bg-green text-white">
+                <i class="fas fa-filter me-2"></i> Filtros de Seguimiento
+            </div>
+            <div class="filter-body">
+                <form method="get" action="@Url.Action("SeguimientoAdopciones")" class="row g-3 align-items-end">
+                    <div class="col-md-3">
+                        <label class="form-label text-brown fw-medium">Estado</label>
+                        <select name="estadoSeguimiento" class="form-select border-green">
+                            <option value="">Todos los estados</option>
+                            <option value="Vencido">Vencido</option>
+                            <option value="Próximo">Próximo</option>
+                            <option value="Programado">Programado</option>
+                            <option value="Sin seguimientos">Sin seguimientos</option>
+                            <option value="Sin contrato">Sin contrato</option>
+                            <option value="Sin programar">Sin programar</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label text-brown fw-medium">Intervención</label>
+                        <select name="intervencion" class="form-select border-green">
+                            <option value="">Todas</option>
+                            <option value="true">Requiere Intervención</option>
+                            <option value="false">Sin Intervención</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label text-brown fw-medium">Buscar</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white border-green"><i class="fas fa-search text-green"></i></span>
+                            <input type="text" name="buscar" class="form-control border-green"
+                                   placeholder="Nombre mascota o adoptante..." />
                         </div>
-                        <div class="card-body">
-                            <h5 class="card-title text-primary">@item.Nombre</h5>
-                            <p class="card-text">
-                                <strong>Especie:</strong> @item.Especie<br />
-                                <strong>Adoptante:</strong> @item.AdoptanteNombre<br />
-                                <strong>Contrato:</strong> @item.NumeroContrato
-                            </p>
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-green w-100">
+                            <i class="fas fa-search me-2"></i> Buscar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
 
-                            <div class="mb-3">
+        @if (Model != null && Model.Any())
+        {
+            <div class="row g-4">
+                @foreach (var item in Model)
+                {
+                    string headerBg = "bg-light-gray";
+                    string headerIcon = "fa-question-circle";
+                    string headerTextColor = "text-brown";
+                    string estado = (string)item.EstadoSeguimiento;
+                    if (estado == "Vencido") { headerBg = "bg-pink"; headerIcon = "fa-exclamation-triangle"; headerTextColor = "text-brown"; }
+                    else if (estado == "Próximo") { headerBg = "bg-yellow"; headerIcon = "fa-clock"; headerTextColor = "text-brown"; }
+                    else if (estado == "Programado") { headerBg = "bg-green"; headerIcon = "fa-calendar-check"; headerTextColor = "text-white"; }
+                    else if (estado == "Sin contrato") { headerBg = "bg-secondary"; headerIcon = "fa-file-contract"; headerTextColor = "text-white"; }
+                    else if (estado == "Sin seguimientos") { headerBg = "bg-info-custom"; headerIcon = "fa-clipboard-list"; headerTextColor = "text-white"; }
+
+                    <div class="col-md-6 col-lg-4">
+                        <div class="adopcion-card h-100">
+                            <div class="adopcion-card-header @headerBg @headerTextColor">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span><i class="fas @headerIcon me-2"></i>@item.EstadoSeguimiento</span>
+                                    @if (item.RequiereIntervencion)
+                                    {
+                                        <span class="badge bg-pink text-brown">
+                                            <i class="fas fa-exclamation-circle me-1"></i> Intervención
+                                        </span>
+                                    }
+                                </div>
+                            </div>
+
+                            <div class="adopcion-card-body">
+                                <h5 class="adopcion-card-title">@item.Nombre</h5>
+                                <div class="adopcion-card-info">
+                                    <p><i class="fas fa-paw text-green me-2"></i><strong>Especie:</strong> @item.Especie @(!string.IsNullOrEmpty((string)item.Raza) ? "· " + item.Raza : "")</p>
+                                    <p><i class="fas fa-user text-green me-2"></i><strong>Adoptante:</strong> @item.AdoptanteNombre</p>
+                                    <p><i class="fas fa-file-contract text-green me-2"></i><strong>Contrato:</strong> @item.NumeroContrato</p>
+                                </div>
+
                                 @if (item.UltimoSeguimiento != null)
                                 {
-                                    <p class="mb-1">
-                                        <strong>Último seguimiento:</strong><br />
-                                        @(((DateTime)item.UltimoSeguimiento).ToString("dd/MM/yyyy"))
+                                    <p class="mb-2 small">
+                                        <i class="fas fa-calendar-check text-green me-2"></i>
+                                        <strong>Último seguimiento:</strong> @(((DateTime)item.UltimoSeguimiento).ToString("dd/MM/yyyy"))
+                                    </p>
+                                }
+                                else
+                                {
+                                    <p class="mb-2 small text-secondary">
+                                        <i class="fas fa-calendar-times me-2"></i>Sin seguimientos realizados
                                     </p>
                                 }
 
                                 @if (item.ProximoSeguimiento != null)
                                 {
-                                    var proximoSeguimiento = (DateTime)item.ProximoSeguimiento;
-                                    var hoy = DateTime.Today;
-                                    var diasRestantes = (proximoSeguimiento - hoy).Days;
-
-                                    <p class="mb-1">
-                                        <strong>Próximo seguimiento:</strong><br />
-                                        @proximoSeguimiento.ToString("dd/MM/yyyy")
+                                    var proximoSeg = (DateTime)item.ProximoSeguimiento;
+                                    var diasRestantes = (proximoSeg - DateTime.Today).Days;
+                                    <p class="mb-1 small">
+                                        <i class="fas fa-calendar-alt text-green me-2"></i>
+                                        <strong>Próximo:</strong> @proximoSeg.ToString("dd/MM/yyyy")
                                     </p>
-                                    <div class="progress mb-2">
-                                        <div class="progress-bar @(diasRestantes <= 0 ? "bg-danger" : diasRestantes <= 7 ? "bg-warning" : "bg-success")"
+                                    <div class="progress mb-2" style="height: 18px;">
+                                        <div class="progress-bar @(diasRestantes <= 0 ? "bg-pink" : diasRestantes <= 7 ? "bg-yellow" : "bg-green")"
                                              role="progressbar"
-                                             style="width: @(Math.Min(100, Math.Max(0, (30 - diasRestantes) * 100 / 30)))%">
+                                             style="width: @(Math.Min(100, Math.Max(5, (30 - diasRestantes) * 100 / 30)))%">
                                             @if (diasRestantes <= 0)
                                             {
-                                                <span>Vencido hace @(-diasRestantes) días</span>
+                                                <small class="text-brown fw-medium">Vencido hace @(-diasRestantes) días</small>
                                             }
                                             else
                                             {
-                                                <span>@diasRestantes días restantes</span>
+                                                <small>@diasRestantes días restantes</small>
                                             }
                                         </div>
                                     </div>
                                 }
                             </div>
+
+                            <div class="adopcion-card-footer">
+                                <div class="d-flex flex-wrap gap-2">
+                                    @if ((bool)item.TieneContrato)
+                                    {
+                                        <a href="@Url.Action("SeguimientoMascota", "Mascotas", new { id = item.MascotaId })"
+                                           class="btn btn-outline-green btn-sm flex-grow-1">
+                                            <i class="fas fa-eye me-1"></i> Ver Seguimientos
+                                        </a>
+                                    }
+
+                                    @if (!(bool)item.TieneContrato)
+                                    {
+                                        <a href="@Url.Action("CrearSeguimientoManual", "Mascotas", new { mascotaId = item.MascotaId })"
+                                           class="btn btn-yellow btn-sm flex-grow-1"
+                                           title="Crear seguimiento (generará contrato automáticamente)">
+                                            <i class="fas fa-plus me-1"></i> Iniciar Seguimiento
+                                        </a>
+                                    }
+                                    else if (!(bool)item.TieneSeguimientos)
+                                    {
+                                        <a href="@Url.Action("CrearSeguimientosAutomaticos", "Mascotas", new { contratoId = item.ContratoId })"
+                                           class="btn btn-green btn-sm flex-grow-1"
+                                           onclick="return confirm('¿Crear seguimientos automáticos para esta adopción?')">
+                                            <i class="fas fa-magic me-1"></i> Crear Seguimientos
+                                        </a>
+                                    }
+                                    else if (estado == "Vencido" || estado == "Próximo")
+                                    {
+                                        <a href="@Url.Action("CrearSeguimientoManual", "Mascotas", new { mascotaId = item.MascotaId })"
+                                           class="btn btn-yellow btn-sm flex-grow-1">
+                                            <i class="fas fa-plus me-1"></i> Registrar
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <a href="@Url.Action("CrearSeguimientoManual", "Mascotas", new { mascotaId = item.MascotaId })"
+                                           class="btn btn-outline-green btn-sm flex-grow-1">
+                                            <i class="fas fa-plus me-1"></i> Nuevo
+                                        </a>
+                                    }
+                                </div>
+                            </div>
                         </div>
-                        <div class="card-footer bg-transparent border-top-0">
-                            <div class="d-grid gap-2">
-                                <a href="@Url.Action("SeguimientoMascota", "Mascotas", new { id = item.MascotaId })"
-                                   class="btn btn-primary btn-sm">
-                                    <i class="fas fa-eye"></i> Ver Seguimientos
-                                </a>
-                                @if (item.ProximoSeguimiento != null && ((DateTime)item.ProximoSeguimiento) <= DateTime.Today)
-                                {
-                                    <a href="@Url.Action("CrearSeguimientoManual", "Mascotas", new { mascotaId = item.MascotaId })"
-                                       class="btn btn-warning btn-sm">
-                                        <i class="fas fa-plus"></i> Registrar Seguimiento
-                                    </a>
-                                }
+                    </div>
+                }
+            </div>
+
+            <div class="row g-3 mt-5">
+                <div class="col-6 col-md-3">
+                    <div class="stat-card">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0 me-3"><i class="fas fa-dog fa-2x text-green"></i></div>
+                            <div>
+                                <div class="text-xs text-uppercase fw-bold text-green">Total</div>
+                                <div class="h3 mb-0 fw-bold text-brown">@Model.Count()</div>
                             </div>
                         </div>
                     </div>
                 </div>
-            }
-        </div>
-    }
-    else
-    {
-        <div class="text-center py-5">
-            <i class="fas fa-clipboard-check fa-4x text-muted mb-3"></i>
-            <h4 class="text-muted">No hay seguimientos pendientes</h4>
-            <p class="text-muted">Todas las adopciones están al día con sus seguimientos.</p>
-            <a href="@Url.Action("Listado", "Mascotas", new { tipo = "Adoptadas" })"
-               class="btn btn-primary mt-3">
-                <i class="fas fa-dog"></i> Ver Mascotas Adoptadas
-            </a>
-        </div>
-    }
+                <div class="col-6 col-md-3">
+                    <div class="stat-card">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0 me-3"><i class="fas fa-clock fa-2x text-yellow"></i></div>
+                            <div>
+                                <div class="text-xs text-uppercase fw-bold text-green">Pendientes</div>
+                                <div class="h3 mb-0 fw-bold text-brown">
+                                    @Model.Count(m => (string)m.EstadoSeguimiento == "Próximo" || (string)m.EstadoSeguimiento == "Vencido")
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="stat-card">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0 me-3"><i class="fas fa-exclamation-triangle fa-2x text-pink"></i></div>
+                            <div>
+                                <div class="text-xs text-uppercase fw-bold text-green">Intervención</div>
+                                <div class="h3 mb-0 fw-bold text-brown">@Model.Count(m => (bool)m.RequiereIntervencion)</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="stat-card">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0 me-3"><i class="fas fa-clipboard-list fa-2x text-secondary"></i></div>
+                            <div>
+                                <div class="text-xs text-uppercase fw-bold text-green">Sin iniciar</div>
+                                <div class="h3 mb-0 fw-bold text-brown">
+                                    @Model.Count(m => (string)m.EstadoSeguimiento == "Sin seguimientos" || (string)m.EstadoSeguimiento == "Sin contrato")
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="empty-state text-center py-5">
+                <i class="fas fa-clipboard-check fa-4x text-green mb-3"></i>
+                <h4 class="text-brown">No hay mascotas adoptadas registradas</h4>
+                <p class="text-secondary mb-3">Las mascotas adoptadas aparecerán aquí para hacer seguimiento.</p>
+                <a href="@Url.Action("Listado", "Mascotas", new { tipo = "Adoptadas" })" class="btn btn-green mt-2">
+                    <i class="fas fa-dog me-2"></i> Ver Mascotas Adoptadas
+                </a>
+            </div>
+        }
+    </div>
+</section>
 
-    <!-- Resumen estadístico -->
-    @if (Model != null && Model.Any())
-    {
-        <div class="row mt-4">
-            <div class="col-md-3">
-                <div class="card border-primary">
-                    <div class="card-body text-center">
-                        <h3 class="text-primary">@Model.Count()</h3>
-                        <p class="text-muted mb-0">Total adopciones</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="card border-warning">
-                    <div class="card-body text-center">
-                        <h3 class="text-warning">@Model.Count(m => m.EstadoSeguimiento == "Próximo" || m.EstadoSeguimiento == "Vencido")</h3>
-                        <p class="text-muted mb-0">Seguimientos pendientes</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="card border-danger">
-                    <div class="card-body text-center">
-                        <h3 class="text-danger">@Model.Count(m => m.RequiereIntervencion)</h3>
-                        <p class="text-muted mb-0">Requieren intervención</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="card border-success">
-                    <div class="card-body text-center">
-                        <h3 class="text-success">@Model.Count(m => m.EstadoSeguimiento == "Programado")</h3>
-                        <p class="text-muted mb-0">Programados</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    }
-</div>
+@section Styles {
+    <style>
+        .seguimiento-hero {
+            background-color: var(--fondo-beige);
+            border-radius: 0 0 30px 30px;
+            margin-bottom: 1rem;
+        }
+
+        .filter-card {
+            background: white;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 15px 35px rgba(151,199,139,0.15);
+        }
+
+        .filter-header {
+            padding: 1rem 1.5rem;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .filter-body {
+            padding: 1.5rem;
+        }
+
+        .adopcion-card {
+            background: white;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 8px 20px rgba(151,199,139,0.15);
+            transition: transform 0.3s, box-shadow 0.3s;
+            display: flex;
+            flex-direction: column;
+        }
+
+            .adopcion-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 15px 30px rgba(151,199,139,0.25);
+            }
+
+        .adopcion-card-header {
+            padding: 0.8rem 1.2rem;
+            font-weight: 600;
+        }
+
+        .adopcion-card-body {
+            padding: 1.2rem 1.5rem;
+            flex: 1;
+        }
+
+        .adopcion-card-title {
+            font-size: 1.2rem;
+            color: var(--texto-oscuro);
+            margin-bottom: 0.8rem;
+            font-weight: 600;
+        }
+
+        .adopcion-card-info p {
+            margin-bottom: 0.4rem;
+            color: #555;
+            font-size: 0.9rem;
+        }
+
+        .adopcion-card-footer {
+            padding: 1rem 1.5rem;
+            border-top: 2px solid var(--verde-menta);
+            background-color: #F2E9D8;
+        }
+
+        .bg-pink {
+            background-color: var(--rosa-pastel) !important;
+        }
+
+        .bg-yellow {
+            background-color: var(--amarillo-suave) !important;
+        }
+
+        .bg-green {
+            background-color: var(--verde-menta) !important;
+        }
+
+        .bg-info-custom {
+            background-color: #17a2b8 !important;
+        }
+
+        .bg-light-gray {
+            background-color: #e9ecef !important;
+        }
+
+        .bg-secondary {
+            background-color: #6c757d !important;
+        }
+
+        .badge.bg-pink {
+            background-color: var(--rosa-pastel) !important;
+            color: var(--texto-oscuro) !important;
+        }
+
+        .progress {
+            background-color: #F2E9D8;
+            border-radius: 30px;
+        }
+
+        .progress-bar {
+            border-radius: 30px;
+            font-size: 0.7rem;
+            line-height: 18px;
+        }
+
+            .progress-bar.bg-pink {
+                background-color: var(--rosa-pastel);
+            }
+
+            .progress-bar.bg-yellow {
+                background-color: var(--amarillo-suave);
+            }
+
+            .progress-bar.bg-green {
+                background-color: var(--verde-menta);
+            }
+
+        .stat-card {
+            background: white;
+            border-radius: 24px;
+            padding: 1.2rem;
+            box-shadow: 0 8px 20px rgba(151,199,139,0.15);
+            transition: transform 0.3s;
+        }
+
+            .stat-card:hover {
+                transform: translateY(-4px);
+            }
+
+        .text-xs {
+            font-size: 0.7rem;
+        }
+
+        .btn-green {
+            background-color: var(--verde-menta);
+            border: none;
+            border-radius: 50px;
+            padding: 0.5rem 1.5rem;
+            font-weight: 500;
+            color: white;
+            transition: all 0.3s;
+        }
+
+            .btn-green:hover {
+                background-color: #86b57a;
+                transform: translateY(-2px);
+                color: white;
+            }
+
+        .btn-yellow {
+            background-color: var(--amarillo-suave);
+            border: none;
+            border-radius: 50px;
+            padding: 0.4rem 1rem;
+            font-weight: 500;
+            color: var(--texto-oscuro);
+            transition: all 0.3s;
+        }
+
+            .btn-yellow:hover {
+                background-color: #e6b85c;
+                transform: translateY(-2px);
+            }
+
+        .btn-outline-green {
+            border: 2px solid var(--verde-menta);
+            background: transparent;
+            color: var(--verde-menta);
+            border-radius: 50px;
+            padding: 0.4rem 1rem;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+            .btn-outline-green:hover {
+                background-color: var(--verde-menta);
+                color: white;
+                transform: translateY(-2px);
+            }
+
+        .input-group-text {
+            border: 2px solid var(--verde-menta);
+            border-radius: 16px 0 0 16px;
+            background-color: white;
+        }
+
+        .form-control, .form-select {
+            border: 2px solid var(--verde-menta);
+            border-left: none;
+            border-radius: 0 16px 16px 0;
+            padding: 0.6rem 1rem;
+        }
+
+            .form-control:focus, .form-select:focus {
+                border-color: var(--verde-menta);
+                box-shadow: 0 0 0 0.2rem rgba(151,199,139,0.25);
+            }
+
+        .empty-state {
+            background: white;
+            border-radius: 24px;
+            padding: 3rem 2rem;
+            box-shadow: 0 15px 35px rgba(151,199,139,0.15);
+            border: 2px dashed var(--verde-menta);
+        }
+
+        @@media (max-width: 768px) {
+            .stat-card {
+                padding: 1rem;
+            }
+        }
+    </style>
+}
 
 @section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-        $(document).ready(function () {
-            // Inicializar tooltips
-            $('[data-bs-toggle="tooltip"]').tooltip();
+    $(document).ready(function () {
+        $('[data-bs-toggle="tooltip"]').tooltip();
 
-            // Mostrar alerta si hay seguimientos vencidos
-            var vencidos = @Model?.Count(m => m.EstadoSeguimiento == "Vencido") ?? 0;
-            if (vencidos > 0) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: '¡Atención!',
-                    html: `Tienes <strong>${vencidos}</strong> seguimiento(s) vencido(s) que requieren atención.`,
-                    confirmButtonText: 'Entendido',
-                    confirmButtonColor: '#ffc107'
-                });
-            }
-        });
+        var vencidos = @(Model != null ? Model.Count(m => (string)m.EstadoSeguimiento == "Vencido") : 0);
+        var sinIniciar = @(Model != null ? Model.Count(m => (string)m.EstadoSeguimiento == "Sin seguimientos" || (string)m.EstadoSeguimiento == "Sin contrato") : 0);
+
+        if (vencidos > 0) {
+            Swal.fire({
+                icon: 'warning',
+                title: '¡Atención!',
+                html: 'Tienes <strong>' + vencidos + '</strong> seguimiento(s) vencido(s)' +
+                      (sinIniciar > 0 ? ' y <strong>' + sinIniciar + '</strong> adopción(es) sin seguimientos iniciados.' : '.'),
+                confirmButtonText: 'Entendido',
+                confirmButtonColor: '#F2C66D'
+            });
+        } else if (sinIniciar > 0) {
+            Swal.fire({
+                icon: 'info',
+                title: 'Seguimientos pendientes',
+                html: 'Tienes <strong>' + sinIniciar + '</strong> adopción(es) sin seguimientos iniciados.',
+                confirmButtonText: 'Entendido',
+                confirmButtonColor: '#97C78B'
+            });
+        }
+    });
     </script>
 }

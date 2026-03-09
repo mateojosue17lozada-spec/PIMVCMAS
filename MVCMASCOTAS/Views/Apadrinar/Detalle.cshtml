@@ -1,367 +1,509 @@
 ﻿@model MVCMASCOTAS.Models.ViewModels.ApadrinamientoDetalleViewModel
 
 @{
-    ViewBag.Title = "Detalle del Apadrinamiento";
+    ViewBag.Title = "Detalle del Apadrinamiento - ADOPTAMANÍA";
     ViewData["Title"] = "Detalle del Apadrinamiento";
 }
 
-<!-- Contenido principal -->
-<div class="container body-content mt-4">
-    <div class="row">
-        <div class="col-md-4">
-            <!-- Información de la mascota -->
-            <div class="card shadow-hover border-green mb-4">
-                <div class="card-header bg-green text-white">
-                    <h5 class="mb-0"><i class="fa fa-paw me-2"></i> Mascota Apadrinada</h5>
-                </div>
-                <div class="card-body bg-light-mint text-center">
-                    @if (Model.MascotaImagen != null && Model.MascotaImagen.Length > 0)
-                    {
-                        <div class="card-img-top">
-                            <img src="data:image/jpeg;base64,@Convert.ToBase64String(Model.MascotaImagen)"
-                                 class="img-fluid rounded mb-3"
-                                 style="max-height: 200px; width: 100%; object-fit: cover;"
-                                 alt="@Model.MascotaNombre">
-                        </div>
-                    }
-                    else
-                    {
-                        <div class="card-img-top">
-                            <img src="~/Content/images/no-image.png"
-                                 class="img-fluid rounded mb-3"
-                                 style="max-height: 200px; width: 100%; object-fit: cover;"
-                                 alt="Sin imagen">
-                        </div>
-                    }
-
-                    <h4 class="text-brown">@Model.MascotaNombre</h4>
-                    <p class="text-secondary">@Model.MascotaEspecie</p>
-
-                    <div class="text-left">
-                        <p>
-                            <i class="fa fa-heart me-2 text-green"></i> <strong class="text-brown">Estado:</strong>
-                            <span class="badge @(Model.Estado == "Activo" ? "bg-green" :
-                                                 Model.Estado == "Pausado" ? "bg-yellow" :
-                                                 "bg-secondary")">
-                                @Model.Estado
-                            </span>
-                        </p>
-
-                        <p>
-                            <i class="fa fa-calendar-alt me-2 text-green"></i> <strong class="text-brown">Inicio:</strong>
-                            @Model.FechaInicio.ToString("dd/MM/yyyy")
-                        </p>
-
-                        @if (Model.FechaFin.HasValue)
-                        {
-                            <p>
-                                <i class="fa fa-calendar-times me-2 text-green"></i> <strong class="text-brown">Fin:</strong>
-                                @Model.FechaFin.Value.ToString("dd/MM/yyyy")
-                            </p>
-                        }
-                    </div>
-                </div>
+<!-- Hero Section -->
+<section class="detalle-hero py-4">
+    <div class="container">
+        <div class="d-flex flex-wrap justify-content-between align-items-center">
+            <div>
+                <h1 class="h2 text-brown mb-1">
+                    <i class="fas fa-paw text-green me-2"></i>Detalle del Apadrinamiento
+                </h1>
+                <p class="text-secondary mb-0">Información detallada de tu apadrinamiento</p>
             </div>
-
-            <!-- Acciones -->
-            <div class="card shadow-hover border-green">
-                <div class="card-header bg-info text-white">
-                    <h5 class="mb-0"><i class="fa fa-cogs me-2"></i> Acciones</h5>
-                </div>
-                <div class="card-body bg-light-mint">
-                    @if (Model.Estado == "Activo")
-                    {
-                        using (Html.BeginForm("Pausar", "Apadrinar", new { id = Model.ApadrinamientoId }, FormMethod.Post))
-                        {
-                            @Html.AntiForgeryToken()
-                            <button type="submit" class="btn btn-yellow btn-block mb-2">
-                                <i class="fa fa-pause me-2"></i> Pausar Apadrinamiento
-                            </button>
-                        }
-                    }
-                    else if (Model.Estado == "Pausado")
-                    {
-                        using (Html.BeginForm("Reactivar", "Apadrinar", new { id = Model.ApadrinamientoId }, FormMethod.Post))
-                        {
-                            @Html.AntiForgeryToken()
-                            <button type="submit" class="btn btn-green btn-block mb-2">
-                                <i class="fa fa-play me-2"></i> Reactivar Apadrinamiento
-                            </button>
-                        }
-                    }
-
-                    @if (Model.Estado == "Activo" || Model.Estado == "Pausado")
-                    {
-                        using (Html.BeginForm("Cancelar", "Apadrinar", new { id = Model.ApadrinamientoId }, FormMethod.Post))
-                        {
-                            @Html.AntiForgeryToken()
-                            <button type="submit" class="btn btn-outline-green btn-block"
-                                    onclick="return confirmCancelarApadrinamiento()">
-                                <i class="fa fa-times-circle me-2"></i> Cancelar Apadrinamiento
-                            </button>
-                        }
-                    }
-
-                    <a href="@Url.Action("MisApadrinamientos", "Apadrinar")" class="btn btn-outline-green btn-block mt-3">
-                        <i class="fa fa-arrow-left me-2"></i> Volver a la lista
-                    </a>
-                </div>
+            <div class="mt-2 mt-sm-0">
+                <a href="@Url.Action("MisApadrinamientos", "Apadrinar")" class="btn btn-outline-green">
+                    <i class="fas fa-arrow-left me-2"></i>Volver a la lista
+                </a>
             </div>
         </div>
+    </div>
+</section>
 
-        <div class="col-md-8">
-            <!-- Información del apadrinamiento -->
-            <div class="card shadow-hover border-green mb-4">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0"><i class="fa fa-info-circle me-2"></i> Detalles del Apadrinamiento</h5>
-                </div>
-                <div class="card-body bg-light-mint">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <p>
-                                <i class="fa fa-dollar-sign me-2 text-green"></i> <strong class="text-brown">Monto Mensual:</strong>
-                                <span class="h5 text-green">$@Model.MontoMensual.ToString("N2")</span>
-                            </p>
-                        </div>
-                        <div class="col-md-6">
-                            <p>
-                                <i class="fa fa-credit-card me-2 text-info"></i> <strong class="text-brown">Método de Pago:</strong>
-                                @Model.MetodoPagoPreferido
-                            </p>
-                        </div>
+<!-- Main Content -->
+<section class="py-4 bg-beige">
+    <div class="container">
+        <div class="row g-4">
+            <!-- Columna izquierda (mascota + acciones) -->
+            <div class="col-md-4">
+                <!-- Tarjeta de la mascota -->
+                <div class="pet-card mb-4">
+                    <div class="pet-card-header bg-green text-white">
+                        <i class="fas fa-paw me-2"></i>Mascota Apadrinada
                     </div>
-
-                    <div class="row">
-                        <div class="col-md-6">
-                            <p>
-                                <i class="fa fa-calendar-day me-2 text-yellow"></i> <strong class="text-brown">Día de Cobro:</strong>
-                                Día @Model.DiaCobroMensual de cada mes
-                            </p>
-                        </div>
-                        <div class="col-md-6">
-                            <p>
-                                <i class="fa fa-hand-holding-usd me-2 text-green"></i> <strong class="text-brown">Total Contribuido:</strong>
-                                <span class="h5 text-green">$@Model.TotalContribuido.ToString("N2")</span>
-                            </p>
-                        </div>
-                    </div>
-
-                    @if (!string.IsNullOrEmpty(Model.Observaciones))
-                    {
-                        <div class="mt-3">
-                            <h6 class="text-brown"><i class="fa fa-sticky-note me-2"></i> Observaciones:</h6>
-                            <div class="alert-green p-3 rounded">
-                                @Html.Raw(Model.Observaciones.Replace("\n", "<br/>"))
+                    <div class="pet-card-body text-center">
+                        @if (Model.MascotaImagen != null && Model.MascotaImagen.Length > 0)
+                        {
+                            <div class="pet-img-wrapper mb-3">
+                                <img src="data:image/jpeg;base64,@Convert.ToBase64String(Model.MascotaImagen)"
+                                     class="pet-img rounded-circle border-green"
+                                     alt="@Model.MascotaNombre">
                             </div>
+                        }
+                        else
+                        {
+                            <div class="pet-img-placeholder rounded-circle border-green mx-auto mb-3">
+                                <i class="fas fa-paw fa-4x text-green"></i>
+                            </div>
+                        }
+
+                        <h4 class="text-brown mb-1">@Model.MascotaNombre</h4>
+                        <p class="text-secondary mb-3">@Model.MascotaEspecie</p>
+
+                        <div class="pet-info text-start">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span><i class="fas fa-heart text-green me-2"></i> <strong class="text-brown">Estado:</strong></span>
+                                <span class="badge @(Model.Estado == "Activo" ? "bg-green text-white" :
+                                                     Model.Estado == "Pausado" ? "bg-yellow text-brown" :
+                                                     "bg-secondary text-white") px-3 py-2">
+                                    @Model.Estado
+                                </span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span><i class="fas fa-calendar-alt text-green me-2"></i> <strong class="text-brown">Inicio:</strong></span>
+                                <span class="text-brown">@Model.FechaInicio.ToString("dd/MM/yyyy")</span>
+                            </div>
+                            @if (Model.FechaFin.HasValue)
+                            {
+                                <div class="d-flex justify-content-between">
+                                    <span><i class="fas fa-calendar-times text-green me-2"></i> <strong class="text-brown">Fin:</strong></span>
+                                    <span class="text-brown">@Model.FechaFin.Value.ToString("dd/MM/yyyy")</span>
+                                </div>
+                            }
                         </div>
-                    }
+                    </div>
+                </div>
+
+                <!-- Tarjeta de acciones -->
+                <div class="action-card">
+                    <div class="action-card-header bg-info text-white">
+                        <i class="fas fa-cogs me-2"></i>Acciones
+                    </div>
+                    <div class="action-card-body">
+                        @if (Model.Estado == "Activo")
+                        {
+                            using (Html.BeginForm("Pausar", "Apadrinar", new { id = Model.ApadrinamientoId }, FormMethod.Post))
+                            {
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-yellow w-100 mb-2">
+                                    <i class="fas fa-pause me-2"></i> Pausar Apadrinamiento
+                                </button>
+                            }
+                        }
+                        else if (Model.Estado == "Pausado")
+                        {
+                            using (Html.BeginForm("Reactivar", "Apadrinar", new { id = Model.ApadrinamientoId }, FormMethod.Post))
+                            {
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-green w-100 mb-2">
+                                    <i class="fas fa-play me-2"></i> Reactivar Apadrinamiento
+                                </button>
+                            }
+                        }
+
+                        @if (Model.Estado == "Activo" || Model.Estado == "Pausado")
+                        {
+                            using (Html.BeginForm("Cancelar", "Apadrinar", new { id = Model.ApadrinamientoId }, FormMethod.Post))
+                            {
+                                @Html.AntiForgeryToken()
+                                <button type="button" class="btn btn-outline-pink w-100 btn-cancelar"
+                                        data-id="@Model.ApadrinamientoId">
+                                    <i class="fas fa-times-circle me-2"></i> Cancelar Apadrinamiento
+                                </button>
+                            }
+                        }
+
+                        <a href="@Url.Action("MisApadrinamientos", "Apadrinar")" class="btn btn-outline-green w-100 mt-3">
+                            <i class="fas fa-arrow-left me-2"></i> Volver a la lista
+                        </a>
+                    </div>
                 </div>
             </div>
 
-            <!-- Historial de pagos -->
-            <div class="card shadow-hover border-green">
-                <div class="card-header bg-success text-white">
-                    <h5 class="mb-0"><i class="fa fa-history me-2"></i> Historial de Pagos</h5>
+            <!-- Columna derecha (detalles, pagos, info) -->
+            <div class="col-md-8">
+                <!-- Tarjeta de detalles -->
+                <div class="info-card mb-4">
+                    <div class="info-card-header bg-primary text-white">
+                        <i class="fas fa-info-circle me-2"></i>Detalles del Apadrinamiento
+                    </div>
+                    <div class="info-card-body">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-dollar-sign text-green fa-lg me-3"></i>
+                                    <div>
+                                        <span class="text-brown fw-medium">Monto Mensual</span>
+                                        <div class="h5 text-green mb-0">$@Model.MontoMensual.ToString("N2")</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-credit-card text-info fa-lg me-3"></i>
+                                    <div>
+                                        <span class="text-brown fw-medium">Método de Pago</span>
+                                        <div class="text-brown">@Model.MetodoPagoPreferido</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-calendar-day text-yellow fa-lg me-3"></i>
+                                    <div>
+                                        <span class="text-brown fw-medium">Día de Cobro</span>
+                                        <div class="text-brown">Día @Model.DiaCobroMensual de cada mes</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-hand-holding-heart text-green fa-lg me-3"></i>
+                                    <div>
+                                        <span class="text-brown fw-medium">Total Contribuido</span>
+                                        <div class="h5 text-green mb-0">$@Model.TotalContribuido.ToString("N2")</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        @if (!string.IsNullOrEmpty(Model.Observaciones))
+                        {
+                            <hr class="border-green my-3" />
+                            <div>
+                                <span class="text-brown fw-medium"><i class="fas fa-sticky-note text-green me-2"></i>Observaciones:</span>
+                                <div class="alert alert-beige border-green mt-2">
+                                    @Html.Raw(Model.Observaciones.Replace("\n", "<br/>"))
+                                </div>
+                            </div>
+                        }
+                    </div>
                 </div>
-                <div class="card-body bg-light-mint">
-                    @if (Model.Pagos != null && Model.Pagos.Any())
-                    {
-                        <div class="table-responsive">
-                            <table class="table table-hover">
-                                <thead class="thead-light">
-                                    <tr>
-                                        <th><i class="fa fa-calendar text-green me-1"></i> <span class="text-brown">Fecha</span></th>
-                                        <th><i class="fa fa-dollar-sign text-green me-1"></i> <span class="text-brown">Monto</span></th>
-                                        <th><i class="fa fa-credit-card text-green me-1"></i> <span class="text-brown">Método</span></th>
-                                        <th><i class="fa fa-tags text-green me-1"></i> <span class="text-brown">Mes Pagado</span></th>
-                                        <th><i class="fa fa-check-circle text-green me-1"></i> <span class="text-brown">Estado</span></th>
-                                        <th><i class="fa fa-receipt text-green me-1"></i> <span class="text-brown">Comprobante</span></th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach (var pago in Model.Pagos)
-                                    {
+
+                <!-- Tarjeta de historial de pagos -->
+                <div class="pagos-card mb-4">
+                    <div class="pagos-card-header bg-success text-white">
+                        <i class="fas fa-history me-2"></i>Historial de Pagos
+                    </div>
+                    <div class="pagos-card-body">
+                        @if (Model.Pagos != null && Model.Pagos.Any())
+                        {
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle">
+                                    <thead>
                                         <tr>
-                                            <td class="text-secondary">@pago.FechaPago.ToString("dd/MM/yyyy")</td>
-                                            <td class="font-weight-bold text-green">$@pago.Monto.ToString("N2")</td>
-                                            <td class="text-secondary">@pago.MetodoPago</td>
-                                            <td class="text-secondary">@pago.MesPagado</td>
-                                            <td>
-                                                <span class="badge @(pago.Estado == "Completado" ? "bg-green" :
-                                                                     pago.Estado == "Pendiente" ? "bg-yellow" :
-                                                                     "bg-danger")">
-                                                    @pago.Estado
-                                                </span>
-                                            </td>
-                                            <td>
-                                                @if (!string.IsNullOrEmpty(pago.NumeroTransaccion))
-                                                {
-                                                    <span class="badge bg-info" title="@pago.NumeroTransaccion">
-                                                        @pago.NumeroTransaccion.Substring(0, Math.Min(10, pago.NumeroTransaccion.Length))...
+                                            <th><i class="fas fa-calendar-alt text-green me-1"></i> <span class="text-brown">Fecha</span></th>
+                                            <th><i class="fas fa-dollar-sign text-green me-1"></i> <span class="text-brown">Monto</span></th>
+                                            <th><i class="fas fa-credit-card text-green me-1"></i> <span class="text-brown">Método</span></th>
+                                            <th><i class="fas fa-calendar-day text-green me-1"></i> <span class="text-brown">Mes</span></th>
+                                            <th><i class="fas fa-check-circle text-green me-1"></i> <span class="text-brown">Estado</span></th>
+                                            <th><i class="fas fa-receipt text-green me-1"></i> <span class="text-brown">Comprobante</span></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var pago in Model.Pagos)
+                                        {
+                                            <tr>
+                                                <td class="text-secondary">@pago.FechaPago.ToString("dd/MM/yyyy")</td>
+                                                <td class="fw-bold text-green">$@pago.Monto.ToString("N2")</td>
+                                                <td class="text-secondary">@pago.MetodoPago</td>
+                                                <td class="text-secondary">@pago.MesPagado</td>
+                                                <td>
+                                                    <span class="badge @(pago.Estado == "Completado" ? "bg-green text-white" :
+                                                                         pago.Estado == "Pendiente" ? "bg-yellow text-brown" :
+                                                                         "bg-pink text-brown") px-3 py-2">
+                                                        @pago.Estado
                                                     </span>
-                                                }
-                                                else
-                                                {
-                                                    <span class="text-secondary">N/A</span>
-                                                }
+                                                </td>
+                                                <td>
+                                                    @if (!string.IsNullOrEmpty(pago.NumeroTransaccion))
+                                                    {
+                                                        <span class="badge bg-info text-white px-3 py-2" title="@pago.NumeroTransaccion">
+                                                            @(pago.NumeroTransaccion.Length > 10 ? pago.NumeroTransaccion.Substring(0, 10) + "…" : pago.NumeroTransaccion)
+                                                        </span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="text-secondary">—</span>
+                                                    }
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                    <tfoot class="bg-light-mint">
+                                        <tr>
+                                            <td colspan="6" class="text-end">
+                                                <strong class="text-brown">Total pagado:</strong>
+                                                <span class="text-green fw-bold fs-5">$@Model.TotalContribuido.ToString("N2")</span>
                                             </td>
                                         </tr>
-                                    }
-                                </tbody>
-                                <tfoot class="bg-light">
-                                    <tr>
-                                        <td colspan="6" class="text-right">
-                                            <strong class="text-brown">Total pagado: <span class="text-green">$@Model.TotalContribuido.ToString("N2")</span></strong>
-                                        </td>
-                                    </tr>
-                                </tfoot>
-                            </table>
-                        </div>
-                    }
-                    else
-                    {
-                        <div class="alert-green p-4 text-center rounded">
-                            <i class="fa fa-info-circle fa-2x text-green mb-3"></i>
-                            <h5 class="text-brown">No hay pagos registrados</h5>
-                            <p class="text-secondary mb-0">Todavía no se han realizado pagos para este apadrinamiento.</p>
-                        </div>
-                    }
-                </div>
-            </div>
-
-            <!-- Información adicional -->
-            <div class="card shadow-hover border-green mt-4">
-                <div class="card-header bg-yellow text-dark">
-                    <h5 class="mb-0"><i class="fa fa-question-circle me-2"></i> Información Importante</h5>
-                </div>
-                <div class="card-body bg-light-mint">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="alert alert-light border border-green">
-                                <h6 class="text-brown"><i class="fa fa-pause-circle text-yellow me-2"></i> Pausar Apadrinamiento</h6>
-                                <p class="small text-secondary mb-0">Al pausar, se detendrán los cobros automáticos pero mantendrás todos tus beneficios.</p>
+                                    </tfoot>
+                                </table>
                             </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="alert alert-light border border-green">
-                                <h6 class="text-brown"><i class="fa fa-times-circle text-danger me-2"></i> Cancelar Apadrinamiento</h6>
-                                <p class="small text-secondary mb-0">La cancelación es permanente. Perderás acceso a los beneficios del programa.</p>
+                        }
+                        else
+                        {
+                            <div class="alert alert-beige border-green text-center py-4">
+                                <i class="fas fa-info-circle fa-3x text-green mb-3"></i>
+                                <h5 class="text-brown">No hay pagos registrados</h5>
+                                <p class="text-secondary mb-0">Todavía no se han realizado pagos para este apadrinamiento.</p>
                             </div>
-                        </div>
+                        }
                     </div>
-                    <div class="alert alert-light border border-green mt-2">
-                        <h6 class="text-brown"><i class="fa fa-phone-alt text-info me-2"></i> ¿Necesitas ayuda?</h6>
-                        <p class="small text-secondary mb-0">
-                            Contacta a nuestro equipo de soporte en <strong class="text-brown">soporte@refugiomascotas.com</strong> o llama al
-                            <strong class="text-brown">(123) 456-7890</strong> para asistencia con tu apadrinamiento.
-                        </p>
+                </div>
+
+                <!-- Tarjeta de información adicional -->
+                <div class="info-card">
+                    <div class="info-card-header bg-yellow">
+                        <i class="fas fa-question-circle me-2"></i>Información Importante
+                    </div>
+                    <div class="info-card-body">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="alert alert-beige border-green h-100">
+                                    <h6 class="text-brown"><i class="fas fa-pause-circle text-yellow me-2"></i>Pausar Apadrinamiento</h6>
+                                    <p class="small text-secondary mb-0">Al pausar, se detendrán los cobros automáticos pero mantendrás todos tus beneficios.</p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="alert alert-beige border-green h-100">
+                                    <h6 class="text-brown"><i class="fas fa-times-circle text-pink me-2"></i>Cancelar Apadrinamiento</h6>
+                                    <p class="small text-secondary mb-0">La cancelación es permanente. Perderás acceso a los beneficios del programa.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="alert alert-beige border-green mt-3">
+                            <h6 class="text-brown"><i class="fas fa-phone-alt text-info me-2"></i>¿Necesitas ayuda?</h6>
+                            <p class="small text-secondary mb-0">
+                                Contacta a nuestro equipo de soporte en <strong class="text-brown">soporte@adoptamania.ec</strong> o llama al
+                                <strong class="text-brown">(02) 245-6789</strong> para asistencia con tu apadrinamiento.
+                            </p>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
+</section>
 
 @section Styles {
     <style>
-        .thead-light th {
+        :root {
+            --green: #97C78B;
+            --yellow: #F2C66D;
+            --pink: #FBCDC0;
+            --brown: #2F2F2F;
+            --bg-light: #F2E9D8;
+            --beige: #F5E6D3;
+            --text-secondary: #555555;
+            --info: #17a2b8;
+            --primary: #007bff;
+            --success: #28a745;
+        }
+
+        body {
+            background-color: var(--beige);
+        }
+
+        /* Hero */
+        .detalle-hero {
+            background-color: var(--beige);
+            border-radius: 0 0 30px 30px;
+            margin-bottom: 1rem;
+        }
+
+        /* Tarjetas */
+        .pet-card, .action-card, .info-card, .pagos-card {
+            background: white;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 15px 35px rgba(151,199,139,0.15);
+            border: none;
+        }
+
+        .pet-card-header, .action-card-header, .info-card-header, .pagos-card-header {
+            padding: 1rem 1.5rem;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .pet-card-body, .action-card-body, .info-card-body, .pagos-card-body {
+            padding: 1.5rem;
+        }
+
+        /* Imagen de mascota */
+        .pet-img-wrapper {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 4px solid var(--green);
+            box-shadow: 0 8px 20px rgba(151,199,139,0.3);
+            margin: 0 auto;
+        }
+
+        .pet-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .pet-img-placeholder {
+            width: 180px;
+            height: 180px;
             background-color: var(--bg-light);
-            border-color: var(--green);
-            color: var(--brown);
+            border: 4px solid var(--green);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
         }
 
-        .table-hover tbody tr:hover {
-            background-color: rgba(151, 199, 139, 0.1);
+        /* Información de la mascota */
+        .pet-info {
+            background-color: var(--bg-light);
+            border-radius: 16px;
+            padding: 1rem;
         }
 
-        .table tfoot {
-            background-color: var(--bg-light) !important;
+        /* Badges */
+        .badge.bg-green {
+            background-color: var(--green) !important;
+            color: white !important;
+        }
+
+        .badge.bg-yellow {
+            background-color: var(--yellow) !important;
+            color: var(--brown) !important;
+        }
+
+        .badge.bg-pink {
+            background-color: var(--pink) !important;
+            color: var(--brown) !important;
         }
 
         .badge.bg-info {
-            background-color: #17a2b8 !important;
+            background-color: var(--info) !important;
             color: white !important;
         }
 
-        .badge.bg-danger {
-            background-color: #dc3545 !important;
-            color: white !important;
+        /* Alertas */
+        .alert-beige {
+            background-color: var(--bg-light);
+            border: 1px solid var(--green);
+            color: var(--brown);
+            border-radius: 16px;
         }
 
-        .badge.bg-primary {
-            background-color: #007bff !important;
-            color: white !important;
+        /* Botones */
+        .btn-green {
+            background-color: var(--green);
+            border: none;
+            border-radius: 50px;
+            padding: 0.6rem 1.8rem;
+            font-weight: 500;
+            transition: all 0.3s;
+            color: white;
         }
 
-        .badge.bg-success {
-            background-color: #28a745 !important;
-            color: white !important;
-        }
-
-        .card-header.bg-primary {
-            background-color: #007bff !important;
-        }
-
-        .card-header.bg-info {
-            background-color: #17a2b8 !important;
-        }
-
-        .card-header.bg-success {
-            background-color: #28a745 !important;
-        }
-
-        .card-header.bg-yellow {
-            background-color: var(--yellow) !important;
-            color: var(--brown) !important;
-        }
-
-        .alert-light {
-            background-color: white !important;
-        }
-
-        .border {
-            border: 1px solid #dee2e6 !important;
-        }
-
-        .me-1 {
-            margin-right: 0.25rem !important;
-        }
-
-        .me-2 {
-            margin-right: 0.5rem !important;
-        }
-
-        .table-responsive {
-            border-radius: 8px;
-            overflow: hidden;
-        }
-
-        .card-img-top {
-            overflow: hidden;
-        }
-
-            .card-img-top img {
-                transition: transform 0.5s ease;
-            }
-
-            .card-img-top:hover img {
-                transform: scale(1.05);
+            .btn-green:hover {
+                background-color: #86b57a;
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(151,199,139,0.4);
             }
 
         .btn-yellow {
-            background-color: var(--yellow) !important;
-            border-color: var(--yellow) !important;
-            color: var(--brown) !important;
+            background-color: var(--yellow);
+            border: none;
+            border-radius: 50px;
+            padding: 0.6rem 1.8rem;
+            font-weight: 500;
+            transition: all 0.3s;
+            color: var(--brown);
         }
 
             .btn-yellow:hover {
-                background-color: #e6b85c !important;
-                border-color: #e6b85c !important;
+                background-color: #e6b85c;
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(242,198,109,0.4);
             }
+
+        .btn-outline-green {
+            border: 2px solid var(--green);
+            background: transparent;
+            color: var(--green);
+            border-radius: 50px;
+            padding: 0.6rem 1.8rem;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+            .btn-outline-green:hover {
+                background-color: var(--green);
+                color: white;
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(151,199,139,0.3);
+            }
+
+        .btn-outline-pink {
+            border: 2px solid var(--pink);
+            background: transparent;
+            color: var(--pink);
+            border-radius: 50px;
+            padding: 0.6rem 1.8rem;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+            .btn-outline-pink:hover {
+                background-color: var(--pink);
+                color: var(--brown);
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(249,194,176,0.4);
+            }
+
+        /* Tabla */
+        .table {
+            margin-bottom: 0;
+        }
+
+            .table th {
+                background-color: var(--bg-light);
+                color: var(--brown);
+                font-weight: 600;
+                border-bottom: 2px solid var(--green);
+                padding: 1rem 0.5rem;
+            }
+
+            .table td {
+                padding: 1rem 0.5rem;
+                border-bottom: 1px solid var(--bg-light);
+            }
+
+            .table tfoot {
+                background-color: var(--bg-light);
+            }
+
+        /* Responsive */
+        @@media (max-width: 768px) {
+            .pet-img-wrapper, .pet-img-placeholder {
+                width: 140px;
+                height: 140px;
+            }
+
+                .pet-img-placeholder i {
+                    font-size: 3rem;
+                }
+        }
     </style>
 }
 
 @section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         $(document).ready(function () {
             console.log('Detalle de apadrinamiento cargado');
@@ -373,55 +515,37 @@
             setTimeout(function () {
                 $('.alert').alert('close');
             }, 5000);
-        });
 
-        // Función para confirmar cancelación con SweetAlert2
-        function confirmCancelarApadrinamiento() {
-            return new Promise((resolve) => {
+            // Confirmación para cancelar con SweetAlert2
+            $('.btn-cancelar').on('click', function (e) {
+                e.preventDefault();
+                var form = $(this).closest('form');
+                var apadrinamientoId = $(this).data('id');
+
                 Swal.fire({
                     title: '¿Cancelar apadrinamiento?',
                     html: '<div class="text-center">' +
-                        '<i class="fa fa-times-circle fa-3x text-green mb-3"></i>' +
-                        '<h5 class="text-brown">¿Estás seguro de que deseas cancelar este apadrinamiento?</h5>' +
-                        '<div class="alert alert-light border border-green text-left p-3 mt-3">' +
-                        '<p class="text-secondary small mb-1"><i class="fa fa-exclamation-triangle text-yellow me-2"></i> La cancelación es permanente</p>' +
-                        '<p class="text-secondary small mb-1"><i class="fa fa-heart-broken text-green me-2"></i> Perderás acceso a los beneficios del programa</p>' +
-                        '<p class="text-secondary small mb-0"><i class="fa fa-undo text-green me-2"></i> Esta acción no se puede deshacer</p>' +
+                        '<i class="fas fa-times-circle fa-3x text-pink mb-3"></i>' +
+                        '<h5 class="text-brown mb-3">¿Estás seguro de que deseas cancelar este apadrinamiento?</h5>' +
+                        '<div class="alert alert-beige border-green text-start p-3 mt-3">' +
+                        '<p class="text-secondary small mb-1"><i class="fas fa-exclamation-triangle text-yellow me-2"></i> La cancelación es permanente</p>' +
+                        '<p class="text-secondary small mb-1"><i class="fas fa-heart-broken text-pink me-2"></i> Perderás acceso a los beneficios del programa</p>' +
+                        '<p class="text-secondary small mb-0"><i class="fas fa-undo-alt text-green me-2"></i> Esta acción no se puede deshacer</p>' +
                         '</div>' +
                         '</div>',
                     icon: 'warning',
                     showCancelButton: true,
-                    confirmButtonColor: '#97C78B',
-                    cancelButtonColor: '#5C4B43',
-                    confirmButtonText: '<i class="fa fa-times-circle me-2"></i> Sí, cancelar',
-                    cancelButtonText: '<i class="fa fa-arrow-left me-2"></i> Volver',
+                    confirmButtonColor: '#FBCDC0',
+                    cancelButtonColor: '#97C78B',
+                    confirmButtonText: '<i class="fas fa-times-circle me-2"></i> Sí, cancelar',
+                    cancelButtonText: '<i class="fas fa-arrow-left me-2"></i> Volver',
                     reverseButtons: true
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        // Encontrar el formulario de cancelar y enviarlo
-                        var form = $('button[onclick*="confirmCancelarApadrinamiento"]').closest('form');
-                        if (form.length > 0) {
-                            // Agregar token anti-forgery si no está presente
-                            if (form.find('input[name="__RequestVerificationToken"]').length === 0) {
-                                var token = $('input[name="__RequestVerificationToken"]').val();
-                                if (token) {
-                                    form.append('<input type="hidden" name="__RequestVerificationToken" value="' + token + '">');
-                                }
-                            }
-                            form.submit();
-                        }
+                        form.submit();
                     }
                 });
             });
-
-            // Prevenir el comportamiento por defecto del botón
-            return false;
-        }
-
-        // Actualizar el onclick del botón de cancelar para usar SweetAlert2
-        $(document).on('click', 'button[onclick*="confirmCancelarApadrinamiento"]', function (e) {
-            e.preventDefault();
-            confirmCancelarApadrinamiento();
         });
     </script>
 }

@@ -1,315 +1,490 @@
 ﻿@model MVCMASCOTAS.Models.Usuarios
 @{
-    ViewBag.Title = "Detalles del Usuario";
+    ViewBag.Title = "Detalles del Usuario - ADOPTAMANÍA";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="page-header mb-4 fade-in-up">
-    <div class="d-flex justify-content-between align-items-center">
-        <div>
-            <h2 class="text-brown"><i class="fa fa-user text-green"></i> Detalles del Usuario</h2>
-            <p class="text-secondary">Información completa del usuario en el sistema</p>
-        </div>
-        <div>
-            <a href="@Url.Action("EditarUsuario", "Admin", new { id = Model.UsuarioId })"
-               class="btn btn-yellow">
-                <i class="fa fa-edit"></i> Editar
-            </a>
-            <a href="@Url.Action("Usuarios", "Admin")" class="btn btn-outline-green">
-                <i class="fa fa-arrow-left"></i> Volver
-            </a>
-        </div>
-    </div>
-</div>
-
-<div class="row">
-    <!-- Columna Izquierda - Información Personal -->
-    <div class="col-md-4">
-        <div class="card shadow-hover border-green mb-4">
-            <div class="card-header bg-green text-white">
-                <h5 class="mb-0"><i class="fa fa-id-card"></i> Perfil</h5>
+<!-- Hero Section (simple) -->
+<section class="details-hero py-4">
+    <div class="container">
+        <div class="d-flex flex-wrap justify-content-between align-items-center">
+            <div>
+                <h1 class="h2 text-brown mb-1">
+                    <i class="fas fa-user-circle text-green me-2"></i>Detalles del Usuario
+                </h1>
+                <p class="text-secondary mb-0">Información completa del usuario en el sistema</p>
             </div>
-            <div class="card-body text-center bg-light-mint">
-                <!-- Imagen de Perfil -->
-                @if (Model.ImagenPerfil != null && Model.ImagenPerfil.Length > 0)
-                {
-                    <img src="data:image/jpeg;base64,@Convert.ToBase64String(Model.ImagenPerfil)"
-                         class="rounded-circle mb-3 border-green"
-                         style="width: 200px; height: 200px; object-fit: cover;"
-                         alt="@Model.NombreCompleto" />
-                }
-                else
-                {
-                    <div class="rounded-circle bg-light-mint d-flex align-items-center justify-content-center mb-3 mx-auto border-green"
-                         style="width: 200px; height: 200px;">
-                        <i class="fa fa-user fa-5x text-secondary"></i>
-                    </div>
-                }
-
-                <h4 class="mb-2 text-brown">@Model.NombreCompleto</h4>
-                <p class="text-secondary mb-3">@Model.Email</p>
-
-                <!-- Estado -->
-                <div class="mb-3">
-                    @if (Model.Activo == true)
-                    {
-                        <span class="badge bg-green p-2 mr-1">
-                            <i class="fa fa-check-circle"></i> Activo
-                        </span>
-                    }
-                    else
-                    {
-                        <span class="badge bg-pink p-2 mr-1">
-                            <i class="fa fa-ban"></i> Inactivo
-                        </span>
-                    }
-
-                    @if (Model.EmailConfirmado == true)
-                    {
-                        <span class="badge bg-green p-2 mr-1">
-                            <i class="fa fa-envelope"></i> Email Confirmado
-                        </span>
-                    }
-
-                    @if (Model.TelefonoConfirmado == true)
-                    {
-                        <span class="badge bg-green p-2">
-                            <i class="fa fa-phone"></i> Teléfono Confirmado
-                        </span>
-                    }
-                </div>
-
-                <!-- ID del Usuario -->
-                <div class="alert alert-green border-green">
-                    <i class="fa fa-fingerprint text-green"></i> <span class="text-brown">ID: <strong>#@Model.UsuarioId</strong></span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Información de Contacto -->
-        <div class="card shadow-hover border-green mb-4">
-            <div class="card-header bg-green text-white">
-                <h5 class="mb-0"><i class="fa fa-address-book"></i> Contacto</h5>
-            </div>
-            <div class="card-body bg-light-mint">
-                <div class="mb-3">
-                    <h6 class="text-brown"><i class="fa fa-phone text-green"></i> Teléfono</h6>
-                    <p class="mb-0 text-brown">@(Model.Telefono ?? "No registrado")</p>
-                </div>
-
-                <div class="mb-3">
-                    <h6 class="text-brown"><i class="fa fa-id-card text-green"></i> Cédula</h6>
-                    <p class="mb-0 text-brown">@(Model.Cedula ?? "No registrada")</p>
-                </div>
+            <div class="mt-2 mt-sm-0">
+                <a href="@Url.Action("EditarUsuario", "Admin", new { id = Model.UsuarioId })" class="btn btn-yellow me-2">
+                    <i class="fas fa-edit me-2"></i>Editar
+                </a>
+                <a href="@Url.Action("Usuarios", "Admin")" class="btn btn-outline-green">
+                    <i class="fas fa-arrow-left me-2"></i>Volver
+                </a>
             </div>
         </div>
     </div>
+</section>
 
-    <!-- Columna Derecha - Información Detallada -->
-    <div class="col-md-8">
-        <!-- Información de Dirección -->
-        <div class="card shadow-hover border-green mb-4">
-            <div class="card-header bg-green text-white">
-                <h5 class="mb-0"><i class="fa fa-map-marker-alt"></i> Dirección</h5>
-            </div>
-            <div class="card-body bg-light-mint">
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="mb-3">
-                            <h6 class="text-brown">Dirección Completa</h6>
-                            <p class="mb-0 text-brown">@(Model.Direccion ?? "No registrada")</p>
-                        </div>
+<!-- Main Content -->
+<section class="py-4 bg-beige">
+    <div class="container">
+        <div class="row g-4">
+            <!-- Columna Izquierda - Información Personal -->
+            <div class="col-md-4">
+                <!-- Perfil -->
+                <div class="profile-card mb-4">
+                    <div class="profile-card-header bg-green text-white">
+                        <i class="fas fa-id-card me-2"></i>Perfil
                     </div>
-                    <div class="col-md-6">
-                        <div class="mb-3">
-                            <h6 class="text-brown">Ciudad</h6>
-                            <p class="mb-0 text-brown">@(Model.Ciudad ?? "No registrada")</p>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="mb-3">
-                            <h6 class="text-brown">Provincia</h6>
-                            <p class="mb-0 text-brown">@(Model.Provincia ?? "No registrada")</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Roles Asignados -->
-        <div class="card shadow-hover border-green mb-4">
-            <div class="card-header bg-yellow">
-                <h5 class="mb-0 text-brown"><i class="fa fa-user-tag"></i> Roles Asignados</h5>
-            </div>
-            <div class="card-body bg-light-mint">
-                @if (Model.UsuariosRoles != null && Model.UsuariosRoles.Any())
-                {
-                    <div class="row">
-                        @foreach (var userRole in Model.UsuariosRoles)
+                    <div class="profile-card-body text-center">
+                        @if (Model.ImagenPerfil != null && Model.ImagenPerfil.Length > 0)
                         {
-                            var role = userRole.Roles;
-                            var cardClass = role.NombreRol == "Administrador" ? "bg-pink" :
-                                           role.NombreRol == "Veterinario" ? "bg-green" :
-                                           role.NombreRol == "Voluntario" ? "bg-yellow" : "bg-light-mint";
-                            var textClass = role.NombreRol == "Administrador" ? "text-brown" :
-                                           role.NombreRol == "Veterinario" ? "text-white" :
-                                           role.NombreRol == "Voluntario" ? "text-brown" : "text-brown";
+                            <img src="data:image/jpeg;base64,@Convert.ToBase64String(Model.ImagenPerfil)"
+                                 class="profile-img rounded-circle mb-3 border-green"
+                                 alt="@Model.NombreCompleto" />
+                        }
+                        else
+                        {
+                            <div class="profile-img-placeholder rounded-circle mx-auto mb-3 border-green">
+                                <i class="fas fa-user fa-5x text-green"></i>
+                            </div>
+                        }
 
-                            <div class="col-md-4 mb-3">
-                                <div class="card border-green shadow-hover @cardClass">
-                                    <div class="card-body text-center">
-                                        <h5 class="@textClass">
-                                            <i class="fa @(role.NombreRol == "Administrador" ? "fa-user-shield" :
-                                                  role.NombreRol == "Veterinario" ? "fa-user-md" :
-                                                  role.NombreRol == "Voluntario" ? "fa-hands-helping" : "fa-user")"></i>
-                                        </h5>
-                                        <h6 class="mb-2 @textClass">@role.NombreRol</h6>
-                                        <small class="@(textClass == "text-white" ? "text-light" : "text-secondary")">
+                        <h4 class="text-brown mb-2">@Model.NombreCompleto</h4>
+                        <p class="text-secondary mb-3">@Model.Email</p>
+
+                        <!-- Badges de estado -->
+                        <div class="mb-3">
+                            @if (Model.Activo == true)
+                            {
+                                <span class="badge bg-green text-white px-3 py-2 me-1">
+                                    <i class="fas fa-check-circle me-1"></i>Activo
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-pink text-brown px-3 py-2 me-1">
+                                    <i class="fas fa-ban me-1"></i>Inactivo
+                                </span>
+                            }
+
+                            @if (Model.EmailConfirmado == true)
+                            {
+                                <span class="badge bg-green text-white px-3 py-2 me-1">
+                                    <i class="fas fa-envelope me-1"></i>Email Confirmado
+                                </span>
+                            }
+
+                            @if (Model.TelefonoConfirmado == true)
+                            {
+                                <span class="badge bg-green text-white px-3 py-2">
+                                    <i class="fas fa-phone me-1"></i>Teléfono Confirmado
+                                </span>
+                            }
+                        </div>
+
+                        <!-- ID del Usuario -->
+                        <div class="alert alert-beige border-green text-start">
+                            <i class="fas fa-fingerprint text-green me-2"></i>
+                            <span class="text-brown fw-medium">ID:</span>
+                            <span class="text-brown fw-bold">#@Model.UsuarioId</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Contacto -->
+                <div class="info-card mb-4">
+                    <div class="info-card-header bg-green text-white">
+                        <i class="fas fa-address-book me-2"></i>Contacto
+                    </div>
+                    <div class="info-card-body">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="info-icon bg-light-mint me-3">
+                                <i class="fas fa-phone text-green"></i>
+                            </div>
+                            <div>
+                                <div class="text-brown fw-medium">Teléfono</div>
+                                <div class="text-secondary">@(Model.Telefono ?? "No registrado")</div>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <div class="info-icon bg-light-mint me-3">
+                                <i class="fas fa-id-card text-green"></i>
+                            </div>
+                            <div>
+                                <div class="text-brown fw-medium">Cédula</div>
+                                <div class="text-secondary">@(Model.Cedula ?? "No registrada")</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Columna Derecha - Información Detallada -->
+            <div class="col-md-8">
+                <!-- Dirección -->
+                <div class="info-card mb-4">
+                    <div class="info-card-header bg-green text-white">
+                        <i class="fas fa-map-marker-alt me-2"></i>Dirección
+                    </div>
+                    <div class="info-card-body">
+                        <div class="mb-3">
+                            <div class="text-brown fw-medium">Dirección Completa</div>
+                            <div class="text-secondary">@(Model.Direccion ?? "No registrada")</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="text-brown fw-medium">Ciudad</div>
+                                <div class="text-secondary">@(Model.Ciudad ?? "No registrada")</div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="text-brown fw-medium">Provincia</div>
+                                <div class="text-secondary">@(Model.Provincia ?? "No registrada")</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Roles Asignados -->
+                <div class="roles-card mb-4">
+                    <div class="roles-card-header bg-yellow">
+                        <i class="fas fa-user-tag me-2"></i>Roles Asignados
+                    </div>
+                    <div class="roles-card-body">
+                        @if (Model.UsuariosRoles != null && Model.UsuariosRoles.Any())
+                        {
+                            <div class="row g-3">
+                                @foreach (var userRole in Model.UsuariosRoles)
+                                {
+                                    var role = userRole.Roles;
+                                    string bgClass = role.NombreRol switch
+                                    {
+                                        "Administrador" => "role-admin",
+                                        "Veterinario" => "role-vet",
+                                        "Voluntario" => "role-vol",
+                                        _ => "role-default"
+                                    };
+                                    <div class="col-md-4">
+                                        <div class="role-card @bgClass">
+                                            <i class="fas @(role.NombreRol switch
+                                                            {
+                                                                "Administrador" => "fa-user-shield",
+                                                                "Veterinario" => "fa-user-md",
+                                                                "Voluntario" => "fa-hands-helping",
+                                                                _ => "fa-user"
+                                                            }) fa-2x mb-2"></i>
+                                            <h6 class="fw-bold">@role.NombreRol</h6>
                                             @if (userRole.FechaAsignacion.HasValue)
                                             {
-                                                <i class="fa fa-calendar"></i>
-                                                @userRole.FechaAsignacion.Value.ToString("dd/MM/yyyy")
+                                                <small class="opacity-75">
+                                                    <i class="fas fa-calendar-alt me-1"></i>@userRole.FechaAsignacion.Value.ToString("dd/MM/yyyy")
+                                                </small>
                                             }
-                                        </small>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="alert alert-beige border-green">
+                                <i class="fas fa-exclamation-triangle text-green me-2"></i>
+                                <span class="text-brown">Este usuario no tiene roles asignados.</span>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <!-- Información del Sistema -->
+                <div class="info-card">
+                    <div class="info-card-header bg-green text-white">
+                        <i class="fas fa-cogs me-2"></i>Información del Sistema
+                    </div>
+                    <div class="info-card-body">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-calendar-plus text-green fa-lg me-3"></i>
+                                    <div>
+                                        <div class="text-brown fw-medium">Fecha de Registro</div>
+                                        <div class="text-secondary">
+                                            @if (Model.FechaRegistro.HasValue)
+                                            {
+                                                @Model.FechaRegistro.Value.ToString("dd/MM/yyyy HH:mm")
+                                            }
+                                            else
+                                            {
+                                                <span>No registrada</span>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-sign-in-alt text-green fa-lg me-3"></i>
+                                    <div>
+                                        <div class="text-brown fw-medium">Último Acceso</div>
+                                        <div class="text-secondary">
+                                            @if (Model.UltimoAcceso.HasValue)
+                                            {
+                                                @Model.UltimoAcceso.Value.ToString("dd/MM/yyyy HH:mm")
+                                            }
+                                            else
+                                            {
+                                                <span>No registrado</span>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        @if (!string.IsNullOrEmpty(Model.PasswordHash))
+                        {
+                            <div class="security-card mt-3">
+                                <h6 class="text-brown mb-3"><i class="fas fa-key text-green me-2"></i>Información de Seguridad</h6>
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <small class="text-brown d-block mb-1">Password Hash:</small>
+                                        <code class="d-block p-2 bg-beige rounded">@Model.PasswordHash</code>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <small class="text-brown d-block mb-1">Salt:</small>
+                                        <code class="d-block p-2 bg-beige rounded">@Model.Salt</code>
                                     </div>
                                 </div>
                             </div>
                         }
                     </div>
-                }
-                else
-                {
-                    <div class="alert alert-green border-green">
-                        <i class="fa fa-exclamation-triangle text-green"></i> <span class="text-brown">Este usuario no tiene roles asignados.</span>
-                    </div>
-                }
-            </div>
-        </div>
-
-        <!-- Información del Sistema -->
-        <div class="card shadow-hover border-green">
-            <div class="card-header bg-green text-white">
-                <h5 class="mb-0"><i class="fa fa-cogs"></i> Información del Sistema</h5>
-            </div>
-            <div class="card-body bg-light-mint">
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="mb-3">
-                            <h6 class="text-brown"><i class="fa fa-calendar-plus text-green"></i> Fecha de Registro</h6>
-                            <p class="mb-0 text-brown">
-                                @if (Model.FechaRegistro.HasValue)
-                                {
-                                    @Model.FechaRegistro.Value.ToString("dd/MM/yyyy HH:mm")
-                                }
-                                else
-                                {
-                                    <span class="text-secondary">No registrada</span>
-                                }
-                            </p>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="mb-3">
-                            <h6 class="text-brown"><i class="fa fa-sign-in-alt text-green"></i> Último Acceso</h6>
-                            <p class="mb-0 text-brown">
-                                @if (Model.UltimoAcceso.HasValue)
-                                {
-                                    @Model.UltimoAcceso.Value.ToString("dd/MM/yyyy HH:mm")
-                                }
-                                else
-                                {
-                                    <span class="text-secondary">No registrado</span>
-                                }
-                            </p>
-                        </div>
-                    </div>
                 </div>
+            </div>
+        </div>
 
-                <!-- Información de seguridad (Hash y Salt) -->
-                @if (!string.IsNullOrEmpty(Model.PasswordHash))
-                {
-                    <div class="alert alert-green border-green mt-3">
-                        <h6 class="text-brown"><i class="fa fa-key text-green"></i> Información de Seguridad</h6>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <small class="text-brown">Password Hash:</small><br>
-                                <code class="small text-truncate d-block text-secondary">@Model.PasswordHash</code>
-                            </div>
-                            <div class="col-md-6">
-                                <small class="text-brown">Salt:</small><br>
-                                <code class="small text-truncate d-block text-secondary">@Model.Salt</code>
-                            </div>
-                        </div>
-                    </div>
-                }
+        <!-- Botones de Acción -->
+        <div class="action-card mt-4">
+            <div class="action-card-body d-flex flex-wrap justify-content-between align-items-center">
+                <div>
+                    @if (Model.Activo == true)
+                    {
+                        <button type="button" class="btn btn-pink me-2 btn-toggle"
+                                data-id="@Model.UsuarioId"
+                                data-nombre="@Model.NombreCompleto"
+                                data-accion="Desactivar"
+                                data-actual="true">
+                            <i class="fas fa-ban me-2"></i>Desactivar Usuario
+                        </button>
+                    }
+                    else
+                    {
+                        <button type="button" class="btn btn-green me-2 btn-toggle"
+                                data-id="@Model.UsuarioId"
+                                data-nombre="@Model.NombreCompleto"
+                                data-accion="Activar"
+                                data-actual="false">
+                            <i class="fas fa-check me-2"></i>Activar Usuario
+                        </button>
+
+                        <button type="button" class="btn btn-pink me-2 btn-eliminar"
+                                data-id="@Model.UsuarioId"
+                                data-nombre="@Model.NombreCompleto">
+                            <i class="fas fa-trash me-2"></i>Eliminar Permanentemente
+                        </button>
+                    }
+                </div>
+                <div>
+                    <a href="@Url.Action("Usuarios", "Admin")" class="btn btn-outline-green">
+                        <i class="fas fa-users me-2"></i>Ver Todos los Usuarios
+                    </a>
+                </div>
             </div>
         </div>
     </div>
-</div>
+</section>
 
-<!-- Botones de Acción -->
-<div class="card shadow-hover border-green mt-4 fade-in-up">
-    <div class="card-body bg-light-mint">
-        <div class="d-flex justify-content-between">
-            <div>
-                @if (Model.Activo == true)
-                {
-                    <button type="button" class="btn btn-pink btn-toggle"
-                            data-id="@Model.UsuarioId"
-                            data-nombre="@Model.NombreCompleto"
-                            data-accion="Desactivar"
-                            data-actual="true">
-                        <i class="fa fa-ban"></i> Desactivar Usuario
-                    </button>
-                }
-                else
-                {
-                    <button type="button" class="btn btn-green btn-toggle"
-                            data-id="@Model.UsuarioId"
-                            data-nombre="@Model.NombreCompleto"
-                            data-accion="Activar"
-                            data-actual="false">
-                        <i class="fa fa-check"></i> Activar Usuario
-                    </button>
-
-                    <button type="button" class="btn btn-pink ml-2 btn-eliminar"
-                            data-id="@Model.UsuarioId"
-                            data-nombre="@Model.NombreCompleto">
-                        <i class="fa fa-trash"></i> Eliminar Permanentemente
-                    </button>
-                }
-            </div>
-
-            <div>
-                <a href="@Url.Action("Usuarios", "Admin")" class="btn btn-outline-green">
-                    <i class="fa fa-users"></i> Ver Todos los Usuarios
-                </a>
-            </div>
-        </div>
-    </div>
-</div>
+<!-- Formulario oculto para AntiForgeryToken (usado por AJAX) -->
+<form id="__AjaxAntiForgeryForm" method="post">@Html.AntiForgeryToken()</form>
 
 @section Styles {
     <style>
-        .page-header {
-            border-bottom: 2px solid var(--green);
-            padding-bottom: 1rem;
+        :root {
+            --green: #97C78B;
+            --yellow: #F2C66D;
+            --pink: #FBCDC0;
+            --brown: #2F2F2F;
+            --bg-light: #F2E9D8;
+            --beige: #F5E6D3;
+            --text-secondary: #555555;
         }
 
-        .card {
-            border-radius: 12px !important;
-            border: 2px solid var(--green) !important;
+        body {
+            background-color: var(--beige);
         }
 
-        .card-header {
-            border-radius: 10px 10px 0 0 !important;
-            padding: 1rem 1.35rem !important;
+        /* Hero */
+        .details-hero {
+            background-color: var(--beige);
+            border-radius: 0 0 30px 30px;
+            margin-bottom: 1rem;
         }
 
-        .rounded-circle.border-green {
-            border: 2px solid var(--green) !important;
+        /* Tarjetas de perfil */
+        .profile-card {
+            background: white;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 15px 35px rgba(151,199,139,0.15);
+            border: none;
         }
 
+        .profile-card-header {
+            background-color: var(--green);
+            color: white;
+            padding: 1rem 1.5rem;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .profile-card-body {
+            padding: 1.5rem;
+        }
+
+        .profile-img {
+            width: 200px;
+            height: 200px;
+            object-fit: cover;
+            border: 4px solid var(--green);
+            box-shadow: 0 8px 20px rgba(151,199,139,0.3);
+        }
+
+        .profile-img-placeholder {
+            width: 200px;
+            height: 200px;
+            background-color: var(--bg-light);
+            border: 4px solid var(--green);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        /* Tarjetas de información */
+        .info-card {
+            background: white;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 15px 35px rgba(151,199,139,0.15);
+            border: none;
+        }
+
+        .info-card-header {
+            background-color: var(--green);
+            color: white;
+            padding: 1rem 1.5rem;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .info-card-body {
+            padding: 1.5rem;
+        }
+
+        .info-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--bg-light);
+        }
+
+        /* Tarjetas de roles */
+        .roles-card {
+            background: white;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 15px 35px rgba(151,199,139,0.15);
+            border: none;
+        }
+
+        .roles-card-header {
+            background-color: var(--yellow);
+            color: var(--brown);
+            padding: 1rem 1.5rem;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .roles-card-body {
+            padding: 1.5rem;
+        }
+
+        .role-card {
+            background: var(--bg-light);
+            border-radius: 16px;
+            padding: 1.2rem 1rem;
+            text-align: center;
+            transition: transform 0.3s;
+            height: 100%;
+        }
+
+            .role-card:hover {
+                transform: translateY(-5px);
+            }
+
+        .role-admin {
+            background: linear-gradient(135deg, #f9c2b0, var(--pink));
+            color: var(--brown);
+        }
+
+        .role-vet {
+            background: linear-gradient(135deg, #86b57a, var(--green));
+            color: white;
+        }
+
+        .role-vol {
+            background: linear-gradient(135deg, #e6b85c, var(--yellow));
+            color: var(--brown);
+        }
+
+        .role-default {
+            background: var(--bg-light);
+            color: var(--brown);
+        }
+
+        /* Tarjeta de seguridad */
+        .security-card {
+            background-color: var(--bg-light);
+            border-radius: 16px;
+            padding: 1.5rem;
+            border: 1px solid var(--green);
+        }
+
+        code {
+            background-color: white;
+            border: 1px solid var(--green);
+            border-radius: 8px;
+            padding: 0.5rem;
+            font-size: 0.8rem;
+            word-break: break-all;
+        }
+
+        /* Tarjeta de acciones */
+        .action-card {
+            background: white;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 15px 35px rgba(151,199,139,0.15);
+            border: none;
+        }
+
+        .action-card-body {
+            padding: 1.5rem;
+        }
+
+        /* Badges */
         .badge.bg-green {
             background-color: var(--green) !important;
             color: white !important;
@@ -325,127 +500,120 @@
             color: var(--brown) !important;
         }
 
-        .badge.bg-light-mint {
-            background-color: var(--bg-light) !important;
-            color: var(--brown) !important;
-            border: 1px solid var(--green) !important;
+        /* Alertas */
+        .alert-beige {
+            background-color: var(--bg-light);
+            border: 1px solid var(--green);
+            color: var(--brown);
+            border-radius: 16px;
         }
 
-        /* Estilos para las tarjetas de roles */
-        .card.bg-pink {
-            background-color: var(--pink) !important;
+        /* Botones */
+        .btn-green {
+            background-color: var(--green);
+            border: none;
+            border-radius: 50px;
+            padding: 0.6rem 1.8rem;
+            font-weight: 500;
+            transition: all 0.3s;
         }
 
-        .card.bg-green {
-            background-color: var(--green) !important;
+            .btn-green:hover {
+                background-color: #86b57a;
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(151,199,139,0.4);
+            }
+
+        .btn-yellow {
+            background-color: var(--yellow);
+            border: none;
+            border-radius: 50px;
+            padding: 0.6rem 1.8rem;
+            font-weight: 500;
+            transition: all 0.3s;
+            color: var(--brown);
         }
 
-        .card.bg-yellow {
-            background-color: var(--yellow) !important;
+            .btn-yellow:hover {
+                background-color: #e6b85c;
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(242,198,109,0.4);
+            }
+
+        .btn-pink {
+            background-color: var(--pink);
+            border: none;
+            border-radius: 50px;
+            padding: 0.6rem 1.8rem;
+            font-weight: 500;
+            transition: all 0.3s;
+            color: var(--brown);
         }
 
-        .card.bg-light-mint {
-            background-color: var(--bg-light) !important;
+            .btn-pink:hover {
+                background-color: #f9c2b0;
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(249,194,176,0.4);
+            }
+
+        .btn-outline-green {
+            border: 2px solid var(--green);
+            background: transparent;
+            color: var(--green);
+            border-radius: 50px;
+            padding: 0.6rem 1.8rem;
+            font-weight: 500;
+            transition: all 0.3s;
         }
 
-        /* Animaciones */
-        .fade-in-up {
-            animation: fadeInUp 0.6s ease-out;
-        }
-
-        /* Código de seguridad */
-        code {
-            background-color: rgba(151, 199, 139, 0.1);
-            padding: 5px 10px;
-            border-radius: 4px;
-            border: 1px solid rgba(151, 199, 139, 0.3);
-            font-family: 'Courier New', monospace;
-        }
+            .btn-outline-green:hover {
+                background-color: var(--green);
+                color: white;
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(151,199,139,0.3);
+            }
 
         /* Responsive */
         @@media (max-width: 768px) {
-            .page-header .d-flex {
+            .profile-img, .profile-img-placeholder {
+                width: 150px;
+                height: 150px;
+            }
+
+                .profile-img-placeholder i {
+                    font-size: 3rem;
+                }
+
+            .action-card-body {
                 flex-direction: column;
-                align-items: flex-start !important;
+                gap: 1rem;
             }
 
-                .page-header .d-flex > div {
-                    margin-bottom: 10px;
+                .action-card-body .btn {
                     width: 100%;
+                    margin: 0 !important;
                 }
-
-                .page-header .d-flex .btn {
-                    width: 100%;
-                    margin-bottom: 5px;
-                }
-
-            .card-body .row .col-md-6,
-            .card-body .row .col-md-4 {
-                margin-bottom: 15px;
-            }
-
-            .rounded-circle {
-                width: 150px !important;
-                height: 150px !important;
-            }
-
-            .card-footer .btn {
-                width: 100%;
-                margin-bottom: 10px;
-            }
-        }
-
-        @@media (max-width: 576px) {
-            .d-flex.justify-content-between {
-                flex-direction: column !important;
-            }
-
-                .d-flex.justify-content-between > div {
-                    width: 100% !important;
-                    margin-bottom: 15px;
-                }
-
-                .d-flex.justify-content-between .btn {
-                    width: 100% !important;
-                    margin-bottom: 10px !important;
-                }
-
-            .col-md-4, .col-md-8 {
-                padding-left: 15px !important;
-                padding-right: 15px !important;
-            }
-        }
-
-        /* Efectos hover */
-        .shadow-hover:hover {
-            transform: translateY(-3px);
-            border-color: var(--green) !important;
-        }
-
-        /* Estilo para las alertas de seguridad */
-        .alert-green code {
-            background-color: rgba(255, 255, 255, 0.1);
-            border-color: rgba(255, 255, 255, 0.2);
         }
     </style>
 }
 
 @section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         $(document).ready(function () {
             console.log('Vista Detalles de Usuario cargada');
 
-            // Efecto hover en tarjetas
-            $('.shadow-hover').hover(
-                function () {
-                    $(this).addClass('shadow-lg');
-                },
-                function () {
-                    $(this).removeClass('shadow-lg');
-                }
-            );
+            // Obtener token AntiForgery
+            function getAntiForgeryToken() {
+                var tokenInput = $('#__AjaxAntiForgeryForm input[name="__RequestVerificationToken"]').first();
+                if (tokenInput.length > 0) return tokenInput.val();
+                tokenInput = $('input[name="__RequestVerificationToken"]').first();
+                if (tokenInput.length > 0) return tokenInput.val();
+                return null;
+            }
+            var antiForgeryToken = getAntiForgeryToken();
 
-            // Confirmación para activar/desactivar usuario con SweetAlert2
+            // Activar/Desactivar usuario con SweetAlert2
             $('.btn-toggle').click(function (e) {
                 e.preventDefault();
 
@@ -464,47 +632,31 @@
                 Swal.fire({
                     title: `¿${accion} usuario?`,
                     html: `<p class="text-brown">¿Está seguro de ${actionText} al usuario <strong>${usuarioNombre}</strong>?</p>
-                          <div class="alert alert-green border-green mt-2">
-                              <small><i class="fa fa-info-circle text-green"></i> ${infoText}</small>
+                          <div class="alert alert-beige border-green mt-2">
+                              <small><i class="fas fa-info-circle text-green"></i> ${infoText}</small>
                           </div>`,
                     icon: 'question',
                     showCancelButton: true,
                     confirmButtonColor: actionColor,
                     cancelButtonColor: '#6c757d',
-                    confirmButtonText: `<i class="fa ${actionIcon}"></i> Sí, ${actionText}`,
-                    cancelButtonText: '<i class="fa fa-times"></i> Cancelar',
-                    showClass: {
-                        popup: 'animate__animated animate__fadeInDown'
-                    },
-                    hideClass: {
-                        popup: 'animate__animated animate__fadeOutUp'
-                    }
+                    confirmButtonText: `<i class="fas ${actionIcon}"></i> Sí, ${actionText}`,
+                    cancelButtonText: '<i class="fas fa-times"></i> Cancelar'
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        // Crear formulario dinámico para enviar
-                        var form = document.createElement('form');
-                        form.method = 'POST';
-                        form.action = '@Url.Action("ToggleUsuario", "Admin")';
-
-                        var token = document.createElement('input');
-                        token.type = 'hidden';
-                        token.name = '__RequestVerificationToken';
-                        token.value = $('input[name="__RequestVerificationToken"]').val();
-
-                        var idInput = document.createElement('input');
-                        idInput.type = 'hidden';
-                        idInput.name = 'id';
-                        idInput.value = usuarioId;
-
-                        form.appendChild(token);
-                        form.appendChild(idInput);
-                        document.body.appendChild(form);
+                        var form = $('<form>', {
+                            method: 'POST',
+                            action: '@Url.Action("ToggleUsuario", "Admin")'
+                        }).append(
+                            $('<input>', { type: 'hidden', name: '__RequestVerificationToken', value: antiForgeryToken }),
+                            $('<input>', { type: 'hidden', name: 'id', value: usuarioId })
+                        );
+                        $('body').append(form);
                         form.submit();
                     }
                 });
             });
 
-            // Confirmación para eliminar usuario con SweetAlert2
+            // Eliminar usuario con SweetAlert2
             $('.btn-eliminar').click(function (e) {
                 e.preventDefault();
                 var usuarioId = $(this).data('id');
@@ -513,8 +665,8 @@
                 Swal.fire({
                     title: '¿Eliminar usuario permanentemente?',
                     html: `<p class="text-brown">¿Está absolutamente seguro de eliminar permanentemente al usuario <strong>${usuarioNombre}</strong>?</p>
-                          <div class="alert alert-green border-green mt-2">
-                              <small><i class="fa fa-exclamation-circle text-green"></i> <strong class="text-brown">ADVERTENCIA:</strong> Esta acción es irreversible</small>
+                          <div class="alert alert-beige border-green mt-2">
+                              <small><i class="fas fa-exclamation-circle text-green"></i> <strong class="text-brown">ADVERTENCIA:</strong> Esta acción es irreversible</small>
                               <ul class="mt-2 mb-0 text-secondary">
                                   <li>Se eliminarán todos los datos personales</li>
                                   <li>Se eliminarán todos los roles asignados</li>
@@ -528,14 +680,8 @@
                     showCancelButton: true,
                     confirmButtonColor: '#FBCDC0',
                     cancelButtonColor: '#97C78B',
-                    confirmButtonText: '<i class="fa fa-trash"></i> Confirmar eliminación',
-                    cancelButtonText: '<i class="fa fa-times"></i> Cancelar',
-                    showClass: {
-                        popup: 'animate__animated animate__fadeInDown'
-                    },
-                    hideClass: {
-                        popup: 'animate__animated animate__fadeOutUp'
-                    },
+                    confirmButtonText: '<i class="fas fa-trash"></i> Confirmar eliminación',
+                    cancelButtonText: '<i class="fas fa-times"></i> Cancelar',
                     preConfirm: () => {
                         const confirmText = document.getElementById('confirmDeleteInput').value;
                         if (confirmText !== 'ELIMINAR') {
@@ -546,43 +692,26 @@
                     }
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        // Crear formulario dinámico para enviar
-                        var form = document.createElement('form');
-                        form.method = 'POST';
-                        form.action = '@Url.Action("EliminarUsuario", "Admin")/' + usuarioId;
+                        var form = $('<form>', {
+                            method: 'POST',
+                            action: '@Url.Action("EliminarUsuario", "Admin")/' + usuarioId
+                        }).append(
+                            $('<input>', { type: 'hidden', name: '__RequestVerificationToken', value: antiForgeryToken })
+                        );
+                        $('body').append(form);
 
-                        var token = document.createElement('input');
-                        token.type = 'hidden';
-                        token.name = '__RequestVerificationToken';
-                        token.value = $('input[name="__RequestVerificationToken"]').val();
-
-                        form.appendChild(token);
-                        document.body.appendChild(form);
-
-                        // Mostrar loader
                         Swal.fire({
                             title: 'Eliminando usuario...',
                             text: 'Por favor espere mientras se procesa la solicitud',
                             icon: 'info',
                             showConfirmButton: false,
                             allowOutsideClick: false,
-                            allowEscapeKey: false,
-                            didOpen: () => {
-                                Swal.showLoading();
-                            }
+                            didOpen: () => Swal.showLoading()
                         });
 
-                        // Enviar formulario después de un breve delay
-                        setTimeout(() => {
-                            form.submit();
-                        }, 1000);
+                        setTimeout(() => form.submit(), 1000);
                     }
                 });
-            });
-
-            // Tooltips para badges
-            $('[title]').tooltip({
-                trigger: 'hover'
             });
 
             // Notificaciones de TempData

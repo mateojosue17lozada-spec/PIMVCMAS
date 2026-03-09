@@ -3,65 +3,88 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@ViewData["Title"] - Refugio de Mascotas</title>
-
-    <!-- Bootstrap 4.6.2 CSS Local -->
+    <title>@ViewData["Title"] - ADOPTAMANÍA</title>
     <link href="~/Content/bootstrap.min.css" rel="stylesheet" />
-    <!-- Font Awesome 4.7.0 Local -->
     <link href="~/Content/font-awesome.min.css" rel="stylesheet" />
-    <!-- Tu CSS personalizado (con las variables :root) -->
     <link href="~/Content/site.css" rel="stylesheet" />
-
-    <!-- SweetAlert2 CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
-
-    <!-- ✅ ESTILOS GLOBALES INLINE -->
+    <link href="https://fonts.googleapis.com/css2?family=Aclonica&family=Advent+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        /* PALETA DE COLORES BASADA EN SITE.CSS */
         :root {
-            --green: #97C78B;
-            --pink: #FBCDC0;
-            --yellow: #F2C66D;
-            --bg-light: #F2E9D8;
-            --brown: #5C4B43;
-            --text-main: #2F2F2F;
-            --text-secondary: #555555;
-            --fondo-claro: #F2E9D8;
+            --rosado-pastel: #D9A8A8;
+            --rosado-claro: #FBCDC0;
+            --verde-menta: #97C78B;
+            --verde-claro: #2BD800;
+            --amarillo-pastel: #F2C66D;
+            --plomo-calido: #D9D3C8;
+            --plomo-azul: #D9D9D9;
+            --texto-oscuro: #2F2F2F;
+            --texto-secundario: #555555;
+            --fondo-beige: #F5E6D3;
         }
 
-        /* CLASES DE COLORES */
+        body {
+            font-family: 'Advent Pro', sans-serif;
+            color: var(--texto-oscuro);
+            background-color: #faf7f2;
+        }
+
+        h1, h2, h3, h4, h5, h6, .navbar-brand, .display-4 {
+            font-family: 'Aclonica', sans-serif;
+            letter-spacing: 0.5px;
+        }
+
+        h1 {
+            font-size: 2.8rem;
+            font-weight: 700;
+        }
+
+        h2 {
+            font-size: 2.2rem;
+            font-weight: 600;
+        }
+
+        h3 {
+            font-size: 1.8rem;
+            font-weight: 500;
+        }
+
+        .lead {
+            font-size: 1.3rem;
+            font-weight: 400;
+        }
+
         .bg-green {
-            background-color: var(--green) !important;
+            background-color: var(--verde-menta) !important;
         }
 
         .bg-pink {
-            background-color: var(--pink) !important;
+            background-color: var(--rosado-claro) !important;
         }
 
         .bg-yellow {
-            background-color: var(--yellow) !important;
+            background-color: var(--amarillo-pastel) !important;
         }
 
-        .bg-light-mint {
-            background-color: var(--bg-light) !important;
+        .bg-beige {
+            background-color: var(--fondo-beige) !important;
         }
 
         .text-green {
-            color: var(--green) !important;
+            color: var(--verde-menta) !important;
         }
 
         .text-brown {
-            color: var(--brown) !important;
+            color: var(--texto-oscuro) !important;
         }
 
         .text-secondary {
-            color: var(--text-secondary) !important;
+            color: var(--texto-secundario) !important;
         }
 
-        /* BOTONES */
         .btn-green {
-            background-color: var(--green) !important;
-            border-color: var(--green) !important;
+            background-color: var(--verde-menta) !important;
+            border-color: var(--verde-menta) !important;
             color: white !important;
         }
 
@@ -71,9 +94,9 @@
             }
 
         .btn-pink {
-            background-color: var(--pink) !important;
-            border-color: var(--pink) !important;
-            color: var(--brown) !important;
+            background-color: var(--rosado-claro) !important;
+            border-color: var(--rosado-claro) !important;
+            color: var(--texto-oscuro) !important;
         }
 
             .btn-pink:hover {
@@ -82,9 +105,9 @@
             }
 
         .btn-yellow {
-            background-color: var(--yellow) !important;
-            border-color: var(--yellow) !important;
-            color: var(--brown) !important;
+            background-color: var(--amarillo-pastel) !important;
+            border-color: var(--amarillo-pastel) !important;
+            color: var(--texto-oscuro) !important;
         }
 
             .btn-yellow:hover {
@@ -93,73 +116,97 @@
             }
 
         .btn-outline-green {
-            color: var(--green) !important;
-            border-color: var(--green) !important;
+            color: var(--verde-menta) !important;
+            border-color: var(--verde-menta) !important;
         }
 
             .btn-outline-green:hover {
-                background-color: var(--green) !important;
+                background-color: var(--verde-menta) !important;
                 color: white !important;
             }
 
-        /* BORDES */
         .border-green {
-            border-color: var(--green) !important;
+            border-color: var(--verde-menta) !important;
         }
 
-        /* ALERTAS */
         .alert-green {
             background-color: rgba(151, 199, 139, 0.1) !important;
-            border: 1px solid var(--green) !important;
-            color: var(--brown) !important;
+            border: 1px solid var(--verde-menta) !important;
+            color: var(--texto-oscuro) !important;
         }
 
-        /* HERO SECTION */
         .hero-section {
-            background: linear-gradient(135deg, var(--bg-light) 0%, white 100%);
+            background: linear-gradient(135deg, var(--fondo-beige) 0%, white 100%);
         }
 
-        .hero-img {
-            border: 5px solid var(--green);
-            max-height: 400px;
-            object-fit: cover;
-            width: 100%;
-        }
-
-        /* CARDS */
         .shadow-hover {
             transition: all 0.3s ease;
             border: 2px solid transparent;
+            border-radius: 20px !important;
+            overflow: hidden;
         }
 
             .shadow-hover:hover {
-                transform: translateY(-5px);
-                box-shadow: 0 10px 25px rgba(151, 199, 139, 0.2) !important;
-                border-color: var(--green);
+                transform: translateY(-8px);
+                box-shadow: 0 15px 30px rgba(151, 199, 139, 0.25) !important;
+                border-color: var(--verde-menta);
             }
 
-        /* STAT BOXES */
+        .card-img-top {
+            height: 220px;
+            object-fit: cover;
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+        }
+
+        /* NUEVA DEFINICIÓN DE STAT-BOX: sin borde, con sombra, centrado */
         .stat-box {
-            padding: 25px;
-            border-radius: 12px;
-            background: white;
-            border: 2px solid var(--green);
+            background-color: white;
+            border-radius: 24px;
+            padding: 2rem 1rem;
+            box-shadow: 0 8px 20px rgba(151, 199, 139, 0.15);
             transition: all 0.3s ease;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            border: none;
         }
 
             .stat-box:hover {
-                transform: translateY(-3px);
-                box-shadow: 0 8px 20px rgba(151, 199, 139, 0.1);
+                transform: translateY(-6px);
+                box-shadow: 0 15px 30px rgba(151, 199, 139, 0.25);
             }
 
-        /* CAMPAIGN CARDS */
+            .stat-box .stat-icon {
+                margin-bottom: 1.2rem;
+                color: var(--verde-menta);
+            }
+
+            .stat-box .counter {
+                font-size: 3rem;
+                font-weight: 700;
+                line-height: 1.2;
+                margin-bottom: 0.5rem;
+                color: var(--texto-oscuro);
+            }
+
+            .stat-box p {
+                font-size: 1.1rem;
+                margin-bottom: 0;
+                color: var(--texto-secundario);
+                font-weight: 500;
+            }
+
         .campaign-img {
             height: 200px;
             background-size: cover;
             background-position: center;
             position: relative;
-            border-top-left-radius: 8px;
-            border-top-right-radius: 8px;
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
         }
 
             .campaign-img .badge {
@@ -167,57 +214,97 @@
                 top: 15px;
                 right: 15px;
                 font-size: 0.8rem;
-                padding: 5px 10px;
+                padding: 6px 12px;
+                border-radius: 30px;
+                font-weight: 600;
             }
 
-        /* BADGES */
         .badge.bg-green {
-            background-color: var(--green) !important;
+            background-color: var(--verde-menta) !important;
             color: white !important;
         }
 
         .badge.bg-pink {
-            background-color: var(--pink) !important;
-            color: var(--brown) !important;
+            background-color: var(--rosado-claro) !important;
+            color: var(--texto-oscuro) !important;
         }
 
         .badge.bg-yellow {
-            background-color: var(--yellow) !important;
-            color: var(--brown) !important;
+            background-color: var(--amarillo-pastel) !important;
+            color: var(--texto-oscuro) !important;
         }
 
-        /* TIPOGRAFÍA */
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        .navbar {
+            background-color: var(--verde-menta) !important;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            padding: 0.8rem 1rem;
         }
 
-        h1, h2, h3, h4, h5, h6 {
-            font-weight: 700;
-        }
-
-        .display-4 {
-            font-weight: 800;
-        }
-
-        /* FORZAR DROPDOWN FUNCTIONALITY */
-        .dropdown-menu {
-            animation: fadeIn 0.3s ease;
-        }
-
-        @@keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
+            .navbar .navbar-brand {
+                color: white !important;
+                font-size: 1.8rem;
+                font-weight: 700;
             }
 
-            to {
-                opacity: 1;
-                transform: translateY(0);
+                .navbar .navbar-brand i {
+                    color: white !important;
+                }
+
+            .navbar .navbar-nav .nav-link {
+                color: white !important;
+                font-weight: 500;
+                padding: 0.8rem 1.2rem !important;
+                transition: background-color 0.2s, color 0.2s;
+                border-radius: 30px;
             }
+
+                .navbar .navbar-nav .nav-link:hover,
+                .navbar .navbar-nav .nav-link:focus {
+                    background-color: rgba(255,255,255,0.2);
+                    color: white !important;
+                }
+
+            .navbar .navbar-nav .dropdown-menu {
+                background-color: white;
+                border: none;
+                border-radius: 16px;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+                margin-top: 0.5rem;
+            }
+
+            .navbar .navbar-nav .dropdown-item {
+                color: var(--texto-oscuro);
+                padding: 0.7rem 1.5rem;
+                font-weight: 400;
+                transition: background-color 0.2s;
+            }
+
+                .navbar .navbar-nav .dropdown-item:hover {
+                    background-color: var(--rosado-claro);
+                    color: var(--texto-oscuro);
+                }
+
+            .navbar .navbar-nav .dropdown-header {
+                color: var(--verde-menta);
+                font-weight: 700;
+                text-transform: uppercase;
+                font-size: 0.75rem;
+                letter-spacing: 1px;
+            }
+
+        .navbar-toggler {
+            border-color: rgba(255,255,255,0.5);
         }
 
-        /* RESPONSIVE - ✅ CON DOBLE @@ */
+        .navbar-toggler-icon {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='white' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+        }
+
         @@media (max-width: 768px) {
+            h1 {
+                font-size: 2.2rem;
+            }
+
             .display-4 {
                 font-size: 2.5rem;
             }
@@ -227,7 +314,7 @@
             }
 
             .stat-box {
-                padding: 15px;
+                padding: 1.5rem 0.5rem;
             }
 
             .campaign-img {
@@ -240,7 +327,6 @@
             }
         }
 
-        /* ANIMACIONES - ✅ CON DOBLE @@ */
         @@keyframes fadeInUp {
             from {
                 opacity: 0;
@@ -257,370 +343,138 @@
             animation: fadeInUp 0.6s ease-out;
         }
 
-        /* IMÁGENES */
-        .card-img-top {
-            overflow: hidden;
+        .hero-img {
+            border-radius: 30px;
+            box-shadow: 0 20px 30px rgba(0,0,0,0.1);
         }
 
-            .card-img-top img {
-                transition: transform 0.5s ease;
-                width: 100%;
-                height: 250px;
-                object-fit: cover;
-            }
-
-            .card-img-top:hover img {
-                transform: scale(1.05);
-            }
-
-        .text-muted {
-            color: #6c757d !important;
+        footer p {
+            color: var(--texto-secundario);
         }
     </style>
-
-    <!-- ✅ CSS específico de cada vista - SOLO UNA VEZ -->
-    @{
-        // Para manejar RenderSection sin usar el helper
-        var stylesSection = RenderSection("Styles", required: false);
-    }
+    @{ var stylesSection = RenderSection("Styles", required: false); }
     @if (stylesSection != null)
-    {
-        @stylesSection
-    }
+    {@stylesSection}
 </head>
 <body>
-    <!-- 🔐 TOKEN ANTIFALSIFICACIÓN - ¡CRÍTICO PARA AJAX! -->
     @Html.AntiForgeryToken()
-
-    <!-- Barra de navegación -->
-    <nav class="navbar navbar-expand-lg navbar-light" style="background-color: #F2E9D8;">
+    <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container">
-            <a class="navbar-brand text-brown font-weight-bold" href="/Home/Index">
-                <i class="fa fa-paw text-green"></i> Refugio Mascotas
-            </a>
-
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
-                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-
+            @Html.ActionLink(" ", "Index", "Home", null, new { @class = "navbar-brand" })
+            <a class="navbar-brand" href="/Home/Index"><i class="fa fa-paw"></i> ADOPTAMANÍA</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav mr-auto">
-                    <li class="nav-item">
-                        <a class="nav-link text-brown" href="/Home/Index">
-                            <i class="fa fa-home"></i> Inicio
-                        </a>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarMascotas" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-paw"></i> Mascotas</a>
+                        <div class="dropdown-menu" aria-labelledby="navbarMascotas">
+                            <a class="dropdown-item" href="/Mascotas/Index"><i class="fa fa-paw"></i> En Adopción</a>
+                            <a class="dropdown-item" href="/Rescate/MascotasPerdidas"><i class="fa fa-search"></i> Perdidas</a>
+                            <a class="dropdown-item" href="/Rescate/Index"><i class="fa fa-ambulance"></i> Rescates</a>
+                        </div>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-brown" href="/Mascotas/Index">
-                            <i class="fa fa-paw"></i> Mascotas
-                        </a>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarParticipa" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-heart"></i> Participa</a>
+                        <div class="dropdown-menu" aria-labelledby="navbarParticipa">
+                            <a class="dropdown-item" href="/Donaciones/Index"><i class="fa fa-donate"></i> Donaciones</a>
+                            <a class="dropdown-item" href="/Voluntariado/Index"><i class="fa fa-users"></i> Voluntariado</a>
+                            <a class="dropdown-item" href="/CampaniaAdopciones/Index"><i class="fa fa-calendar-alt"></i> Eventos</a>
+                        </div>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-brown" href="/Rescate/MascotasPerdidas">
-                            <i class="fa fa-search"></i> Mascotas Perdidas
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-brown" href="/Rescate/Index">
-                            <i class="fa fa-ambulance"></i> Rescates
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-brown" href="/Donaciones/Index">
-                            <i class="fa fa-donate"></i> Donaciones
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-brown" href="/Home/About">
-                            <i class="fa fa-info-circle"></i> Acerca de
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-brown" href="/Home/Contact">
-                            <i class="fa fa-envelope"></i> Contacto
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-brown" href="/Home/Terminos">
-                            <i class="fa fa-file-alt"></i> Términos
-                        </a>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarInfo" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-info-circle"></i> Información</a>
+                        <div class="dropdown-menu" aria-labelledby="navbarInfo">
+                            <a class="dropdown-item" href="/Home/About"><i class="fa fa-info-circle"></i> Acerca de</a>
+                            <a class="dropdown-item" href="/Home/Contact"><i class="fa fa-envelope"></i> Contacto</a>
+                            <a class="dropdown-item" href="/Home/Terminos"><i class="fa fa-file-alt"></i> Términos</a>
+                        </div>
                     </li>
                 </ul>
-
-                <!-- Menú de usuario -->
                 <ul class="navbar-nav ml-auto">
-                    <!-- Verificar autenticación usando User.Identity en lugar de ViewData -->
                     @if (User.Identity.IsAuthenticated)
                     {
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle text-brown" href="#" id="navbarDropdown" role="button"
-                               data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <i class="fa fa-user"></i> @User.Identity.Name
-                            </a>
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-user-circle"></i> @User.Identity.Name</a>
                             <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
-                                <!-- PARA TODOS LOS USUARIOS -->
-                                <a class="dropdown-item text-brown" href="/Account/MiPerfil">
-                                    <i class="fa fa-user-circle"></i> Mi Perfil
-                                </a>
-
-                                <!-- SOLO PARA ADMINISTRADOR -->
+                                <a class="dropdown-item" href="/Account/MiPerfil"><i class="fa fa-user-circle"></i> Mi Perfil</a>
                                 @if (User.IsInRole("Administrador"))
                                 {
                                     <div class="dropdown-divider"></div>
-                                    <h6 class="dropdown-header text-brown">Administración</h6>
-                                    <a class="dropdown-item text-brown" href="/Admin/Dashboard">
-                                        <i class="fa fa-tachometer-alt"></i> Panel Administrador
-                                    </a>
-                                    <a class="dropdown-item text-brown" href="/Admin/Usuarios">
-                                        <i class="fa fa-users"></i> Gestionar Usuarios
-                                    </a>
-                                    <a class="dropdown-item text-brown" href="/Admin/Roles">
-                                        <i class="fa fa-user-shield"></i> Gestionar Roles
-                                    </a>
+                                    <h6 class="dropdown-header">Administración</h6>
+                                    <a class="dropdown-item" href="/Admin/Dashboard"><i class="fa fa-tachometer-alt"></i> Panel</a>
+                                    <a class="dropdown-item" href="/Admin/Usuarios"><i class="fa fa-users"></i> Usuarios</a>
+                                    <a class="dropdown-item" href="/Admin/Roles"><i class="fa fa-user-shield"></i> Roles</a>
                                 }
-
                                 <div class="dropdown-divider"></div>
-                                <!-- ✅ CORREGIDO: Botón de logout simple para GET -->
-                                <a class="dropdown-item text-brown" href="javascript:void(0);" onclick="confirmarLogout()">
-                                    <i class="fa fa-sign-out"></i> Cerrar Sesión
-                                </a>
+                                <a class="dropdown-item" href="javascript:void(0);" onclick="confirmarLogout()"><i class="fa fa-sign-out"></i> Cerrar Sesión</a>
                             </div>
                         </li>
                     }
                     else
                     {
-                        <li class="nav-item">
-                            <a class="btn btn-outline-secondary btn-sm mr-2" href="/Account/Login">
-                                <i class="fa fa-sign-in"></i> Iniciar Sesión
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="btn btn-warning btn-sm" href="/Account/Register">
-                                <i class="fa fa-user-plus"></i> Registrarse
-                            </a>
-                        </li>
+                        <li class="nav-item"><a class="btn btn-outline-light btn-sm mr-2" href="/Account/Login"><i class="fa fa-sign-in"></i> Iniciar Sesión</a></li>
+                        <li class="nav-item"><a class="btn btn-light btn-sm" href="/Account/Register"><i class="fa fa-user-plus"></i> Registrarse</a></li>
                     }
                 </ul>
             </div>
         </div>
     </nav>
-
-    <!-- Contenido principal -->
     <div class="container body-content mt-4">
-        <!-- Mostrar mensajes de éxito/error -->
         @if (ViewData["SuccessMessage"] != null)
         {
             <div class="alert alert-green border-green alert-dismissible fade show" role="alert">
-                <i class="fa fa-check-circle text-green"></i>
-                <strong class="text-brown">@ViewData["SuccessMessage"]</strong>
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+                <i class="fa fa-check-circle text-green"></i> <strong class="text-brown">@ViewData["SuccessMessage"]</strong>
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
             </div>
         }
-
         @if (ViewData["ErrorMessage"] != null)
         {
             <div class="alert alert-green border-green alert-dismissible fade show" role="alert">
-                <i class="fa fa-exclamation-circle text-green"></i>
-                <strong class="text-brown">@ViewData["ErrorMessage"]</strong>
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+                <i class="fa fa-exclamation-circle text-green"></i> <strong class="text-brown">@ViewData["ErrorMessage"]</strong>
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
             </div>
         }
-
-        <!-- Contenido de la vista -->
-        @{
-            var body = RenderBody();
-        }
-        @if (body != null)
-        {
-            @body
-        }
-
+        @RenderBody()
         <hr class="mt-5" />
-
-        <!-- Footer -->
-        <footer class="mt-4 mb-4 text-center">
-            <p class="text-secondary">&copy; @DateTime.Now.Year - Refugio de Mascotas - Todos los derechos reservados</p>
-        </footer>
+        <footer class="mt-4 mb-4 text-center"><p class="text-secondary">&copy; @DateTime.Now.Year - ADOPTAMANÍA - Todos los derechos reservados</p></footer>
     </div>
-
-    <!-- Scripts - ORDEN CORRECTO ES IMPORTANTE -->
     <script src="~/Scripts/jquery-3.6.0.min.js"></script>
-    <!-- VERIFICACIÓN DE JQUERY -->
-    <script>
-        console.log('jQuery cargado desde Layout, versión:', typeof jQuery !== 'undefined' ? $.fn.jquery : 'NO DEFINIDO');
-    </script>
     <script src="~/Scripts/bootstrap.bundle.min.js"></script>
-
-    <!-- ✅ AGREGADO: Chart.js para gráficos del Dashboard -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
-
     <script src="~/Scripts/jquery.validate.min.js"></script>
     <script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.inputmask/5.0.8/jquery.inputmask.min.js"></script>
-    <!-- SweetAlert2 JS -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="~/Scripts/site.js"></script>
-
-    <!-- ✅ Scripts específicos de cada vista - SOLO UNA VEZ -->
-    @{
-        var scriptsSection = RenderSection("Scripts", required: false);
-    }
+    @{ var scriptsSection = RenderSection("Scripts", required: false); }
     @if (scriptsSection != null)
-    {
-        @scriptsSection
-    }
-
-    <!-- ✅ SCRIPT MEJORADO PARA LOGOUT (GET) Y FUNCIONALIDAD GENERAL -->
+    {@scriptsSection}
     <script>
-        // VERIFICAR SI TODAS LAS LIBRERÍAS ESTÁN CARGADAS
-        document.addEventListener('DOMContentLoaded', function () {
-            console.log('DOM completamente cargado');
-
-            // Verificar librerías cargadas
-            console.log('jQuery:', typeof jQuery !== 'undefined' ? 'OK v' + $.fn.jquery : 'NO CARGADO');
-            console.log('Bootstrap:', typeof bootstrap !== 'undefined' ? 'OK' : 'NO CARGADO');
-            console.log('SweetAlert2:', typeof Swal !== 'undefined' ? 'OK' : 'NO CARGADO');
-            console.log('Chart.js:', typeof Chart !== 'undefined' ? 'OK v' + Chart.version : 'NO CARGADO');
-        });
-
         $(document).ready(function () {
-            console.log('Layout loaded - jQuery ready');
-
-            // Inicializar dropdowns inmediatamente
-            $('.dropdown-toggle').dropdown();
-
-            // Inicializar tooltips y popovers
             $('[data-toggle="tooltip"]').tooltip();
             $('[data-toggle="popover"]').popover();
-
-            // Forzar que dropdowns funcionen con hover en desktop
-            if (window.innerWidth > 768) {
-                $('.dropdown').hover(
-                    function () {
-                        $(this).addClass('show');
-                        $(this).find('.dropdown-menu').addClass('show');
-                    },
-                    function () {
-                        $(this).removeClass('show');
-                        $(this).find('.dropdown-menu').removeClass('show');
-                    }
-                );
-            }
-
-            // Auto cerrar alertas después de 5 segundos
-            setTimeout(function () {
-                $('.alert').alert('close');
-            }, 5000);
-
-            // Inicializar máscaras de entrada
-            function inicializarMascaras() {
-                $('[data-mask]').each(function () {
-                    var mask = $(this).data('mask');
-                    $(this).inputmask(mask);
-                });
-            }
-            inicializarMascaras();
-
-            // Contador animado para números (si existen elementos con clase 'counter')
-            $('.counter').each(function () {
-                var $this = $(this);
-                var target = parseInt($this.text());
-                if (!isNaN(target)) {
-                    $({ countNum: 0 }).animate({
-                        countNum: target
-                    }, {
-                        duration: 2000,
-                        easing: 'swing',
-                        step: function () {
-                            $this.text(Math.floor(this.countNum));
-                        },
-                        complete: function () {
-                            $this.text(this.countNum);
-                        }
-                    });
-                }
-            });
-
-            // Efecto hover para cards con clase shadow-hover
-            $('.shadow-hover').hover(
-                function () {
-                    $(this).addClass('shadow-lg');
-                },
-                function () {
-                    $(this).removeClass('shadow-lg');
-                }
-            );
+            setTimeout(function () { $('.alert').alert('close'); }, 5000);
         });
-
-        // ✅ FUNCIÓN PARA CONFIRMAR Y EJECUTAR LOGOUT (GET SIMPLE) CON FALLBACK
         function confirmarLogout() {
-            // Verificar si SweetAlert2 está cargado
             if (typeof Swal !== 'undefined') {
                 Swal.fire({
                     title: '¿Cerrar sesión?',
-                    text: "¿Estás seguro de que deseas salir del sistema?",
+                    text: "¿Estás seguro de que deseas salir?",
                     icon: 'question',
                     showCancelButton: true,
                     confirmButtonColor: '#97C78B',
                     cancelButtonColor: '#FBCDC0',
                     confirmButtonText: 'Sí, cerrar sesión',
-                    cancelButtonText: 'Cancelar',
-                    reverseButtons: true,
-                    customClass: {
-                        confirmButton: 'btn btn-green',
-                        cancelButton: 'btn btn-pink'
-                    }
+                    cancelButtonText: 'Cancelar'
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        // Mostrar mensaje de procesamiento
-                        Swal.fire({
-                            title: 'Cerrando sesión...',
-                            text: 'Redirigiendo al inicio',
-                            allowOutsideClick: false,
-                            allowEscapeKey: false,
-                            didOpen: () => {
-                                Swal.showLoading();
-                            }
-                        });
-
-                        // Redirigir directamente a la acción Logout (GET)
-                        setTimeout(function () {
-                            window.location.href = '/Account/Logout';
-                        }, 1000);
+                        Swal.fire({ title: 'Cerrando sesión...', timer: 1000, showConfirmButton: false, didOpen: () => Swal.showLoading() });
+                        setTimeout(() => window.location.href = '/Account/Logout', 1000);
                     }
                 });
             } else {
-                // Fallback si SweetAlert2 no está cargado
-                if (confirm('¿Estás seguro de que deseas cerrar sesión?')) {
-                    // Mostrar mensaje simple
-                    var message = document.createElement('div');
-                    message.style.cssText = 'position:fixed;top:0;left:0;width:100%;background:#97C78B;color:white;padding:10px;text-align:center;z-index:9999;';
-                    message.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Cerrando sesión...';
-                    document.body.appendChild(message);
-
-                    // Redirigir después de 1 segundo
-                    setTimeout(function () {
-                        window.location.href = '/Account/Logout';
-                    }, 1000);
-                }
+                if (confirm('¿Cerrar sesión?')) window.location.href = '/Account/Logout';
             }
-        }
-
-        // FUNCIÓN DE EMERGENCIA PARA DROPDOWNS (si Bootstrap no funciona)
-        function forzarDropdown(id) {
-            var dropdown = document.getElementById(id);
-            if (dropdown) {
-                var menu = dropdown.querySelector('.dropdown-menu');
-                if (menu) {
-                    menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
-                }
-            }
-            return false;
         }
     </script>
 </body>

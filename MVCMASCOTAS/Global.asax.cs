@@ -26,6 +26,8 @@ namespace MVCMASCOTAS
 
             // Optimizar para MVC
             MvcHandler.DisableMvcResponseHeader = true;
+
+
         }
 
         protected void Application_PostAuthenticateRequest(Object sender, EventArgs e)

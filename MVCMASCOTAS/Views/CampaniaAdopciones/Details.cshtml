@@ -1,83 +1,309 @@
 ﻿@model MVCMASCOTAS.Models.CampaniaAdopcion
 
 @{
-    ViewBag.Title = "Details";
+    ViewBag.Title = "Detalles de Campaña - ADOPTAMANÍA";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>Details</h2>
+<!-- Hero Section -->
+<section class="detalle-hero py-4">
+    <div class="container">
+        <div class="d-flex flex-wrap justify-content-between align-items-center">
+            <div>
+                <h1 class="h2 text-brown mb-1">
+                    <i class="fas fa-calendar-alt text-green me-2"></i>Detalles de Campaña
+                </h1>
+                <p class="text-secondary mb-0">Información completa de la campaña de adopción</p>
+            </div>
+            <div class="mt-2 mt-sm-0">
+                <a href="@Url.Action("Edit", new { id = Model.IdCampania })" class="btn btn-yellow me-2">
+                    <i class="fas fa-edit me-2"></i>Editar
+                </a>
+                <a href="@Url.Action("Index")" class="btn btn-outline-green">
+                    <i class="fas fa-arrow-left me-2"></i>Volver a la lista
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
 
-<div>
-    <h4>CampaniaAdopcion</h4>
-    <hr />
-    <dl class="dl-horizontal">
-        <dt>
-            @Html.DisplayNameFor(model => model.NombreCampania)
-        </dt>
+<!-- Main Content -->
+<section class="py-4 bg-beige">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <div class="campania-card">
+                    <div class="campania-card-header bg-green text-white">
+                        <i class="fas fa-info-circle me-2"></i>Información de la Campaña
+                    </div>
+                    <div class="campania-card-body">
+                        <!-- Fila con imagen (si existe) -->
+                        @if (Model.Foto != null && Model.Foto.Length > 0)
+                        {
+                            <div class="text-center mb-4">
+                                <img src="data:image/jpeg;base64,@Convert.ToBase64String(Model.Foto)"
+                                     alt="Imagen de campaña"
+                                     class="img-fluid rounded-3 border-green shadow-sm"
+                                     style="max-height: 300px; object-fit: cover;" />
+                            </div>
+                        }
 
-        <dd>
-            @Html.DisplayFor(model => model.NombreCampania)
-        </dd>
+                        <div class="row g-3">
+                            <!-- Nombre -->
+                            <div class="col-md-6">
+                                <div class="detail-item">
+                                    <div class="detail-label">
+                                        <i class="fas fa-tag text-green me-2"></i>Nombre
+                                    </div>
+                                    <div class="detail-value">@Model.NombreCampania</div>
+                                </div>
+                            </div>
 
-        <dt>
-            @Html.DisplayNameFor(model => model.Lugar)
-        </dt>
+                            <!-- Lugar -->
+                            <div class="col-md-6">
+                                <div class="detail-item">
+                                    <div class="detail-label">
+                                        <i class="fas fa-map-marker-alt text-green me-2"></i>Lugar
+                                    </div>
+                                    <div class="detail-value">@Model.Lugar</div>
+                                </div>
+                            </div>
 
-        <dd>
-            @Html.DisplayFor(model => model.Lugar)
-        </dd>
+                            <!-- Fecha -->
+                            <div class="col-md-6">
+                                <div class="detail-item">
+                                    <div class="detail-label">
+                                        <i class="fas fa-calendar-alt text-green me-2"></i>Fecha
+                                    </div>
+                                    <div class="detail-value">@Model.Fecha.ToString("dd/MM/yyyy")</div>
+                                </div>
+                            </div>
 
-        <dt>
-            @Html.DisplayNameFor(model => model.Fecha)
-        </dt>
+                            <!-- Hora -->
+                            <div class="col-md-6">
+                                <div class="detail-item">
+                                    <div class="detail-label">
+                                        <i class="fas fa-clock text-green me-2"></i>Hora
+                                    </div>
+                                    <div class="detail-value">@Model.Hora</div>
+                                </div>
+                            </div>
 
-        <dd>
-            @Html.DisplayFor(model => model.Fecha)
-        </dd>
+                            <!-- Estado -->
+                            <div class="col-md-6">
+                                <div class="detail-item">
+                                    <div class="detail-label">
+                                        <i class="fas fa-toggle-on text-green me-2"></i>Estado
+                                    </div>
+                                    <div class="detail-value">
+                                        @if (Model.Estado == true)
+                                        {
+                                            <span class="badge bg-green text-white px-3 py-2">
+                                                <i class="fas fa-check-circle me-1"></i>Activa
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-pink text-brown px-3 py-2">
+                                                <i class="fas fa-times-circle me-1"></i>Inactiva
+                                            </span>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
 
-        <dt>
-            @Html.DisplayNameFor(model => model.Hora)
-        </dt>
+                            <!-- Fecha de creación (corregida) -->
+                            <div class="col-md-6">
+                                <div class="detail-item">
+                                    <div class="detail-label">
+                                        <i class="fas fa-calendar-plus text-green me-2"></i>Fecha de creación
+                                    </div>
+                                    <div class="detail-value">
+                                        @Model.FechaCreacion.ToString("dd/MM/yyyy HH:mm")
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
-        <dd>
-            @Html.DisplayFor(model => model.Hora)
-        </dd>
+                        <!-- Actividades (descripción larga) -->
+                        @if (!string.IsNullOrEmpty(Model.Actividades))
+                        {
+                            <div class="mt-4">
+                                <h6 class="text-brown mb-2">
+                                    <i class="fas fa-clipboard-list text-green me-2"></i>Actividades
+                                </h6>
+                                <div class="alert alert-beige border-green">
+                                    @Model.Actividades
+                                </div>
+                            </div>
+                        }
 
-        <dt>
-            @Html.DisplayNameFor(model => model.Actividades)
-        </dt>
+                        <!-- Botones de navegación adicionales (solo para pantalla) -->
+                        <div class="d-flex justify-content-between mt-4 pt-3 border-top border-green no-print">
+                            <a href="@Url.Action("Index")" class="btn btn-outline-green">
+                                <i class="fas fa-arrow-left me-2"></i>Volver a la lista
+                            </a>
+                            <a href="@Url.Action("Edit", new { id = Model.IdCampania })" class="btn btn-yellow">
+                                <i class="fas fa-edit me-2"></i>Editar campaña
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
 
-        <dd>
-            @Html.DisplayFor(model => model.Actividades)
-        </dd>
+@section Styles {
+    <style>
+        :root {
+            --green: #97C78B;
+            --yellow: #F2C66D;
+            --pink: #FBCDC0;
+            --brown: #2F2F2F;
+            --bg-light: #F2E9D8;
+            --beige: #F5E6D3;
+            --text-secondary: #555555;
+        }
 
-        <dt>
-            @Html.DisplayNameFor(model => model.Foto)
-        </dt>
+        body {
+            background-color: var(--beige);
+        }
 
-        <dd>
-            @Html.DisplayFor(model => model.Foto)
-        </dd>
+        /* Hero */
+        .detalle-hero {
+            background-color: var(--beige);
+            border-radius: 0 0 30px 30px;
+            margin-bottom: 1rem;
+        }
 
-        <dt>
-            @Html.DisplayNameFor(model => model.Estado)
-        </dt>
+        /* Tarjeta de campaña */
+        .campania-card {
+            background: white;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 15px 35px rgba(151,199,139,0.15);
+            border: none;
+        }
 
-        <dd>
-            @Html.DisplayFor(model => model.Estado)
-        </dd>
+        .campania-card-header {
+            padding: 1rem 1.5rem;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
 
-        <dt>
-            @Html.DisplayNameFor(model => model.FechaCreacion)
-        </dt>
+        .campania-card-body {
+            padding: 1.5rem;
+        }
 
-        <dd>
-            @Html.DisplayFor(model => model.FechaCreacion)
-        </dd>
+        /* Elementos de detalle */
+        .detail-item {
+            background-color: var(--bg-light);
+            border-radius: 16px;
+            padding: 1rem;
+            height: 100%;
+            transition: transform 0.2s;
+        }
 
-    </dl>
-</div>
-<p>
-    @Html.ActionLink("Edit", "Edit", new { id = Model.IdCampania }) |
-    @Html.ActionLink("Back to List", "Index")
-</p>
+            .detail-item:hover {
+                transform: translateY(-2px);
+            }
+
+        .detail-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.3rem;
+        }
+
+        .detail-value {
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: var(--brown);
+        }
+
+        /* Badges */
+        .badge.bg-green {
+            background-color: var(--green) !important;
+            color: white !important;
+        }
+
+        .badge.bg-pink {
+            background-color: var(--pink) !important;
+            color: var(--brown) !important;
+        }
+
+        /* Alertas */
+        .alert-beige {
+            background-color: var(--bg-light);
+            border: 1px solid var(--green);
+            color: var(--brown);
+            border-radius: 16px;
+        }
+
+        /* Botones */
+        .btn-green {
+            background-color: var(--green);
+            border: none;
+            border-radius: 50px;
+            padding: 0.6rem 1.8rem;
+            font-weight: 500;
+            transition: all 0.3s;
+            color: white;
+        }
+
+            .btn-green:hover {
+                background-color: #86b57a;
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(151,199,139,0.4);
+            }
+
+        .btn-yellow {
+            background-color: var(--yellow);
+            border: none;
+            border-radius: 50px;
+            padding: 0.6rem 1.8rem;
+            font-weight: 500;
+            transition: all 0.3s;
+            color: var(--brown);
+        }
+
+            .btn-yellow:hover {
+                background-color: #e6b85c;
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(242,198,109,0.4);
+            }
+
+        .btn-outline-green {
+            border: 2px solid var(--green);
+            background: transparent;
+            color: var(--green);
+            border-radius: 50px;
+            padding: 0.6rem 1.8rem;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+            .btn-outline-green:hover {
+                background-color: var(--green);
+                color: white;
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(151,199,139,0.3);
+            }
+
+        /* Imagen */
+        .border-green {
+            border: 2px solid var(--green);
+        }
+
+        /* Responsive */
+        @@media (max-width: 768px) {
+            .detail-item {
+                padding: 0.8rem;
+            }
+
+            .detail-value {
+                font-size: 1rem;
+            }
+        }
+    </style>
+}

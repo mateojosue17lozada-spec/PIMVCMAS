@@ -1,0 +1,41 @@
+﻿@model MVCMASCOTAS.Controllers.FormularioSimuladoController.FormularioSimuladoItem
+@{
+    ViewBag.Title = "Eliminar Formulario";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card form-card border-danger">
+                <div class="form-card-header bg-danger text-white">
+                    <i class="fas fa-exclamation-triangle me-2"></i>Confirmar eliminación
+                </div>
+                <div class="card-body">
+                    <p class="fs-5">¿Estás seguro de que deseas eliminar el formulario <strong>#@Model.Id</strong>?</p>
+                    <div class="alert alert-beige border-yellow">
+                        <p><strong>Solicitante:</strong> @Model.Solicitante</p>
+                        <p><strong>Mascota:</strong> @Model.Mascota</p>
+                        <p><strong>Fecha:</strong> @Model.FechaSolicitud.ToString("dd/MM/yyyy")</p>
+                        <p><strong>Estado:</strong> @Model.Estado</p>
+                    </div>
+                    <p class="text-secondary">Esta acción eliminará permanentemente el formulario y no se podrá recuperar.</p>
+
+                    @using (Html.BeginForm())
+                    {
+                        @Html.AntiForgeryToken()
+                        @Html.Hidden("id", Model.Id)
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-danger flex-grow-1">
+                                <i class="fas fa-trash me-2"></i>Sí, eliminar
+                            </button>
+                            <a href="@Url.Action("Index")" class="btn btn-outline-secondary flex-grow-1">
+                                <i class="fas fa-times me-2"></i>Cancelar
+                            </a>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

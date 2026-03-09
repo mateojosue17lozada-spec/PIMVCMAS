@@ -1,0 +1,43 @@
+﻿@model IEnumerable<MVCMASCOTAS.Controllers.CategoriaSimuladoController.CategoriaItem>
+
+@{
+    ViewBag.Title = "Categorías de Mascotas (Simulado)";
+}
+
+<h2>Administrar Categorías</h2>
+
+
+<div>
+    <a href="@Url.Action("Dashboard", "Admin")" class="btn btn-outline-green btn-sm">
+        <i class="fa fa-arrow-left"></i> Dashboard
+    </a>
+</div>
+
+
+<p>
+    @Html.ActionLink("Crear Nueva", "Create", null, new { @class = "btn btn-primary" })
+</p>
+
+<table class="table table-striped">
+    <tr>
+        <th>ID</th>
+        <th>Nombre</th>
+        <th>Descripción</th>
+        <th>Activo</th>
+        <th>Acciones</th>
+    </tr>
+
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>@item.Id</td>
+            <td>@item.Nombre</td>
+            <td>@item.Descripcion</td>
+            <td>@(item.Activo ? "Sí" : "No")</td>
+            <td>
+                @Html.ActionLink("Editar", "Edit", new { id = item.Id }) |
+                @Html.ActionLink("Eliminar", "Delete", new { id = item.Id })
+            </td>
+        </tr>
+    }
+</table>
