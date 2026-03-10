@@ -1,14 +1,15 @@
-﻿using System;
+﻿using MVCMASCOTAS.Helpers;
+using MVCMASCOTAS.Models;
+using MVCMASCOTAS.Models.ViewModels;
+using System;
+using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Security;
-using MVCMASCOTAS.Helpers;
-using MVCMASCOTAS.Models;
-using MVCMASCOTAS.Models.ViewModels;
-using System.Configuration;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace MVCMASCOTAS.Controllers
 {
@@ -572,7 +573,15 @@ namespace MVCMASCOTAS.Controllers
 
         #region PERFIL DE USUARIO
 
-        // GET: Account/MiPerfil
+        // =====================================================================
+        // REEMPLAZA COMPLETO el método MiPerfil() en AccountController.cs
+        // Está dentro de:  #region PERFIL DE USUARIO
+        // Busca:           // GET: Account/MiPerfil
+        //                  [Authorize]
+        //                  public ActionResult MiPerfil()
+        // Reemplaza hasta el cierre de llave del método (antes de EditProfile)
+        // =====================================================================
+
         [Authorize]
         public ActionResult MiPerfil()
         {
@@ -588,10 +597,9 @@ namespace MVCMASCOTAS.Controllers
                     return RedirectToAction("Logout");
                 }
 
-                // Obtener estadísticas para mostrar en la vista
                 var userId = usuario.UsuarioId;
 
-                // Usar try-catch para cada estadística en caso de que las tablas no existan
+                // ── Contadores ────────────────────────────────────────────────────────────
                 try { ViewBag.TotalSolicitudes = db.SolicitudAdopcion.Count(s => s.UsuarioId == userId); }
                 catch { ViewBag.TotalSolicitudes = 0; }
 
@@ -610,81 +618,91 @@ namespace MVCMASCOTAS.Controllers
                 try { ViewBag.TotalReportes = db.ReportesRescate.Count(r => r.UsuarioReportante == userId); }
                 catch { ViewBag.TotalReportes = 0; }
 
-                // Pega este bloque en MiPerfil(), DESPUÉS de los ViewBag.Total... y ANTES de return View(usuario)
-
-                // ── Solicitudes ──────────────────────────────────────────────────────────
+                // ── Solicitudes ── usa clase concreta, NO objeto anónimo ──────────────────
                 try
                 {
                     ViewBag.MisSolicitudes = db.SolicitudAdopcion
                         .Where(s => s.UsuarioId == userId)
                         .OrderByDescending(s => s.FechaSolicitud)
                         .Take(10)
-                        .Select(s => new
+                        .ToList()
+                        .Select(s => new SolicitudPerfilViewModel
                         {
                             SolicitudId = s.SolicitudId,
-                            NombreMascota = s.Mascotas.Nombre,
-                            Especie = s.Mascotas.Especie,
-                            FechaSolicitud = s.FechaSolicitud.ToString(),   // string para evitar ?. en vista
-                            Estado = s.Estado
+                            NombreMascota = s.Mascotas != null ? s.Mascotas.Nombre : "Sin nombre",
+                            Especie = s.Mascotas != null ? s.Mascotas.Especie : "",
+                            FechaSolicitud = s.FechaSolicitud.HasValue
+                                                ? s.FechaSolicitud.Value.ToString("dd/MM/yyyy")
+                                                : "",
+                            Estado = s.Estado ?? ""
                         })
-                        .ToList<dynamic>();
+                        .ToList();
                 }
-                catch { ViewBag.MisSolicitudes = null; }
+                catch { ViewBag.MisSolicitudes = new List<SolicitudPerfilViewModel>(); }
 
-                // ── Donaciones ───────────────────────────────────────────────────────────
+                // ── Donaciones ────────────────────────────────────────────────────────────
                 try
                 {
                     ViewBag.MisDonaciones = db.Donaciones
                         .Where(d => d.UsuarioId == userId)
                         .OrderByDescending(d => d.FechaDonacion)
                         .Take(10)
-                        .Select(d => new
+                        .ToList()
+                        .Select(d => new DonacionPerfilViewModel
                         {
-                            TipoDonacion = d.TipoDonacion,
+                            TipoDonacion = d.TipoDonacion ?? "",
                             Monto = d.Monto,
-                            FechaDonacion = d.FechaDonacion.ToString(),
-                            Estado = d.Estado
+                            FechaDonacion = d.FechaDonacion.HasValue
+                                                ? d.FechaDonacion.Value.ToString("dd/MM/yyyy")
+                                                : "",
+                            Estado = d.Estado ?? ""
                         })
-                        .ToList<dynamic>();
+                        .ToList();
                 }
-                catch { ViewBag.MisDonaciones = null; }
+                catch { ViewBag.MisDonaciones = new List<DonacionPerfilViewModel>(); }
 
-                // ── Apadrinamientos ──────────────────────────────────────────────────────
+                // ── Apadrinamientos ───────────────────────────────────────────────────────
                 try
                 {
                     ViewBag.MisApadrinamientos = db.Apadrinamientos
                         .Where(a => a.UsuarioId == userId)
                         .OrderByDescending(a => a.FechaInicio)
                         .Take(10)
-                        .Select(a => new
+                        .ToList()
+                        .Select(a => new ApadrinamientoPerfilViewModel
                         {
-                            NombreMascota = a.Mascotas.Nombre,
-                            Especie = a.Mascotas.Especie,
+                            NombreMascota = a.Mascotas != null ? a.Mascotas.Nombre : "Sin nombre",
+                            Especie = a.Mascotas != null ? a.Mascotas.Especie : "",
                             MontoMensual = a.MontoMensual,
-                            FechaInicio = a.FechaInicio.ToString(),
-                            Estado = a.Estado
+                            FechaInicio = a.FechaInicio.HasValue
+                                                ? a.FechaInicio.Value.ToString("dd/MM/yyyy")
+                                                : "",
+                            Estado = a.Estado ?? ""
                         })
-                        .ToList<dynamic>();
+                        .ToList();
                 }
-                catch { ViewBag.MisApadrinamientos = null; }
+                catch { ViewBag.MisApadrinamientos = new List<ApadrinamientoPerfilViewModel>(); }
 
-                // ── Voluntariado ─────────────────────────────────────────────────────────
+                // ── Voluntariado ──────────────────────────────────────────────────────────
                 try
                 {
                     ViewBag.MisActividades = db.InscripcionesActividades
                         .Where(i => i.UsuarioId == userId)
                         .OrderByDescending(i => i.Actividades.FechaActividad)
                         .Take(10)
-                        .Select(i => new
+                        .ToList()
+                        .Select(i => new ActividadPerfilViewModel
                         {
-                            NombreActividad = i.Actividades.NombreActividad,
-                            TipoActividad = i.Actividades.TipoActividad,
-                            FechaActividad = i.Actividades.FechaActividad.ToString(),
-                            Estado = i.Estado
+                            NombreActividad = i.Actividades != null ? i.Actividades.NombreActividad : "",
+                            TipoActividad = i.Actividades != null ? i.Actividades.TipoActividad : "",
+                            FechaActividad = (i.Actividades != null && i.Actividades.FechaActividad != null)
+                                                  ? i.Actividades.FechaActividad.ToString("dd/MM/yyyy")
+                                                  : "",
+                            Estado = i.Estado ?? ""
                         })
-                        .ToList<dynamic>();
+                        .ToList();
                 }
-                catch { ViewBag.MisActividades = null; }
+                catch { ViewBag.MisActividades = new List<ActividadPerfilViewModel>(); }
 
                 // ── Pedidos ───────────────────────────────────────────────────────────────
                 try
@@ -693,16 +711,19 @@ namespace MVCMASCOTAS.Controllers
                         .Where(p => p.UsuarioId == userId)
                         .OrderByDescending(p => p.FechaPedido)
                         .Take(10)
-                        .Select(p => new
+                        .ToList()
+                        .Select(p => new PedidoPerfilViewModel
                         {
-                            NumeroPedido = p.NumeroPedido,
-                            FechaPedido = p.FechaPedido.ToString(),
+                            NumeroPedido = p.NumeroPedido ?? "",
+                            FechaPedido = p.FechaPedido.HasValue
+                                               ? p.FechaPedido.Value.ToString("dd/MM/yyyy")
+                                               : "",
                             Total = p.Total,
-                            Estado = p.Estado
+                            Estado = p.Estado ?? ""
                         })
-                        .ToList<dynamic>();
+                        .ToList();
                 }
-                catch { ViewBag.MisPedidos = null; }
+                catch { ViewBag.MisPedidos = new List<PedidoPerfilViewModel>(); }
 
                 // ── Reportes ──────────────────────────────────────────────────────────────
                 try
@@ -711,24 +732,27 @@ namespace MVCMASCOTAS.Controllers
                         .Where(r => r.UsuarioReportante == userId)
                         .OrderByDescending(r => r.FechaReporte)
                         .Take(5)
-                        .Select(r => new
+                        .ToList()
+                        .Select(r => new ReportePerfilViewModel
                         {
-                            TipoAnimal = r.TipoAnimal,
-                            UbicacionReporte = r.UbicacionReporte,
-                            FechaReporte = r.FechaReporte.ToString(),
-                            Estado = r.Estado
+                            TipoAnimal = r.TipoAnimal ?? "",
+                            UbicacionReporte = r.UbicacionReporte ?? "",
+                            FechaReporte = r.FechaReporte.HasValue
+                                                   ? r.FechaReporte.Value.ToString("dd/MM/yyyy")
+                                                   : "",
+                            Estado = r.Estado ?? ""
                         })
-                        .ToList<dynamic>();
+                        .ToList();
                 }
-                catch { ViewBag.MisReportes = null; }
+                catch { ViewBag.MisReportes = new List<ReportePerfilViewModel>(); }
 
-                // ⚡ NUEVO: Mostrar estado de seguridad
+                // ── Seguridad ─────────────────────────────────────────────────────────────
                 ViewBag.IntentosFallidos = usuario.IntentosFallidos ?? 0;
                 ViewBag.BloqueadoPermanentemente = usuario.BloqueadoPermanentemente ?? false;
                 ViewBag.FechaBloqueoTemporal = usuario.FechaBloqueoTemporal;
                 ViewBag.FechaDesbloqueo = usuario.FechaDesbloqueo;
 
-                // Obtener roles del usuario
+                // ── Roles ─────────────────────────────────────────────────────────────────
                 var roles = db.UsuariosRoles
                     .Where(ur => ur.UsuarioId == usuario.UsuarioId)
                     .Select(ur => ur.Roles.NombreRol)
@@ -738,15 +762,10 @@ namespace MVCMASCOTAS.Controllers
                 ViewBag.FechaRegistroFormateada = usuario.FechaRegistro?.ToString("dd/MM/yyyy HH:mm");
                 ViewBag.UltimoAccesoFormateado = usuario.UltimoAcceso?.ToString("dd/MM/yyyy HH:mm");
 
-                // Convertir imagen a Base64 para mostrar
-                if (usuario.ImagenPerfil != null && usuario.ImagenPerfil.Length > 0)
-                {
-                    ViewBag.ImagenBase64 = Convert.ToBase64String(usuario.ImagenPerfil);
-                }
-                else
-                {
-                    ViewBag.ImagenBase64 = null;
-                }
+                // ── Imagen ────────────────────────────────────────────────────────────────
+                ViewBag.ImagenBase64 = (usuario.ImagenPerfil != null && usuario.ImagenPerfil.Length > 0)
+                    ? Convert.ToBase64String(usuario.ImagenPerfil)
+                    : null;
 
                 return View(usuario);
             }

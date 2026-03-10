@@ -587,6 +587,7 @@
     <Compile Include="Models\ViewModels\MascotaDetalleViewModel.cs" />
     <Compile Include="Models\ViewModels\MascotaViewModel.cs" />
     <Compile Include="Models\ViewModels\PaginacionViewModel.cs" />
+    <Compile Include="Models\ViewModels\PerfilViewModels.cs" />
     <Compile Include="Models\ViewModels\ProductoViewModel.cs" />
     <Compile Include="Models\ViewModels\RegisterViewModel.cs" />
     <Compile Include="Models\ViewModels\RegistroAuditoriaViewModel.cs" />

@@ -1,7 +1,22 @@
 ﻿@model MVCMASCOTAS.Models.Usuarios
+@using MVCMASCOTAS.Models.ViewModels
 @{
     ViewBag.Title = "Mi Perfil - ADOPTAMANIA";
     Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var solicitudes = ViewBag.MisSolicitudes as IEnumerable<SolicitudPerfilViewModel> ?? new List<SolicitudPerfilViewModel>();
+    var donaciones = ViewBag.MisDonaciones as IEnumerable<DonacionPerfilViewModel> ?? new List<DonacionPerfilViewModel>();
+    var apadrinamientos = ViewBag.MisApadrinamientos as IEnumerable<ApadrinamientoPerfilViewModel> ?? new List<ApadrinamientoPerfilViewModel>();
+    var actividades = ViewBag.MisActividades as IEnumerable<ActividadPerfilViewModel> ?? new List<ActividadPerfilViewModel>();
+    var pedidos = ViewBag.MisPedidos as IEnumerable<PedidoPerfilViewModel> ?? new List<PedidoPerfilViewModel>();
+    var reportes = ViewBag.MisReportes as IEnumerable<ReportePerfilViewModel> ?? new List<ReportePerfilViewModel>();
+
+    int solicitudesPendientes = solicitudes.Count(s => s.Estado == "Pendiente" || s.Estado == "En evaluación");
+
+    // Pre-calcular para pasar como data-atributo HTML (evita errores de Razor dentro de scripts)
+    string mensajeNotif = solicitudesPendientes == 1
+        ? "Tienes 1 solicitud de adopción pendiente de revisión."
+        : "Tienes " + solicitudesPendientes.ToString() + " solicitudes pendientes de revisión.";
 }
 
 <section class="profile-hero py-4">
@@ -12,17 +27,20 @@
     </div>
 </section>
 
+@* Span oculto — pasa datos de Razor a JS sin mezclarlos dentro del bloque script *@
+<span id="js-notif" data-pendientes="@solicitudesPendientes" data-mensaje="@mensajeNotif" style="display:none;"></span>
+
 <section class="py-5 bg-beige">
     <div class="container">
+
+        @* ── Fila info usuario ─────────────────────────────────────────── *@
         <div class="row mb-4">
             <div class="col-md-4 text-center mb-4 mb-md-0">
                 <div class="profile-image-wrapper mx-auto mb-3">
                     @if (Model.ImagenPerfil != null && Model.ImagenPerfil.Length > 0)
                     {
                         <img src="data:image/jpeg;base64,@Convert.ToBase64String(Model.ImagenPerfil)"
-                             class="rounded-circle border-4 border-green"
-                             style="width: 180px; height: 180px; object-fit: cover;"
-                             alt="Foto de perfil">
+                             class="rounded-circle" style="width:180px;height:180px;object-fit:cover;" alt="Foto">
                     }
                     else
                     {
@@ -31,80 +49,67 @@
                         </div>
                     }
                 </div>
-
                 <h4 class="text-brown mb-2">@Model.NombreCompleto</h4>
-                <div class="mb-3">
-                    <p class="mb-1">
-                        <i class="fas fa-envelope text-green me-2"></i> @Model.Email
-                        @if (Model.EmailConfirmado == true)
-                        {
-                            <span class="badge bg-green text-white ms-2">Verificado</span>
-                        }
-                        else
-                        {
-                            <span class="badge bg-yellow text-brown ms-2">No verificado</span>
-                        }
-                    </p>
-                    <p class="mb-0">
-                        <i class="fas fa-phone text-green me-2"></i> @(Model.Telefono ?? "No registrado")
-                        @if (Model.TelefonoConfirmado == true)
-                        {
-                            <span class="badge bg-green text-white ms-2">Verificado</span>
-                        }
-                        else if (!string.IsNullOrEmpty(Model.Telefono))
-                        {
-                            <span class="badge bg-yellow text-brown ms-2">No verificado</span>
-                        }
-                    </p>
-                </div>
+                <p class="mb-1">
+                    <i class="fas fa-envelope text-green me-2"></i> @Model.Email
+                    @if (Model.EmailConfirmado == true)
+                    {<span class="badge bg-green text-white ms-2">Verificado</span> }
+                    else
+                    { <span class="badge bg-yellow text-brown ms-2">No verificado</span>}
+                </p>
+                <p class="mb-3">
+                    <i class="fas fa-phone text-green me-2"></i> @(Model.Telefono ?? "No registrado")
+                    @if (Model.TelefonoConfirmado == true)
+                    {<span class="badge bg-green text-white ms-2">Verificado</span> }
+                    else if (!string.IsNullOrEmpty(Model.Telefono))
+                    { <span class="badge bg-yellow text-brown ms-2">No verificado</span>}
+                </p>
                 <a href="@Url.Action("EditProfile", "Account")" class="btn btn-pink">
                     <i class="fas fa-edit me-2"></i> Editar Perfil
                 </a>
             </div>
-
             <div class="col-md-8">
                 <div class="row g-3">
-                    <div class="col-md-6 col-6">
+                    <div class="col-6">
                         <div class="info-card text-center">
                             <i class="fas fa-city text-green fa-2x mb-2"></i>
                             <div class="h4 text-brown mb-1">@(Model.Ciudad ?? "Quito")</div>
                             <div class="text-secondary">Ciudad</div>
                         </div>
                     </div>
-                    <div class="col-md-6 col-6">
+                    <div class="col-6">
                         <div class="info-card text-center">
                             <i class="fas fa-map-marker-alt text-green fa-2x mb-2"></i>
                             <div class="h4 text-brown mb-1">@(Model.Provincia ?? "Pichincha")</div>
                             <div class="text-secondary">Provincia</div>
                         </div>
                     </div>
-                    <div class="col-md-6 col-6">
+                    <div class="col-6">
                         <div class="info-card text-center">
                             <i class="fas fa-calendar-check text-green fa-2x mb-2"></i>
-                            <div class="h4 text-brown mb-1">@(Model.FechaRegistro.HasValue ? Model.FechaRegistro.Value.ToString("dd MMM yyyy") : "No registrada")</div>
+                            <div class="h4 text-brown mb-1">
+                                @(Model.FechaRegistro.HasValue ? Model.FechaRegistro.Value.ToString("dd MMM yyyy") : "No registrada")
+                            </div>
                             <div class="text-secondary">Miembro desde</div>
                         </div>
                     </div>
-                    <div class="col-md-6 col-6">
+                    <div class="col-6">
                         <div class="info-card text-center">
                             <i class="fas fa-user-check text-green fa-2x mb-2"></i>
                             <div class="h4 mb-1">
                                 @if (Model.Activo == true)
-                                {
-                                    <span class="text-green">Activo</span>
-                                }
+                                {<span class="text-green">Activo</span> }
                                 else
-                                {
-                                    <span class="text-brown">Inactivo</span>
-                                }
+                                { <span class="text-brown">Inactivo</span>}
                             </div>
-                            <div class="text-secondary">Estado de cuenta</div>
+                            <div class="text-secondary">Estado</div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
+        @* ── Stats ─────────────────────────────────────────────────────── *@
         <div class="row g-3 mb-5">
             <div class="col-md-3 col-6">
                 <div class="stat-card bg-pink-light">
@@ -136,82 +141,68 @@
             </div>
         </div>
 
+        @* ── Tabs ──────────────────────────────────────────────────────── *@
         <div class="tabs-card">
             <ul class="nav nav-tabs" id="profileTab" role="tablist">
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="solicitudes-tab" data-bs-toggle="tab" data-bs-target="#solicitudes" type="button" role="tab">
-                        <i class="fas fa-file-alt me-2"></i>Solicitudes (@ViewBag.TotalSolicitudes)
+                    <button class="nav-link active" id="tab-btn-solicitudes"
+                            data-bs-toggle="tab" data-bs-target="#tab-solicitudes" type="button" role="tab">
+                        <i class="fas fa-file-alt me-1"></i>Solicitudes (@ViewBag.TotalSolicitudes)
+                        @if (solicitudesPendientes > 0)
+                        {<span class="notif-badge ms-1">@solicitudesPendientes</span>}
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="donaciones-tab" data-bs-toggle="tab" data-bs-target="#donaciones" type="button" role="tab">
-                        <i class="fas fa-donate me-2"></i>Donaciones (@ViewBag.TotalDonaciones)
+                    <button class="nav-link" id="tab-btn-donaciones"
+                            data-bs-toggle="tab" data-bs-target="#tab-donaciones" type="button" role="tab">
+                        <i class="fas fa-donate me-1"></i>Donaciones (@ViewBag.TotalDonaciones)
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="apadrinamientos-tab" data-bs-toggle="tab" data-bs-target="#apadrinamientos" type="button" role="tab">
-                        <i class="fas fa-heart me-2"></i>Apadrinamientos (@ViewBag.TotalApadrinamientos)
+                    <button class="nav-link" id="tab-btn-apadrinamientos"
+                            data-bs-toggle="tab" data-bs-target="#tab-apadrinamientos" type="button" role="tab">
+                        <i class="fas fa-heart me-1"></i>Apadrinamientos (@ViewBag.TotalApadrinamientos)
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="voluntariado-tab" data-bs-toggle="tab" data-bs-target="#voluntariado" type="button" role="tab">
-                        <i class="fas fa-hands-helping me-2"></i>Voluntariado (@ViewBag.TotalVoluntariado)
+                    <button class="nav-link" id="tab-btn-voluntariado"
+                            data-bs-toggle="tab" data-bs-target="#tab-voluntariado" type="button" role="tab">
+                        <i class="fas fa-hands-helping me-1"></i>Voluntariado (@ViewBag.TotalVoluntariado)
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="pedidos-tab" data-bs-toggle="tab" data-bs-target="#pedidos" type="button" role="tab">
-                        <i class="fas fa-shopping-bag me-2"></i>Pedidos (@ViewBag.TotalPedidos)
+                    <button class="nav-link" id="tab-btn-pedidos"
+                            data-bs-toggle="tab" data-bs-target="#tab-pedidos" type="button" role="tab">
+                        <i class="fas fa-shopping-bag me-1"></i>Pedidos (@ViewBag.TotalPedidos)
                     </button>
                 </li>
             </ul>
+
             <div class="tab-content p-4" id="profileTabContent">
 
-                <div class="tab-pane fade show active" id="solicitudes" role="tabpanel">
-                    @{
-                        var solicitudes = ViewBag.MisSolicitudes as IEnumerable<dynamic>;
-                    }
-                    @if (solicitudes != null && solicitudes.Any())
+                @* SOLICITUDES *@
+                <div class="tab-pane fade show active" id="tab-solicitudes" role="tabpanel">
+                    @if (solicitudes.Any())
                     {
                         <div class="table-responsive">
                             <table class="table table-hover align-middle">
-                                <thead>
-                                    <tr>
-                                        <th>Mascota</th>
-                                        <th>Fecha</th>
-                                        <th>Estado</th>
-                                        <th>Acciones</th>
-                                    </tr>
-                                </thead>
+                                <thead><tr><th>Mascota</th><th>Fecha</th><th>Estado</th><th>Acciones</th></tr></thead>
                                 <tbody>
-                                    @foreach (var solicitud in solicitudes)
+                                    @foreach (SolicitudPerfilViewModel s in solicitudes)
                                     {
-                                        var badgeSolicitud = solicitud.Estado == "Aprobada" ? "bg-green text-white" :
-                                                             solicitud.Estado == "Rechazada" ? "bg-pink text-brown" :
-                                                                                              "bg-yellow text-brown";
+                                        string b = s.Estado == "Aprobada" ? "bg-green text-white" : s.Estado == "Rechazada" ? "bg-pink text-brown" : "bg-yellow text-brown";
                                         <tr>
-                                            <td>
-                                                <strong class="text-brown">@solicitud.NombreMascota</strong>
-                                                <br /><small class="text-secondary">@solicitud.Especie</small>
-                                            </td>
-                                            <td class="text-secondary">@solicitud.FechaSolicitud</td>
-                                            <td>
-                                                <span class="badge @badgeSolicitud px-3 py-2">@solicitud.Estado</span>
-                                            </td>
-                                            <td>
-                                                <a href="@Url.Action("DetallesSolicitud", "Adopcion", new { id = solicitud.SolicitudId })"
-                                                   class="btn btn-sm btn-outline-green">
-                                                    <i class="fas fa-eye me-1"></i> Ver
-                                                </a>
-                                            </td>
+                                            <td><strong class="text-brown">@s.NombreMascota</strong><br /><small class="text-secondary">@s.Especie</small></td>
+                                            <td class="text-secondary">@s.FechaSolicitud</td>
+                                            <td><span class="badge @b px-3 py-2">@s.Estado</span></td>
+                                            <td><a href="@Url.Action("Detalles", "Adopcion", new { id = s.SolicitudId })" class="btn btn-sm btn-outline-green"><i class="fas fa-eye me-1"></i>Ver</a></td>
                                         </tr>
                                     }
                                 </tbody>
                             </table>
                         </div>
                         <div class="text-center mt-3">
-                            <a href="@Url.Action("MisSolicitudes", "Adopcion")" class="btn btn-green text-white">
-                                <i class="fas fa-list me-2"></i> Ver todas
-                            </a>
+                            <a href="@Url.Action("MisSolicitudes", "Adopcion")" class="btn btn-green text-white"><i class="fas fa-list me-2"></i>Ver todas</a>
                         </div>
                     }
                     else
@@ -219,50 +210,32 @@
                         <div class="empty-state text-center py-5">
                             <i class="fas fa-file-alt fa-4x text-secondary mb-3"></i>
                             <h5 class="text-brown">No tienes solicitudes de adopcion</h5>
-                            <p class="text-secondary mb-3">Comienza adoptando una mascota</p>
-                            <a href="@Url.Action("Index", "Mascotas")" class="btn btn-green text-white">
-                                <i class="fas fa-paw me-2"></i> Ver mascotas
-                            </a>
+                            <p class="text-secondary">Comienza adoptando una mascota</p>
+                            <a href="@Url.Action("Index", "Mascotas")" class="btn btn-green text-white"><i class="fas fa-paw me-2"></i>Ver mascotas</a>
                         </div>
                     }
                 </div>
 
-                <div class="tab-pane fade" id="donaciones" role="tabpanel">
-                    @{
-                        var donaciones = ViewBag.MisDonaciones as IEnumerable<dynamic>;
-                    }
-                    @if (donaciones != null && donaciones.Any())
+                @* DONACIONES *@
+                <div class="tab-pane fade" id="tab-donaciones" role="tabpanel">
+                    @if (donaciones.Any())
                     {
                         <div class="table-responsive">
                             <table class="table table-hover align-middle">
-                                <thead>
-                                    <tr>
-                                        <th>Tipo</th>
-                                        <th>Monto</th>
-                                        <th>Fecha</th>
-                                        <th>Estado</th>
-                                    </tr>
-                                </thead>
+                                <thead><tr><th>Tipo</th><th>Monto</th><th>Fecha</th><th>Estado</th></tr></thead>
                                 <tbody>
-                                    @foreach (var donacion in donaciones)
+                                    @foreach (DonacionPerfilViewModel d in donaciones)
                                     {
-                                        var badgeDonacion = donacion.Estado == "Completada" ? "bg-green text-white" : "bg-yellow text-brown";
+                                        string b = d.Estado == "Completada" ? "bg-green text-white" : "bg-yellow text-brown";
                                         <tr>
-                                            <td><i class="fas fa-gift text-green me-2"></i><span class="text-brown">@donacion.TipoDonacion</span></td>
-                                            <td><strong class="text-green">$@donacion.Monto</strong></td>
-                                            <td class="text-secondary">@donacion.FechaDonacion</td>
-                                            <td>
-                                                <span class="badge @badgeDonacion px-3 py-2">@donacion.Estado</span>
-                                            </td>
+                                            <td><i class="fas fa-gift text-green me-2"></i><span class="text-brown">@d.TipoDonacion</span></td>
+                                            <td><strong class="text-green">$@d.Monto</strong></td>
+                                            <td class="text-secondary">@d.FechaDonacion</td>
+                                            <td><span class="badge @b px-3 py-2">@d.Estado</span></td>
                                         </tr>
                                     }
                                 </tbody>
                             </table>
-                        </div>
-                        <div class="text-center mt-3">
-                            <a href="@Url.Action("MisDonaciones", "Donaciones")" class="btn btn-green text-white">
-                                <i class="fas fa-history me-2"></i> Ver historial
-                            </a>
                         </div>
                     }
                     else
@@ -270,53 +243,31 @@
                         <div class="empty-state text-center py-5">
                             <i class="fas fa-donate fa-4x text-secondary mb-3"></i>
                             <h5 class="text-brown">No tienes donaciones registradas</h5>
-                            <p class="text-secondary mb-3">Tu apoyo es importante</p>
-                            <a href="@Url.Action("Create", "Donaciones")" class="btn btn-green text-white">
-                                <i class="fas fa-hand-holding-heart me-2"></i> Donar
-                            </a>
+                            <a href="@Url.Action("Create", "Donaciones")" class="btn btn-green text-white"><i class="fas fa-hand-holding-heart me-2"></i>Donar</a>
                         </div>
                     }
                 </div>
 
-                <div class="tab-pane fade" id="apadrinamientos" role="tabpanel">
-                    @{
-                        var apadrinamientos = ViewBag.MisApadrinamientos as IEnumerable<dynamic>;
-                    }
-                    @if (apadrinamientos != null && apadrinamientos.Any())
+                @* APADRINAMIENTOS *@
+                <div class="tab-pane fade" id="tab-apadrinamientos" role="tabpanel">
+                    @if (apadrinamientos.Any())
                     {
                         <div class="table-responsive">
                             <table class="table table-hover align-middle">
-                                <thead>
-                                    <tr>
-                                        <th>Mascota</th>
-                                        <th>Monto Mensual</th>
-                                        <th>Inicio</th>
-                                        <th>Estado</th>
-                                    </tr>
-                                </thead>
+                                <thead><tr><th>Mascota</th><th>Monto Mensual</th><th>Inicio</th><th>Estado</th></tr></thead>
                                 <tbody>
-                                    @foreach (var apadrinamiento in apadrinamientos)
+                                    @foreach (ApadrinamientoPerfilViewModel a in apadrinamientos)
                                     {
-                                        var badgeApad = apadrinamiento.Estado == "Activo" ? "bg-green text-white" : "bg-light-mint text-brown";
+                                        string b = a.Estado == "Activo" ? "bg-green text-white" : "bg-light-mint text-brown";
                                         <tr>
-                                            <td>
-                                                <strong class="text-brown">@apadrinamiento.NombreMascota</strong>
-                                                <br /><small class="text-secondary">@apadrinamiento.Especie</small>
-                                            </td>
-                                            <td><strong class="text-green">$@apadrinamiento.MontoMensual</strong></td>
-                                            <td class="text-secondary">@apadrinamiento.FechaInicio</td>
-                                            <td>
-                                                <span class="badge @badgeApad px-3 py-2">@apadrinamiento.Estado</span>
-                                            </td>
+                                            <td><strong class="text-brown">@a.NombreMascota</strong><br /><small class="text-secondary">@a.Especie</small></td>
+                                            <td><strong class="text-green">$@a.MontoMensual</strong></td>
+                                            <td class="text-secondary">@a.FechaInicio</td>
+                                            <td><span class="badge @b px-3 py-2">@a.Estado</span></td>
                                         </tr>
                                     }
                                 </tbody>
                             </table>
-                        </div>
-                        <div class="text-center mt-3">
-                            <a href="@Url.Action("MisApadrinamientos", "Donaciones")" class="btn btn-green text-white">
-                                <i class="fas fa-heart me-2"></i> Ver apadrinamientos
-                            </a>
                         </div>
                     }
                     else
@@ -324,51 +275,30 @@
                         <div class="empty-state text-center py-5">
                             <i class="fas fa-heart fa-4x text-secondary mb-3"></i>
                             <h5 class="text-brown">No tienes mascotas apadrinadas</h5>
-                            <p class="text-secondary mb-3">Apoya mensualmente a una mascota</p>
-                            <a href="@Url.Action("Index", "Mascotas")" class="btn btn-green text-white">
-                                <i class="fas fa-heart me-2"></i> Apadrinar
-                            </a>
+                            <a href="@Url.Action("Index", "Mascotas")" class="btn btn-green text-white"><i class="fas fa-heart me-2"></i>Apadrinar</a>
                         </div>
                     }
                 </div>
 
-                <div class="tab-pane fade" id="voluntariado" role="tabpanel">
-                    @{
-                        var actividades = ViewBag.MisActividades as IEnumerable<dynamic>;
-                    }
-                    @if (actividades != null && actividades.Any())
+                @* VOLUNTARIADO *@
+                <div class="tab-pane fade" id="tab-voluntariado" role="tabpanel">
+                    @if (actividades.Any())
                     {
                         <div class="table-responsive">
                             <table class="table table-hover align-middle">
-                                <thead>
-                                    <tr>
-                                        <th>Actividad</th>
-                                        <th>Fecha</th>
-                                        <th>Estado</th>
-                                    </tr>
-                                </thead>
+                                <thead><tr><th>Actividad</th><th>Fecha</th><th>Estado</th></tr></thead>
                                 <tbody>
-                                    @foreach (var actividad in actividades)
+                                    @foreach (ActividadPerfilViewModel a in actividades)
                                     {
-                                        var badgeAct = actividad.Estado == "Confirmada" ? "bg-green text-white" : "bg-yellow text-brown";
+                                        string b = a.Estado == "Confirmada" ? "bg-green text-white" : "bg-yellow text-brown";
                                         <tr>
-                                            <td>
-                                                <strong class="text-brown">@actividad.NombreActividad</strong>
-                                                <br /><small class="text-secondary">@actividad.TipoActividad</small>
-                                            </td>
-                                            <td class="text-secondary">@actividad.FechaActividad</td>
-                                            <td>
-                                                <span class="badge @badgeAct px-3 py-2">@actividad.Estado</span>
-                                            </td>
+                                            <td><strong class="text-brown">@a.NombreActividad</strong><br /><small class="text-secondary">@a.TipoActividad</small></td>
+                                            <td class="text-secondary">@a.FechaActividad</td>
+                                            <td><span class="badge @b px-3 py-2">@a.Estado</span></td>
                                         </tr>
                                     }
                                 </tbody>
                             </table>
-                        </div>
-                        <div class="text-center mt-3">
-                            <a href="@Url.Action("MisActividades", "Voluntariado")" class="btn btn-green text-white">
-                                <i class="fas fa-calendar-check me-2"></i> Ver actividades
-                            </a>
                         </div>
                     }
                     else
@@ -376,50 +306,31 @@
                         <div class="empty-state text-center py-5">
                             <i class="fas fa-hands-helping fa-4x text-secondary mb-3"></i>
                             <h5 class="text-brown">No estas inscrito en actividades</h5>
-                            <p class="text-secondary mb-3">Unete a nuestro voluntariado</p>
-                            <a href="@Url.Action("Index", "Actividades")" class="btn btn-green text-white">
-                                <i class="fas fa-user-plus me-2"></i> Ver actividades
-                            </a>
+                            <a href="@Url.Action("Index", "Actividades")" class="btn btn-green text-white"><i class="fas fa-user-plus me-2"></i>Ver actividades</a>
                         </div>
                     }
                 </div>
 
-                <div class="tab-pane fade" id="pedidos" role="tabpanel">
-                    @{
-                        var pedidos = ViewBag.MisPedidos as IEnumerable<dynamic>;
-                    }
-                    @if (pedidos != null && pedidos.Any())
+                @* PEDIDOS *@
+                <div class="tab-pane fade" id="tab-pedidos" role="tabpanel">
+                    @if (pedidos.Any())
                     {
                         <div class="table-responsive">
                             <table class="table table-hover align-middle">
-                                <thead>
-                                    <tr>
-                                        <th>N Pedido</th>
-                                        <th>Fecha</th>
-                                        <th>Total</th>
-                                        <th>Estado</th>
-                                    </tr>
-                                </thead>
+                                <thead><tr><th>N Pedido</th><th>Fecha</th><th>Total</th><th>Estado</th></tr></thead>
                                 <tbody>
-                                    @foreach (var pedido in pedidos)
+                                    @foreach (PedidoPerfilViewModel p in pedidos)
                                     {
-                                        var badgePedido = pedido.Estado == "Entregado" ? "bg-green text-white" : "bg-yellow text-brown";
+                                        string b = p.Estado == "Entregado" ? "bg-green text-white" : "bg-yellow text-brown";
                                         <tr>
-                                            <td><strong class="text-brown">@pedido.NumeroPedido</strong></td>
-                                            <td class="text-secondary">@pedido.FechaPedido</td>
-                                            <td><strong class="text-green">$@pedido.Total</strong></td>
-                                            <td>
-                                                <span class="badge @badgePedido px-3 py-2">@pedido.Estado</span>
-                                            </td>
+                                            <td><strong class="text-brown">@p.NumeroPedido</strong></td>
+                                            <td class="text-secondary">@p.FechaPedido</td>
+                                            <td><strong class="text-green">$@p.Total</strong></td>
+                                            <td><span class="badge @b px-3 py-2">@p.Estado</span></td>
                                         </tr>
                                     }
                                 </tbody>
                             </table>
-                        </div>
-                        <div class="text-center mt-3">
-                            <a href="@Url.Action("MisPedidos", "Tienda")" class="btn btn-green text-white">
-                                <i class="fas fa-shopping-bag me-2"></i> Ver pedidos
-                            </a>
                         </div>
                     }
                     else
@@ -427,10 +338,7 @@
                         <div class="empty-state text-center py-5">
                             <i class="fas fa-shopping-bag fa-4x text-secondary mb-3"></i>
                             <h5 class="text-brown">No tienes pedidos registrados</h5>
-                            <p class="text-secondary mb-3">Visita nuestra tienda solidaria</p>
-                            <a href="@Url.Action("Index", "Tienda")" class="btn btn-green text-white">
-                                <i class="fas fa-store me-2"></i> Ir a la tienda
-                            </a>
+                            <a href="@Url.Action("Index", "Tienda")" class="btn btn-green text-white"><i class="fas fa-store me-2"></i>Ir a la tienda</a>
                         </div>
                     }
                 </div>
@@ -438,75 +346,56 @@
             </div>
         </div>
 
+        @* ── Seguridad + Reportes ──────────────────────────────────────── *@
         <div class="row mt-5 g-3">
             <div class="col-md-6">
                 <div class="security-card p-4">
-                    <h5 class="text-brown mb-3"><i class="fas fa-shield-alt text-green me-2"></i> Seguridad de la Cuenta</h5>
+                    <h5 class="text-brown mb-3"><i class="fas fa-shield-alt text-green me-2"></i>Seguridad de la Cuenta</h5>
                     <div class="list-group list-group-flush">
                         <a href="@Url.Action("ChangePassword", "Account")" class="list-group-item d-flex justify-content-between align-items-center">
-                            <span><i class="fas fa-key text-green me-2"></i> Cambiar Contrasena</span>
+                            <span><i class="fas fa-key text-green me-2"></i>Cambiar Contrasena</span>
                             <i class="fas fa-chevron-right text-secondary"></i>
                         </a>
                         <div class="list-group-item d-flex justify-content-between align-items-center">
-                            <span><i class="fas fa-envelope @(Model.EmailConfirmado == true ? "text-green" : "text-brown") me-2"></i> Email Confirmado</span>
+                            <span><i class="fas fa-envelope @(Model.EmailConfirmado == true ? "text-green" : "text-brown") me-2"></i>Email</span>
                             @if (Model.EmailConfirmado == true)
-                            {
-                                <span class="badge bg-green text-white px-3 py-2">Verificado</span>
-                            }
+                            {<span class="badge bg-green text-white px-3 py-2">Verificado</span> }
                             else
-                            {
-                                <span class="badge bg-yellow text-brown px-3 py-2">Pendiente</span>
-                            }
+                            { <span class="badge bg-yellow text-brown px-3 py-2">Pendiente</span>}
                         </div>
                         <div class="list-group-item d-flex justify-content-between align-items-center">
-                            <span><i class="fas fa-phone @(Model.TelefonoConfirmado == true ? "text-green" : "text-secondary") me-2"></i> Telefono Confirmado</span>
+                            <span><i class="fas fa-phone @(Model.TelefonoConfirmado == true ? "text-green" : "text-secondary") me-2"></i>Telefono</span>
                             @if (Model.TelefonoConfirmado == true)
-                            {
-                                <span class="badge bg-green text-white px-3 py-2">Verificado</span>
-                            }
+                            {<span class="badge bg-green text-white px-3 py-2">Verificado</span> }
                             else if (!string.IsNullOrEmpty(Model.Telefono))
-                            {
-                                <span class="badge bg-yellow text-brown px-3 py-2">Pendiente</span>
-                            }
+                            { <span class="badge bg-yellow text-brown px-3 py-2">Pendiente</span> }
                             else
-                            {
-                                <span class="badge bg-light-mint text-brown px-3 py-2">No registrado</span>
-                            }
+                            { <span class="badge bg-light-mint text-brown px-3 py-2">No registrado</span>}
                         </div>
                     </div>
                 </div>
             </div>
             <div class="col-md-6">
                 <div class="security-card p-4">
-                    <h5 class="text-brown mb-3"><i class="fas fa-bullhorn text-green me-2"></i> Mis Reportes (@ViewBag.TotalReportes)</h5>
-                    @{
-                        var reportes = ViewBag.MisReportes as IEnumerable<dynamic>;
-                    }
-                    @if (reportes != null && reportes.Any())
+                    <h5 class="text-brown mb-3"><i class="fas fa-bullhorn text-green me-2"></i>Mis Reportes (@ViewBag.TotalReportes)</h5>
+                    @if (reportes.Any())
                     {
                         <div class="list-group list-group-flush">
-                            @foreach (var reporte in reportes)
+                            @foreach (ReportePerfilViewModel r in reportes)
                             {
-                                var badgeReporte = reporte.Estado == "Pendiente" ? "bg-yellow text-brown" :
-                                                  reporte.Estado == "Rescatado" ? "bg-green text-white" :
-                                                                                   "bg-light-mint text-brown";
+                                string br = r.Estado == "Pendiente" ? "bg-yellow text-brown" :
+                                            r.Estado == "Rescatado" ? "bg-green text-white" : "bg-light-mint text-brown";
                                 <div class="list-group-item">
                                     <div class="d-flex w-100 justify-content-between">
-                                        <h6 class="mb-1 text-brown"><i class="fas fa-paw text-green me-2"></i>@reporte.TipoAnimal</h6>
-                                        <small class="text-secondary">@reporte.FechaReporte</small>
+                                        <h6 class="mb-1 text-brown"><i class="fas fa-paw text-green me-2"></i>@r.TipoAnimal</h6>
+                                        <small class="text-secondary">@r.FechaReporte</small>
                                     </div>
-                                    <p class="mb-1 text-secondary">@reporte.UbicacionReporte</p>
-                                    <small>
-                                        <span class="badge @badgeReporte">@reporte.Estado</span>
-                                    </small>
+                                    <p class="mb-1 text-secondary small">@r.UbicacionReporte</p>
+                                    <span class="badge @br">@r.Estado</span>
                                 </div>
                             }
                         </div>
-                        <div class="text-center mt-3">
-                            <a href="@Url.Action("MisReportes", "Rescate")" class="btn btn-sm btn-outline-green">
-                                <i class="fas fa-list me-2"></i> Ver todos
-                            </a>
-                        </div>
+                        @* Enlace "Ver todos" desactivado hasta corregir vista MisReportes *@
                     }
                     else
                     {
@@ -514,13 +403,14 @@
                             <i class="fas fa-exclamation-triangle fa-3x text-secondary mb-2"></i>
                             <p class="text-brown">No has realizado reportes de rescate</p>
                             <a href="@Url.Action("ReportarRescate", "Rescate")" class="btn btn-sm btn-green text-white">
-                                <i class="fas fa-plus me-2"></i> Reportar rescate
+                                <i class="fas fa-plus me-2"></i>Reportar rescate
                             </a>
                         </div>
                     }
                 </div>
             </div>
         </div>
+
     </div>
 </section>
 
@@ -538,7 +428,7 @@
             border-radius: 50%;
             overflow: hidden;
             border: 4px solid var(--verde-menta);
-            box-shadow: 0 8px 20px rgba(151,199,139,0.2);
+            box-shadow: 0 8px 20px rgba(151,199,139,.2);
         }
 
         .profile-placeholder {
@@ -551,29 +441,27 @@
         .info-card {
             background: white;
             border-radius: 20px;
-            padding: 1.5rem 0.5rem;
-            box-shadow: 0 8px 20px rgba(151,199,139,0.1);
+            padding: 1.5rem .5rem;
+            box-shadow: 0 8px 20px rgba(151,199,139,.1);
             height: 100%;
-            transition: transform 0.3s;
+            transition: transform .3s;
         }
 
             .info-card:hover {
                 transform: translateY(-5px);
-                box-shadow: 0 12px 25px rgba(151,199,139,0.2);
             }
 
         .stat-card {
             border-radius: 24px;
-            padding: 2rem 0.5rem;
+            padding: 2rem .5rem;
             text-align: center;
-            box-shadow: 0 8px 20px rgba(151,199,139,0.15);
-            transition: transform 0.3s;
+            box-shadow: 0 8px 20px rgba(151,199,139,.15);
+            transition: transform .3s;
             height: 100%;
         }
 
             .stat-card:hover {
                 transform: translateY(-5px);
-                box-shadow: 0 15px 30px rgba(151,199,139,0.25);
             }
 
         .bg-pink-light {
@@ -601,7 +489,7 @@
             background: white;
             border-radius: 24px;
             overflow: hidden;
-            box-shadow: 0 15px 35px rgba(151,199,139,0.15);
+            box-shadow: 0 15px 35px rgba(151,199,139,.15);
         }
 
         .nav-tabs {
@@ -614,24 +502,36 @@
                 color: var(--texto-oscuro);
                 font-weight: 500;
                 border-radius: 12px 12px 0 0;
-                padding: 1rem 1.5rem;
-                margin-right: 0.25rem;
-                transition: background-color 0.2s;
+                padding: 1rem 1.2rem;
+                margin-right: .25rem;
+                transition: background-color .2s;
             }
 
                 .nav-tabs .nav-link:hover {
                     background-color: var(--rosado-claro);
-                    color: var(--texto-oscuro);
                 }
 
                 .nav-tabs .nav-link.active {
-                    background-color: var(--verde-menta);
-                    color: white;
+                    background-color: var(--verde-menta) !important;
+                    color: white !important;
                 }
 
                     .nav-tabs .nav-link.active i {
-                        color: white;
+                        color: white !important;
                     }
+
+        .notif-badge {
+            display: inline-block;
+            background: #e74c3c;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: .7rem;
+            font-weight: 700;
+            line-height: 20px;
+            text-align: center;
+        }
 
         .tab-content {
             padding: 2rem;
@@ -644,11 +544,11 @@
         }
 
         .table-hover tbody tr:hover {
-            background-color: rgba(151,199,139,0.05);
+            background-color: rgba(151,199,139,.05);
         }
 
         .badge {
-            font-size: 0.85rem;
+            font-size: .85rem;
             font-weight: 500;
             border-radius: 30px;
         }
@@ -656,7 +556,7 @@
         .security-card {
             background: white;
             border-radius: 24px;
-            box-shadow: 0 8px 20px rgba(151,199,139,0.1);
+            box-shadow: 0 8px 20px rgba(151,199,139,.1);
             height: 100%;
         }
 
@@ -671,18 +571,13 @@
                 border-bottom: none;
             }
 
-        .list-group-item-action:hover {
-            background-color: var(--fondo-beige);
-            border-radius: 12px;
-        }
-
         .btn-green {
             background-color: var(--verde-menta);
             border: none;
             border-radius: 50px;
-            padding: 0.6rem 1.8rem;
+            padding: .6rem 1.8rem;
             font-weight: 500;
-            transition: all 0.3s;
+            transition: all .3s;
         }
 
             .btn-green:hover {
@@ -694,10 +589,10 @@
             background-color: var(--rosado-claro);
             border: none;
             border-radius: 50px;
-            padding: 0.6rem 1.8rem;
+            padding: .6rem 1.8rem;
             font-weight: 500;
-            transition: all 0.3s;
             color: var(--texto-oscuro);
+            transition: all .3s;
         }
 
             .btn-pink:hover {
@@ -710,9 +605,9 @@
             background: transparent;
             color: var(--verde-menta);
             border-radius: 50px;
-            padding: 0.4rem 0.8rem;
+            padding: .4rem .8rem;
             font-weight: 500;
-            transition: all 0.3s;
+            transition: all .3s;
         }
 
             .btn-outline-green:hover {
@@ -720,22 +615,18 @@
                 color: white;
             }
 
-            .btn-outline-green.btn-sm {
-                padding: 0.3rem 0.7rem;
-            }
+        .empty-state {
+            color: var(--texto-oscuro);
+        }
 
         @@media (max-width: 768px) {
             .nav-tabs .nav-link {
-                padding: 0.75rem 1rem;
-                font-size: 0.9rem;
+                padding: .6rem .5rem;
+                font-size: .78rem;
             }
 
             .tab-content {
                 padding: 1rem;
-            }
-
-            .stat-card {
-                padding: 1.5rem 0.5rem;
             }
 
             .counter {
@@ -749,31 +640,58 @@
     @Scripts.Render("~/bundles/jqueryval")
     <script>
         $(document).ready(function () {
+
             // Contador animado
             $('.counter').each(function () {
-                var $this = $(this);
-                var currentValue = parseInt($this.text());
-                if (!isNaN(currentValue) && currentValue > 0) {
-                    $({ countNum: 0 }).animate({ countNum: currentValue }, {
-                        duration: 1500,
-                        easing: 'swing',
-                        step: function () { $this.text(Math.floor(this.countNum)); },
-                        complete: function () { $this.text(this.countNum); }
+                var $el = $(this), n = parseInt($el.text());
+                if (!isNaN(n) && n > 0) {
+                    $({ c: 0 }).animate({ c: n }, {
+                        duration: 1500, easing: 'swing',
+                        step: function () { $el.text(Math.floor(this.c)); },
+                        complete: function () { $el.text(n); }
                     });
                 }
             });
 
+            // ── Notificaciones ────────────────────────────────────────────────
+            // Leemos los datos desde el atributo HTML — esto evita por completo
+            // el problema de Razor generando código JS mal formado dentro de <script>
+            var $n = $('#js-notif');
+            var pendientes = parseInt($n.data('pendientes') || '0');
+            var mensaje    = String($n.data('mensaje') || '');
+
+            if (pendientes > 0 && typeof Swal !== 'undefined') {
+                setTimeout(function () {
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'Solicitudes activas',
+                        text: mensaje,
+                        confirmButtonColor: '#97C78B',
+                        confirmButtonText: 'Ver solicitudes',
+                        showCancelButton: true,
+                        cancelButtonText: 'Cerrar'
+                    }).then(function (r) {
+                        if (r.isConfirmed) {
+                            var btn = document.getElementById('tab-btn-solicitudes');
+                            if (btn) {
+                                btn.click();
+                                setTimeout(function () {
+                                    window.scrollTo({ top: btn.offsetTop - 80, behavior: 'smooth' });
+                                }, 300);
+                            }
+                        }
+                    });
+                }, 1500);
+            }
+
+            // Mensajes TempData
             @if (TempData["SuccessMessage"] != null)
             {
-                <text>
-                Swal.fire({ icon: 'success', title: 'Exito!', text: '@TempData["SuccessMessage"]', confirmButtonColor: '#97C78B' });
-                </text>
+                <text>if (typeof Swal !== 'undefined') Swal.fire({ icon: 'success', title: 'Exito!', text: '@Html.Raw(HttpUtility.JavaScriptStringEncode(TempData["SuccessMessage"].ToString()))', confirmButtonColor: '#97C78B' });</text>
             }
             @if (TempData["ErrorMessage"] != null)
             {
-                <text>
-                Swal.fire({ icon: 'error', title: 'Error', text: '@TempData["ErrorMessage"]', confirmButtonColor: '#97C78B' });
-                </text>
+                <text>if (typeof Swal !== 'undefined') Swal.fire({ icon: 'error', title: 'Error', text: '@Html.Raw(HttpUtility.JavaScriptStringEncode(TempData["ErrorMessage"].ToString()))', confirmButtonColor: '#97C78B' });</text>
             }
         });
     </script>

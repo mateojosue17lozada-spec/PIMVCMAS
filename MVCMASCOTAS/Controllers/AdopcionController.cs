@@ -3,9 +3,11 @@ using MVCMASCOTAS.Models;
 using MVCMASCOTAS.Models.ViewModels;
 using System;
 using System.Collections.Generic;
+using System.Configuration;        // AÑADIDO para leer configuración
 using System.Data.Entity;
 using System.Data.Entity.Validation;
 using System.Linq;
+using System.Threading.Tasks;      // AÑADIDO para async/await
 using System.Web.Mvc;
 
 namespace MVCMASCOTAS.Controllers
@@ -128,7 +130,7 @@ namespace MVCMASCOTAS.Controllers
         // POST: Adopcion/Solicitar
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Solicitar(int mascotaId, FormularioAdopcionViewModel model)
+        public async Task<ActionResult> Solicitar(int mascotaId, FormularioAdopcionViewModel model) // CAMBIADO a async Task<>
         {
             if (!ModelState.IsValid)
             {
@@ -157,16 +159,13 @@ namespace MVCMASCOTAS.Controllers
             }
 
             // Crear solicitud
-            // Crear solicitud - CORREGIDO
             var solicitud = new SolicitudAdopcion
             {
                 MascotaId = mascotaId,
                 UsuarioId = usuario.UsuarioId,
                 FechaSolicitud = DateTime.Now,
                 Estado = "Pendiente",
-                // CAMPO OBLIGATORIO QUE FALTABA
                 EstadoAdopcion = "No iniciada",
-                // OTROS CAMPOS PARA EVITAR NULL
                 PuntajeEvaluacion = 0,
                 ResultadoEvaluacion = "Pendiente"
             };
@@ -174,73 +173,58 @@ namespace MVCMASCOTAS.Controllers
             db.SolicitudAdopcion.Add(solicitud);
             db.SaveChanges();
 
-            // 🔥 CREAR FORMULARIO CON VALORES EXPLÍCITOS
-            // 🔥 CREAR FORMULARIO CON VALORES EXPLÍCITOS - VERSIÓN ACTUALIZADA CON ENUMS
-            // CREAR FORMULARIO CON VALORES EXPLÍCITOS - VERSIÓN CORREGIDA
+            // Crear formulario
             var formulario = new FormularioAdopcionDetalle
             {
                 SolicitudId = solicitud.SolicitudId,
 
-                // Campos de vivienda
                 TipoVivienda = model.TipoVivienda ?? "",
                 ViviendaPropia = model.ViviendaPropia,
                 TieneJardin = model.TieneJardin,
                 TamanioJardin = model.TamanioJardin ?? "",
                 PermisoMascotas = model.PermisoMascotas,
 
-                // Composición del hogar
                 PersonasEnCasa = model.PersonasEnCasa > 0 ? (int?)model.PersonasEnCasa : null,
                 HayNinios = model.HayNinios,
                 EdadesNinios = model.EdadesNinios ?? "",
 
-                // Experiencia con mascotas
                 ExperienciaPreviaConMascotas = model.ExperienciaPreviaConMascotas,
                 DetalleExperiencia = model.DetalleExperiencia ?? "",
                 TieneMascotasActualmente = model.TieneMascotasActualmente,
 
-                // Mascotas actuales
                 CantidadPerros = model.CantidadPerros > 0 ? (int?)model.CantidadPerros : null,
                 CantidadGatos = model.CantidadGatos > 0 ? (int?)model.CantidadGatos : null,
                 OtrasMascotas = model.OtrasMascotas ?? "",
                 MascotasEsterilizadas = model.MascotasEsterilizadas,
 
-                // Disponibilidad
                 TiempoDisponibleDiario = model.TiempoDisponibleDiario ?? "",
                 QuienCuidaraMascota = model.QuienCuidaraMascota?.ToString() ?? "",
 
-                // Preguntas
                 MotivoAdopcion = model.MotivoAdopcion?.ToString() ?? "",
                 QuePasaSiCambiaResidencia = model.QuePasaSiCambiaResidencia?.ToString() ?? "",
                 QuePasaSiProblemasComportamiento = model.QuePasaSiProblemasComportamiento?.ToString() ?? "",
 
-                // Referencias
                 VeterinarioReferencia = model.VeterinarioReferencia?.ToString() ?? "",
                 ReferenciaPersonal1 = model.ReferenciaPersonal1 ?? "",
                 TelefonoReferencia1 = model.TelefonoReferencia1 ?? "",
                 ReferenciaPersonal2 = model.ReferenciaPersonal2 ?? "",
                 TelefonoReferencia2 = model.TelefonoReferencia2 ?? "",
 
-                // ⚠️ CAMPOS BOOLEANOS OBLIGATORIOS (NOT NULL en BD)
-                AceptaEsterilizacion = model.AceptaEsterilizacion,  // Debe venir true/false del formulario
-                AceptaVisitasSeguimiento = model.AceptaVisitasSeguimiento,  // Debe venir true/false
-                AceptaCondicionesLOBA = model.AceptaCondicionesLOBA,  // Debe venir true/false
-                AceptaDevolucionSiNoPuedeAtender = model.AceptaDevolucionSiNoPuedeAtender,  // Debe venir true/false
+                AceptaEsterilizacion = model.AceptaEsterilizacion,
+                AceptaVisitasSeguimiento = model.AceptaVisitasSeguimiento,
+                AceptaCondicionesLOBA = model.AceptaCondicionesLOBA,
+                AceptaDevolucionSiNoPuedeAtender = model.AceptaDevolucionSiNoPuedeAtender,
 
                 FechaLlenado = DateTime.Now
             };
 
             try
             {
-                // 🔥 DESACTIVAR VALIDACIÓN TEMPORALMENTE PARA VER EL ERROR
                 db.Configuration.ValidateOnSaveEnabled = false;
-
                 db.FormularioAdopcionDetalle.Add(formulario);
                 db.SaveChanges();
-
-                // Volver a activar
                 db.Configuration.ValidateOnSaveEnabled = true;
 
-                // Evaluar automáticamente
                 int puntaje = EvaluarSolicitud(formulario);
                 string resultado = puntaje >= 80 ? "Apto" : puntaje >= 60 ? "Revisión Manual" : "No Apto";
 
@@ -252,6 +236,45 @@ namespace MVCMASCOTAS.Controllers
 
                 AuditoriaHelper.RegistrarAccion("Solicitud Adopción", "Adopcion",
                     $"Solicitud creada para mascota ID: {mascotaId}, Resultado: {resultado}", usuario.UsuarioId);
+
+                // ========== ENVÍO DE NOTIFICACIONES POR EMAIL ==========
+                bool emailHabilitado = bool.Parse(ConfigurationManager.AppSettings["EmailHabilitado"] ?? "false");
+                if (emailHabilitado)
+                {
+                    try
+                    {
+                        // Notificar al solicitante
+                        await EmailHelper.SendAdoptionRequestReceivedAsync(
+                            usuario.Email,
+                            usuario.NombreCompleto,
+                            mascotaVerificacion.Nombre
+                        );
+
+                        // Notificar a los administradores
+                        var adminEmails = db.Usuarios
+                            .Where(u => u.UsuariosRoles.Any(r => r.Roles.NombreRol == "Administrador"))
+                            .Select(u => u.Email)
+                            .ToList();
+
+                        string detallesUrl = Url.Action("Detalles", "Adopcion", new { id = solicitud.SolicitudId }, Request.Url.Scheme);
+                        string mensajeAdmin = $"Se ha recibido una nueva solicitud de <strong>{usuario.NombreCompleto}</strong> para adoptar a <strong>{mascotaVerificacion.Nombre}</strong>.<br/>" +
+                                              $"<a href='{detallesUrl}'>Ver solicitud</a>";
+
+                        foreach (var adminEmail in adminEmails)
+                        {
+                            await EmailHelper.SendNotificationAsync(
+                                adminEmail,
+                                "Nueva solicitud de adopción",
+                                mensajeAdmin
+                            );
+                        }
+                    }
+                    catch (Exception emailEx)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"[Email] Error al enviar notificación: {emailEx.Message}");
+                    }
+                }
+                // =======================================================
 
                 if (resultado == "Apto")
                 {
@@ -266,7 +289,6 @@ namespace MVCMASCOTAS.Controllers
             }
             catch (Exception ex)
             {
-                // 🔥 CAPTURAR EL ERROR REAL
                 System.Diagnostics.Debug.WriteLine("=== ERROR DETALLADO ===");
                 System.Diagnostics.Debug.WriteLine($"Mensaje: {ex.Message}");
                 System.Diagnostics.Debug.WriteLine($"StackTrace: {ex.StackTrace}");
@@ -276,7 +298,6 @@ namespace MVCMASCOTAS.Controllers
                     System.Diagnostics.Debug.WriteLine($"InnerException: {ex.InnerException.Message}");
                 }
 
-                // Si es DbEntityValidationException, mostrar todos los errores
                 if (ex is DbEntityValidationException dbEx)
                 {
                     var errors = new List<string>();
@@ -289,8 +310,6 @@ namespace MVCMASCOTAS.Controllers
                             System.Diagnostics.Debug.WriteLine(error);
                         }
                     }
-
-                    // Mostrar en la interfaz
                     TempData["ErrorMessage"] = "Error de validación: " + string.Join(" | ", errors);
                 }
                 else
@@ -298,7 +317,6 @@ namespace MVCMASCOTAS.Controllers
                     TempData["ErrorMessage"] = $"Error: {ex.Message}";
                 }
 
-                // Recargar la vista
                 var mascota = db.Mascotas.Find(mascotaId);
                 ViewBag.NombreMascota = mascota?.Nombre ?? "Mascota";
                 ViewBag.MascotaId = mascotaId;
@@ -315,36 +333,29 @@ namespace MVCMASCOTAS.Controllers
         {
             int puntaje = 0;
 
-            // Vivienda (20 puntos)
             if (formulario.ViviendaPropia == true) puntaje += 10;
             if (formulario.TieneJardin == true) puntaje += 5;
             if (formulario.PermisoMascotas == true) puntaje += 5;
 
-            // Experiencia (20 puntos)
             if (formulario.ExperienciaPreviaConMascotas == true) puntaje += 15;
             if (formulario.TieneMascotasActualmente == true && formulario.MascotasEsterilizadas == true) puntaje += 5;
 
-            // Disponibilidad (20 puntos)
             if (formulario.TiempoDisponibleDiario == "4+ horas" || formulario.TiempoDisponibleDiario == "Todo el día") puntaje += 20;
             else if (formulario.TiempoDisponibleDiario == "2-4 horas") puntaje += 15;
             else if (formulario.TiempoDisponibleDiario == "1-2 horas") puntaje += 10;
             else if (formulario.TiempoDisponibleDiario == "Menos de 1 hora") puntaje += 5;
 
-            // Quién cuidará (10 puntos)
             if (!string.IsNullOrEmpty(formulario.QuienCuidaraMascota) && formulario.QuienCuidaraMascota.Length > 20) puntaje += 10;
 
-            // Compromisos legales (20 puntos)
             if (formulario.AceptaEsterilizacion == true) puntaje += 5;
             if (formulario.AceptaVisitasSeguimiento == true) puntaje += 5;
             if (formulario.AceptaCondicionesLOBA == true) puntaje += 5;
             if (formulario.AceptaDevolucionSiNoPuedeAtender == true) puntaje += 5;
 
-            // Compromiso (20 puntos)
             if (!string.IsNullOrEmpty(formulario.MotivoAdopcion) && formulario.MotivoAdopcion.Length > 50) puntaje += 10;
             if (!string.IsNullOrEmpty(formulario.QuePasaSiCambiaResidencia)) puntaje += 5;
             if (!string.IsNullOrEmpty(formulario.QuePasaSiProblemasComportamiento)) puntaje += 5;
 
-            // Referencias (10 puntos adicionales)
             if (!string.IsNullOrEmpty(formulario.VeterinarioReferencia)) puntaje += 5;
             if (!string.IsNullOrEmpty(formulario.ReferenciaPersonal1) && !string.IsNullOrEmpty(formulario.TelefonoReferencia1)) puntaje += 5;
 
@@ -393,28 +404,23 @@ namespace MVCMASCOTAS.Controllers
                     return RedirectToAction("MisSolicitudes");
                 }
 
-                // Verificar que la solicitud pertenezca al usuario
                 if (solicitud.UsuarioId != usuario.UsuarioId)
                 {
                     TempData["ErrorMessage"] = "No tienes permiso para cancelar esta solicitud.";
                     return RedirectToAction("MisSolicitudes");
                 }
 
-                // Verificar que la solicitud esté en estado Pendiente o En evaluación
                 if (solicitud.Estado != "Pendiente" && solicitud.Estado != "En evaluación")
                 {
                     TempData["ErrorMessage"] = "Solo se pueden cancelar solicitudes en estado Pendiente o En evaluación.";
                     return RedirectToAction("MisSolicitudes");
                 }
 
-                // ✅ SANITIZAR MOTIVO - CORREGIDO
                 if (string.IsNullOrWhiteSpace(motivoCancelacion))
                     motivoCancelacion = "Cancelada por el usuario";
                 else
                     motivoCancelacion = SanitizarString(motivoCancelacion, 500);
 
-                // Actualizar estado
-                string estadoAnterior = solicitud.Estado;
                 solicitud.Estado = "Cancelada";
                 solicitud.EstadoAdopcion = "Cancelada";
                 solicitud.MotivoRechazo = motivoCancelacion;
@@ -423,7 +429,6 @@ namespace MVCMASCOTAS.Controllers
 
                 db.SaveChanges();
 
-                // Auditoría
                 AuditoriaHelper.RegistrarAccion("Cancelar Solicitud", "Adopcion",
                     $"Solicitud #{solicitud.SolicitudId} cancelada por el usuario. Mascota: {solicitud.MascotaId}, Motivo: {motivoCancelacion}",
                     usuario.UsuarioId);
@@ -469,7 +474,7 @@ namespace MVCMASCOTAS.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Administrador,Veterinario")]
-        public ActionResult EvaluarSolicitud(int SolicitudId, int? PuntajeEvaluacion,
+        public async Task<ActionResult> EvaluarSolicitud(int SolicitudId, int? PuntajeEvaluacion, // CAMBIADO a async Task<>
                                              string ResultadoEvaluacion, string Estado,
                                              string Observaciones, string MotivoRechazo,
                                              string action = "")
@@ -483,7 +488,6 @@ namespace MVCMASCOTAS.Controllers
                     return RedirectToAction("SolicitudAdopcion", "Admin");
                 }
 
-                // Procesar acción específica
                 if (!string.IsNullOrEmpty(action))
                 {
                     if (action == "aprobar")
@@ -498,7 +502,6 @@ namespace MVCMASCOTAS.Controllers
                     }
                 }
 
-                // Asignar valores
                 solicitud.PuntajeEvaluacion = PuntajeEvaluacion;
                 solicitud.ResultadoEvaluacion = ResultadoEvaluacion;
                 solicitud.Estado = Estado;
@@ -506,14 +509,12 @@ namespace MVCMASCOTAS.Controllers
                 solicitud.MotivoRechazo = MotivoRechazo;
                 solicitud.FechaEvaluacion = DateTime.Now;
 
-                // Obtener usuario evaluador
                 var usuarioEvaluador = db.Usuarios.FirstOrDefault(u => u.Email == User.Identity.Name);
                 if (usuarioEvaluador != null)
                 {
                     solicitud.EvaluadoPor = usuarioEvaluador.UsuarioId;
                 }
 
-                // Actualizar estado de mascota si se aprueba
                 if (Estado == "Aprobada" && solicitud.MascotaId > 0)
                 {
                     var mascota = db.Mascotas.Find(solicitud.MascotaId);
@@ -523,10 +524,8 @@ namespace MVCMASCOTAS.Controllers
                     }
                 }
 
-                // Guardar cambios PRIMERO
                 db.SaveChanges();
 
-                // Crear evaluación detallada (opcional, si no existe)
                 var evaluacionExistente = db.EvaluacionAdopcion
                     .FirstOrDefault(e => e.SolicitudId == SolicitudId);
 
@@ -545,7 +544,6 @@ namespace MVCMASCOTAS.Controllers
                     db.SaveChanges();
                 }
 
-                // Auditoría
                 if (usuarioEvaluador != null)
                 {
                     AuditoriaHelper.RegistrarAccion("Evaluación Adopción", "Adopcion",
@@ -553,12 +551,43 @@ namespace MVCMASCOTAS.Controllers
                         usuarioEvaluador.UsuarioId);
                 }
 
+                // ========== ENVÍO DE NOTIFICACIONES POR EMAIL ==========
+                bool emailHabilitado = bool.Parse(ConfigurationManager.AppSettings["EmailHabilitado"] ?? "false");
+                if (emailHabilitado && solicitud.Usuarios != null)
+                {
+                    try
+                    {
+                        string nombreMascota = solicitud.Mascotas?.Nombre ?? "la mascota";
+                        if (Estado == "Aprobada")
+                        {
+                            await EmailHelper.SendAdoptionApprovedAsync(
+                                solicitud.Usuarios.Email,
+                                solicitud.Usuarios.NombreCompleto,
+                                nombreMascota
+                            );
+                        }
+                        else if (Estado == "Rechazada")
+                        {
+                            await EmailHelper.SendAdoptionRejectedAsync(
+                                solicitud.Usuarios.Email,
+                                solicitud.Usuarios.NombreCompleto,
+                                nombreMascota,
+                                MotivoRechazo ?? "No se especificó motivo"
+                            );
+                        }
+                    }
+                    catch (Exception emailEx)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"[Email] Error al notificar cambio de estado: {emailEx.Message}");
+                    }
+                }
+                // =======================================================
+
                 TempData["SuccessMessage"] = $"Evaluación guardada exitosamente. Estado: {Estado}";
                 return RedirectToAction("SolicitudAdopcion", "Admin");
             }
             catch (Exception ex)
             {
-                // Manejar errores de validación específicos
                 var errorMsg = ex.Message;
                 if (ex is System.Data.Entity.Validation.DbEntityValidationException dbEx)
                 {
@@ -621,7 +650,6 @@ namespace MVCMASCOTAS.Controllers
                     return RedirectToAction("Seguimiento", new { id = SolicitudId });
                 }
 
-                // Procesar fotos
                 string fotosEvidencia = "";
                 if (Fotos != null && Fotos.Length > 0)
                 {
@@ -804,25 +832,33 @@ namespace MVCMASCOTAS.Controllers
         }
 
         // ============================================================================
+        // NUEVO: ACCIÓN HIJA PARA EL CONTADOR DE SOLICITUDES PENDIENTES
+        // ============================================================================
+        [ChildActionOnly]
+        public ActionResult _SolicitudesPendientesCount()
+        {
+            if (!User.IsInRole("Administrador"))
+                return Content(""); // No mostrar nada si no es admin
+
+            int count = db.SolicitudAdopcion.Count(s => s.Estado == "Pendiente");
+            return PartialView("_SolicitudesPendientesCount", count);
+        }
+
+        // ============================================================================
         // MÉTODOS AUXILIARES PRIVADOS
         // ============================================================================
 
-        /// <summary>
-        /// Método auxiliar para sanitizar strings y prevenir XSS
-        /// </summary>
         private string SanitizarString(string input, int maxLength = 0)
         {
             if (string.IsNullOrEmpty(input))
                 return input;
 
-            // Eliminar caracteres peligrosos para prevenir XSS
             string sanitized = input.Replace("<", "&lt;")
                                     .Replace(">", "&gt;")
                                     .Replace("\"", "&quot;")
                                     .Replace("'", "&#39;")
                                     .Replace("&", "&amp;");
 
-            // Truncar si excede la longitud máxima
             if (maxLength > 0 && sanitized.Length > maxLength)
                 sanitized = sanitized.Substring(0, maxLength);
 
