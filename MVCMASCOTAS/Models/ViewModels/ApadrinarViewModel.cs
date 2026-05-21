@@ -5,6 +5,8 @@ using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 
 namespace MVCMASCOTAS.Models.ViewModels
+
+    //sdfghjkkjhgfd
 {
     // Para la vista Index - Lista de mascotas
     public class MascotaResumenViewModel
